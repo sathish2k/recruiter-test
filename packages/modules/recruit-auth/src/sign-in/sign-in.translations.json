@@ -1,0 +1,24 @@
+{
+  "title": "Sign in with email",
+  "subtitle": "Source, screen, and schedule across every client — from one workspace.",
+  "submit": "Get Started",
+  "forgot": "Forgot password?",
+  "footerText": "New to Troy?",
+  "footerLink": "Start a free trial",
+  "email": {
+    "label": "Email",
+    "placeholder": "Email",
+    "errors": {
+      "required": "Email is required",
+      "format": "Enter a valid work email"
+    }
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "Password",
+    "errors": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters"
+    }
+  }
+}

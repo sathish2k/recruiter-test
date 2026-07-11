@@ -1,0 +1,495 @@
+<title>AI Recruiter — Engine Playground</title>
+<style>
+  :root {
+    --ink: #1b1830; --muted: #6a6785; --faint: #9793b0;
+    --paper: #f5f4fb; --card: #ffffff; --line: #e6e2f3; --line-2: #d9d4ec;
+    --indigo: #4f46e5; --indigo-ink: #3730a3; --indigo-soft: #ecebfd;
+    --sky: #0ea5e9;
+    --code-bg: #17141f; --code-ink: #e9e6f7; --code-faint: #b8b2d6; --code-line: #2c2640;
+    --good: #0d9668; --good-bg: #e6f6ef; --good-ink: #075e42;
+    --miss: #e11d48; --miss-bg: #fdeaef; --miss-ink: #9f1239;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --r: 10px;
+  }
+  * { box-sizing: border-box; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .page {
+    background: var(--paper); color: var(--ink); font-family: var(--sans);
+    min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  header.masthead { border-bottom: 1px solid var(--line); padding-bottom: 1.75rem; margin-bottom: 2rem; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--indigo); margin: 0 0 .6rem;
+  }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -.02em; text-wrap: balance; }
+  .lede { color: var(--muted); font-size: 16px; max-width: 62ch; margin: 0; }
+  .lede code { font-family: var(--mono); font-size: 13px; background: var(--indigo-soft); color: var(--indigo-ink); padding: 1px 6px; border-radius: 5px; }
+
+  h2 { font-size: 15px; font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin: 2.75rem 0 1rem; font-weight: 600; }
+
+  .urlbar { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+  .urlfield { flex: 1 1 320px; display: flex; align-items: center; background: var(--card); border: 1px solid var(--line-2); border-radius: var(--r); padding: 0 6px 0 14px; transition: border-color .15s, box-shadow .15s; }
+  .urlfield:focus-within { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-soft); }
+  .urlfield .host { font-family: var(--mono); font-size: 13px; color: var(--faint); user-select: none; }
+  .urlfield input { flex: 1; border: 0; outline: 0; background: transparent; font-family: var(--mono); font-size: 15px; color: var(--ink); padding: 12px 8px; min-width: 60px; }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-family: var(--mono); font-size: 13px; cursor: pointer; user-select: none;
+    background: var(--card); border: 1px solid var(--line-2); color: var(--ink);
+    padding: 8px 12px; border-radius: 8px; transition: all .12s;
+  }
+  .chip:hover { border-color: var(--indigo); color: var(--indigo-ink); }
+  .chip.active { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+  .chip:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin: 1.5rem 0 0; flex-wrap: wrap; }
+  .stage { flex: 1 1 0; min-width: 150px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); }
+  .stage:first-child { border-radius: var(--r) 0 0 var(--r); }
+  .stage:last-child { border-radius: 0 var(--r) var(--r) 0; }
+  .stage + .stage { border-left: 0; }
+  .stage .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin: 0 0 6px; }
+  .stage .v { font-family: var(--mono); font-size: 13px; color: var(--ink); word-break: break-word; }
+  .arrow { align-self: center; color: var(--line-2); font-size: 18px; padding: 0 2px; }
+
+  .split { display: grid; grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); gap: 16px; margin-top: 16px; }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .panel .head { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding: 11px 14px; border-bottom: 1px solid var(--line); background: #fbfaff; }
+  .panel .body { padding: 14px; }
+
+  .branch { display: flex; flex-direction: column; gap: 6px; }
+  .node { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; }
+  .node .rid { background: var(--indigo-soft); color: var(--indigo-ink); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+  .node .rpath { color: var(--muted); }
+  .node.leaf .rid { background: var(--indigo); color: #fff; }
+  .node .indent { color: var(--line-2); }
+
+  .tree { display: flex; flex-direction: column; gap: 8px; }
+  .layer { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 13px; }
+  .badge { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; font-weight: 600; }
+  .badge.core { background: #e4effe; color: #0b4a94; }
+  .badge.auth { background: #fdeefb; color: #9333a6; }
+  .badge.page { background: var(--good-bg); color: var(--good-ink); }
+  .layer .cfgid { color: var(--ink); }
+  .muted-line { color: var(--faint); font-family: var(--mono); font-size: 12.5px; }
+
+  .why { margin-top: 14px; border-left: 3px solid var(--indigo); background: #fbfaff; padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13.5px; color: var(--muted); }
+  .why.miss { border-left-color: var(--miss); background: var(--miss-bg); color: var(--miss-ink); }
+  .why b { color: var(--ink); font-weight: 600; }
+  .why.miss b { color: var(--miss-ink); }
+  .why code { font-family: var(--mono); font-size: 12.5px; }
+
+  /* --- the rendered-screen mock --- */
+  .screen .body { padding: 14px; background: #efedf7; }
+  .browser { border-radius: 9px; overflow: hidden; border: 1px solid var(--line-2); background: var(--card); box-shadow: 0 1px 2px rgba(27,24,48,.06); }
+  .chrome { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #edeaf6; border-bottom: 1px solid var(--line); }
+  .dots { display: flex; gap: 5px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: #cdc8e0; display: block; }
+  .addr { flex: 1; font-family: var(--mono); font-size: 11.5px; color: var(--muted); background: var(--card); border-radius: 6px; padding: 3px 9px; border: 1px solid var(--line); }
+  .viewport { height: 300px; display: flex; }
+
+  .mock-core { display: flex; width: 100%; }
+  .mock-side { width: 128px; background: #17141f; padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
+  .mock-side .brand { color: #fff; font-weight: 600; font-size: 12px; margin-bottom: 4px; font-family: var(--sans); }
+  .region-tag { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .mock-main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .mock-top { height: 46px; border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 14px; gap: 10px; background: var(--card); }
+  .mock-main { flex: 1; padding: 16px; overflow: auto; background: var(--paper); }
+
+  .mock-auth { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+  .mock-auth-card { width: 240px; }
+
+  .cblock { border: 1.5px dashed var(--line-2); border-radius: 8px; padding: 12px; background: var(--card); margin-bottom: 10px; }
+  .cblock:last-child { margin-bottom: 0; }
+  .cblock .ctype { font-family: var(--mono); font-size: 12px; color: var(--indigo-ink); font-weight: 600; }
+  .cblock .cid { font-family: var(--mono); font-size: 10.5px; color: var(--faint); display: block; margin-top: 2px; }
+  .bar-item { font-family: var(--mono); font-size: 11px; color: var(--muted); background: #f0eefa; border-radius: 5px; padding: 4px 8px; }
+  .side-item { color: #cbc6e2; background: #241f33; }
+  .outlet-frame { border: 1.5px solid var(--indigo); border-radius: 8px; padding: 4px; position: relative; }
+  .outlet-lbl { position: absolute; top: -9px; left: 8px; background: var(--paper); color: var(--indigo); font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 0 5px; }
+
+  .mock-404 { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--paper); gap: 4px; }
+  .mock-404 .big { font-family: var(--mono); font-size: 34px; font-weight: 700; color: var(--miss); }
+  .mock-404 .sm { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  details.editor { margin-top: 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--card); overflow: hidden; }
+  details.editor > summary { cursor: pointer; padding: 12px 16px; font-family: var(--mono); font-size: 13px; color: var(--ink); list-style: none; display: flex; align-items: center; gap: 8px; }
+  details.editor > summary::-webkit-details-marker { display: none; }
+  details.editor > summary .tw { transition: transform .15s; color: var(--faint); }
+  details.editor[open] > summary .tw { transform: rotate(90deg); }
+  .editor-body { padding: 0 16px 16px; }
+  .editor-body textarea { width: 100%; height: 220px; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; color: var(--code-ink); background: var(--code-bg); border: 1px solid var(--code-line); border-radius: 8px; padding: 12px; resize: vertical; tab-size: 2; }
+  .editor-body textarea:focus { outline: 2px solid var(--indigo); outline-offset: 1px; }
+  .editor-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .editor-actions button { font-family: var(--sans); font-size: 13px; cursor: pointer; border: 1px solid var(--line-2); background: var(--card); padding: 7px 14px; border-radius: 8px; color: var(--ink); }
+  .editor-actions button.primary { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+  .editor-actions button:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+  .parse-msg { font-family: var(--mono); font-size: 12px; }
+  .parse-msg.ok { color: var(--good); }
+  .parse-msg.err { color: var(--miss); }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .rc { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+  .rc h3 { margin: 0 0 4px; font-size: 15px; }
+  .rc h3 code { font-family: var(--mono); font-size: 13px; color: var(--indigo-ink); }
+  .rc p { margin: 0; color: var(--muted); font-size: 13.5px; }
+  .rc .tag { display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--indigo); background: var(--indigo-soft); padding: 2px 7px; border-radius: 5px; margin-bottom: 8px; }
+  .rc pre { margin: 10px 0 0; background: var(--code-bg); color: var(--code-ink); border-radius: 7px; padding: 10px 12px; overflow-x: auto; font-family: var(--mono); font-size: 11.5px; line-height: 1.5; }
+  .rc pre .c { color: var(--code-faint); }
+  .rc pre .s { color: #a5b4fc; }
+
+  footer.foot { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--faint); font-size: 13px; }
+  footer.foot code { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="page">
+  <h2 class="sr-only">Interactive playground: type a URL and see how the config-driven engine matches a route branch, assembles a render tree, and renders layouts and pages.</h2>
+  <div class="wrap">
+    <header class="masthead">
+      <p class="eyebrow">@recruit/sdk · config-driven engine</p>
+      <h1>How a URL becomes a screen</h1>
+      <p class="lede">Type a path below. The engine matches it to a <code>Route</code> branch, collects the branch's layouts and the leaf's page into a render tree, then wraps the page in each layout shell. This runs the real <code>findRouteBySlug</code> and <code>generateRenderTree</code> logic in your browser.</p>
+    </header>
+
+    <div class="urlbar">
+      <label class="urlfield" aria-label="URL path">
+        <span class="host">localhost:3000</span>
+        <input id="url" type="text" value="/" spellcheck="false" autocomplete="off" />
+      </label>
+      <div class="presets" id="presets" role="group" aria-label="Example paths"></div>
+    </div>
+
+    <div class="pipeline" id="pipeline"></div>
+
+    <div class="split">
+      <div class="panel">
+        <div class="head">resolution</div>
+        <div class="body">
+          <div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Matched branch</div>
+          <div class="branch" id="branch"></div>
+          <div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px">Render tree</div>
+          <div class="tree" id="tree"></div>
+          <div id="why"></div>
+        </div>
+      </div>
+      <div class="panel screen">
+        <div class="head">rendered screen</div>
+        <div class="body">
+          <div class="browser">
+            <div class="chrome"><span class="dots"><i></i><i></i><i></i></span><span class="addr" id="addr">/</span></div>
+            <div class="viewport" id="viewport"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <details class="editor">
+      <summary><span class="tw">▸</span> Edit the config — change routes &amp; configurations, watch matching update</summary>
+      <div class="editor-body">
+        <textarea id="config" spellcheck="false"></textarea>
+        <div class="editor-actions">
+          <button class="primary" id="apply">Apply changes</button>
+          <button id="reset">Reset</button>
+          <span class="parse-msg ok" id="parsemsg">valid</span>
+        </div>
+      </div>
+    </details>
+
+    <h2>Layout templates</h2>
+    <div class="cards">
+      <div class="rc">
+        <span class="tag">template: core</span>
+        <h3><code>MuiCoreLayout</code></h3>
+        <p>The app shell. Regions bucketed by <code>position</code>: <code>left</code> sidebar, <code>top</code> appbar, the scrollable <code>main</code> outlet, <code>bottom</code>.</p>
+      </div>
+      <div class="rc">
+        <span class="tag">template: auth</span>
+        <h3><code>MuiAuthLayout</code></h3>
+        <p>A bare, centered column for sign-in and public screens. No sidebar; optional <code>top</code> / <code>bottom</code> around the outlet.</p>
+      </div>
+      <div class="rc">
+        <span class="tag">template: custom</span>
+        <h3>Inline shell</h3>
+        <p>No template — the layout renders its own <code>elements</code> (grid/stack) with an <code>outlet</code> marking where the page goes.</p>
+      </div>
+    </div>
+
+    <h2>Element types</h2>
+    <div class="cards">
+      <div class="rc"><h3><code>outlet</code></h3><p>Where the matched page renders inside a layout. Every layout needs exactly one.</p></div>
+      <div class="rc"><h3><code>component</code></h3><p>A registered component, by <code>componentType</code>. Gets <code>configuration</code>, <code>data</code>, <code>translation</code>, <code>schema</code>, <code>currentRoute</code> injected.</p></div>
+      <div class="rc"><h3><code>slot</code></h3><p>A named region filled by a route whose <code>slot</code> matches — drives a panel from the URL, independent of the page.</p></div>
+      <div class="rc"><h3><code>configuration</code></h3><p>Embeds another Configuration by id — reuse a block across pages.</p></div>
+    </div>
+
+    <h2>Matching rules</h2>
+    <div class="cards">
+      <div class="rc">
+        <span class="tag">the root gotcha</span>
+        <h3>Root carries layout + page</h3>
+        <p>The empty path (<code>/</code>) returns the first <code>path:"/"</code> route and does <b style="color:var(--ink)">not</b> descend into children. Put both <code>layout</code> and <code>page</code> on the root route.</p>
+        <pre><span class="c">// ✅ right</span>
+{ id:<span class="s">"Root"</span>, path:<span class="s">"/"</span>,
+  layout:<span class="s">"Core"</span>, page:<span class="s">"Home"</span> }</pre>
+      </div>
+      <div class="rc">
+        <span class="tag">specificity</span>
+        <h3>Static beats param</h3>
+        <p>A static segment scores <code>+2</code>, a param (<code>:id</code>) scores <code>+1</code>. So <code>candidates/list</code> wins over <code>candidates/:id</code> for the slug <code>list</code>. Ties break toward more segments consumed.</p>
+      </div>
+      <div class="rc">
+        <span class="tag">404</span>
+        <h3>Every slug must be consumed</h3>
+        <p>A branch matches only if some route consumes each remaining slug. No branch → <code>null</code> → the renderer shows <code>404 - Page Not Found</code>.</p>
+      </div>
+    </div>
+
+    <footer class="foot">
+      Mirrors <code>packages/recruit-sdk/src/engine/{router,renderer,orchestrator}.tsx</code>. Full authoring guide in <code>doc/routing.md</code> and <code>doc/layouts.md</code>.
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  var DEFAULT = {
+    routes: [
+      { id: "Root", path: "/", layout: "Core.Layout", page: "Home.Page", children: ["Candidates", "Roles"] },
+      { id: "Candidates", path: "candidates", page: "Candidates.Page", children: ["CandidateDetail"] },
+      { id: "CandidateDetail", path: ":id", page: "CandidateDetail.Page", children: [] },
+      { id: "Roles", path: "roles", page: "Roles.Page", children: [] },
+      { id: "SignIn", path: "signin", layout: "Auth.Layout", page: "SignIn.Page", children: [] }
+    ],
+    configurations: [
+      { id: "Core.Layout", template: "core", elements: [
+        { id: "sidebar", type: "component", componentType: "Nav.Sidebar", position: "left" },
+        { id: "appbar", type: "component", componentType: "App.Bar", position: "top" },
+        { id: "core-outlet", type: "outlet", position: "main" }
+      ] },
+      { id: "Auth.Layout", template: "auth", elements: [
+        { id: "auth-outlet", type: "outlet", position: "main" }
+      ] },
+      { id: "Home.Page", elements: [{ id: "welcome", type: "component", componentType: "Home.Welcome" }] },
+      { id: "Candidates.Page", elements: [{ id: "cand-table", type: "component", componentType: "Candidates.Table" }] },
+      { id: "CandidateDetail.Page", elements: [
+        { id: "cand-head", type: "component", componentType: "Candidate.Header" },
+        { id: "cand-tabs", type: "component", componentType: "Candidate.Tabs" }
+      ] },
+      { id: "Roles.Page", elements: [{ id: "roles-grid", type: "component", componentType: "Roles.Grid" }] },
+      { id: "SignIn.Page", elements: [{ id: "signin-form", type: "component", componentType: "Auth.SignInForm" }] }
+    ]
+  };
+  var PRESETS = ["/", "/candidates", "/candidates/42", "/roles", "/signin", "/nope"];
+
+  var routes = DEFAULT.routes, configurations = DEFAULT.configurations;
+
+  // --- faithful port of engine/router.ts + engine/renderer.ts ---
+  function findBestMatchBranch(slugs, candidateRoutes, routeMap) {
+    var matches = [];
+    for (var r = 0; r < candidateRoutes.length; r++) {
+      var route = candidateRoutes[r];
+      var seg = route.path.split("/").filter(function (p) { return p.length > 0; });
+      if (seg.length > slugs.length) continue;
+      var ok = true, spec = 0;
+      for (var i = 0; i < seg.length; i++) {
+        if (seg[i].charAt(0) === ":") spec += 1;
+        else if (seg[i] === slugs[i]) spec += 2;
+        else { ok = false; break; }
+      }
+      if (ok) matches.push({ route: route, spec: spec, consumed: seg.length });
+    }
+    if (!matches.length) return null;
+    matches.sort(function (a, b) { return a.spec !== b.spec ? b.spec - a.spec : b.consumed - a.consumed; });
+    var best = matches[0];
+    var rest = slugs.slice(best.consumed);
+    var childIds = best.route.children || [];
+    if (rest.length === 0) return [best.route];
+    if (childIds.length) {
+      var childRoutes = childIds.map(function (id) { return routeMap.get(id); }).filter(Boolean);
+      var childBranch = findBestMatchBranch(rest, childRoutes, routeMap);
+      if (childBranch) return [best.route].concat(childBranch);
+    }
+    return null;
+  }
+  function findRouteBySlug(slugParts, routeList) {
+    var main = routeList.filter(function (r) { return !r.slot; });
+    if (!slugParts || slugParts.length === 0 || (slugParts.length === 1 && slugParts[0] === "")) {
+      var root = main.find(function (r) { return r.path === "/"; });
+      return root ? [root] : null;
+    }
+    var map = new Map(routeList.map(function (r) { return [r.id, r]; }));
+    var top = main.filter(function (r) { return !main.some(function (p) { return (p.children || []).indexOf(r.id) >= 0; }); });
+    return findBestMatchBranch(slugParts, top, map);
+  }
+  function generateRenderTree(matched, configs, allRoutes, slugParts) {
+    if (!matched || !matched.length) return null;
+    var cm = new Map(configs.map(function (c) { return [c.id, c]; }));
+    var tree = { layouts: [], page: null, slots: {} };
+    matched.forEach(function (route) { if (route.layout && cm.get(route.layout)) tree.layouts.push(cm.get(route.layout)); });
+    var last = matched[matched.length - 1];
+    if (last && last.page) tree.page = cm.get(last.page) || null;
+    return tree;
+  }
+
+  function parseUrl(url) {
+    var clean = (url || "").trim().replace(/^\/+/, "").replace(/\/+$/, "");
+    return clean === "" ? [] : clean.split("/");
+  }
+
+  var esc = function (s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); };
+
+  // --- rendering ---
+  function renderPipeline(slugParts, matched, tree) {
+    var slugTxt = slugParts.length ? "[" + slugParts.map(function (s) { return '"' + esc(s) + '"'; }).join(", ") + "]" : "[]";
+    var branchTxt = matched ? matched.map(function (r) { return r.id; }).join(" → ") : "null";
+    var pageTxt = tree && tree.page ? tree.page.id : "—";
+    document.getElementById("pipeline").innerHTML =
+      stage("URL", esc("/" + slugParts.join("/"))) + arw() +
+      stage("slugParts", slugTxt) + arw() +
+      stage("matched branch", esc(branchTxt)) + arw() +
+      stage("page", esc(pageTxt));
+  }
+  function stage(k, v) { return '<div class="stage"><p class="k">' + k + '</p><div class="v">' + v + "</div></div>"; }
+  function arw() { return '<div class="arrow">→</div>'; }
+
+  function renderBranch(matched) {
+    var el = document.getElementById("branch");
+    if (!matched) { el.innerHTML = '<div class="muted-line">null — no route matched</div>'; return; }
+    el.innerHTML = matched.map(function (r, i) {
+      var leaf = i === matched.length - 1;
+      var indent = i ? '<span class="indent">' + "&nbsp;".repeat(i * 2) + "└</span>" : "";
+      return '<div class="node' + (leaf ? " leaf" : "") + '">' + indent +
+        '<span class="rid">' + esc(r.id) + '</span>' +
+        '<span class="rpath">' + esc(r.path) + '</span></div>';
+    }).join("");
+  }
+
+  function renderTree(tree) {
+    var el = document.getElementById("tree");
+    if (!tree || !tree.page) { el.innerHTML = '<div class="muted-line">no page → 404</div>'; return; }
+    var rows = tree.layouts.map(function (l) {
+      var t = l.template || "custom";
+      return '<div class="layer"><span class="badge ' + (t === "auth" ? "auth" : t === "core" ? "core" : "core") + '">' + esc(t) + '</span><span class="cfgid">' + esc(l.id) + '</span></div>';
+    });
+    rows.push('<div class="layer"><span class="badge page">page</span><span class="cfgid">' + esc(tree.page.id) + '</span></div>');
+    el.innerHTML = rows.join("");
+  }
+
+  function renderWhy(slugParts, matched, tree) {
+    var el = document.getElementById("why");
+    if (!matched) {
+      el.innerHTML = '<div class="why miss">No route branch consumed all of <code>[' + slugParts.map(esc).join(", ") + ']</code>. The engine returns <b>null</b> → the renderer shows the 404 page.</div>';
+      return;
+    }
+    if (slugParts.length === 0) {
+      el.innerHTML = '<div class="why">Empty path uses the <b>root shortcut</b>: the first route with <code>path:"/"</code>, with no descent into children — so its <code>layout</code> and <code>page</code> must both sit on the root route.</div>';
+      return;
+    }
+    var leaf = matched[matched.length - 1];
+    var seg = leaf.path.split("/").filter(function (p) { return p.length; });
+    var hasParam = seg.some(function (s) { return s.charAt(0) === ":"; });
+    if (hasParam) {
+      var pi = seg.findIndex(function (s) { return s.charAt(0) === ":"; });
+      el.innerHTML = '<div class="why">Leaf <code>' + esc(leaf.id) + '</code> matched via a <b>param</b> segment <code>' + esc(seg[pi]) + '</code> (+1). A static child would have outranked it (+2).</div>';
+    } else {
+      el.innerHTML = '<div class="why">Every segment matched <b>statically</b> (+2 each). Branch depth: <code>' + matched.length + '</code> route' + (matched.length > 1 ? "s" : "") + '.</div>';
+    }
+  }
+
+  function bar(items, side) { return items.map(function (c) { return '<span class="bar-item' + (side ? " side-item" : "") + '">' + esc(c.componentType || c.type) + "</span>"; }).join(""); }
+  function pageMock(page) {
+    if (!page.elements.length) return '<div class="muted-line" style="text-align:center;padding:20px 0">empty page</div>';
+    return page.elements.map(function (e) {
+      if (e.type !== "component") return "";
+      return '<div class="cblock"><span class="ctype">' + esc(e.componentType) + '</span><span class="cid">#' + esc(e.id) + " · " + esc(e.type) + "</span></div>";
+    }).join("");
+  }
+  function byPos(cfg, pos) { return (cfg.elements || []).filter(function (e) { return e.type === "component" && (e.position || "main") === pos; }); }
+
+  function layoutMock(cfg, childHTML) {
+    var t = cfg.template || "custom";
+    if (t === "core") {
+      return '<div class="mock-core">' +
+        '<div class="mock-side"><div class="brand">AI Recruiter</div><div class="region-tag" style="color:#6f6a86">left</div>' + bar(byPos(cfg, "left"), true) + '</div>' +
+        '<div class="mock-main-col"><div class="mock-top"><span class="region-tag">top</span>' + bar(byPos(cfg, "top"), false) + '</div>' +
+        '<div class="mock-main"><div class="outlet-frame"><span class="outlet-lbl">outlet</span>' + childHTML + "</div></div></div></div>";
+    }
+    if (t === "auth") {
+      return '<div class="mock-auth"><div class="mock-auth-card"><div class="outlet-frame"><span class="outlet-lbl">outlet</span>' + childHTML + "</div></div></div>";
+    }
+    return '<div class="mock-main" style="width:100%"><div class="outlet-frame"><span class="outlet-lbl">outlet</span>' + childHTML + "</div></div>";
+  }
+
+  function renderScreen(tree) {
+    var vp = document.getElementById("viewport");
+    if (!tree || !tree.page) {
+      vp.innerHTML = '<div class="mock-404"><div class="big">404</div><div class="sm">Page Not Found</div></div>';
+      return;
+    }
+    var html = pageMock(tree.page);
+    for (var i = tree.layouts.length - 1; i >= 0; i--) html = layoutMock(tree.layouts[i], html);
+    vp.innerHTML = html;
+  }
+
+  function resolve(url) {
+    var slugParts = parseUrl(url);
+    var matched = findRouteBySlug(slugParts, routes);
+    var tree = matched ? generateRenderTree(matched, configurations, routes, slugParts) : null;
+    document.getElementById("addr").textContent = "/" + slugParts.join("/");
+    renderPipeline(slugParts, matched, tree);
+    renderBranch(matched);
+    renderTree(tree);
+    renderWhy(slugParts, matched, tree);
+    renderScreen(tree);
+    markPreset(url);
+  }
+
+  // --- wiring ---
+  var input = document.getElementById("url");
+  input.addEventListener("input", function () { resolve(input.value); });
+
+  var presetsEl = document.getElementById("presets");
+  PRESETS.forEach(function (p) {
+    var b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = p; b.dataset.url = p;
+    b.addEventListener("click", function () { input.value = p; resolve(p); input.focus(); });
+    presetsEl.appendChild(b);
+  });
+  function markPreset(url) {
+    var norm = "/" + parseUrl(url).join("/");
+    Array.prototype.forEach.call(presetsEl.children, function (b) {
+      var pn = "/" + parseUrl(b.dataset.url).join("/");
+      b.classList.toggle("active", pn === norm);
+    });
+  }
+
+  var cfgArea = document.getElementById("config");
+  var msg = document.getElementById("parsemsg");
+  function fillConfig() { cfgArea.value = JSON.stringify({ routes: routes, configurations: configurations }, null, 2); }
+  function applyConfig() {
+    try {
+      var parsed = JSON.parse(cfgArea.value);
+      if (!Array.isArray(parsed.routes) || !Array.isArray(parsed.configurations)) throw new Error("need { routes: [], configurations: [] }");
+      routes = parsed.routes; configurations = parsed.configurations;
+      msg.textContent = "valid — applied"; msg.className = "parse-msg ok";
+      resolve(input.value);
+    } catch (e) {
+      msg.textContent = "invalid JSON: " + e.message; msg.className = "parse-msg err";
+    }
+  }
+  document.getElementById("apply").addEventListener("click", applyConfig);
+  document.getElementById("reset").addEventListener("click", function () {
+    routes = DEFAULT.routes; configurations = DEFAULT.configurations;
+    fillConfig(); msg.textContent = "reset"; msg.className = "parse-msg ok"; resolve(input.value);
+  });
+  cfgArea.addEventListener("input", function () { msg.textContent = "edited — click Apply"; msg.className = "parse-msg"; });
+
+  fillConfig();
+  resolve("/");
+})();
+</script>

@@ -1,0 +1,13 @@
+{
+  "name": "@recruit/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test",
+    "seed": "bun scripts/seed.ts",
+    "typecheck": "tsc --noEmit"
+  }
+}

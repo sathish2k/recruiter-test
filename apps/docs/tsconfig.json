@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "noUncheckedIndexedAccess": false,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@recruit/types": ["../../packages/types/src/index.ts"],
+      "@recruit/sdk": ["../../packages/recruit-sdk/src/index.ts"],
+      "@recruit/shared": ["../../packages/shared/src/index.ts"],
+      "@recruit/ui": ["../../packages/ui/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

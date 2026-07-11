@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "noUncheckedIndexedAccess": false,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@recruit/types": ["../../packages/types/src/index.ts"],
+      "@recruit/sdk": ["../../packages/recruit-sdk/src/index.ts"],
+      "@recruit/shared": ["../../packages/shared/src/index.ts"],
+      "@recruit/ui": ["../../packages/ui/src/index.ts"],
+      "@recruit/configurations": ["../../packages/configurations/src/index.ts"],
+      "@recruit/module-auth": [
+        "../../packages/modules/recruit-auth/src/index.ts"
+      ],
+      "@recruit/module-dashboard": [
+        "../../packages/modules/recruit-dashboard/src/index.ts"
+      ],
+      "@recruit/module-candidate": [
+        "../../packages/modules/recruit-candidate/src/index.ts"
+      ]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
