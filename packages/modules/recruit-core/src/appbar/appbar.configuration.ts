@@ -11,6 +11,7 @@ export interface AppbarAction {
 export const AppbarConfiguration = {
   titles: {
     "Recruit.Root": "titles.dashboard",
+    "Recruit.Clients.Route": "titles.clients",
   } as Record<string, string>,
   actions: [
     { icon: "notifications", badge: true },

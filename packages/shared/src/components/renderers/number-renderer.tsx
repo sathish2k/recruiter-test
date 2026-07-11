@@ -12,6 +12,7 @@ export interface NumberRendererConfig {
   suffix?: string;
   variant?: TypographyProps["variant"];
   color?: TypographyProps["color"];
+  sx?: TypographyProps["sx"];
 }
 
 export function NumberRenderer({
@@ -24,7 +25,12 @@ export function NumberRenderer({
   const { formatNumber } = useFormatters();
   const value = Number(delve(data, config.path) ?? 0);
   return (
-    <Typography component="span" variant={config.variant} color={config.color}>
+    <Typography
+      component="span"
+      variant={config.variant}
+      color={config.color}
+      sx={config.sx}
+    >
       {config.prefix ?? ""}
       {formatNumber(value, config.options)}
       {config.suffix ?? ""}

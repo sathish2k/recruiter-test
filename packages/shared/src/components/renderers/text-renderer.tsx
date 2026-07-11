@@ -9,6 +9,7 @@ export interface TextRendererConfig {
   suffix?: string;
   variant?: TypographyProps["variant"];
   color?: TypographyProps["color"];
+  sx?: TypographyProps["sx"];
   placeholder?: string;
 }
 
@@ -34,7 +35,12 @@ export function TextRenderer({
   const value =
     raw == null || raw === "" ? (config.placeholder ?? "") : String(raw);
   return (
-    <Typography component="span" variant={config.variant} color={config.color}>
+    <Typography
+      component="span"
+      variant={config.variant}
+      color={config.color}
+      sx={config.sx}
+    >
       {config.prefix ?? ""}
       {transform(value, config.transform)}
       {config.suffix ?? ""}

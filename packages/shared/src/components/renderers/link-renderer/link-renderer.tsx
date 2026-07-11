@@ -1,7 +1,7 @@
 "use client";
 
 import Link, { type LinkProps } from "@mui/material/Link";
-import { usePortalRouter } from "@recruit/sdk";
+import { usePortalRouter, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 import NextLink from "next/link";
 
@@ -14,10 +14,14 @@ export interface LinkParamConfig {
 }
 
 export interface LinkRendererConfig {
+  /** Component id the `label.name` translation key resolves against. */
+  id?: string;
   path?: string;
   linkType?: LinkType;
   routeId?: string;
   href?: string;
+  /** Translation key for the link text (`{ name }`); takes priority over `text`. */
+  label?: { name: string };
   text?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   variant?: LinkProps["variant"];
@@ -45,11 +49,13 @@ export function LinkRenderer({
   data?: Record<string, unknown>;
 }) {
   const { getPathFromRouteId } = usePortalRouter();
+  const { t } = useTranslation(config.id ?? "");
   const {
     path,
     linkType = "auto",
     routeId,
     href,
+    label,
     text,
     target = "_self",
     variant = "inherit",
@@ -61,7 +67,7 @@ export function LinkRenderer({
   } = config;
 
   const value = path ? (delve(data, path) as string | undefined) : undefined;
-  const displayText = text || value || "";
+  const displayText = (label ? t(label.name) : text) || value || "";
   const finalType =
     linkType === "auto"
       ? isExternal(value || href || "")

@@ -1,0 +1,1 @@
+preload = ["./src/bun-v8-shim.ts"]

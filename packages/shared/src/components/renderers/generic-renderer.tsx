@@ -9,11 +9,16 @@ import {
 import { DateRenderer, type DateRendererConfig } from "./date-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
+import {
+  StaticTranslationRenderer,
+  type StaticTranslationRendererConfig,
+} from "./static-translation-renderer";
 import { StatusRenderer, type StatusRendererConfig } from "./status-renderer";
 import { TextRenderer, type TextRendererConfig } from "./text-renderer";
 
 export type GenericRendererConfig =
   | TextRendererConfig
+  | StaticTranslationRendererConfig
   | NumberRendererConfig
   | CurrencyRendererConfig
   | DateRendererConfig
@@ -34,6 +39,8 @@ export function GenericRenderer({
     case "string":
     case "text":
       return <TextRenderer config={config} data={data} />;
+    case "static-translation":
+      return <StaticTranslationRenderer config={config} data={data} />;
     case "number":
       return <NumberRenderer config={config} data={data} />;
     case "currency":

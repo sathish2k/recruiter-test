@@ -33,6 +33,8 @@ export type {
 export { httpClient, setAuthToken } from "./client";
 export {
   type PaginatedResponse,
+  type ResponseMeta,
   useFetch,
+  type UseFetchParams,
   type UseFetchResult,
 } from "./hooks";

@@ -247,7 +247,7 @@ import { useFetch } from "@recruit/sdk";
 
 function Stats({ id }: { id: string }) {
   const { data, isLoading, totalCount, mutate } = useFetch<Home>(id);
-  // useFetch(id, [query], { method: "get" }) to pass args / pick a method
+  // useFetch(id, { filters, data }) — get(filters) is always the read; pass data to skip fetching
 }`}
       />
 

@@ -1,5 +1,11 @@
 export { cn } from "./utils/cn";
 export {
+  ClientCard,
+  type ClientCardConfig,
+  type ClientCardData,
+  type ClientMetricConfig,
+} from "./components/client-card";
+export {
   formatCurrency,
   formatDate,
   formatNumber,
@@ -14,6 +20,24 @@ export {
   type PasswordStrengthConfig,
   type Widget,
 } from "./components/form-renderer";
+export {
+  FormModal,
+  type FormModalProps,
+  Modal,
+  type ModalProps,
+  useModal,
+  type UseModalResult,
+} from "./components/modal";
+export {
+  type FilterConfig,
+  type FilterOption,
+  Filters,
+  type FiltersConfig,
+  type FiltersProps,
+  type FilterValue,
+  useFilters,
+  type UseFiltersResult,
+} from "./components/filters";
 export {
   AuthCard,
   ForgotPassword,
@@ -40,6 +64,10 @@ export {
   type LinkType,
   NumberRenderer,
   type NumberRendererConfig,
+  StatCardRenderer,
+  type StatCardRendererConfig,
+  StaticTranslationRenderer,
+  type StaticTranslationRendererConfig,
   StatusRenderer,
   type StatusRendererConfig,
   TextRenderer,

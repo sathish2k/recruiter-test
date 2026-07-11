@@ -161,7 +161,7 @@ export default function ReferencePage() {
             desc: "Sets the bearer token the httpClient interceptor uses. The SDK's AuthProvider calls it from the next-auth session.",
           },
           {
-            name: "useFetch(id, args?, opts?)",
+            name: "useFetch(id, params?)",
             type: "→ UseFetchResult",
             desc: "The one data hook: SWR read via the datasource's get(), plus mutation (its mutating methods: create/update/…).",
           },

@@ -10,6 +10,14 @@ export const routes: Route[] = [
     children: [],
   },
   {
+    id: "Recruit.Clients.Route",
+    path: "clients",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Clients.Page",
+    guard: [{ type: "authenticationGuard" }],
+    children: [],
+  },
+  {
     id: "Auth.Login.Route",
     path: "login",
     layout: "Auth.Layout",

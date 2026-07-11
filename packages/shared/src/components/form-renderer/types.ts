@@ -64,6 +64,10 @@ export interface FormRendererProps {
   onSubmit: (data: FormValues) => void | Promise<void>;
   /** Translation key for the submit button (default "submit"). */
   submitLabel?: string;
+  /** When set, renders a Cancel button beside Submit (footer row) that calls it. */
+  onCancel?: () => void;
+  /** Translation key for the cancel button (default "cancel"). */
+  cancelLabel?: string;
   loading?: boolean;
   beforeSubmit?: import("react").ReactNode;
 }

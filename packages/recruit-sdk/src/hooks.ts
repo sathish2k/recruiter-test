@@ -11,14 +11,21 @@ import type { DatasourceInstance } from "./types";
 
 const EMPTY_DATASOURCE: DatasourceInstance = {};
 
+export interface ResponseMeta {
+  totalCount?: number;
+  [key: string]: unknown;
+}
+
 export interface PaginatedResponse<T> {
   data: T;
-  meta?: { totalCount?: number };
+  meta?: ResponseMeta;
 }
 
 export interface UseFetchResult<T> {
   data: T | undefined;
   totalCount: number;
+  /** The response envelope's `meta` (e.g. counts, summary), when present. */
+  meta: ResponseMeta | undefined;
   error: unknown;
   isLoading: boolean;
   isValidating: boolean;
@@ -26,17 +33,19 @@ export interface UseFetchResult<T> {
   mutation: DatasourceInstance;
 }
 
-export interface UseFetchOptions<T> extends SWRConfiguration<T> {
-  method?: string;
+export interface UseFetchParams<T>
+  extends SWRConfiguration<PaginatedResponse<T>> {
+  /** Query object passed straight to the datasource's get(filters). */
+  filters?: Record<string, unknown>;
+  /** When provided, SWR does NOT fetch — this value is used directly. */
+  data?: T | PaginatedResponse<T>;
 }
 
 export function useFetch<T = unknown>(
   componentId: string,
-  // biome-ignore lint/suspicious/noExplicitAny: datasource method args are arbitrary.
-  args: any[] = [],
-  options: UseFetchOptions<PaginatedResponse<T>> = {},
+  params: UseFetchParams<T> = {},
 ): UseFetchResult<T> {
-  const { method = "get", ...swrOptions } = options;
+  const { filters, data: provided, ...swrOptions } = params;
   const factory = useDatasourceFactory(useComponentDatasourceId(componentId));
   const seed = useComponentData<PaginatedResponse<T>>(componentId);
 
@@ -48,16 +57,23 @@ export function useFetch<T = unknown>(
     ) as DatasourceInstance;
   }, [factory]);
 
-  const canRead = typeof datasource?.[method] === "function";
-  const key = canRead ? [componentId, method, ...args] : null;
+  // Reads always call the datasource's get(); a provided `data` disables
+  // fetching (null key).
+  const canRead =
+    provided === undefined && typeof datasource?.get === "function";
+  const key = canRead ? [componentId, "get", filters ?? {}] : null;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<
-    PaginatedResponse<T>
-  >(
+  const {
+    data: fetched,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR<PaginatedResponse<T>>(
     key,
     async () =>
-      (await (datasource as DatasourceInstance)[method](
-        ...args,
+      (await (datasource as DatasourceInstance).get(
+        filters,
       )) as PaginatedResponse<T>,
     {
       fallbackData: seed && Object.keys(seed).length > 0 ? seed : undefined,
@@ -65,16 +81,18 @@ export function useFetch<T = unknown>(
     },
   );
 
-  const body = data as unknown;
+  const body = (provided ?? fetched) as unknown;
   const isEnvelope =
     !!body && typeof body === "object" && "data" in (body as object);
   const value = (isEnvelope ? (body as PaginatedResponse<T>).data : body) as
     | T
     | undefined;
 
+  const meta = (body as PaginatedResponse<T>)?.meta;
   return {
     data: value,
-    totalCount: (body as PaginatedResponse<T>)?.meta?.totalCount ?? 0,
+    totalCount: meta?.totalCount ?? 0,
+    meta,
     error,
     isLoading,
     isValidating,

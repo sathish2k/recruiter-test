@@ -4,9 +4,24 @@ import MailRounded from "@mui/icons-material/MailRounded";
 import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
+import {
+  type Route,
+  useAuthUser,
+  usePortalRouter,
+  useTranslation,
+} from "@recruit/sdk";
 import type { ReactNode } from "react";
 import type { AppbarAction } from "./appbar.configuration";
+
+function initials(name?: string | null): string {
+  if (!name) return "";
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 const ICONS: Record<string, ReactNode> = {
   notifications: <NotificationsRounded sx={{ fontSize: 16 }} />,
@@ -41,6 +56,7 @@ export function AppbarComponent({
 }) {
   const router = usePortalRouter();
   const { t } = useTranslation(id);
+  const user = useAuthUser();
   const titleKey = configuration?.titles?.[currentRoute?.id ?? ""];
   const actions = configuration?.actions ?? [];
 
@@ -66,6 +82,7 @@ export function AppbarComponent({
               <Box
                 key="avatar"
                 onClick={go}
+                title={user?.name ?? undefined}
                 sx={{
                   width: 32,
                   height: 32,
@@ -80,7 +97,7 @@ export function AppbarComponent({
                   cursor: "pointer",
                 }}
               >
-                {t(action.label ?? "")}
+                {initials(user?.name) || t(action.label ?? "")}
               </Box>
             );
           }

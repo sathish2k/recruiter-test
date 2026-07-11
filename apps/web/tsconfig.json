@@ -24,6 +24,9 @@
       ],
       "@recruit/module-candidate": [
         "../../packages/modules/recruit-candidate/src/index.ts"
+      ],
+      "@recruit/module-client": [
+        "../../packages/modules/recruit-client/src/index.ts"
       ]
     }
   },

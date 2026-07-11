@@ -1,0 +1,43 @@
+{
+  "search": "Search clients…",
+  "export": "Export",
+  "addClient": "Add Client",
+  "cancel": "Cancel",
+  "addForm": {
+    "title": "Add client",
+    "description": "You can add roles and contacts after creating.",
+    "submit": "Create client",
+    "name": "Company name",
+    "namePlaceholder": "e.g. Acme Corp",
+    "industry": "Industry",
+    "industryPlaceholder": "e.g. Fintech",
+    "manager": "Account lead",
+    "managerPlaceholder": "e.g. Riya Kapoor"
+  },
+  "openRoles": "Open roles",
+  "inPipeline": "In pipeline",
+  "hires": "Hires",
+  "sourced": "Sourced {value}",
+  "screened": "Screened {value}",
+  "interviewing": "Interviewing {value}",
+  "viewDetails": "View details",
+  "filters": {
+    "all": "All",
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
+  "status": {
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
+  "summary": {
+    "activeClients": "Active Clients",
+    "activeDelta": "+1 this quarter",
+    "openRoles": "Open Roles",
+    "openRolesDelta": "across {value} clients",
+    "avgTimeToHire": "Avg Time to Hire",
+    "avgTimeDelta": "−4 days",
+    "placements": "Placements YTD",
+    "placementsDelta": "+18%"
+  }
+}

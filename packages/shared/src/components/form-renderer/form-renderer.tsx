@@ -235,6 +235,8 @@ export function FormRenderer({
   defaultValues,
   onSubmit,
   submitLabel = "submit",
+  onCancel,
+  cancelLabel = "cancel",
   loading = false,
   beforeSubmit,
 }: FormRendererProps) {
@@ -272,15 +274,58 @@ export function FormRenderer({
           />
         ))}
         {beforeSubmit}
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          loading={loading || formState.isSubmitting}
-          sx={{ borderRadius: "12px", py: 1.4, fontSize: 14, fontWeight: 700 }}
-        >
-          {t(submitLabel)}
-        </Button>
+        {onCancel ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "8px",
+              borderTop: "1px solid rgba(255,255,255,.08)",
+              pt: "16px",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={onCancel}
+              sx={{
+                borderRadius: "999px",
+                px: "18px",
+                fontSize: 12.5,
+                fontWeight: 600,
+              }}
+            >
+              {t(cancelLabel)}
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              loading={loading || formState.isSubmitting}
+              sx={{
+                borderRadius: "999px",
+                px: "20px",
+                fontSize: 12.5,
+                fontWeight: 700,
+              }}
+            >
+              {t(submitLabel)}
+            </Button>
+          </Box>
+        ) : (
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            loading={loading || formState.isSubmitting}
+            sx={{
+              borderRadius: "12px",
+              py: 1.4,
+              fontSize: 14,
+              fontWeight: 700,
+            }}
+          >
+            {t(submitLabel)}
+          </Button>
+        )}
       </Stack>
     </Box>
   );

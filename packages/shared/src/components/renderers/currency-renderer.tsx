@@ -12,6 +12,7 @@ export interface CurrencyRendererConfig {
   currencyPath?: string;
   variant?: TypographyProps["variant"];
   color?: TypographyProps["color"];
+  sx?: TypographyProps["sx"];
 }
 
 export function CurrencyRenderer({
@@ -27,7 +28,12 @@ export function CurrencyRenderer({
     ? String(delve(data, config.currencyPath) ?? config.currency ?? "USD")
     : (config.currency ?? "USD");
   return (
-    <Typography component="span" variant={config.variant} color={config.color}>
+    <Typography
+      component="span"
+      variant={config.variant}
+      color={config.color}
+      sx={config.sx}
+    >
       {formatCurrency(value, currency)}
     </Typography>
   );

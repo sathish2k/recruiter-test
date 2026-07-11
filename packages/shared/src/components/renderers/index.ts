@@ -18,5 +18,13 @@ export {
   type LinkType,
 } from "./link-renderer";
 export { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
+export {
+  StatCardRenderer,
+  type StatCardRendererConfig,
+} from "./stat-card-renderer";
+export {
+  StaticTranslationRenderer,
+  type StaticTranslationRendererConfig,
+} from "./static-translation-renderer";
 export { StatusRenderer, type StatusRendererConfig } from "./status-renderer";
 export { TextRenderer, type TextRendererConfig } from "./text-renderer";
