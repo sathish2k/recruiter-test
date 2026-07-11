@@ -21,4 +21,24 @@ export const AuthPages: Record<string, Configuration> = {
       },
     ],
   },
+  "Auth.ForgotPassword.Configuration": {
+    id: "Auth.ForgotPassword.Configuration",
+    elements: [
+      {
+        id: "auth-forgot-password",
+        type: "component",
+        componentType: "Auth.ForgotPassword.Component",
+      },
+    ],
+  },
+  "Auth.ResetPassword.Configuration": {
+    id: "Auth.ResetPassword.Configuration",
+    elements: [
+      {
+        id: "auth-reset-password",
+        type: "component",
+        componentType: "Auth.ResetPassword.Component",
+      },
+    ],
+  },
 };

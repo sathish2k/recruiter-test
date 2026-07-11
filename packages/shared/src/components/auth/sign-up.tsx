@@ -32,24 +32,22 @@ export function SignUp({
 }) {
   const { schema, links } = useConfiguration<SignUpConfig>(id);
   const { t } = useTranslation(id);
-  const link = (cfg?: LinkRendererConfig) =>
-    cfg ? { ...cfg, text: t(cfg.text ?? "") } : undefined;
+  const link = (config?: LinkRendererConfig) =>
+    config ? { ...config, text: t(config.text ?? "") } : undefined;
   const tos = link(links?.tos);
   const privacy = link(links?.privacy);
   const signIn = link(links?.signIn);
 
   return (
     <AuthCard
-      width={440}
       icon={<PersonAddAlt1Rounded sx={{ fontSize: 26 }} />}
       title={t("title")}
       subtitle={t("subtitle")}
     >
       {schema ? (
         <FormRenderer
+          id={id}
           schema={schema}
-          t={t}
-          submitLabel={t("submit")}
           onSubmit={(v: FormValues) => onSubmit(v as unknown as SignUpValues)}
         />
       ) : null}

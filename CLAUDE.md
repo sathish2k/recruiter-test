@@ -136,11 +136,14 @@ Credentials auth, JWT sessions, shared HS256 secret between next-auth and the AP
    password (`Bun.password.verify`) and signs a JWT (`JWT_SECRET`, claims
    `{ sub, agencyId, role }`) via the shared `jwtPlugin`.
 3. **Session** — next-auth stores that token as `session.accessToken` (jwt +
-   session callbacks). `AuthTokenSync` mirrors it into the SDK client via
-   `setApiToken()` and revalidates SWR.
-4. **Requests** — `createApiClient`'s interceptor attaches `Authorization:
-   Bearer <token>`. The API `authGuard` (`isAuth` macro) verifies it with the
-   same secret and exposes `ctx.auth` (`{ sub, agencyId, role }`) to handlers.
+   session callbacks). The SDK's `AuthProvider` (wraps the tree, needs next-auth's
+   `SessionProvider` above it) shows a loader until the session resolves, then
+   calls `setAuthToken()` (logout should redirect, which reloads and clears the
+   in-memory SWR cache for free).
+4. **Requests** — the shared `httpClient` (one axios instance datasources use)
+   has a request **interceptor** that attaches `Authorization: Bearer <token>`.
+   The API `authGuard` (`isAuth` macro) verifies it with the same secret and
+   exposes `ctx.auth` (`{ sub, agencyId, role }`) to handlers.
 
 Env: `JWT_SECRET` (shared, HS256), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`,
 `API_URL` / `NEXT_PUBLIC_API_URL`.

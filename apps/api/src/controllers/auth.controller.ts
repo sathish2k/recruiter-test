@@ -4,6 +4,8 @@ import {
   type Credentials,
   registerAccount,
   type RegisterInput,
+  requestPasswordReset,
+  resetPassword as resetPasswordService,
   verifyCredentials,
 } from "../services/auth.service";
 
@@ -27,4 +29,17 @@ export async function login(ctx: { body: Credentials; jwt: JwtSigner }) {
     role: user.role,
   });
   return { token, user };
+}
+
+export async function forgotPassword(ctx: { body: { email: string } }) {
+  await requestPasswordReset(ctx.body.email);
+  return { ok: true };
+}
+
+export async function resetPassword(ctx: {
+  body: { token: string; password: string };
+}) {
+  const ok = await resetPasswordService(ctx.body.token, ctx.body.password);
+  if (!ok) return status(400, "Invalid or expired reset link");
+  return { ok: true };
 }

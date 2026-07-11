@@ -151,9 +151,14 @@ export default function ReferencePage() {
       <PropsTable
         rows={[
           {
-            name: "createApiClient(getToken?)",
-            type: "→ AxiosInstance",
-            desc: "An axios instance with base URL from NEXT_PUBLIC_API_URL and a bearer-token interceptor.",
+            name: "httpClient",
+            type: "AxiosInstance",
+            desc: "The shared axios instance (base URL from NEXT_PUBLIC_API_URL). A request interceptor attaches Authorization: Bearer <token> from setAuthToken.",
+          },
+          {
+            name: "setAuthToken(token?)",
+            type: "→ void",
+            desc: "Sets the bearer token the httpClient interceptor uses. The SDK's AuthProvider calls it from the next-auth session.",
           },
           {
             name: "useFetch(id, args?, opts?)",

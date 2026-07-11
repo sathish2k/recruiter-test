@@ -17,4 +17,13 @@ export default new Elysia({ name: "auth.routes" })
       email: t.String({ format: "email" }),
       password: t.String({ minLength: 1 }),
     }),
+  })
+  .post("/auth/forgot-password", (ctx) => authController.forgotPassword(ctx), {
+    body: t.Object({ email: t.String({ format: "email" }) }),
+  })
+  .post("/auth/reset-password", (ctx) => authController.resetPassword(ctx), {
+    body: t.Object({
+      token: t.String({ minLength: 1 }),
+      password: t.String({ minLength: 8 }),
+    }),
   });

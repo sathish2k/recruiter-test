@@ -5,6 +5,18 @@ export const layouts: Configuration[] = [
     id: "Recruit.Core.Layout",
     template: "core",
     elements: [
+      {
+        id: "Recruit.Sidenav.Layout",
+        type: "component",
+        componentType: "Recruit.Sidenav.Component",
+        position: "left",
+      },
+      {
+        id: "Recruit.Appbar.Layout",
+        type: "component",
+        componentType: "Recruit.Appbar.Component",
+        position: "top",
+      },
       { id: "Recruit.Core.Outlet.Layout", type: "outlet", position: "main" },
     ],
   },

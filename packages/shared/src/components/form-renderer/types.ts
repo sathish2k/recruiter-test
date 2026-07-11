@@ -28,7 +28,7 @@ export interface JsonSchemaProperty {
   hideLabel?: boolean;
   help?: string;
   rows?: number;
-  strengthMeter?: boolean;
+  strengthMeter?: boolean | PasswordStrengthConfig;
 
   errorMessage?: string | Record<string, string>;
 }
@@ -45,14 +45,25 @@ export interface JsonSchema {
   };
 }
 
+export interface PasswordStrengthConfig {
+  /** Regex rules (as strings); each password match adds one to the score. */
+  rules?: string[];
+  /** Translation key (or literal) shown for each score level. */
+  labels?: string[];
+  /** Bar color for each score level. */
+  colors?: string[];
+}
+
 export type FormValues = Record<string, unknown>;
 
 export interface FormRendererProps {
+  /** Component id — the form resolves all text via useTranslation(id). */
+  id: string;
   schema: JsonSchema;
   defaultValues?: FormValues;
   onSubmit: (data: FormValues) => void | Promise<void>;
+  /** Translation key for the submit button (default "submit"). */
   submitLabel?: string;
   loading?: boolean;
-  t?: (key: string, fallback?: string) => string;
   beforeSubmit?: import("react").ReactNode;
 }

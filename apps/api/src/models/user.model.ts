@@ -7,6 +7,8 @@ export interface UserDoc {
   name: string;
   role: UserRole;
   passwordHash: string;
+  resetTokenHash?: string;
+  resetTokenExpires?: Date;
 }
 
 const userSchema = new Schema<UserDoc>(
@@ -16,6 +18,8 @@ const userSchema = new Schema<UserDoc>(
     name: { type: String, required: true },
     role: { type: String, enum: ["lead", "recruiter"], required: true },
     passwordHash: { type: String, required: true },
+    resetTokenHash: { type: String },
+    resetTokenExpires: { type: Date },
   },
   { timestamps: true },
 );

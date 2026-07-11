@@ -23,4 +23,18 @@ export const routes: Route[] = [
     page: "Auth.CreateAccount.Configuration",
     children: [],
   },
+  {
+    id: "Auth.ForgotPassword.Route",
+    path: "forgot-password",
+    layout: "Auth.Layout",
+    page: "Auth.ForgotPassword.Configuration",
+    children: [],
+  },
+  {
+    id: "Auth.ResetPassword.Route",
+    path: "reset-password",
+    layout: "Auth.Layout",
+    page: "Auth.ResetPassword.Configuration",
+    children: [],
+  },
 ];

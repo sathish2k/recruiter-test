@@ -30,7 +30,7 @@ export type {
   TranslationExportModel,
 } from "./types";
 
-export { createApiClient, setApiToken } from "./client";
+export { httpClient, setAuthToken } from "./client";
 export {
   type PaginatedResponse,
   useFetch,

@@ -1,4 +1,12 @@
+import { createHash, randomBytes } from "node:crypto";
+import { sendEmail } from "../lib/mailjet";
 import { UserModel } from "../models/user.model";
+
+const RESET_TTL_MS = 60 * 60 * 1000;
+
+function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 export interface RegisterInput {
   fullName: string;
@@ -38,4 +46,40 @@ export async function verifyCredentials({ email, password }: Credentials) {
     name: user.name,
     role: user.role,
   };
+}
+
+// Emails a reset link. Silent when the email is unknown so the endpoint never
+// reveals which addresses have accounts.
+export async function requestPasswordReset(email: string): Promise<void> {
+  const user = await UserModel.findOne({ email: email.toLowerCase() });
+  if (!user) return;
+  const token = randomBytes(32).toString("hex");
+  user.resetTokenHash = hashToken(token);
+  user.resetTokenExpires = new Date(Date.now() + RESET_TTL_MS);
+  await user.save();
+  const origin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
+  const link = `${origin}/reset-password?token=${token}`;
+  await sendEmail({
+    to: { email: user.email, name: user.name },
+    subject: "Reset your password",
+    html: `<p>Reset your password with the link below (valid for 1 hour):</p><p><a href="${link}">${link}</a></p>`,
+  });
+}
+
+// Consumes a reset token and sets the new password. Returns false when the
+// token is unknown or expired.
+export async function resetPassword(
+  token: string,
+  password: string,
+): Promise<boolean> {
+  const user = await UserModel.findOne({
+    resetTokenHash: hashToken(token),
+    resetTokenExpires: { $gt: new Date() },
+  });
+  if (!user) return false;
+  user.passwordHash = await Bun.password.hash(password);
+  user.resetTokenHash = undefined;
+  user.resetTokenExpires = undefined;
+  await user.save();
+  return true;
 }

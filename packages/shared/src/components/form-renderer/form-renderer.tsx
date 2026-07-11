@@ -18,6 +18,7 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ajvResolver } from "@hookform/resolvers/ajv";
+import { useTranslation } from "@recruit/sdk";
 import { type ReactNode, useMemo, useState } from "react";
 import {
   type Control,
@@ -25,10 +26,18 @@ import {
   type FieldValues,
   useForm,
 } from "react-hook-form";
-import type { FormRendererProps, JsonSchemaProperty, Widget } from "./types";
+import type {
+  FormRendererProps,
+  JsonSchemaProperty,
+  PasswordStrengthConfig,
+  Widget,
+} from "./types";
 
-const STRENGTH_COLORS = ["", "#E05B5B", "#D69B3C", "#4EA874"];
-const STRENGTH_LABELS = ["", "Weak", "Okay", "Strong"];
+const DEFAULT_STRENGTH: Required<PasswordStrengthConfig> = {
+  rules: ["^.{8,}$", "[A-Z]", "[0-9]"],
+  labels: ["Weak", "Okay", "Strong"],
+  colors: ["#E05B5B", "#D69B3C", "#4EA874"],
+};
 
 const ICONS: Record<string, ReactNode> = {
   mail: <MailOutlineRounded sx={{ fontSize: 18 }} />,
@@ -37,10 +46,14 @@ const ICONS: Record<string, ReactNode> = {
   domain: <DomainRounded sx={{ fontSize: 18 }} />,
 };
 
-function passwordStrength(pw: string): number {
-  if (!pw) return 0;
-  if (pw.length < 8) return 1;
-  return /[A-Z]/.test(pw) && /[0-9]/.test(pw) ? 3 : 2;
+// Resolve a field's strengthMeter (true | config | falsy) to a full config.
+function resolveStrength(
+  strengthMeter: JsonSchemaProperty["strengthMeter"],
+): Required<PasswordStrengthConfig> | null {
+  if (!strengthMeter) return null;
+  return strengthMeter === true
+    ? DEFAULT_STRENGTH
+    : { ...DEFAULT_STRENGTH, ...strengthMeter };
 }
 
 function widgetFor(prop: JsonSchemaProperty): Widget {
@@ -51,25 +64,39 @@ function widgetFor(prop: JsonSchemaProperty): Widget {
   return "text";
 }
 
-function StrengthMeter({ value }: { value: string }) {
-  const score = passwordStrength(value);
+function StrengthMeter({
+  value,
+  config,
+  t,
+}: {
+  value: string;
+  config: Required<PasswordStrengthConfig>;
+  t: (key: string, fallback?: string) => string;
+}) {
+  const score = value
+    ? config.rules.reduce((n, r) => (new RegExp(r).test(value) ? n + 1 : n), 0)
+    : 0;
+  const color =
+    config.colors[score - 1] ?? config.colors[config.colors.length - 1];
+  const levels = config.rules.map((_, i) => i + 1);
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mt: 1 }}>
-      {[1, 2, 3].map((i) => (
+      {levels.map((level) => (
         <Box
-          key={i}
+          key={level}
           sx={{
             flex: 1,
             height: 4,
             borderRadius: 999,
-            bgcolor: score >= i ? STRENGTH_COLORS[score] : "#2A2A28",
+            bgcolor: score >= level ? color : "#2A2A28",
           }}
         />
       ))}
       <Typography
         sx={{ fontSize: 11, color: "text.secondary", ml: 0.75, minWidth: 34 }}
       >
-        {STRENGTH_LABELS[score] ?? ""}
+        {score > 0 ? t(config.labels[score - 1] ?? "") : ""}
       </Typography>
     </Box>
   );
@@ -137,6 +164,7 @@ function Field({
         }
 
         const isPw = widget === "password";
+        const strength = isPw ? resolveStrength(prop.strengthMeter) : null;
         const type = isPw
           ? showPw
             ? "text"
@@ -187,8 +215,12 @@ function Field({
                 },
               }}
             />
-            {isPw && prop.strengthMeter ? (
-              <StrengthMeter value={String(field.value ?? "")} />
+            {strength ? (
+              <StrengthMeter
+                value={String(field.value ?? "")}
+                config={strength}
+                t={t}
+              />
             ) : null}
           </Box>
         );
@@ -198,14 +230,15 @@ function Field({
 }
 
 export function FormRenderer({
+  id,
   schema,
   defaultValues,
   onSubmit,
-  submitLabel = "Submit",
+  submitLabel = "submit",
   loading = false,
-  t = (key) => key,
   beforeSubmit,
 }: FormRendererProps) {
+  const { t } = useTranslation(id);
   const resolver = useMemo(
     () => ajvResolver(schema as never, { strict: false }),
     [schema],
@@ -246,7 +279,7 @@ export function FormRenderer({
           loading={loading || formState.isSubmitting}
           sx={{ borderRadius: "12px", py: 1.4, fontSize: 14, fontWeight: 700 }}
         >
-          {submitLabel}
+          {t(submitLabel)}
         </Button>
       </Stack>
     </Box>

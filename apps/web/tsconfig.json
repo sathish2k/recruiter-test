@@ -16,6 +16,9 @@
       "@recruit/module-auth": [
         "../../packages/modules/recruit-auth/src/index.ts"
       ],
+      "@recruit/module-core": [
+        "../../packages/modules/recruit-core/src/index.ts"
+      ],
       "@recruit/module-dashboard": [
         "../../packages/modules/recruit-dashboard/src/index.ts"
       ],

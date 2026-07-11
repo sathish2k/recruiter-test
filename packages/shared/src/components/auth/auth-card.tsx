@@ -8,7 +8,9 @@ export function AuthCard({
   icon,
   title,
   subtitle,
-  width = 420,
+  // Design card is 440px content-box (440 content + 44*2 padding + border).
+  // Our card is border-box (CssBaseline), so width is the total → 530 to match.
+  width = 530,
   children,
 }: {
   icon: ReactNode;
@@ -37,7 +39,7 @@ export function AuthCard({
             "linear-gradient(180deg,rgba(242,106,27,.14),rgba(28,28,27,.6) 40%),#1C1C1B",
           border: "1px solid rgba(255,255,255,.09)",
           borderRadius: "24px",
-          p: "40px 44px 36px",
+          p: "38px 44px 34px",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -56,7 +58,7 @@ export function AuthCard({
             justifyContent: "center",
             color: "#FF9D57",
             boxShadow: "0 10px 24px rgba(0,0,0,.4)",
-            mb: "22px",
+            mb: "20px",
           }}
         >
           {icon}

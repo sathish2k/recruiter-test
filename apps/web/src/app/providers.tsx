@@ -5,6 +5,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import { AllModules, routes } from "@recruit/configurations";
 import {
+  AuthProvider,
   DatasourceProvider,
   LocaleProvider,
   PortalRouterProvider,
@@ -12,7 +13,6 @@ import {
 import { theme } from "@recruit/ui";
 import { SessionProvider } from "next-auth/react";
 import type { ReactNode } from "react";
-import { AuthTokenSync } from "./auth-token-sync";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -23,8 +23,7 @@ export function Providers({ children }: { children: ReactNode }) {
           <PortalRouterProvider routes={routes}>
             <DatasourceProvider modules={AllModules}>
               <SessionProvider>
-                <AuthTokenSync />
-                {children}
+                <AuthProvider>{children}</AuthProvider>
               </SessionProvider>
             </DatasourceProvider>
           </PortalRouterProvider>

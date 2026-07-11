@@ -25,7 +25,11 @@ export function MuiCoreLayout({
     const def = componentRegistry.get(element.componentType ?? "");
     const Component = def?.value;
     if (!Component) return null;
-    const props = { ...(dataMap.get(element.id) || {}), currentRoute };
+    const props = {
+      id: element.id,
+      ...(dataMap.get(element.id) || {}),
+      currentRoute,
+    };
     return <Component key={element.id} {...props} />;
   };
 

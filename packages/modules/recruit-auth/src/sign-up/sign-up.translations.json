@@ -36,6 +36,12 @@
     "errors": {
       "required": "Password is required",
       "minLength": "Password must be at least 8 characters"
+    },
+    "strength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
     }
   }
 }

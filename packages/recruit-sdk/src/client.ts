@@ -1,24 +1,17 @@
-import axios, { type AxiosInstance } from "axios";
+import axios from "axios";
 
-let apiToken: string | undefined;
+let authToken: string | undefined;
 
-export function setApiToken(token?: string) {
-  apiToken = token;
+export function setAuthToken(token?: string) {
+  authToken = token;
 }
 
-export function createApiClient(
-  getToken?: () => string | undefined,
-): AxiosInstance {
-  const client = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
-    headers: { "Content-Type": "application/json" },
-  });
+export const httpClient = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+  headers: { "Content-Type": "application/json" },
+});
 
-  client.interceptors.request.use((config) => {
-    const token = getToken?.() ?? apiToken;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
-
-  return client;
-}
+httpClient.interceptors.request.use((config) => {
+  if (authToken) config.headers.Authorization = `Bearer ${authToken}`;
+  return config;
+});

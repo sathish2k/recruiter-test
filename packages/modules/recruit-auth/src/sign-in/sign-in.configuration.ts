@@ -41,7 +41,7 @@ const schema: JsonSchema = {
 
 const links: Record<string, LinkRendererConfig> = {
   forgot: {
-    href: "#",
+    routeId: "Auth.ForgotPassword.Route",
     text: "forgot",
     underline: "none",
     sx: { fontSize: 12.5, ...accentSx },

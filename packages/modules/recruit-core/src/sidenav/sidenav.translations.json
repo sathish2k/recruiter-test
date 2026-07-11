@@ -1,0 +1,23 @@
+{
+  "brand": "Troy",
+  "groups": {
+    "main": "MAIN",
+    "aiFeatures": "AI FEATURES",
+    "tools": "TOOLS"
+  },
+  "items": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "jobs": "Jobs",
+    "candidates": "Candidates",
+    "pipeline": "Pipeline",
+    "teamActivity": "Team Activity",
+    "interviews": "Interviews",
+    "placements": "Placements",
+    "messages": "Messages",
+    "aiScreening": "AI Screening",
+    "automation": "Automation",
+    "settings": "Settings",
+    "helpCenter": "Help center"
+  }
+}

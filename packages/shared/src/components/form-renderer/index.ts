@@ -4,5 +4,6 @@ export type {
   FormValues,
   JsonSchema,
   JsonSchemaProperty,
+  PasswordStrengthConfig,
   Widget,
 } from "./types";

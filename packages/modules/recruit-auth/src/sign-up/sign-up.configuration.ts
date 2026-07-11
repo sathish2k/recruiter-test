@@ -50,7 +50,16 @@ const schema: JsonSchema = {
       minLength: 8,
       icon: "lock",
       hideLabel: true,
-      strengthMeter: true,
+      strengthMeter: {
+        rules: ["^.{8,}$", "[A-Z]", "[0-9]", "[^A-Za-z0-9]"],
+        labels: [
+          "password.strength.weak",
+          "password.strength.fair",
+          "password.strength.good",
+          "password.strength.strong",
+        ],
+        colors: ["#E05B5B", "#D69B3C", "#8FB94E", "#4EA874"],
+      },
       title: "password.label",
       placeholder: "password.placeholder",
       errorMessage: { minLength: "password.errors.minLength" },

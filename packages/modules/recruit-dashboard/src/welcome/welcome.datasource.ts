@@ -1,9 +1,6 @@
-import { createApiClient, type DatasourceInstance } from "@recruit/sdk";
+import { httpClient, type DatasourceInstance } from "@recruit/sdk";
 
-export const welcomeDatasource = (): DatasourceInstance => {
-  const client = createApiClient();
-  return {
-    get: async (query?: Record<string, unknown>) =>
-      (await client.get("/home", { params: query })).data,
-  };
-};
+export const welcomeDatasource = (): DatasourceInstance => ({
+  get: async (query?: Record<string, unknown>) =>
+    (await httpClient.get("/home", { params: query })).data,
+});

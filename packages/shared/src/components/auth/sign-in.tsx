@@ -31,8 +31,8 @@ export function SignIn({
 }) {
   const { schema, links } = useConfiguration<SignInConfig>(id);
   const { t } = useTranslation(id);
-  const link = (cfg?: LinkRendererConfig) =>
-    cfg ? { ...cfg, text: t(cfg.text ?? "") } : undefined;
+  const link = (config?: LinkRendererConfig) =>
+    config ? { ...config, text: t(config.text ?? "") } : undefined;
   const forgot = link(links?.forgot);
   const signUp = link(links?.signUp);
 
@@ -44,9 +44,8 @@ export function SignIn({
     >
       {schema ? (
         <FormRenderer
+          id={id}
           schema={schema}
-          t={t}
-          submitLabel={t("submit")}
           onSubmit={(v: FormValues) => onSubmit(v as unknown as SignInValues)}
           beforeSubmit={
             forgot ? (

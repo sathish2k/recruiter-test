@@ -11,10 +11,15 @@ export {
   type FormValues,
   type JsonSchema,
   type JsonSchemaProperty,
+  type PasswordStrengthConfig,
   type Widget,
 } from "./components/form-renderer";
 export {
   AuthCard,
+  ForgotPassword,
+  type ForgotPasswordValues,
+  ResetPassword,
+  type ResetPasswordValues,
   SignIn,
   type SignInValues,
   SignUp,
