@@ -1,0 +1,52 @@
+import {
+  BooleanRenderer,
+  type BooleanRendererConfig,
+} from "./boolean-renderer";
+import {
+  CurrencyRenderer,
+  type CurrencyRendererConfig,
+} from "./currency-renderer";
+import { DateRenderer, type DateRendererConfig } from "./date-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
+import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
+import { StatusRenderer, type StatusRendererConfig } from "./status-renderer";
+import { TextRenderer, type TextRendererConfig } from "./text-renderer";
+
+export type GenericRendererConfig =
+  | TextRendererConfig
+  | NumberRendererConfig
+  | CurrencyRendererConfig
+  | DateRendererConfig
+  | BooleanRendererConfig
+  | StatusRendererConfig
+  | ({ type: "link" } & LinkRendererConfig);
+
+// Dispatch a config `type` to its renderer. `path` reads the value out of
+// `data`; currency/number/date are locale-aware (each uses useFormatters).
+export function GenericRenderer({
+  config,
+  data = {},
+}: {
+  config: GenericRendererConfig;
+  data?: Record<string, unknown>;
+}) {
+  switch (config.type) {
+    case "string":
+    case "text":
+      return <TextRenderer config={config} data={data} />;
+    case "number":
+      return <NumberRenderer config={config} data={data} />;
+    case "currency":
+      return <CurrencyRenderer config={config} data={data} />;
+    case "date":
+      return <DateRenderer config={config} data={data} />;
+    case "boolean":
+      return <BooleanRenderer config={config} data={data} />;
+    case "status":
+      return <StatusRenderer config={config} data={data} />;
+    case "link":
+      return <LinkRenderer config={config} data={data} />;
+    default:
+      return null;
+  }
+}
