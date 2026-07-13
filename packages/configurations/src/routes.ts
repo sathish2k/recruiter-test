@@ -18,6 +18,22 @@ export const routes: Route[] = [
     children: [],
   },
   {
+    id: "Recruit.Jobs.Route",
+    path: "jobs",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Jobs.Page",
+    guard: [{ type: "authenticationGuard" }],
+    children: [],
+  },
+  {
+    id: "Recruit.Candidates.Route",
+    path: "candidates",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Candidates.Page",
+    guard: [{ type: "authenticationGuard" }],
+    children: [],
+  },
+  {
     id: "Auth.Login.Route",
     path: "login",
     layout: "Auth.Layout",

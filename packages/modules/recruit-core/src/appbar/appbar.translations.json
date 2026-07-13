@@ -2,6 +2,8 @@
   "avatar": "RK",
   "titles": {
     "dashboard": "Dashboard",
-    "clients": "Clients"
+    "clients": "Clients",
+    "jobs": "Jobs",
+    "candidates": "Candidates"
   }
 }

@@ -1,0 +1,33 @@
+{
+  "search": "Search candidates…",
+  "export": "Export",
+  "exportAs": "EXPORT AS",
+  "importCsv": "Import CSV",
+  "addCandidate": "Add Candidate",
+  "filters": {
+    "stage": "Stage",
+    "client": "Client",
+    "role": "Role",
+    "source": "Source",
+    "exp": "Experience",
+    "match": "AI Match"
+  },
+  "columns": {
+    "candidate": "Candidate",
+    "role": "Role",
+    "client": "Client",
+    "match": "AI Match",
+    "exp": "Experience",
+    "applied": "Applied",
+    "stage": "Stage",
+    "actions": "Actions"
+  },
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "excel": "Excel (.xlsx)",
+    "word": "Word (.docx)"
+  },
+  "showing": "Showing {shown} of {total} candidates",
+  "noData": "No candidates match these filters",
+  "loadError": "Something went wrong loading candidates."
+}

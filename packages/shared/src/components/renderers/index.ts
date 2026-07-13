@@ -1,4 +1,12 @@
 export {
+  ActionsRenderer,
+  type ActionsRendererConfig,
+} from "./actions-renderer";
+export {
+  AiMatchRenderer,
+  type AiMatchRendererConfig,
+} from "./ai-match-renderer";
+export {
   BooleanRenderer,
   type BooleanRendererConfig,
 } from "./boolean-renderer";
@@ -7,6 +15,7 @@ export {
   type CurrencyRendererConfig,
 } from "./currency-renderer";
 export { DateRenderer, type DateRendererConfig } from "./date-renderer";
+export { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
 export {
   GenericRenderer,
   type GenericRendererConfig,
@@ -18,6 +27,7 @@ export {
   type LinkType,
 } from "./link-renderer";
 export { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
+export { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 export {
   StatCardRenderer,
   type StatCardRendererConfig,

@@ -1,4 +1,12 @@
 import {
+  ActionsRenderer,
+  type ActionsRendererConfig,
+} from "./actions-renderer";
+import {
+  AiMatchRenderer,
+  type AiMatchRendererConfig,
+} from "./ai-match-renderer";
+import {
   BooleanRenderer,
   type BooleanRendererConfig,
 } from "./boolean-renderer";
@@ -7,8 +15,10 @@ import {
   type CurrencyRendererConfig,
 } from "./currency-renderer";
 import { DateRenderer, type DateRendererConfig } from "./date-renderer";
+import { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
+import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 import {
   StaticTranslationRenderer,
   type StaticTranslationRendererConfig,
@@ -24,6 +34,10 @@ export type GenericRendererConfig =
   | DateRendererConfig
   | BooleanRendererConfig
   | StatusRendererConfig
+  | EntityRendererConfig
+  | AiMatchRendererConfig
+  | PillRendererConfig
+  | ActionsRendererConfig
   | ({ type: "link" } & LinkRendererConfig);
 
 // Dispatch a config `type` to its renderer. `path` reads the value out of
@@ -51,6 +65,14 @@ export function GenericRenderer({
       return <BooleanRenderer config={config} data={data} />;
     case "status":
       return <StatusRenderer config={config} data={data} />;
+    case "entity":
+      return <EntityRenderer config={config} data={data} />;
+    case "ai-match":
+      return <AiMatchRenderer config={config} data={data} />;
+    case "pill":
+      return <PillRenderer config={config} data={data} />;
+    case "actions":
+      return <ActionsRenderer config={config} data={data} />;
     case "link":
       return <LinkRenderer config={config} data={data} />;
     default:

@@ -22,6 +22,9 @@
       "@recruit/module-dashboard": [
         "../../packages/modules/recruit-dashboard/src/index.ts"
       ],
+      "@recruit/module-jobs": [
+        "../../packages/modules/recruit-jobs/src/index.ts"
+      ],
       "@recruit/module-candidate": [
         "../../packages/modules/recruit-candidate/src/index.ts"
       ],

@@ -1,0 +1,31 @@
+{
+  "search": "Search jobs…",
+  "export": "Export",
+  "exportAs": "EXPORT AS",
+  "newJob": "New Job",
+  "filters": {
+    "role": "Role",
+    "client": "Client",
+    "status": "Status",
+    "location": "Location",
+    "empType": "Employment type",
+    "level": "Experience level"
+  },
+  "columns": {
+    "role": "Role",
+    "client": "Client",
+    "location": "Location · Type",
+    "pipeline": "Pipeline",
+    "matched": "AI Matched",
+    "posted": "Posted",
+    "status": "Status"
+  },
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "excel": "Excel (.xlsx)",
+    "word": "Word (.docx)"
+  },
+  "showing": "Showing {shown} of {total} jobs · page {page} of {pages}",
+  "noData": "No jobs match these filters",
+  "loadError": "Something went wrong loading jobs."
+}

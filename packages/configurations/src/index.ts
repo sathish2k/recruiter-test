@@ -1,6 +1,12 @@
 import type { Configuration } from "@recruit/sdk";
 import { layouts } from "./layouts";
-import { AuthPages, ClientPages, DashboardPages } from "./pages";
+import {
+  AuthPages,
+  CandidatePages,
+  ClientPages,
+  DashboardPages,
+  JobsPages,
+} from "./pages";
 
 export { routes } from "./routes";
 export { AllModules } from "./registry";
@@ -10,4 +16,6 @@ export const allConfigurations: Configuration[] = [
   ...Object.values(DashboardPages),
   ...Object.values(AuthPages),
   ...Object.values(ClientPages),
+  ...Object.values(JobsPages),
+  ...Object.values(CandidatePages),
 ];
