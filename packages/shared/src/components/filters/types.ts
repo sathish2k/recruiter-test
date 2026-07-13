@@ -36,8 +36,8 @@ export interface CheckboxFilter extends BaseFilter {
   options: FilterOption[];
 }
 
-export interface MultiSelectFilter extends BaseFilter {
-  type: "multiselect";
+export interface SelectFilter extends BaseFilter {
+  type: "select";
   options: FilterOption[];
 }
 
@@ -65,7 +65,7 @@ export type FilterConfig =
   | DropdownFilter
   | RadioFilter
   | CheckboxFilter
-  | MultiSelectFilter
+  | SelectFilter
   | ToggleFilter
   | DateFilter
   | DateRangeFilter

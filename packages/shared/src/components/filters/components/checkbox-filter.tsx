@@ -2,16 +2,16 @@
 
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import Box from "@mui/material/Box";
-import type { CheckboxFilter, MultiSelectFilter } from "../types";
+import type { CheckboxFilter, SelectFilter } from "../types";
 import { FilterPopover, optionRowSx } from "./filter-popover";
 
-// Handles both `checkbox` and `multiselect` — the value is a string[].
+// Handles both `checkbox` and `select` — the value is a string[].
 export function CheckboxFilterComponent({
   config,
   value,
   onChange,
 }: {
-  config: CheckboxFilter | MultiSelectFilter;
+  config: CheckboxFilter | SelectFilter;
   value: string[] | undefined;
   onChange: (value: string[]) => void;
 }) {

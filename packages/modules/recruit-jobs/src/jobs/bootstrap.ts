@@ -2,6 +2,7 @@ import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
 import { JobsComponent } from "./jobs.component";
 import { JobsConfiguration } from "./jobs.configuration";
 import { jobsDatasource } from "./jobs.datasource";
+import deTranslation from "./jobs.translations.de.json";
 import fallbackTranslation from "./jobs.translations.json";
 
 const CONFIGURATION: ComponentDependency = {
@@ -13,7 +14,8 @@ const CONFIGURATION: ComponentDependency = {
 const TRANSLATION: ComponentDependency = {
   id: "Recruit.Jobs.Translation",
   type: "TRANSLATION",
-  value: { fallback: fallbackTranslation },
+  // `fallback` is the default; each language key (de) is a *.translations.<lang>.json file.
+  value: { fallback: fallbackTranslation, de: deTranslation },
 };
 
 const DATASOURCE: ComponentDependency = {

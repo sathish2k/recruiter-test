@@ -95,7 +95,7 @@ function displayValue(config: FilterConfig, value: unknown): string {
         config.options.find((o) => o.value === value)?.label ?? String(value)
       );
     case "checkbox":
-    case "multiselect":
+    case "select":
       return Array.isArray(value)
         ? value
             .map((v) => config.options.find((o) => o.value === v)?.label ?? v)
@@ -157,7 +157,7 @@ function control(
         />
       );
     case "checkbox":
-    case "multiselect":
+    case "select":
       return (
         <CheckboxFilterComponent
           config={filter}

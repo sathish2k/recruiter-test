@@ -6,8 +6,10 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
 } from "react";
-import { useLocale } from "./locale-provider";
+import { useTranslation as useI18nextTranslation } from "react-i18next";
+import { registerTranslations } from "./i18n";
 
 export interface GlobalDependencyContextType {
   configurationMap: Map<string, Record<string, unknown>>;
@@ -37,6 +39,19 @@ export function GlobalDependencyProvider({
   translationMap,
   datasourceRefMap = EMPTY_REFS,
 }: GlobalDependencyProviderProps) {
+  const { i18n } = useI18nextTranslation();
+
+  // Register each component's translations as an i18next namespace on the
+  // app-level instance. Runs synchronously before children render, and again
+  // when the map changes.
+  const lastMap = useRef<
+    GlobalDependencyProviderProps["translationMap"] | null
+  >(null);
+  if (lastMap.current !== translationMap) {
+    registerTranslations(i18n, translationMap);
+    lastMap.current = translationMap;
+  }
+
   const value = useMemo<GlobalDependencyContextType>(
     () => ({ configurationMap, dataMap, translationMap, datasourceRefMap }),
     [configurationMap, dataMap, translationMap, datasourceRefMap],
@@ -72,43 +87,32 @@ export interface TranslationData {
   [locale: string]: unknown;
 }
 
-function dget(obj: unknown, path: string): unknown {
-  return path
-    .split(".")
-    .reduce<unknown>(
-      (o, k) =>
-        o && typeof o === "object"
-          ? (o as Record<string, unknown>)[k]
-          : undefined,
-      obj,
-    );
-}
-
+// Resolves text via i18next, scoped to the component's namespace (= id). The
+// signature is unchanged: `t(key, fallback?)`. Pass an options object as the
+// second arg for i18next features (count/plurals, interpolation values).
 export function useTranslation(componentId: string): {
-  t: (key: string, fallback?: string) => string;
+  t: (key: string, fallback?: string | Record<string, unknown>) => string;
   language: string;
   setLanguage: (language: string) => void;
 } {
-  const { translationMap } = useGlobalDependencies();
-  const { language, setLanguage } = useLocale();
-  const data = translationMap.get(componentId) as TranslationData | undefined;
+  const { t: rawT, i18n } = useI18nextTranslation(componentId);
 
   const t = useCallback(
-    (key: string, fallback?: string): string => {
-      const fromLang = data?.[language] ? dget(data[language], key) : undefined;
-      if (typeof fromLang === "string") return fromLang;
-      const fromFallback = data?.fallback
-        ? dget(data.fallback, key)
-        : undefined;
-      if (typeof fromFallback === "string") return fromFallback;
-      const fromEn = data?.en ? dget(data.en, key) : undefined;
-      if (typeof fromEn === "string") return fromEn;
-      return fallback ?? key;
+    (key: string, fallback?: string | Record<string, unknown>): string => {
+      const options =
+        typeof fallback === "string" ? { defaultValue: fallback } : fallback;
+      return rawT(key, options) as string;
     },
-    [data, language],
+    [rawT],
+  );
+  const setLanguage = useCallback(
+    (language: string) => {
+      i18n.changeLanguage(language);
+    },
+    [i18n],
   );
 
-  return { t, language, setLanguage };
+  return { t, language: i18n.language, setLanguage };
 }
 
 export function useComponentData<T = Record<string, unknown>>(

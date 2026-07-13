@@ -1,4 +1,5 @@
 import {
+  type ActionHandler,
   ActionsRenderer,
   type ActionsRendererConfig,
 } from "./actions-renderer";
@@ -45,9 +46,11 @@ export type GenericRendererConfig =
 export function GenericRenderer({
   config,
   data = {},
+  actionHandler,
 }: {
   config: GenericRendererConfig;
   data?: Record<string, unknown>;
+  actionHandler?: ActionHandler;
 }) {
   switch (config.type) {
     case "string":
@@ -72,7 +75,13 @@ export function GenericRenderer({
     case "pill":
       return <PillRenderer config={config} data={data} />;
     case "actions":
-      return <ActionsRenderer config={config} data={data} />;
+      return (
+        <ActionsRenderer
+          config={config}
+          data={data}
+          actionHandler={actionHandler}
+        />
+      );
     case "link":
       return <LinkRenderer config={config} data={data} />;
     default:

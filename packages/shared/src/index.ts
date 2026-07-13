@@ -67,6 +67,8 @@ export {
   type SignUpValues,
 } from "./components/auth";
 export {
+  type ActionHandler,
+  type ActionItem,
   ActionsRenderer,
   type ActionsRendererConfig,
   AiMatchRenderer,

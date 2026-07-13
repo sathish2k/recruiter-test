@@ -17,5 +17,7 @@ export default new Elysia({ name: "candidate.routes" })
       match: t.Optional(t.String()),
       sortKey: t.Optional(t.String()),
       sortDir: t.Optional(t.String()),
+      page: t.Optional(t.String()),
+      pageSize: t.Optional(t.String()),
     }),
   });

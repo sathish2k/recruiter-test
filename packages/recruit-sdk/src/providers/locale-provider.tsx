@@ -1,20 +1,20 @@
 "use client";
 
+import { type ReactNode, useState } from "react";
 import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+  I18nextProvider,
+  useTranslation as useI18nextTranslation,
+} from "react-i18next";
+import { createI18n } from "./i18n";
 
 export interface LocaleContextValue {
   language: string;
   setLanguage: (language: string) => void;
 }
 
-const LocaleContext = createContext<LocaleContextValue | undefined>(undefined);
-
+// Owns the i18next instance for the whole app and makes it the single source of
+// truth for language. `useLocale` reads that language (and drives the Intl
+// formatters), so translations and formatting stay in lockstep.
 export function LocaleProvider({
   children,
   defaultLanguage = "en",
@@ -22,13 +22,16 @@ export function LocaleProvider({
   children: ReactNode;
   defaultLanguage?: string;
 }) {
-  const [language, setLanguage] = useState(defaultLanguage);
-  const value = useMemo(() => ({ language, setLanguage }), [language]);
-  return (
-    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
-  );
+  const [i18n] = useState(() => createI18n(defaultLanguage));
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }
 
 export function useLocale(): LocaleContextValue {
-  return useContext(LocaleContext) ?? { language: "en", setLanguage: () => {} };
+  const { i18n } = useI18nextTranslation();
+  return {
+    language: i18n.language,
+    setLanguage: (language: string) => {
+      i18n.changeLanguage(language);
+    },
+  };
 }

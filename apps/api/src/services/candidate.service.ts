@@ -11,6 +11,8 @@ export interface CandidateFilters {
   match?: string; // comma-joined AI-match bands
   sortKey?: string;
   sortDir?: string;
+  page?: string;
+  pageSize?: string;
 }
 
 function escapeRegExp(value: string): string {
@@ -107,9 +109,16 @@ export async function listCandidates(filters: CandidateFilters = {}) {
     ? { [sortField]: sortDir === "desc" ? -1 : 1 }
     : { _id: 1 };
 
-  const docs = await CandidateModel.find(query).sort(sort).lean();
+  // Server-side pagination — totalCount is the full match count, not the page.
+  const page = Math.max(1, Number(filters.page) || 1);
+  const pageSize = Math.max(0, Number(filters.pageSize) || 0);
+
+  const totalCount = await CandidateModel.countDocuments(query);
+  let cursor = CandidateModel.find(query).sort(sort);
+  if (pageSize > 0) cursor = cursor.skip((page - 1) * pageSize).limit(pageSize);
+  const docs = await cursor.lean();
   const data = docs.map((c) =>
     mapCandidate(c as CandidateDoc & { _id: unknown }),
   );
-  return { data, totalCount: data.length };
+  return { data, totalCount };
 }

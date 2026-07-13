@@ -309,25 +309,74 @@ export const theme = createTheme({
     MuiPaginationItem: {
       styleOverrides: {
         root: {
+          width: 30,
+          height: 30,
+          minWidth: 30,
+          margin: "0 3px",
+          fontSize: 12.5,
+          fontWeight: 600,
+          color: "#9A968E",
           borderRadius: 999,
-          "&.Mui-selected": { background: "rgba(255,255,255,0.08)" },
+          "&:hover": { background: "rgba(255,255,255,0.06)" },
+          "&.Mui-selected": {
+            background: "rgba(255,255,255,0.08)",
+            color: "#ECEAE7",
+            borderColor: "transparent",
+          },
         },
+        page: { border: "1px solid rgba(255,255,255,0.06)" },
+        previousNext: {
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "#ECEAE7",
+        },
+      },
+    },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          background: "#1C1C1B",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 16,
+          padding: "18px 20px",
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: { "&:hover": { background: "rgba(255,255,255,0.03)" } },
+        head: { "&:hover": { background: "transparent" } },
       },
     },
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderColor: "rgba(255,255,255,0.05)",
-          fontSize: 12.5,
-          padding: "11px 12px",
+          borderBottom: "none",
+          padding: "13px 14px",
+          fontSize: 13,
+          color: "#ECEAE7",
         },
         head: {
           color: "#9A968E",
-          fontSize: 11.5,
-          fontWeight: 600,
+          fontSize: 12,
+          fontWeight: 400,
           background: "rgba(255,255,255,0.04)",
-          borderBottom: "none",
+          padding: "10px 14px",
+          "&:first-of-type": {
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: 10,
+          },
+          "&:last-of-type": {
+            borderTopRightRadius: 10,
+            borderBottomRightRadius: 10,
+          },
         },
+        body: { borderBottom: "1px solid rgba(255,255,255,0.05)" },
+      },
+    },
+    MuiTableSortLabel: {
+      styleOverrides: {
+        root: { "&.Mui-active": { color: "#ECEAE7" } },
+        icon: { fontSize: 16, color: "#FF9D57 !important" },
       },
     },
   },

@@ -13,6 +13,7 @@ import {
 import type { ReactNode } from "react";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
+import type { ActionHandler } from "../renderers";
 import { TableRenderer } from "./table-renderer";
 import type { TableCta, TableFilterExportConfig } from "./table-renderer.types";
 
@@ -31,10 +32,12 @@ export function TableFilterExportRenderer({
   id,
   config: configProp,
   onCta,
+  actionHandler,
 }: {
   id: string;
   config?: TableFilterExportConfig;
   onCta?: (action: string) => void;
+  actionHandler?: ActionHandler;
 }) {
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<TableFilterExportConfig>(id);
@@ -42,9 +45,10 @@ export function TableFilterExportRenderer({
   const router = usePortalRouter();
   const { filters } = useFilters();
 
-  // Filters go straight to the API — it filters server-side.
+  // The table fetches its own paged/sorted data (server-side) from `filters`.
+  // This fetch is the full filtered set (no pagination) used only for Export.
   const { data } = useFetch<Row[]>(id, { filters });
-  const rows = data ?? [];
+  const exportRows = data ?? [];
 
   // Resolve the filter config's translation keys (labels/placeholders).
   const filterOptions: FilterConfig[] = (config?.filters ?? []).map((f) => {
@@ -79,16 +83,31 @@ export function TableFilterExportRenderer({
           alignItems: "center",
           justifyContent: "space-between",
           gap: "12px",
-          flexWrap: "wrap",
         }}
       >
-        {config?.filters ? <Filters options={filterOptions} /> : <Box />}
-        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {config?.filters ? (
+            <Filters
+              options={filterOptions}
+              responsive
+              showClearAll
+              moreLabel={t("moreFilters", "Filters")}
+            />
+          ) : null}
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            flex: "none",
+          }}
+        >
           {config?.export ? (
             <Export
               id={id}
               config={config.export}
-              data={rows}
+              data={exportRows}
               filename={config.exportFilename ?? id}
             />
           ) : null}
@@ -128,7 +147,12 @@ export function TableFilterExportRenderer({
         </Box>
       </Box>
 
-      <TableRenderer id={id} config={config} data={rows} />
+      <TableRenderer
+        id={id}
+        config={config}
+        filters={filters}
+        actionHandler={actionHandler}
+      />
     </Box>
   );
 }

@@ -11,6 +11,8 @@ export interface JobFilters {
   level?: string;
   sortKey?: string;
   sortDir?: string; // "asc" | "desc"
+  page?: string;
+  pageSize?: string;
 }
 
 function escapeRegExp(value: string): string {
@@ -87,7 +89,14 @@ export async function listJobs(filters: JobFilters = {}) {
     ? { [sortField]: sortDir === "desc" ? -1 : 1 }
     : { _id: 1 };
 
-  const docs = await JobModel.find(query).sort(sort).lean();
+  // Server-side pagination — totalCount is the full match count, not the page.
+  const page = Math.max(1, Number(filters.page) || 1);
+  const pageSize = Math.max(0, Number(filters.pageSize) || 0);
+
+  const totalCount = await JobModel.countDocuments(query);
+  let cursor = JobModel.find(query).sort(sort);
+  if (pageSize > 0) cursor = cursor.skip((page - 1) * pageSize).limit(pageSize);
+  const docs = await cursor.lean();
   const data = docs.map((j) => mapJob(j as JobDoc & { _id: unknown }));
-  return { data, totalCount: data.length };
+  return { data, totalCount };
 }

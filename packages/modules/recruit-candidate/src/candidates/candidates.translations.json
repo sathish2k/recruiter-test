@@ -2,6 +2,7 @@
   "search": "Search candidates…",
   "export": "Export",
   "exportAs": "EXPORT AS",
+  "moreFilters": "Filters",
   "importCsv": "Import CSV",
   "addCandidate": "Add Candidate",
   "filters": {
@@ -27,7 +28,7 @@
     "excel": "Excel (.xlsx)",
     "word": "Word (.docx)"
   },
-  "showing": "Showing {shown} of {total} candidates",
+  "showing": "Showing {{shown}} of {{total}} candidates",
   "noData": "No candidates match these filters",
   "loadError": "Something went wrong loading candidates."
 }

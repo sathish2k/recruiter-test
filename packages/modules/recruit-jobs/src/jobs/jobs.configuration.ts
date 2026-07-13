@@ -25,7 +25,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
   filters: [
     { type: "search", key: "search", placeholder: "search" },
     {
-      type: "multiselect",
+      type: "select",
       key: "role",
       label: { name: "filters.role" },
       options: [
@@ -36,7 +36,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "client",
       label: { name: "filters.client" },
       options: [
@@ -48,7 +48,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "status",
       label: { name: "filters.status" },
       options: [
@@ -58,7 +58,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "location",
       label: { name: "filters.location" },
       options: [
@@ -70,7 +70,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "empType",
       label: { name: "filters.empType" },
       options: [
@@ -80,7 +80,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "level",
       label: { name: "filters.level" },
       options: [

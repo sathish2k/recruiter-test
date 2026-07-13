@@ -1,0 +1,32 @@
+{
+  "search": "Jobs suchen…",
+  "export": "Exportieren",
+  "exportAs": "EXPORTIEREN ALS",
+  "moreFilters": "Filter",
+  "newJob": "Neuer Job",
+  "filters": {
+    "role": "Rolle",
+    "client": "Kunde",
+    "status": "Status",
+    "location": "Standort",
+    "empType": "Beschäftigungsart",
+    "level": "Erfahrungsstufe"
+  },
+  "columns": {
+    "role": "Rolle",
+    "client": "Kunde",
+    "location": "Standort · Typ",
+    "pipeline": "Pipeline",
+    "matched": "KI-Treffer",
+    "posted": "Veröffentlicht",
+    "status": "Status"
+  },
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "excel": "Excel (.xlsx)",
+    "word": "Word (.docx)"
+  },
+  "showing": "Zeige {{shown}} von {{total}} Jobs · Seite {{page}} von {{pages}}",
+  "noData": "Keine Jobs entsprechen diesen Filtern",
+  "loadError": "Beim Laden der Jobs ist ein Fehler aufgetreten."
+}

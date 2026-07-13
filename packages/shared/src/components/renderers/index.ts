@@ -1,4 +1,6 @@
 export {
+  type ActionHandler,
+  type ActionItem,
   ActionsRenderer,
   type ActionsRendererConfig,
 } from "./actions-renderer";

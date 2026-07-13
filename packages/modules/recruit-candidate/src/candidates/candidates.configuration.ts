@@ -40,7 +40,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
   filters: [
     { type: "search", key: "search", placeholder: "search" },
     {
-      type: "multiselect",
+      type: "select",
       key: "stage",
       label: { name: "filters.stage" },
       options: [
@@ -53,7 +53,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "client",
       label: { name: "filters.client" },
       options: [
@@ -65,7 +65,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "role",
       label: { name: "filters.role" },
       options: [
@@ -76,7 +76,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "source",
       label: { name: "filters.source" },
       options: [
@@ -87,7 +87,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "exp",
       label: { name: "filters.exp" },
       options: [
@@ -98,7 +98,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       ],
     },
     {
-      type: "multiselect",
+      type: "select",
       key: "match",
       label: { name: "filters.match" },
       options: [
@@ -177,7 +177,11 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       label: { name: "columns.actions" },
       value: {
         type: "actions",
-        actions: [{ icon: "event" }, { icon: "mail" }, { icon: "more" }],
+        actions: [
+          { type: "schedule", icon: "event" },
+          { type: "message", icon: "mail" },
+          { type: "more", icon: "more" },
+        ],
       },
     },
   ],

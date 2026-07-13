@@ -2,6 +2,14 @@ import type { ExportConfig } from "../export";
 import type { FilterConfig } from "../filters";
 import type { GenericRendererConfig, LinkRendererConfig } from "../renderers";
 
+export type Row = Record<string, unknown>;
+export type SortState = { key: string; dir: "asc" | "desc" } | null;
+/** The translation function returned by useTranslation(id). */
+export type TFunc = (
+  key: string,
+  fallback?: string | Record<string, unknown>,
+) => string;
+
 export interface ColumnLabel {
   /** Translation key resolved via useTranslation(id). */
   name: string;
