@@ -1,6 +1,8 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
@@ -68,20 +70,12 @@ function StatCard({
   const deltaColor = config.delta?.color ?? DELTA_COLOR;
 
   const card = (
-    <Box
+    <Card
+      variant={clickable ? "interactive" : "base"}
       sx={{
-        background: "#1C1C1B",
-        border: "1px solid rgba(255,255,255,.06)",
-        borderRadius: "14px",
-        p: pill ? "18px 20px" : "16px 18px",
         color: "#ECEAE7",
-        ...(clickable
-          ? {
-              cursor: "pointer",
-              transition: "border-color .15s",
-              "&:hover": { borderColor: "rgba(242,106,27,.4)" },
-            }
-          : {}),
+        borderRadius: "14px",
+        padding: pill ? "18px 20px" : "16px 18px",
       }}
     >
       <Typography
@@ -105,27 +99,24 @@ function StatCard({
           <GenericRenderer config={valueConfig} data={data} />
         ) : null}
         {deltaText ? (
-          <Box
-            component="span"
-            sx={
-              pill
-                ? {
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: deltaColor,
-                    background: "rgba(242,106,27,.14)",
-                    border: "1px solid rgba(242,106,27,.3)",
-                    p: "4px 9px",
-                    borderRadius: "999px",
-                  }
-                : { fontSize: 12, fontWeight: 600, color: deltaColor }
-            }
-          >
-            {deltaText}
-          </Box>
+          pill ? (
+            <Chip
+              variant="soft"
+              color="primary"
+              size="small"
+              label={deltaText}
+            />
+          ) : (
+            <Box
+              component="span"
+              sx={{ fontSize: 12, fontWeight: 600, color: deltaColor }}
+            >
+              {deltaText}
+            </Box>
+          )
         ) : null}
       </Box>
-    </Box>
+    </Card>
   );
 
   if (config.link) {
@@ -140,9 +131,6 @@ function StatCard({
   return card;
 }
 
-// Renders one or many stat cards. Config comes from the prop (single or array)
-// or the component's registered configuration by id. Looping is driven by the
-// config array, not by data. Fetches by id unless `data` is provided.
 export function StatCardRenderer({
   id,
   config: configProp,
@@ -177,8 +165,6 @@ export function StatCardRenderer({
     />
   ));
 
-  // One card → render it plain. Multiple → auto-grid (one column per card by
-  // default) unless the caller overrides gridTemplateColumns.
   if (configs.length > 1 || gridTemplateColumns) {
     return (
       <Box

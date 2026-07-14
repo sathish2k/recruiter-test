@@ -8,6 +8,13 @@
       "cwd": "apps/web",
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "--watch", "src/index.ts"],
+      "cwd": "apps/api",
+      "port": 3001
     }
   ]
 }

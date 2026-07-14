@@ -49,7 +49,7 @@ export const RecentCandidatesConfiguration: TableRendererConfig = {
     },
     actionIcon: "arrow-forward",
   },
-  rowRouteId: "Recruit.Candidates.Route",
+  rowRouteId: "Recruit.CandidateDetail.Route",
   columns: [
     {
       label: { name: "columns.candidate" },

@@ -1,5 +1,6 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 
 export function AuthBackdropComponent() {
@@ -89,22 +90,19 @@ export function AuthBackdropComponent() {
           gap: 1.25,
         }}
       >
-        <Box
+        <Avatar
+          variant="rounded"
           sx={{
             width: 34,
             height: 34,
-            borderRadius: "10px",
             background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             fontWeight: 700,
             fontSize: 16,
             color: "#fff",
           }}
         >
           T
-        </Box>
+        </Avatar>
         <Box sx={{ fontWeight: 700, fontSize: 15.5, color: "#ECEAE7" }}>
           Troy
         </Box>

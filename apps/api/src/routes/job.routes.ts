@@ -21,6 +21,10 @@ export default new Elysia({ name: "job.routes" })
       pageSize: t.Optional(t.String()),
     }),
   })
+  .get("/jobs/:id", (ctx) => jobController.getJob(ctx), {
+    isAuth: true,
+    params: t.Object({ id: t.String() }),
+  })
   .post("/jobs", (ctx) => jobController.postJob(ctx), {
     isAuth: true,
     body: t.Object({
@@ -31,5 +35,10 @@ export default new Elysia({ name: "job.routes" })
       location: t.Optional(t.String()),
       empType: t.Optional(t.String()),
       openings: t.Optional(t.Number()),
+      description: t.Optional(t.String()),
+      salaryMin: t.Optional(t.String()),
+      salaryMax: t.Optional(t.String()),
+      skills: t.Optional(t.Array(t.String())),
+      status: t.Optional(t.String()),
     }),
   });

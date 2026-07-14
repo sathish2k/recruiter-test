@@ -1,7 +1,9 @@
+import { status } from "elysia";
 import type { AuthClaims } from "../plugins/auth-guard";
 import {
   type CreateJobInput,
   createJob,
+  getJob as getJobById,
   type JobFilters,
   listJobs,
 } from "../services/job.service";
@@ -9,6 +11,15 @@ import {
 export async function getJobs(ctx: { auth: AuthClaims; query: JobFilters }) {
   const { data, totalCount } = await listJobs(ctx.query ?? {});
   return { data, meta: { totalCount } };
+}
+
+export async function getJob(ctx: {
+  auth: AuthClaims;
+  params: { id: string };
+}) {
+  const job = await getJobById(ctx.params.id);
+  if (!job) return status(404, "Job not found");
+  return { data: job };
 }
 
 export async function postJob(ctx: { auth: AuthClaims; body: CreateJobInput }) {

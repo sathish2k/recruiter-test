@@ -1,0 +1,71 @@
+{
+  "back": "Job Details",
+  "actions": {
+    "keywords": "Keywords",
+    "keywordsTitle": "AI sourcing keywords",
+    "edit": "Edit",
+    "share": "Share",
+    "linkCopied": "Link copied ✓"
+  },
+  "attributes": {
+    "level": "Level",
+    "experience": "Work Experience",
+    "empType": "Employment Type",
+    "workType": "Work Type"
+  },
+  "levels": {
+    "Junior": "Junior-level",
+    "Mid": "Mid-level",
+    "Senior": "Senior-level",
+    "Staff": "Staff-level"
+  },
+  "sections": {
+    "description": "Job Description",
+    "qualifications": "Qualifications",
+    "responsibilities": "Responsibilities",
+    "skills": "Must-have skills"
+  },
+  "team": {
+    "title": "Assigned team",
+    "change": "Change"
+  },
+  "posting": {
+    "title": "Job Posting",
+    "status": "Status",
+    "creationDate": "Creation Date",
+    "recruitmentPeriod": "Recruitment Period",
+    "totalApplicants": "Total Applicants",
+    "viewPipeline": "View pipeline →",
+    "quota": "Quota",
+    "quotaValue": "{{count}} ({{note}})",
+    "views": "Total Views",
+    "saves": "Total Saves",
+    "lastUpdate": "Last Update"
+  },
+  "screening": {
+    "title": "AI Screening",
+    "on": "On",
+    "off": "Off",
+    "screened": "Screened so far",
+    "screenedValue": "{{screened}} of {{total}}",
+    "matched": "Matched {{threshold}}%+",
+    "threshold": "Match threshold"
+  },
+  "keywordsModal": {
+    "title": "Sourcing keywords",
+    "subtitle": "{{title}} · {{client}} — auto-generated on save",
+    "searchAs": "SEARCH AS",
+    "linkedinBadge": "in",
+    "linkedinTitle": "LinkedIn boolean",
+    "linkedinHint": "paste into Recruiter or the people search bar",
+    "naukriBadge": "N",
+    "naukriTitle": "Naukri & job boards",
+    "naukriHint": "comma-separated keywords for resume search",
+    "copy": "Copy",
+    "copied": "Copied ✓",
+    "regenerates": "Regenerates when the JD or skills change",
+    "searchOnLinkedin": "Search on LinkedIn"
+  },
+  "notFound": "This job could not be found.",
+  "loadError": "Something went wrong loading this job."
+}

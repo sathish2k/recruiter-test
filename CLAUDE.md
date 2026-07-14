@@ -191,9 +191,18 @@ unauthenticated visitors to login on the server, before any data is fetched.
 
 - The design system is theme-only (`packages/ui/src/theme.ts`): custom variants
   via the `variants` array + module augmentation; **no wrapper components**. Use
-  plain `@mui/material/*` with the registered variants (`Button contained`,
-  `Chip soft`, `Card accent|feature|ghost|interactive|inset`, restyled
-  Tabs/Alert/Table/Pagination/Stepper).
+  plain `@mui/material/*` with the registered variants: `Button contained`
+  (orange-gradient pill) / `contained secondary` (light pill) / `outlined`,
+  `IconButton` (bordered circle; `color="primary"` soft-orange, `edge="end"`
+  borderless adornment), `Chip soft`, `Card
+  base|accent|feature|ghost|interactive|inset`, `Avatar`, `Paper dropdown`,
+  restyled Tabs/Menu/MenuItem/Dialog/Alert/Table/Pagination/Stepper, and the
+  shared `SearchField`. Colors via palette tokens (`text.*`, `divider`,
+  `background.paper`).
+- **Always use theme-based components.** Never hardcode chrome (`#1C1C1B`
+  cards, borders, radii, table styles) in component `sx` — use the themed atom;
+  if a look is missing, add a theme variant. Atoms (themed MUI) compose shared
+  components (`packages/shared`); shared components compose feature modules.
 - MUI 9 removed system shorthand props — use `sx`. Grid uses `size`/`offset`.
 
 ## Commands
@@ -208,6 +217,9 @@ bunx biome check --write .        # lint + format
 Verify changes with: `bunx biome check --write packages apps`,
 `bunx turbo run typecheck build --force`, `bun test packages`.
 
+Run the API from `apps/api` (`bun run --watch src/index.ts`, port 3001) so Bun
+loads `apps/api/.env` (JWT_SECRET etc.) — don't override env vars on the CLI.
+
 ## Conventions
 
 - Reuse from `@recruit/sdk` and `@recruit/shared`; don't reimplement engine or
@@ -215,7 +227,29 @@ Verify changes with: `bunx biome check --write packages apps`,
 - Text is never hardcoded in components — it lives in `*.translations.json`.
 - Structure/targets (schema, links, route ids) live in `*.configuration.ts`,
   not in the shared component.
-- Deliberate shortcuts are marked with a `ponytail:` comment.
+- Deliberate shortcuts are marked with a `ponytail:` comment. No narrative /
+  AI-style explanatory comments — architecture knowledge belongs here and in
+  `.claude/skills/`; keep only functional comments (`biome-ignore`, `ponytail:`, `TODO:`).
+- Prefer the minimal change: one abstraction, no speculative flexibility.
+
+## Reference apps
+
+- `/Users/chithra/Development/pos-billing-develop` — PRIMARY. Its `pos-sdk`
+  engine, `configurations/`, `usePortalRouter`, `LinkRenderer`, datasource +
+  `useFetch`, and route-guard patterns are mirrored into `@recruit/*`. When
+  unsure how something should look, check it first and match field-for-field.
+- `/Users/chithra/Development/ai-recruiter-app` — secondary (folder structure,
+  MUI theme-as-design-system with no wrapper components).
+
+## Design source (Troy)
+
+Screens are designed in Claude Design — project
+<https://claude.ai/design/p/6f6b750f-ef0f-4411-a69c-9d63dde59ed0>. Fetch them
+via the `claude_design` MCP (`https://api.anthropic.com/v1/design/mcp`, auth
+with `/design-login`; in Claude Code use the `DesignSync` tool): `list_files`
+on that project id, then `get_file` with a path like
+`AIRecruiter - Dashboard.dc.html`. Match implementations to these files
+pixel-by-pixel (via the theme's variants, never inline chrome).
 
 ## Gotchas
 
@@ -226,3 +260,8 @@ Verify changes with: `bunx biome check --write packages apps`,
   Next needs `experimental.externalDir: true` to compile them.
 - The editor's TS server uses the root `tsconfig.json` for files under
   `packages/`, so that config `include`s `packages/**` — don't empty it.
+- `react-apexcharts` renders a blank canvas under React 19 + Turbopack. The
+  shared `Chart` (`packages/shared/src/components/graph-renderer/chart.tsx`)
+  drives the core `apexcharts` lib imperatively instead (dynamic import,
+  recreate on input change) — never reintroduce the wrapper, and never pass
+  `undefined`-valued top-level option keys (apex reads `.colors` off every key).

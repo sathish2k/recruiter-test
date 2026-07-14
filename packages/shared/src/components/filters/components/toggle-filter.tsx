@@ -23,9 +23,9 @@ export function ToggleFilterComponent({
         py: "5px",
         borderRadius: "999px",
         border: "1px solid rgba(255,255,255,.1)",
-        background: "#1C1C1B",
+        bgcolor: "background.paper",
         fontSize: 13,
-        color: value ? "#ECEAE7" : "#9A968E",
+        color: value ? "text.primary" : "text.secondary",
       }}
     >
       {config.label?.name}

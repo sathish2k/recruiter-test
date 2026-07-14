@@ -42,9 +42,6 @@ function isExternal(value: string): boolean {
   );
 }
 
-// Config-driven link. By default renders the resolved text; pass `children` to
-// wrap ANY component in the link instead (the children become the link body and
-// default to no underline / inherited color so they control their own styling).
 export function LinkRenderer({
   config,
   data = {},
@@ -73,7 +70,6 @@ export function LinkRenderer({
   const value = path ? (delve(data, path) as string | undefined) : undefined;
   const displayText = (label ? t(label.name) : text) || value || "";
   const content = children ?? displayText;
-  // Custom children control their own look → default to no underline / inherit.
   const underline = config.underline ?? (children ? "none" : "hover");
   const color = config.color ?? (children ? "inherit" : "primary");
 

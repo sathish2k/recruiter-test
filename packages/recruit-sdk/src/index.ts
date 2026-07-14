@@ -6,6 +6,7 @@ export {
   type PortalRouter,
   PortalRouterProvider,
   usePortalRouter,
+  useRouteParams,
 } from "./navigation";
 export * from "./providers";
 export type {

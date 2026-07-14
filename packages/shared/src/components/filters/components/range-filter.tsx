@@ -13,10 +13,12 @@ export function RangeFilterComponent({
   config,
   value,
   onChange,
+  active,
 }: {
   config: RangeFilter;
   value: RangeValue | undefined;
   onChange: (value: RangeValue) => void;
+  active?: boolean;
 }) {
   const range = value ?? {};
   const summary =
@@ -27,7 +29,12 @@ export function RangeFilterComponent({
   const toNum = (raw: string) => (raw === "" ? undefined : Number(raw));
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary} minWidth={220}>
+    <FilterPopover
+      label={config.label?.name}
+      summary={summary}
+      minWidth={220}
+      active={active}
+    >
       {() => (
         <Box sx={{ display: "flex", gap: "8px", p: "4px" }}>
           <input

@@ -1,0 +1,22 @@
+{
+  "back": "Back to Candidates",
+  "actions.message": "Message",
+  "actions.schedule": "Schedule interview",
+  "report.title": "AI Screening Report",
+  "report.aiMatch": "AI MATCH",
+  "report.strengths": "STRENGTHS",
+  "report.watchouts": "WATCH-OUTS",
+  "experience.title": "Experience",
+  "education.title": "Education & Certifications",
+  "skills.title": "Skills",
+  "skills.hint": "✦ = required by the job",
+  "details.title": "Details",
+  "attachments.title": "Attachments",
+  "applying.title": "Applying for",
+  "interviews.title": "Interviews",
+  "interviews.schedule": "+ Schedule",
+  "interviews.join": "Join",
+  "notes.title": "Notes",
+  "notes.placeholder": "Add a note for the team…",
+  "notes.justNow": "just now"
+}

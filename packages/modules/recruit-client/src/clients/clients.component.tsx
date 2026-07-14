@@ -3,6 +3,7 @@
 import AddRounded from "@mui/icons-material/AddRounded";
 import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import {
   ClientCard,
@@ -15,8 +16,10 @@ import {
   type JsonSchema,
   StatCardRenderer,
   type StatCardRendererConfig,
+  Toast,
   useFilters,
   useModal,
+  useToast,
 } from "@recruit/shared";
 
 interface ClientsConfig {
@@ -31,9 +34,8 @@ export function ClientsComponent({ id }: { id: string }) {
   const config = useConfiguration<ClientsConfig>(id);
   const { filters } = useFilters();
   const addModal = useModal();
+  const { toast, show, clear } = useToast();
 
-  // Filters go straight to the API — it filters + counts server-side (and
-  // treats `status: "all"` / empty search as no filter).
   const { data, meta, mutation, mutate } = useFetch<ClientCardData[]>(id, {
     filters,
   });
@@ -44,9 +46,12 @@ export function ClientsComponent({ id }: { id: string }) {
   const createClient = async (values: FormValues) => {
     await mutation.create?.(values);
     await mutate();
+    show(
+      t("toast.created"),
+      t("toast.createdSub", { name: String(values.name ?? "") }),
+    );
   };
 
-  // Resolve the config's translation keys + inject the backend status counts.
   const filterOptions: FilterConfig[] = (config.filters ?? []).map((f) => {
     if ("options" in f) {
       return {
@@ -69,7 +74,6 @@ export function ClientsComponent({ id }: { id: string }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {/* Toolbar */}
       <Box
         sx={{
           display: "flex",
@@ -81,43 +85,20 @@ export function ClientsComponent({ id }: { id: string }) {
       >
         <Filters options={filterOptions} />
         <Box sx={{ display: "flex", gap: "8px" }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              px: "16px",
-              py: "9px",
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,.14)",
-              fontSize: 13,
-              cursor: "pointer",
-              "&:hover": { background: "rgba(255,255,255,.06)" },
-            }}
+          <Button
+            variant="outlined"
+            startIcon={<FileDownloadOutlined sx={{ fontSize: 18 }} />}
+            sx={{ fontWeight: 400 }}
           >
-            <FileDownloadOutlined sx={{ fontSize: 18 }} />
             {t("export")}
-          </Box>
-          <Box
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddRounded sx={{ fontSize: 18 }} />}
             onClick={() => addModal.open()}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              px: "16px",
-              py: "9px",
-              borderRadius: "999px",
-              background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: "pointer",
-              "&:hover": { filter: "brightness(1.08)" },
-            }}
           >
-            <AddRounded sx={{ fontSize: 18 }} />
             {t("addClient")}
-          </Box>
+          </Button>
         </Box>
       </Box>
 
@@ -135,10 +116,8 @@ export function ClientsComponent({ id }: { id: string }) {
         />
       ) : null}
 
-      {/* Summary */}
       <StatCardRenderer id={id} config={config.stats} data={summary} />
 
-      {/* Client cards */}
       <Box
         sx={{
           display: "grid",
@@ -156,6 +135,8 @@ export function ClientsComponent({ id }: { id: string }) {
           />
         ))}
       </Box>
+
+      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

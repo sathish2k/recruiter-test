@@ -1,62 +1,51 @@
 "use client";
 
 import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
-import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Popover from "@mui/material/Popover";
 import { type ReactNode, useState } from "react";
 
-// A filter trigger button + popover. `children` receives a `close` callback so
-// single-select controls can dismiss on choose. Shared by the popover-based
-// filter controls (dropdown, radio, checkbox, date, daterange, range).
 export function FilterPopover({
   label,
   summary,
-  minWidth = 200,
+  minWidth = 220,
+  active = false,
   children,
 }: {
   label?: string;
   summary?: string;
   minWidth?: number;
+  active?: boolean;
   children: (close: () => void) => ReactNode;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return (
     <>
-      <Box
+      <Button
+        variant="outlined"
         onClick={(e) => setAnchor(e.currentTarget)}
+        endIcon={<ExpandMoreRounded sx={{ color: "text.disabled" }} />}
         sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          px: "16px",
-          py: "9px",
-          borderRadius: "999px",
-          border: "1px solid rgba(255,255,255,.1)",
-          background: "#1C1C1B",
-          fontSize: 13,
-          color: summary ? "#ECEAE7" : "#9A968E",
-          cursor: "pointer",
+          fontSize: 12.5,
+          fontWeight: 600,
+          background: active ? "rgba(242,106,27,.12)" : "#1C1C1B",
+          borderColor: active ? "rgba(242,106,27,.5)" : undefined,
+          color: active
+            ? "#F0B27C"
+            : summary
+              ? "text.primary"
+              : "text.secondary",
         }}
       >
         {summary ?? label ?? ""}
-        <ExpandMoreRounded sx={{ fontSize: 18, color: "#7C7972" }} />
-      </Box>
+      </Button>
       <Popover
         open={!!anchor}
         anchorEl={anchor}
         onClose={() => setAnchor(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         slotProps={{
-          paper: {
-            sx: {
-              mt: "6px",
-              minWidth,
-              background: "#1F1F1E",
-              border: "1px solid rgba(255,255,255,.12)",
-              borderRadius: "12px",
-              p: "6px",
-            },
-          },
+          paper: { variant: "dropdown", sx: { mt: "6px", minWidth } },
         }}
       >
         {children(() => setAnchor(null))}
@@ -74,7 +63,7 @@ export const optionRowSx = (active: boolean) => ({
   borderRadius: "8px",
   fontSize: 13,
   cursor: "pointer",
-  color: active ? "#ECEAE7" : "#9A968E",
+  color: active ? "text.primary" : "text.secondary",
   "&:hover": { background: "rgba(255,255,255,.05)" },
 });
 

@@ -3,26 +3,33 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import InputBase from "@mui/material/InputBase";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ajvResolver } from "@hookform/resolvers/ajv";
 import { useTranslation } from "@recruit/sdk";
 import { useMemo, useState } from "react";
 import { IconRenderer } from "../renderers";
+import { MarkdownEditor } from "./markdown-editor";
 import {
   type Control,
   Controller,
   type FieldValues,
+  type Resolver,
   useForm,
 } from "react-hook-form";
 import type {
   FormRendererProps,
+  JsonSchema,
   JsonSchemaProperty,
   PasswordStrengthConfig,
   Widget,
@@ -34,7 +41,6 @@ const DEFAULT_STRENGTH: Required<PasswordStrengthConfig> = {
   colors: ["#E05B5B", "#D69B3C", "#4EA874"],
 };
 
-// Resolve a field's strengthMeter (true | config | falsy) to a full config.
 function resolveStrength(
   strengthMeter: JsonSchemaProperty["strengthMeter"],
 ): Required<PasswordStrengthConfig> | null {
@@ -46,10 +52,50 @@ function resolveStrength(
 
 function widgetFor(prop: JsonSchemaProperty): Widget {
   if (prop.widget) return prop.widget;
+  if (prop.type === "array") return "chips";
   if (prop.enum) return "select";
   if (prop.type === "boolean") return "switch";
   if (prop.format === "password") return "password";
   return "text";
+}
+
+export function defaultFor(prop: JsonSchemaProperty): unknown {
+  if (prop.default !== undefined) return prop.default;
+  if (prop.type === "array") return [];
+  if (prop.type === "boolean") return false;
+  return "";
+}
+
+export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
+  const base = ajvResolver(schema as never, { strict: false });
+  return async (values, context, options) => {
+    const result = await base(values, context, options);
+    const errors = { ...result.errors };
+    for (const [key, prop] of Object.entries(schema.properties)) {
+      if (!prop.matchesField || errors[key]) continue;
+      if (values[key] && values[key] !== values[prop.matchesField]) {
+        errors[key] = {
+          type: "matches",
+          message:
+            typeof prop.errorMessage === "object"
+              ? prop.errorMessage.matches
+              : prop.errorMessage,
+        };
+      }
+    }
+    return Object.keys(errors).length
+      ? { values: {}, errors }
+      : { values: result.values ?? values, errors: {} };
+  };
+}
+
+export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
+  if (hide) return null;
+  return (
+    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "#C9C5BD" }}>
+      {label}
+    </Typography>
+  );
 }
 
 function StrengthMeter({
@@ -90,7 +136,7 @@ function StrengthMeter({
   );
 }
 
-function Field({
+export function Field({
   name,
   prop,
   control,
@@ -110,6 +156,93 @@ function Field({
       name={name}
       control={control}
       render={({ field, fieldState }) => {
+        if (widget === "chips") {
+          const values: string[] = Array.isArray(field.value)
+            ? field.value
+            : [];
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              <FieldLabel label={label} hide={prop.hideLabel} />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  alignItems: "center",
+                }}
+              >
+                {values.map((value, i) => (
+                  <Chip
+                    // biome-ignore lint/suspicious/noArrayIndexKey: duplicates allowed; position is identity.
+                    key={`${value}-${i}`}
+                    variant="soft"
+                    label={value}
+                    onDelete={() =>
+                      field.onChange(values.filter((_, j) => j !== i))
+                    }
+                  />
+                ))}
+                <InputBase
+                  placeholder={
+                    prop.placeholder ? t(prop.placeholder) : undefined
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return;
+                    e.preventDefault();
+                    const input = e.target as HTMLInputElement;
+                    const value = input.value.trim();
+                    if (!value) return;
+                    field.onChange([...values, value]);
+                    input.value = "";
+                  }}
+                  sx={{
+                    border: "1px dashed rgba(255,255,255,.18)",
+                    borderRadius: "999px",
+                    px: "14px",
+                    py: "3px",
+                    fontSize: 12.5,
+                    width: 150,
+                  }}
+                />
+              </Box>
+            </Box>
+          );
+        }
+        if (widget === "markdown") {
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              <FieldLabel label={label} hide={prop.hideLabel} />
+              <MarkdownEditor
+                value={String(field.value ?? "")}
+                onChange={field.onChange}
+                placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
+                rows={prop.rows}
+                t={t}
+              />
+            </Box>
+          );
+        }
+        if (widget === "segmented") {
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              <FieldLabel label={label} hide={prop.hideLabel} />
+              <Tabs
+                value={field.value || (prop.enum?.[0] ?? "")}
+                onChange={(_, next) => field.onChange(next)}
+                sx={{ width: "100%", "& .MuiTabs-list": { width: "100%" } }}
+              >
+                {(prop.enum ?? []).map((v, i) => (
+                  <Tab
+                    key={String(v)}
+                    value={v}
+                    label={prop.enumNames?.[i] ?? String(v)}
+                    sx={{ flex: 1 }}
+                  />
+                ))}
+              </Tabs>
+            </Box>
+          );
+        }
         if (widget === "switch" || widget === "checkbox") {
           const Toggle = widget === "switch" ? Switch : Checkbox;
           return (
@@ -132,22 +265,25 @@ function Field({
             : undefined;
         if (widget === "select") {
           return (
-            <TextField
-              select
-              fullWidth
-              label={prop.hideLabel ? undefined : label}
-              value={field.value ?? ""}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              error={!!fieldState.error}
-              helperText={helperText}
-            >
-              {(prop.enum ?? []).map((v, i) => (
-                <MenuItem key={String(v)} value={v}>
-                  {prop.enumNames?.[i] ?? String(v)}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              <FieldLabel label={label} hide={prop.hideLabel} />
+              <TextField
+                select
+                fullWidth
+                hiddenLabel
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                error={!!fieldState.error}
+                helperText={helperText}
+              >
+                {(prop.enum ?? []).map((v, i) => (
+                  <MenuItem key={String(v)} value={v}>
+                    {prop.enumNames?.[i] ?? String(v)}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
           );
         }
 
@@ -164,7 +300,8 @@ function Field({
               : "text";
 
         return (
-          <Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+            <FieldLabel label={label} hide={prop.hideLabel} />
             <TextField
               {...field}
               value={field.value ?? ""}
@@ -172,8 +309,7 @@ function Field({
               type={widget === "textarea" ? undefined : type}
               multiline={widget === "textarea"}
               minRows={prop.rows}
-              hiddenLabel={prop.hideLabel}
-              label={prop.hideLabel ? undefined : label}
+              hiddenLabel
               placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
               error={!!fieldState.error}
               helperText={helperText}
@@ -190,6 +326,7 @@ function Field({
                   endAdornment: isPw ? (
                     <IconButton
                       size="small"
+                      edge="end"
                       onClick={() => setShowPw((v) => !v)}
                       sx={{ color: "text.disabled" }}
                     >
@@ -228,16 +365,11 @@ export function FormRenderer({
   beforeSubmit,
 }: FormRendererProps) {
   const { t } = useTranslation(id);
-  const resolver = useMemo(
-    () => ajvResolver(schema as never, { strict: false }),
-    [schema],
-  );
+  const resolver = useMemo(() => buildResolver(schema), [schema]);
   const initial = useMemo(() => {
     const values: FieldValues = { ...defaultValues };
     for (const [key, prop] of Object.entries(schema.properties)) {
-      if (values[key] === undefined) {
-        values[key] = prop.default ?? (prop.type === "boolean" ? false : "");
-      }
+      if (values[key] === undefined) values[key] = defaultFor(prop);
     }
     return values;
   }, [schema, defaultValues]);
@@ -274,12 +406,7 @@ export function FormRenderer({
             <Button
               variant="outlined"
               onClick={onCancel}
-              sx={{
-                borderRadius: "999px",
-                px: "18px",
-                fontSize: 12.5,
-                fontWeight: 600,
-              }}
+              sx={{ px: "18px", fontSize: 12.5 }}
             >
               {t(cancelLabel)}
             </Button>
@@ -287,12 +414,7 @@ export function FormRenderer({
               type="submit"
               variant="contained"
               loading={loading || formState.isSubmitting}
-              sx={{
-                borderRadius: "999px",
-                px: "20px",
-                fontSize: 12.5,
-                fontWeight: 700,
-              }}
+              sx={{ px: "20px", fontSize: 12.5, fontWeight: 700 }}
             >
               {t(submitLabel)}
             </Button>
@@ -305,7 +427,7 @@ export function FormRenderer({
             loading={loading || formState.isSubmitting}
             sx={{
               borderRadius: "12px",
-              py: 1.4,
+              py: "14px",
               fontSize: 14,
               fontWeight: 700,
             }}

@@ -6,12 +6,6 @@ import { useEffect, useMemo, useRef } from "react";
 
 export type ApexChartType = "bar" | "line" | "area" | "pie" | "donut";
 
-// ApexCharts driven imperatively via the core lib (not react-apexcharts, whose
-// class component renders blank under React 19 StrictMode + Turbopack). The lib
-// is imported dynamically on the client only (it touches `window`). The chart is
-// recreated whenever its inputs change (keyed on a JSON snapshot) rather than
-// patched in place — incremental updateOptions/updateSeries race the async
-// render() and choke on partial option objects.
 export function Chart({
   type,
   series,
@@ -24,7 +18,6 @@ export function Chart({
   height?: number;
 }) {
   const elRef = useRef<HTMLDivElement | null>(null);
-  // Functions (formatters) are dropped by stringify — fine, they rarely change.
   const key = useMemo(
     () => JSON.stringify({ type, height, series, options }),
     [type, height, series, options],
@@ -44,8 +37,6 @@ export function Chart({
         chart: { ...options.chart, type, height },
         series,
       };
-      // A key whose value is `undefined` makes apex throw (it reads `.colors`
-      // off every config key). Drop them defensively.
       for (const k of Object.keys(merged)) {
         if (merged[k] === undefined) delete merged[k];
       }

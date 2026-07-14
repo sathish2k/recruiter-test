@@ -8,13 +8,20 @@ export function DateFilterComponent({
   config,
   value,
   onChange,
+  active,
 }: {
   config: DateFilter;
   value: string | undefined;
   onChange: (value: string) => void;
+  active?: boolean;
 }) {
   return (
-    <FilterPopover label={config.label?.name} summary={value} minWidth={180}>
+    <FilterPopover
+      label={config.label?.name}
+      summary={value}
+      minWidth={180}
+      active={active}
+    >
       {() => (
         <Box sx={{ p: "4px" }}>
           <input

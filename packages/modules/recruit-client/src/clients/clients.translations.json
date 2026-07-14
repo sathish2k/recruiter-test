@@ -21,6 +21,10 @@
   "screened": "Screened {value}",
   "interviewing": "Interviewing {value}",
   "viewDetails": "View details",
+  "toast": {
+    "created": "Client created",
+    "createdSub": "{{name}} — add the first role to start sourcing"
+  },
   "filters": {
     "all": "All",
     "hiring": "Hiring",

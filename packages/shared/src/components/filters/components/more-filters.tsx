@@ -1,45 +1,56 @@
 "use client";
 
-import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Popover from "@mui/material/Popover";
 import Typography from "@mui/material/Typography";
 import { type ReactNode, useState } from "react";
+import { IconRenderer } from "../../renderers";
 import type { FilterConfig } from "../types";
 
-// The overflow control: a "More filters" button that opens a popover stacking
-// the filters that didn't fit inline (each with its label + control).
 export function MoreFilters({
   filters,
   label,
+  activeCount = 0,
   renderControl,
 }: {
   filters: FilterConfig[];
   label: string;
+  activeCount?: number;
   renderControl: (filter: FilterConfig) => ReactNode;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return (
     <>
-      <Box
+      <Button
+        variant="outlined"
         onClick={(e) => setAnchor(e.currentTarget)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          px: "16px",
-          py: "9px",
-          borderRadius: "999px",
-          border: "1px solid rgba(255,255,255,.14)",
-          fontSize: 13,
-          color: "#9A968E",
-          cursor: "pointer",
-          "&:hover": { background: "rgba(255,255,255,.06)", color: "#ECEAE7" },
-        }}
+        startIcon={<IconRenderer name="filter" size={16} />}
+        sx={{ fontWeight: 400, color: "text.secondary" }}
       >
-        <MoreHorizRounded sx={{ fontSize: 18 }} />
         {label}
-      </Box>
+        {activeCount > 0 ? (
+          <Box
+            component="span"
+            sx={{
+              ml: "8px",
+              minWidth: 18,
+              height: 18,
+              borderRadius: "999px",
+              background: "#F26A1B",
+              color: "#fff",
+              fontSize: 11,
+              fontWeight: 700,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              px: "5px",
+            }}
+          >
+            {activeCount}
+          </Box>
+        ) : null}
+      </Button>
       <Popover
         open={!!anchor}
         anchorEl={anchor}
@@ -48,14 +59,8 @@ export function MoreFilters({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         slotProps={{
           paper: {
-            sx: {
-              mt: "6px",
-              minWidth: 260,
-              background: "#1F1F1E",
-              border: "1px solid rgba(255,255,255,.12)",
-              borderRadius: "14px",
-              p: "16px",
-            },
+            variant: "dropdown",
+            sx: { mt: "6px", minWidth: 260, p: "16px" },
           },
         }}
       >
@@ -63,7 +68,9 @@ export function MoreFilters({
           {filters.map((filter) => (
             <Box key={filter.key}>
               {filter.label ? (
-                <Typography sx={{ fontSize: 12, color: "#9A968E", mb: "6px" }}>
+                <Typography
+                  sx={{ fontSize: 12, color: "text.secondary", mb: "6px" }}
+                >
                   {filter.label.name}
                 </Typography>
               ) : null}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { findRouteBySlug } from "./engine/router";
 import type { Route } from "./types";
 
 export interface PortalRouter {
@@ -19,6 +20,7 @@ export interface PortalRouter {
 }
 
 const PortalRouterContext = createContext<PortalRouter | undefined>(undefined);
+const RoutesContext = createContext<Route[]>([]);
 
 function buildPath(
   routes: Route[],
@@ -70,7 +72,7 @@ export function PortalRouterProvider({
 
   return (
     <PortalRouterContext.Provider value={value}>
-      {children}
+      <RoutesContext.Provider value={routes}>{children}</RoutesContext.Provider>
     </PortalRouterContext.Provider>
   );
 }
@@ -83,4 +85,25 @@ export function usePortalRouter(): PortalRouter {
     );
   }
   return ctx;
+}
+
+export function useRouteParams(): Record<string, string> {
+  const routes = useContext(RoutesContext);
+  const pathname = usePathname();
+  return useMemo(() => {
+    const slugs = (pathname ?? "/").split("/").filter(Boolean);
+    const branch = findRouteBySlug(slugs, routes);
+    if (!branch) return {};
+    const params: Record<string, string> = {};
+    let i = 0;
+    for (const route of branch) {
+      for (const segment of route.path.split("/").filter(Boolean)) {
+        if (segment.startsWith(":")) {
+          params[segment.slice(1)] = decodeURIComponent(slugs[i] ?? "");
+        }
+        i++;
+      }
+    }
+    return params;
+  }, [routes, pathname]);
 }

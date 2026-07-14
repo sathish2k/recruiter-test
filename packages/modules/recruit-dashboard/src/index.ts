@@ -8,12 +8,10 @@ import { SCREENING_COMPONENT } from "./screening/bootstrap";
 import { STATS_COMPONENT } from "./stats/bootstrap";
 import { DASHBOARD_TOOLBAR_COMPONENT } from "./toolbar/bootstrap";
 import { UPCOMING_INTERVIEWS_COMPONENT } from "./upcoming-interviews/bootstrap";
-import { WELCOME_COMPONENT } from "./welcome/bootstrap";
 
 export const DashboardModule: Module = {
   id: "Dashboard.Module",
   components: [
-    WELCOME_COMPONENT,
     DASHBOARD_TOOLBAR_COMPONENT,
     STATS_COMPONENT,
     HIRING_COMPONENT,

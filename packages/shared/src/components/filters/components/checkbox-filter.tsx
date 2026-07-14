@@ -5,18 +5,26 @@ import Box from "@mui/material/Box";
 import type { CheckboxFilter, SelectFilter } from "../types";
 import { FilterPopover, optionRowSx } from "./filter-popover";
 
-// Handles both `checkbox` and `select` — the value is a string[].
 export function CheckboxFilterComponent({
   config,
   value,
   onChange,
+  active,
 }: {
   config: CheckboxFilter | SelectFilter;
   value: string[] | undefined;
   onChange: (value: string[]) => void;
+  active?: boolean;
 }) {
   const values = Array.isArray(value) ? value : [];
-  const summary = values.length ? `${values.length} selected` : undefined;
+  const first = values.length
+    ? (config.options.find((o) => o.value === values[0])?.label ?? values[0])
+    : undefined;
+  const summary = first
+    ? `${[config.label?.name, first].filter(Boolean).join(": ")}${
+        values.length > 1 ? ` +${values.length - 1}` : ""
+      }`
+    : undefined;
 
   const toggle = (v: string) =>
     onChange(
@@ -24,7 +32,7 @@ export function CheckboxFilterComponent({
     );
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary}>
+    <FilterPopover label={config.label?.name} summary={summary} active={active}>
       {() =>
         config.options.map((option) => {
           const checked = values.includes(option.value);

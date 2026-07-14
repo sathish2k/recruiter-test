@@ -8,14 +8,20 @@ export function RadioFilterComponent({
   config,
   value,
   onChange,
+  active: activeProp,
 }: {
   config: RadioFilter;
   value: string | undefined;
   onChange: (value: string) => void;
+  active?: boolean;
 }) {
   const selected = config.options.find((o) => o.value === value);
   return (
-    <FilterPopover label={config.label?.name} summary={selected?.label}>
+    <FilterPopover
+      label={config.label?.name}
+      summary={selected?.label}
+      active={activeProp}
+    >
       {(close) =>
         config.options.map((option) => {
           const active = option.value === value;

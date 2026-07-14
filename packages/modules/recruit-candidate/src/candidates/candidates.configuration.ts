@@ -37,8 +37,9 @@ const STAGE_PILLS = {
 // translation KEYS resolved by the renderer. Cells render via GenericRenderer.
 export const CandidatesConfiguration: TableFilterExportConfig = {
   exportFilename: "candidates",
+  rowRouteId: "Recruit.CandidateDetail.Route",
   filters: [
-    { type: "search", key: "search", placeholder: "search" },
+    { type: "search", key: "search", placeholder: "search", width: 360 },
     {
       type: "select",
       key: "stage",
@@ -133,7 +134,11 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       action: "import",
       variant: "secondary",
     },
-    { label: { name: "addCandidate" }, icon: "add", action: "add" },
+    {
+      label: { name: "addCandidate" },
+      icon: "add",
+      routeId: "Recruit.AddCandidate.Route",
+    },
   ],
   columns: [
     {
@@ -177,6 +182,7 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
     {
       label: { name: "columns.applied" },
       value: { type: "string", path: "applied", sx: { color: "#9A968E" } },
+      sort: { key: "applied" },
     },
     {
       label: { name: "columns.stage" },

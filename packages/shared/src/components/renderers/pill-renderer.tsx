@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import delve from "dlv";
 
 export interface PillRendererConfig {
@@ -8,8 +9,6 @@ export interface PillRendererConfig {
   styles: Record<string, { fg: string; bg: string; border: string }>;
 }
 
-// A status/stage pill with arbitrary per-value colors (matches the design's
-// custom pills, which the MUI-palette StatusRenderer can't express).
 export function PillRenderer({
   config,
   data = {},
@@ -21,20 +20,15 @@ export function PillRenderer({
   const st = config.styles[value];
   if (!st) return <Box component="span">{value}</Box>;
   return (
-    <Box
-      component="span"
+    <Chip
+      variant="soft"
+      size="small"
+      label={value}
       sx={{
-        display: "inline-block",
-        fontSize: 12,
-        fontWeight: 600,
         color: st.fg,
-        background: st.bg,
+        backgroundColor: st.bg,
         border: `1px solid ${st.border}`,
-        p: "4px 11px",
-        borderRadius: "999px",
       }}
-    >
-      {value}
-    </Box>
+    />
   );
 }

@@ -23,7 +23,7 @@ const STATUS_PILLS = {
 export const JobsConfiguration: TableFilterExportConfig = {
   exportFilename: "jobs",
   filters: [
-    { type: "search", key: "search", placeholder: "search" },
+    { type: "search", key: "search", placeholder: "search", width: 360 },
     {
       type: "select",
       key: "role",
@@ -108,7 +108,9 @@ export const JobsConfiguration: TableFilterExportConfig = {
       },
     ],
   },
-  ctas: [{ label: { name: "newJob" }, icon: "add", action: "add" }],
+  ctas: [
+    { label: { name: "newJob" }, icon: "add", routeId: "Recruit.AddJob.Route" },
+  ],
   columns: [
     {
       label: { name: "columns.role" },
@@ -146,6 +148,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
     {
       label: { name: "columns.posted" },
       value: { type: "string", path: "posted", sx: { color: "#9A968E" } },
+      sort: { key: "posted" },
     },
     {
       label: { name: "columns.status" },
@@ -153,6 +156,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
       sort: { key: "status" },
     },
   ],
+  rowRouteId: "Recruit.JobDetail.Route",
   // Trailing kebab (⋮) menu — a link item plus custom actions (actionHandler).
   actionsLabel: { name: "columns.actions" },
   actions: [
@@ -160,7 +164,8 @@ export const JobsConfiguration: TableFilterExportConfig = {
       type: "link",
       icon: "view",
       label: { name: "actionsMenu.view" },
-      routeId: "Recruit.Jobs.Route",
+      routeId: "Recruit.JobDetail.Route",
+      params: { id: { type: "dynamic", path: "id" } },
     },
     { type: "edit", icon: "edit", label: { name: "actionsMenu.edit" } },
     { type: "delete", icon: "delete", label: { name: "actionsMenu.delete" } },

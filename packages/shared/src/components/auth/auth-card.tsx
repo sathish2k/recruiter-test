@@ -1,6 +1,8 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 
@@ -8,9 +10,7 @@ export function AuthCard({
   icon,
   title,
   subtitle,
-  // Design card is 440px content-box (440 content + 44*2 padding + border).
-  // Our card is border-box (CssBaseline), so width is the total → 530 to match.
-  width = 530,
+  width = 420,
   children,
 }: {
   icon: ReactNode;
@@ -31,13 +31,11 @@ export function AuthCard({
         p: "60px 24px",
       }}
     >
-      <Box
+      <Card
+        variant="accent"
         sx={{
           width,
           maxWidth: "100%",
-          background:
-            "linear-gradient(180deg,rgba(242,106,27,.14),rgba(28,28,27,.6) 40%),#1C1C1B",
-          border: "1px solid rgba(255,255,255,.09)",
           borderRadius: "24px",
           p: "38px 44px 34px",
           display: "flex",
@@ -46,23 +44,21 @@ export function AuthCard({
           boxShadow: "0 30px 80px rgba(0,0,0,.5)",
         }}
       >
-        <Box
+        <Avatar
+          variant="rounded"
           sx={{
             width: 56,
             height: 56,
             borderRadius: "16px",
             background: "linear-gradient(180deg,#2A2A28,#1C1C1B)",
             border: "1px solid rgba(255,255,255,.12)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             color: "#FF9D57",
             boxShadow: "0 10px 24px rgba(0,0,0,.4)",
             mb: "20px",
           }}
         >
           {icon}
-        </Box>
+        </Avatar>
         <Typography
           sx={{
             fontSize: 23,
@@ -87,7 +83,7 @@ export function AuthCard({
           {subtitle}
         </Typography>
         <Box sx={{ width: "100%" }}>{children}</Box>
-      </Box>
+      </Card>
     </Box>
   );
 }

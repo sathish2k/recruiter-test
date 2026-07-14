@@ -9,8 +9,6 @@ import type {
   TFunc,
 } from "./table-renderer.types";
 
-// The table's header row: one cell per column (with a sort toggle when the
-// column is sortable) plus an optional trailing actions header.
 export function TableHeaderRenderer({
   columns,
   hasActions,

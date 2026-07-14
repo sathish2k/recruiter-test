@@ -3,6 +3,7 @@
   "export": "Export",
   "exportAs": "EXPORT AS",
   "moreFilters": "Filters",
+  "clearAll": "Clear all",
   "importCsv": "Import CSV",
   "addCandidate": "Add Candidate",
   "filters": {
@@ -30,5 +31,6 @@
   },
   "showing": "Showing {{shown}} of {{total}} candidates",
   "noData": "No candidates match these filters",
+  "emptyHint": "Try adjusting or clearing the filters.",
   "loadError": "Something went wrong loading candidates."
 }

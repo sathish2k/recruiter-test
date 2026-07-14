@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import { useFetch, useTranslation } from "@recruit/sdk";
 
 interface Screening {
@@ -16,14 +17,7 @@ export function ScreeningComponent({ id }: { id: string }) {
   const { screened, quota, distribution } = data;
 
   return (
-    <Box
-      sx={{
-        background: "#1C1C1B",
-        border: "1px solid rgba(255,255,255,.06)",
-        borderRadius: "16px",
-        p: "18px 20px",
-      }}
-    >
+    <Card variant="base">
       <Box sx={{ fontSize: 14.5, fontWeight: 600, mb: "6px" }}>
         {t("title")}
       </Box>
@@ -80,6 +74,6 @@ export function ScreeningComponent({ id }: { id: string }) {
           </Box>
         ))}
       </Box>
-    </Box>
+    </Card>
   );
 }

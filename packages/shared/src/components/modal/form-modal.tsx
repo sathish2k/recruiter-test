@@ -16,8 +16,6 @@ export interface FormModalProps
   closeOnSubmit?: boolean;
 }
 
-// A modal that renders a FormRenderer. The form's Cancel/Submit footer is wired
-// to the modal — Cancel closes it, and a successful submit closes it too.
 export function FormModal({
   open,
   onClose,

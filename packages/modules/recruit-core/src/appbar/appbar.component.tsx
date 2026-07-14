@@ -1,6 +1,8 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import {
   type Route,
@@ -20,20 +22,6 @@ function initials(name?: string | null): string {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
 }
-
-const iconButtonSx = {
-  position: "relative",
-  width: 32,
-  height: 32,
-  borderRadius: "999px",
-  border: "1px solid rgba(255,255,255,.12)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "#9A968E",
-  cursor: "pointer",
-  "&:hover": { background: "rgba(255,255,255,.06)", color: "#ECEAE7" },
-} as const;
 
 export function AppbarComponent({
   id,
@@ -61,7 +49,8 @@ export function AppbarComponent({
         justifyContent: "space-between",
         px: "26px",
         py: "16px",
-        borderBottom: "1px solid rgba(255,255,255,.06)",
+        borderBottom: "1px solid",
+        borderColor: "divider",
       }}
     >
       <Typography sx={{ fontSize: 17, fontWeight: 600 }}>
@@ -72,30 +61,22 @@ export function AppbarComponent({
           const go = () => action.routeId && router.push(action.routeId);
           if (action.kind === "avatar") {
             return (
-              <Box
+              <Avatar
                 key="avatar"
                 onClick={go}
                 title={user?.name ?? undefined}
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: "999px",
-                  background: "#5B4A3A",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "#FFD9BC",
-                  cursor: "pointer",
-                }}
+                sx={{ bgcolor: "#5B4A3A", color: "#FFD9BC", cursor: "pointer" }}
               >
                 {initials(user?.name) || t(action.label ?? "")}
-              </Box>
+              </Avatar>
             );
           }
           return (
-            <Box key={action.icon} onClick={go} sx={iconButtonSx}>
+            <IconButton
+              key={action.icon}
+              onClick={go}
+              sx={{ width: 32, height: 32 }}
+            >
               {action.icon ? (
                 <IconRenderer name={action.icon} size={16} />
               ) : null}
@@ -108,12 +89,12 @@ export function AppbarComponent({
                     width: 7,
                     height: 7,
                     borderRadius: "999px",
-                    background: "#F26A1B",
+                    bgcolor: "primary.main",
                     border: "2px solid #131313",
                   }}
                 />
               ) : null}
-            </Box>
+            </IconButton>
           );
         })}
       </Box>

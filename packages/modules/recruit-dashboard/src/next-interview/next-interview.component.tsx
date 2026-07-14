@@ -1,6 +1,9 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
 import { useFetch, useTranslation } from "@recruit/sdk";
 
 interface NextInterview {
@@ -20,15 +23,7 @@ export function NextInterviewComponent({ id }: { id: string }) {
   if (!n) return null;
 
   return (
-    <Box
-      sx={{
-        borderRadius: "16px",
-        p: "20px",
-        background:
-          "radial-gradient(120% 140% at 85% 0%,rgba(242,106,27,.4),rgba(28,28,27,.9) 55%),#1C1C1B",
-        border: "1px solid rgba(255,255,255,.09)",
-      }}
-    >
+    <Card variant="feature">
       <Box
         sx={{
           display: "flex",
@@ -47,22 +42,17 @@ export function NextInterviewComponent({ id }: { id: string }) {
       <Box
         sx={{ display: "flex", alignItems: "center", gap: "12px", mb: "14px" }}
       >
-        <Box
+        <Avatar
           sx={{
             width: 44,
             height: 44,
-            borderRadius: "999px",
-            background: n.avatarBg,
+            bgcolor: n.avatarBg,
             color: n.avatarFg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             fontSize: 14,
-            fontWeight: 600,
           }}
         >
           {n.initials}
-        </Box>
+        </Avatar>
         <Box>
           <Box sx={{ fontSize: 15.5, fontWeight: 700 }}>{n.name}</Box>
           <Box sx={{ fontSize: 12.5, color: "#C9C5BD" }}>{n.role}</Box>
@@ -76,21 +66,10 @@ export function NextInterviewComponent({ id }: { id: string }) {
         }}
       >
         <Box sx={{ fontSize: 13, color: "#C9C5BD" }}>{n.when}</Box>
-        <Box
-          sx={{
-            p: "8px 16px",
-            borderRadius: "999px",
-            background: "#F5F3F0",
-            color: "#1a1a1a",
-            fontSize: 12.5,
-            fontWeight: 700,
-            cursor: "pointer",
-            "&:hover": { filter: "brightness(.92)" },
-          }}
-        >
+        <Button variant="contained" color="secondary" sx={{ fontSize: 12.5 }}>
           {t("join")}
-        </Box>
+        </Button>
       </Box>
-    </Box>
+    </Card>
   );
 }

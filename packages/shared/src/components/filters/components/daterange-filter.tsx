@@ -13,10 +13,12 @@ export function DateRangeFilterComponent({
   config,
   value,
   onChange,
+  active,
 }: {
   config: DateRangeFilter;
   value: DateRangeValue | undefined;
   onChange: (value: DateRangeValue) => void;
+  active?: boolean;
 }) {
   const range = value ?? {};
   const summary =
@@ -25,7 +27,12 @@ export function DateRangeFilterComponent({
       : undefined;
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary} minWidth={220}>
+    <FilterPopover
+      label={config.label?.name}
+      summary={summary}
+      minWidth={220}
+      active={active}
+    >
       {() => (
         <Box
           sx={{

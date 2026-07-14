@@ -20,7 +20,6 @@ export const ClientsConfiguration: {
         type: "string",
         title: "addForm.name",
         placeholder: "addForm.namePlaceholder",
-        icon: "domain",
       },
       industry: {
         type: "string",
@@ -31,6 +30,7 @@ export const ClientsConfiguration: {
         type: "string",
         title: "addForm.manager",
         placeholder: "addForm.managerPlaceholder",
+        enum: ["Riya Kapoor", "Dev Shah", "Ana Novak"],
       },
     },
     required: ["name"],

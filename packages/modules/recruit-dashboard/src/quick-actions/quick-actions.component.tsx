@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import {
   useConfiguration,
   usePortalRouter,
@@ -29,25 +30,15 @@ export function QuickActionsComponent({ id }: { id: string }) {
       </Box>
       <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         {actions.map((a) => (
-          <Box
+          <Button
             key={a.label}
+            variant="outlined"
+            startIcon={<IconRenderer name={a.icon} size={16} />}
             onClick={() => a.routeId && router.push(a.routeId)}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              p: "9px 14px",
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,.14)",
-              fontSize: 12.5,
-              color: "#ECEAE7",
-              cursor: "pointer",
-              "&:hover": { background: "rgba(255,255,255,.06)" },
-            }}
+            sx={{ fontWeight: 400, fontSize: 12.5 }}
           >
-            <IconRenderer name={a.icon} size={16} />
             {t(a.label)}
-          </Box>
+          </Button>
         ))}
       </Box>
     </Box>

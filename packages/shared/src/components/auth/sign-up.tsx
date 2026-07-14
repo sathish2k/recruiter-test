@@ -43,6 +43,7 @@ export function SignUp({
       icon={<PersonAddAlt1Rounded sx={{ fontSize: 26 }} />}
       title={t("title")}
       subtitle={t("subtitle")}
+      width={440}
     >
       {schema ? (
         <FormRenderer

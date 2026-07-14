@@ -12,9 +12,6 @@ export interface LocaleContextValue {
   setLanguage: (language: string) => void;
 }
 
-// Owns the i18next instance for the whole app and makes it the single source of
-// truth for language. `useLocale` reads that language (and drives the Intl
-// formatters), so translations and formatting stay in lockstep.
 export function LocaleProvider({
   children,
   defaultLanguage = "en",

@@ -13,6 +13,6 @@ export {
 export { MoreFilters } from "./more-filters";
 export { RadioFilterComponent } from "./radio-filter";
 export { RangeFilterComponent, type RangeValue } from "./range-filter";
-export { SearchFilterComponent } from "./search-filter";
+export { SearchField, SearchFilterComponent } from "./search-filter";
 export { SegmentedFilterComponent } from "./segmented-filter";
 export { ToggleFilterComponent } from "./toggle-filter";

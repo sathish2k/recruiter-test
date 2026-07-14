@@ -11,8 +11,6 @@ export interface UseModalResult<T = unknown> {
   toggle: () => void;
 }
 
-// Local open/close state for a modal, with an optional data payload carried
-// from open() (e.g. the record being edited).
 export function useModal<T = unknown>(initialOpen = false): UseModalResult<T> {
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [data, setData] = useState<T | undefined>(undefined);

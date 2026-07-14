@@ -15,6 +15,7 @@ declare module "@mui/material/Paper" {
     feature: true;
     ghost: true;
     inset: true;
+    dropdown: true;
   }
 }
 
@@ -69,6 +70,7 @@ export const theme = createTheme({
       dark: "#E4560F",
       contrastText: "#FFFFFF",
     },
+    secondary: { main: "#F5F3F0", contrastText: "#1a1a1a" },
     success: { main: "#4EA874", light: "#8FD6AC" },
     warning: { main: "#D69B3C", light: "#F0C27C" },
     error: { main: "#C85050", light: "#E89A9A" },
@@ -97,7 +99,8 @@ export const theme = createTheme({
           borderRadius: 999,
           fontWeight: 600,
           fontSize: 13,
-          paddingInline: 16,
+          lineHeight: 1.45,
+          padding: "9px 16px",
         },
       },
       variants: [
@@ -106,6 +109,15 @@ export const theme = createTheme({
           style: {
             background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
             "&:hover": { filter: "brightness(1.08)" },
+          },
+        },
+        {
+          props: { variant: "contained", color: "secondary" },
+          style: {
+            background: "#F5F3F0",
+            color: "#1a1a1a",
+            fontWeight: 700,
+            "&:hover": { background: "#F5F3F0", filter: "brightness(.92)" },
           },
         },
         {
@@ -121,6 +133,67 @@ export const theme = createTheme({
         },
       ],
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          width: 30,
+          height: 30,
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "#C9C5BD",
+          "&:hover": { background: "rgba(255,255,255,0.06)", color: "#ECEAE7" },
+          "& svg": { fontSize: 16 },
+        },
+      },
+      variants: [
+        {
+          props: { color: "primary" },
+          style: {
+            color: SOFT.primary.fg,
+            background: SOFT.primary.bg,
+            border: `1px solid ${SOFT.primary.border}`,
+            "&:hover": { background: "rgba(242,106,27,0.2)" },
+          },
+        },
+        {
+          props: { edge: "end" },
+          style: { width: "auto", height: "auto", border: "none" },
+        },
+      ],
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          fontSize: 12,
+          fontWeight: 600,
+          width: 32,
+          height: 32,
+        },
+        rounded: { borderRadius: 10 },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          background: "#1F1F1E",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: 12,
+          boxShadow: "0 18px 50px rgba(0,0,0,.6)",
+        },
+        list: { padding: 6 },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontSize: 13,
+          color: "#C9C5BD",
+          padding: "9px 11px",
+          gap: 10,
+          "&:hover": { background: "rgba(255,255,255,0.06)", color: "#ECEAE7" },
+        },
+      },
+    },
     MuiChip: {
       styleOverrides: {
         root: { borderRadius: 999, fontWeight: 600, fontSize: 12 },
@@ -135,6 +208,19 @@ export const theme = createTheme({
           borderRadius: 14,
         },
       },
+      variants: [
+        {
+          props: { variant: "dropdown" },
+          style: {
+            background: "#1F1F1E",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 12,
+            boxShadow: "0 18px 50px rgba(0,0,0,.6)",
+            padding: 6,
+            zIndex: 30,
+          },
+        },
+      ],
     },
     MuiCard: {
       defaultProps: { variant: "base" },
@@ -170,8 +256,8 @@ export const theme = createTheme({
           props: { variant: "accent" },
           style: {
             background:
-              "linear-gradient(150deg,rgba(242,106,27,.32),rgba(28,28,27,.7)),#1C1C1B",
-            border: "1px solid rgba(242,106,27,0.3)",
+              "linear-gradient(180deg,rgba(242,106,27,.14),rgba(28,28,27,.6) 40%),#1C1C1B",
+            border: "1px solid rgba(255,255,255,0.09)",
           },
         },
         {
@@ -210,6 +296,7 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: { borderRadius: 12, background: "#141413", fontSize: 13.5 },
+        input: { paddingBlock: 13 },
         notchedOutline: { borderColor: "rgba(255,255,255,0.10)" },
       },
     },
@@ -268,10 +355,10 @@ export const theme = createTheme({
         root: {
           minHeight: "auto",
           width: "fit-content",
-          background: "#141413",
+          background: "#1C1C1B",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 999,
-          padding: 3,
+          padding: 4,
         },
         indicator: { display: "none" },
       },
@@ -282,14 +369,38 @@ export const theme = createTheme({
           minHeight: "auto",
           textTransform: "none",
           borderRadius: 999,
-          padding: "7px 15px",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "#7C7972",
+          padding: "7px 14px",
+          fontSize: 12.5,
+          fontWeight: 400,
+          color: "#9A968E",
           "&.Mui-selected": {
             color: "#ECEAE7",
+            fontWeight: 600,
             background: "rgba(255,255,255,0.1)",
           },
+        },
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: { width: 40, height: 23, padding: 0 },
+        switchBase: {
+          padding: 2.5,
+          "&.Mui-checked": {
+            transform: "translateX(17px)",
+            color: "#fff",
+            "& + .MuiSwitch-track": { backgroundColor: "#F26A1B", opacity: 1 },
+          },
+        },
+        thumb: { width: 18, height: 18, boxShadow: "none", color: "#fff" },
+        track: { borderRadius: 999, backgroundColor: "#2A2A28", opacity: 1 },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: "#7C7972",
+          "&.Mui-checked": { color: "#FF9D57" },
         },
       },
     },
@@ -376,7 +487,7 @@ export const theme = createTheme({
     MuiTableSortLabel: {
       styleOverrides: {
         root: { "&.Mui-active": { color: "#ECEAE7" } },
-        icon: { fontSize: 16, color: "#FF9D57 !important" },
+        icon: { fontSize: 14, color: "#FF9D57 !important" },
       },
     },
   },

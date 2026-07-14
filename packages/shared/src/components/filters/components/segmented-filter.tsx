@@ -1,6 +1,7 @@
 "use client";
 
-import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import type { SegmentedFilter } from "../types";
 
 export function SegmentedFilterComponent({
@@ -14,34 +15,18 @@ export function SegmentedFilterComponent({
 }) {
   const active = value ?? config.options[0]?.value;
   return (
-    <Box
-      sx={{
-        display: "flex",
-        background: "#1C1C1B",
-        border: "1px solid rgba(255,255,255,.08)",
-        borderRadius: "999px",
-        p: "4px",
-      }}
-    >
+    <Tabs value={active} onChange={(_, next) => onChange(next)}>
       {config.options.map((option) => (
-        <Box
+        <Tab
           key={option.value}
-          onClick={() => onChange(option.value)}
-          sx={{
-            px: "14px",
-            py: "7px",
-            borderRadius: "999px",
-            fontSize: 12.5,
-            cursor: "pointer",
-            ...(active === option.value
-              ? { background: "rgba(255,255,255,.1)", fontWeight: 600 }
-              : { color: "#9A968E" }),
-          }}
-        >
-          {option.label}
-          {option.count != null ? ` (${option.count})` : ""}
-        </Box>
+          value={option.value}
+          label={
+            option.count != null
+              ? `${option.label} (${option.count})`
+              : option.label
+          }
+        />
       ))}
-    </Box>
+    </Tabs>
   );
 }

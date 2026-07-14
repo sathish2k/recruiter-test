@@ -1,12 +1,21 @@
 "use client";
 
-import LockResetRounded from "@mui/icons-material/LockResetRounded";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useConfiguration, useTranslation } from "@recruit/sdk";
+import {
+  useConfiguration,
+  usePortalRouter,
+  useTranslation,
+} from "@recruit/sdk";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { FormRenderer } from "../form-renderer";
 import type { FormValues, JsonSchema } from "../form-renderer/types";
+import { IconRenderer } from "../renderers/icon-renderer";
+import {
+  LinkRenderer,
+  type LinkRendererConfig,
+} from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface ResetPasswordValues {
@@ -15,6 +24,7 @@ export interface ResetPasswordValues {
 
 interface ResetPasswordConfig {
   schema?: JsonSchema;
+  links?: Record<string, LinkRendererConfig>;
 }
 
 interface ResetPasswordProps {
@@ -24,7 +34,6 @@ interface ResetPasswordProps {
   ) => void | Promise<void>;
 }
 
-// useSearchParams must sit inside a Suspense boundary (Next requirement).
 export function ResetPassword(props: ResetPasswordProps) {
   return (
     <Suspense>
@@ -34,17 +43,38 @@ export function ResetPassword(props: ResetPasswordProps) {
 }
 
 function ResetPasswordForm({ id, onSubmit }: ResetPasswordProps) {
-  const { schema } = useConfiguration<ResetPasswordConfig>(id);
+  const { schema, links } = useConfiguration<ResetPasswordConfig>(id);
   const { t } = useTranslation(id);
+  const router = usePortalRouter();
   const token = useSearchParams().get("token");
+  const [done, setDone] = useState(false);
+  const back = links?.signIn
+    ? { ...links.signIn, text: t(links.signIn.text ?? "") }
+    : undefined;
 
   return (
     <AuthCard
-      icon={<LockResetRounded sx={{ fontSize: 26 }} />}
-      title={t("title")}
-      subtitle={t("subtitle")}
+      icon={<IconRenderer name="key" size={26} />}
+      title={done ? t("success.title") : t("title")}
+      subtitle={done ? t("success.subtitle") : t("subtitle")}
     >
-      {!token ? (
+      {done ? (
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={() =>
+            links?.signIn?.routeId && router.push(links.signIn.routeId)
+          }
+          sx={{
+            borderRadius: "12px",
+            py: "14px",
+            fontSize: 14,
+            fontWeight: 700,
+          }}
+        >
+          {t("success.cta")}
+        </Button>
+      ) : !token ? (
         <Typography
           sx={{
             fontSize: 14,
@@ -59,10 +89,24 @@ function ResetPasswordForm({ id, onSubmit }: ResetPasswordProps) {
         <FormRenderer
           id={id}
           schema={schema}
-          onSubmit={(v: FormValues) =>
-            onSubmit({ ...(v as unknown as ResetPasswordValues), token })
-          }
+          onSubmit={async (v: FormValues) => {
+            const { password } = v as unknown as ResetPasswordValues;
+            await onSubmit({ password, token });
+            setDone(true);
+          }}
         />
+      ) : null}
+      {!done ? (
+        <Typography
+          sx={{
+            mt: "20px",
+            fontSize: 13,
+            color: "#9A968E",
+            textAlign: "center",
+          }}
+        >
+          {back ? <LinkRenderer config={back} /> : null}
+        </Typography>
       ) : null}
     </AuthCard>
   );

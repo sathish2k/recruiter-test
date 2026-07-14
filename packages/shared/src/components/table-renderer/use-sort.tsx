@@ -4,10 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import type { SortState } from "./table-renderer.types";
 
-// Sort state for a table, synced to the URL (`?sortKey=…&sortDir=…`) so it
-// survives reloads, is shareable, and can be set by a link (e.g. the dashboard
-// "See all" → Candidates sorted by created date). A header click cycles the
-// column asc → desc → cleared. Server- and client-side tables both read `sort`.
 export function useSort() {
   const router = useRouter();
   const searchParams = useSearchParams();

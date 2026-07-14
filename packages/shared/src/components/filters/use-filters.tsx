@@ -24,8 +24,6 @@ function isEmpty(value: unknown): boolean {
   );
 }
 
-// Filter state synced to the URL (`?filters=<json>`), so filters survive
-// reloads and are shareable. Returns the current filters + mutators.
 export function useFilters(): UseFiltersResult {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -42,9 +40,7 @@ export function useFilters(): UseFiltersResult {
       setFiltersState((prev) =>
         JSON.stringify(prev) !== JSON.stringify(parsed) ? parsed : prev,
       );
-    } catch {
-      // ignore an invalid filters param
-    }
+    } catch {}
   }, [searchParams]);
 
   const updateUrl = useCallback(

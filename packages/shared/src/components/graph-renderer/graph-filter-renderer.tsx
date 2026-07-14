@@ -20,9 +20,6 @@ const selectSx = {
   ".MuiSelect-select": { p: "7px 12px" },
 };
 
-// GraphRenderer + client-side controls: a Select per configured filter and
-// prev/next category pagination. Filtering and slicing happen in-memory here;
-// the resulting rows are handed to GraphRenderer as `data` (no extra fetch).
 export function GraphFilterRenderer({
   id,
   config: configProp,

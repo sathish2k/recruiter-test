@@ -1,12 +1,18 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
 import {
   useConfiguration,
   useFetch,
   usePortalRouter,
   useTranslation,
 } from "@recruit/sdk";
+import { IconRenderer } from "@recruit/shared";
 
 interface Upcoming {
   id: string;
@@ -26,14 +32,7 @@ export function UpcomingInterviewsComponent({ id }: { id: string }) {
   const items = data?.upcoming ?? [];
 
   return (
-    <Box
-      sx={{
-        background: "#1C1C1B",
-        border: "1px solid rgba(255,255,255,.06)",
-        borderRadius: "16px",
-        p: "18px 20px",
-      }}
-    >
+    <Card variant="base">
       <Box
         sx={{
           display: "flex",
@@ -43,76 +42,60 @@ export function UpcomingInterviewsComponent({ id }: { id: string }) {
         }}
       >
         <Box sx={{ fontSize: 14.5, fontWeight: 600 }}>{t("title")}</Box>
+        <IconButton
+          onClick={() =>
+            config?.viewAllRouteId && router.push(config.viewAllRouteId)
+          }
+          sx={{ width: 28, height: 28 }}
+        >
+          <IconRenderer name="add" size={14} />
+        </IconButton>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {items.map((u) => (
-          <Box
+          <Card
             key={u.id}
+            variant="inset"
             sx={{
               display: "flex",
               alignItems: "center",
               gap: "12px",
-              background: "#141413",
-              border: "1px solid rgba(255,255,255,.06)",
-              borderRadius: "12px",
-              p: "12px 14px",
             }}
           >
-            <Box
+            <Avatar
+              variant="rounded"
               sx={{
                 width: 36,
                 height: 36,
-                borderRadius: "10px",
-                background: u.avatarBg,
+                bgcolor: u.avatarBg,
                 color: u.avatarFg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 12,
-                fontWeight: 600,
               }}
             >
               {u.initials}
-            </Box>
+            </Avatar>
             <Box sx={{ flex: 1 }}>
               <Box sx={{ fontSize: 13.5, fontWeight: 600 }}>{u.name}</Box>
               <Box sx={{ fontSize: 12, color: "#9A968E" }}>{u.meta}</Box>
             </Box>
-            <Box
-              sx={{
-                fontSize: 11.5,
-                fontWeight: 600,
-                color: "#C9C5BD",
-                background: "rgba(255,255,255,.07)",
-                p: "4px 10px",
-                borderRadius: "999px",
-              }}
-            >
-              {u.time}
-            </Box>
-          </Box>
+            <Chip variant="soft" size="small" label={u.time} />
+          </Card>
         ))}
-        <Box
+        <Button
+          variant="outlined"
+          fullWidth
           onClick={() =>
             config?.viewAllRouteId && router.push(config.viewAllRouteId)
           }
           sx={{
-            textAlign: "center",
-            p: "11px",
-            border: "1px solid rgba(255,255,255,.12)",
-            borderRadius: "12px",
-            fontSize: 13,
+            fontWeight: 400,
             color: "#C9C5BD",
-            cursor: "pointer",
-            "&:hover": {
-              background: "rgba(255,255,255,.05)",
-              color: "#ECEAE7",
-            },
+            borderRadius: "12px",
+            py: "11px",
           }}
         >
           {t("viewAll")}
-        </Box>
+        </Button>
       </Box>
-    </Box>
+    </Card>
   );
 }

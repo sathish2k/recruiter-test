@@ -2,8 +2,25 @@
 
 import type { SvgIconComponent } from "@mui/icons-material";
 import AddRounded from "@mui/icons-material/AddRounded";
+import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import CallRounded from "@mui/icons-material/CallRounded";
+import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
+import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import FlagRounded from "@mui/icons-material/FlagRounded";
+import HourglassTopRounded from "@mui/icons-material/HourglassTopRounded";
+import LocationOnRounded from "@mui/icons-material/LocationOnRounded";
+import ManageSearchRounded from "@mui/icons-material/ManageSearchRounded";
+import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
+import PsychologyRounded from "@mui/icons-material/PsychologyRounded";
+import ScheduleRounded from "@mui/icons-material/ScheduleRounded";
+import SchoolRounded from "@mui/icons-material/SchoolRounded";
+import ShareRounded from "@mui/icons-material/ShareRounded";
+import SourceRounded from "@mui/icons-material/SourceRounded";
+import WorkspacePremiumRounded from "@mui/icons-material/WorkspacePremiumRounded";
 import BarChartRounded from "@mui/icons-material/BarChartRounded";
+import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
+import RocketLaunchRounded from "@mui/icons-material/RocketLaunchRounded";
 import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
 import BoltRounded from "@mui/icons-material/BoltRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
@@ -15,6 +32,21 @@ import EditOutlined from "@mui/icons-material/EditOutlined";
 import EventRounded from "@mui/icons-material/EventRounded";
 import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
+import FilterListRounded from "@mui/icons-material/FilterListRounded";
+import FormatBoldRounded from "@mui/icons-material/FormatBoldRounded";
+import FormatItalicRounded from "@mui/icons-material/FormatItalicRounded";
+import FormatListBulletedRounded from "@mui/icons-material/FormatListBulletedRounded";
+import FormatListNumberedRounded from "@mui/icons-material/FormatListNumberedRounded";
+import FormatQuoteRounded from "@mui/icons-material/FormatQuoteRounded";
+import ChecklistRounded from "@mui/icons-material/ChecklistRounded";
+import CodeRounded from "@mui/icons-material/CodeRounded";
+import DataObjectRounded from "@mui/icons-material/DataObjectRounded";
+import HorizontalRuleRounded from "@mui/icons-material/HorizontalRuleRounded";
+import LinkRounded from "@mui/icons-material/LinkRounded";
+import StrikethroughSRounded from "@mui/icons-material/StrikethroughSRounded";
+import KeyRounded from "@mui/icons-material/KeyRounded";
+import MoveUpRounded from "@mui/icons-material/MoveUpRounded";
+import QuizRounded from "@mui/icons-material/QuizRounded";
 import GroupRounded from "@mui/icons-material/GroupRounded";
 import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
@@ -44,8 +76,6 @@ import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
 
-// Single icon registry for the whole app. Config passes a `name` (or an image
-// `src`); consumers size/color via props. Replaces the per-component icon maps.
 export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   add: AddRounded,
   edit: EditOutlined,
@@ -68,19 +98,49 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   domain: DomainRounded,
   close: CloseRounded,
   check: CheckRounded,
+  "check-circle": CheckCircleRounded,
   search: SearchRounded,
   "expand-more": ExpandMoreRounded,
+  filter: FilterListRounded,
+  bold: FormatBoldRounded,
+  italic: FormatItalicRounded,
+  strikethrough: StrikethroughSRounded,
+  "list-bulleted": FormatListBulletedRounded,
+  "list-numbered": FormatListNumberedRounded,
+  checklist: ChecklistRounded,
+  quote: FormatQuoteRounded,
+  code: CodeRounded,
+  "code-block": DataObjectRounded,
+  link: LinkRounded,
+  "horizontal-rule": HorizontalRuleRounded,
+  key: KeyRounded,
+  "move-up": MoveUpRounded,
+  quiz: QuizRounded,
+  "arrow-back": ArrowBackRounded,
   "arrow-forward": ArrowForwardRounded,
   "bar-chart": BarChartRounded,
+  rocket: RocketLaunchRounded,
+  call: CallRounded,
+  "chevron-right": ChevronRightRounded,
+  copy: ContentCopyRounded,
+  flag: FlagRounded,
+  hourglass: HourglassTopRounded,
+  location: LocationOnRounded,
+  "manage-search": ManageSearchRounded,
+  "open-in-new": OpenInNewRounded,
+  psychology: PsychologyRounded,
+  schedule: ScheduleRounded,
+  school: SchoolRounded,
+  share: ShareRounded,
+  source: SourceRounded,
+  certificate: WorkspacePremiumRounded,
   sparkle: AutoAwesomeRounded,
   notifications: NotificationsRounded,
-  // File formats (export).
   pdf: PictureAsPdfRounded,
   excel: TableViewRounded,
   csv: TableViewRounded,
   word: DescriptionRounded,
   json: DescriptionRounded,
-  // Navigation.
   dashboard: SpaceDashboardRounded,
   work: WorkRounded,
   group: GroupRounded,

@@ -41,9 +41,6 @@ export function GlobalDependencyProvider({
 }: GlobalDependencyProviderProps) {
   const { i18n } = useI18nextTranslation();
 
-  // Register each component's translations as an i18next namespace on the
-  // app-level instance. Runs synchronously before children render, and again
-  // when the map changes.
   const lastMap = useRef<
     GlobalDependencyProviderProps["translationMap"] | null
   >(null);
@@ -87,9 +84,6 @@ export interface TranslationData {
   [locale: string]: unknown;
 }
 
-// Resolves text via i18next, scoped to the component's namespace (= id). The
-// signature is unchanged: `t(key, fallback?)`. Pass an options object as the
-// second arg for i18next features (count/plurals, interpolation values).
 export function useTranslation(componentId: string): {
   t: (key: string, fallback?: string | Record<string, unknown>) => string;
   language: string;

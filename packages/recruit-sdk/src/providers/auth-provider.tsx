@@ -27,10 +27,6 @@ export function useAuthUser(): AuthUser | null {
   return useContext(AuthUserContext);
 }
 
-// Shows a loader until the session resolves, then feeds the token to the
-// httpClient interceptor via setAuthToken — so no request fires before the
-// token is attached. Also exposes the session user via useAuthUser(). Requires
-// next-auth's SessionProvider as an ancestor.
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
   const token = (session as { accessToken?: string } | null)?.accessToken;

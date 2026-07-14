@@ -20,4 +20,25 @@ export default new Elysia({ name: "candidate.routes" })
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
     }),
+  })
+  .get("/candidates/:id", (ctx) => candidateController.getCandidate(ctx), {
+    isAuth: true,
+    params: t.Object({ id: t.String() }),
+  })
+  .post("/candidates", (ctx) => candidateController.postCandidate(ctx), {
+    isAuth: true,
+    body: t.Object({
+      firstName: t.String(),
+      lastName: t.Optional(t.String()),
+      email: t.Optional(t.String()),
+      phone: t.Optional(t.String()),
+      location: t.Optional(t.String()),
+      linkedin: t.Optional(t.String()),
+      job: t.Optional(t.String()),
+      source: t.Optional(t.String()),
+      currentTitle: t.Optional(t.String()),
+      years: t.Optional(t.Number()),
+      skills: t.Optional(t.Array(t.String())),
+      notes: t.Optional(t.String()),
+    }),
   });

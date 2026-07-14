@@ -1,6 +1,8 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { IconRenderer } from "@recruit/shared";
@@ -28,7 +30,8 @@ export function SidenavComponent({
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
-        borderRight: "1px solid rgba(255,255,255,.06)",
+        borderRight: "1px solid",
+        borderColor: "divider",
         p: "22px 18px",
         height: "100vh",
         overflowY: "auto",
@@ -37,22 +40,18 @@ export function SidenavComponent({
       <Box
         sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "26px" }}
       >
-        <Box
+        <Avatar
+          variant="rounded"
           sx={{
-            width: 32,
-            height: 32,
             borderRadius: "9px",
             background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             fontWeight: 700,
             fontSize: 15,
             color: "#fff",
           }}
         >
           {t("brand").charAt(0)}
-        </Box>
+        </Avatar>
         <Typography sx={{ fontWeight: 700, fontSize: 15 }}>
           {t("brand")}
         </Typography>
@@ -60,15 +59,7 @@ export function SidenavComponent({
 
       {groups.map((group, gi) => (
         <Box key={group.title}>
-          {gi > 0 ? (
-            <Box
-              sx={{
-                height: "1px",
-                bgcolor: "rgba(255,255,255,.07)",
-                my: "20px",
-              }}
-            />
-          ) : null}
+          {gi > 0 ? <Divider sx={{ my: "20px" }} /> : null}
           <Typography
             sx={{
               fontSize: 11,

@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import {
   useConfiguration,
   useFetch,
@@ -23,16 +24,6 @@ interface ToolbarConfig {
   addForm?: JsonSchema;
 }
 
-const pillSx = {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-  p: "9px 16px",
-  borderRadius: "999px",
-  fontSize: 13,
-  cursor: "pointer",
-};
-
 export function ToolbarComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<ToolbarConfig>(id);
@@ -48,38 +39,28 @@ export function ToolbarComponent({ id }: { id: string }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
       {config?.manageClientsRouteId ? (
-        <Box
+        <Button
+          variant="outlined"
+          startIcon={<IconRenderer name="domain" size={16} />}
+          sx={{ fontWeight: 400 }}
           onClick={() =>
             config.manageClientsRouteId &&
             router.push(config.manageClientsRouteId)
           }
-          sx={{
-            ...pillSx,
-            border: "1px solid rgba(255,255,255,.14)",
-            color: "#ECEAE7",
-            "&:hover": { background: "rgba(255,255,255,.06)" },
-          }}
         >
-          <IconRenderer name="domain" size={16} />
           {t("manageClients")}
-        </Box>
+        </Button>
       ) : null}
       {config?.export ? (
         <Export id={id} config={config.export} data={[]} filename="dashboard" />
       ) : null}
-      <Box
+      <Button
+        variant="contained"
+        startIcon={<IconRenderer name="add" size={17} />}
         onClick={() => addModal.open()}
-        sx={{
-          ...pillSx,
-          fontWeight: 600,
-          background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-          color: "#fff",
-          "&:hover": { filter: "brightness(1.08)" },
-        }}
       >
-        <IconRenderer name="add" size={17} />
         {t("newJob")}
-      </Box>
+      </Button>
       {config?.addForm ? (
         <FormModal
           open={addModal.isOpen}

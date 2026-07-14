@@ -17,9 +17,6 @@ export interface StaticTranslationRendererConfig {
   sx?: TypographyProps["sx"];
 }
 
-// Combines a translated string (by `key`) with a dynamic value read from `data`
-// at `value`. If the translation contains `{value}` the value is interpolated
-// there; otherwise it's appended.
 export function StaticTranslationRenderer({
   config,
   data = {},

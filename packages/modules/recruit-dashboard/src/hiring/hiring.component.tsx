@@ -1,6 +1,10 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import { IconRenderer } from "@recruit/shared";
 import delve from "dlv";
@@ -12,7 +16,6 @@ interface HiringData {
   points: Record<string, unknown>[];
 }
 
-// Round up to a "nice" axis maximum (268 → 300, 90 → 100, 18 → 20).
 function niceMax(v: number): number {
   if (v <= 0) return 10;
   const pow = 10 ** Math.floor(Math.log10(v));
@@ -48,7 +51,6 @@ export function HiringComponent({ id }: { id: string }) {
 
   if (!config) return null;
   const metric = metrics.find((m) => m.key === metricKey) ?? metrics[0];
-  const color = metric?.color ?? "#FF8A3C";
   const period = periods[periodIdx];
 
   const values = points.map((p) => Number(delve(p, metric?.key ?? "") ?? 0));
@@ -57,32 +59,8 @@ export function HiringComponent({ id }: { id: string }) {
   const peakIndex = values.indexOf(Math.max(...values));
   const yLabels = [max, Math.round((max * 2) / 3), Math.round(max / 3), 0];
 
-  const iconBtn = (active: boolean) => ({
-    width: 30,
-    height: 30,
-    borderRadius: "999px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    color: active ? "#F0B27C" : "#9A968E",
-    background: active ? "rgba(242,106,27,.14)" : "transparent",
-    border: `1px solid ${active ? "rgba(242,106,27,.3)" : "rgba(255,255,255,.12)"}`,
-    "&:hover": {
-      background: active ? "rgba(242,106,27,.18)" : "rgba(255,255,255,.06)",
-    },
-  });
-
   return (
-    <Box
-      sx={{
-        background: "#1C1C1B",
-        border: "1px solid rgba(255,255,255,.06)",
-        borderRadius: "16px",
-        p: "20px 22px",
-      }}
-    >
-      {/* Title + total + period */}
+    <Card variant="base">
       <Box
         sx={{
           display: "flex",
@@ -99,27 +77,17 @@ export function HiringComponent({ id }: { id: string }) {
           </Box>
         </Box>
         {periods.length ? (
-          <Box
+          <Button
+            variant="outlined"
             onClick={() => setPeriodIdx((i) => (i + 1) % periods.length)}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              p: "8px 14px",
-              borderRadius: "999px",
-              border: "1px solid rgba(255,255,255,.14)",
-              fontSize: 12.5,
-              cursor: "pointer",
-              "&:hover": { background: "rgba(255,255,255,.06)" },
-            }}
+            endIcon={<IconRenderer name="expand-more" size={15} />}
+            sx={{ fontWeight: 400, fontSize: 12.5 }}
           >
             {period ? t(period.label) : ""}
-            <IconRenderer name="expand-more" size={15} color="#9A968E" />
-          </Box>
+          </Button>
         ) : null}
       </Box>
 
-      {/* Metric tabs + value/more buttons */}
       <Box
         sx={{
           display: "flex",
@@ -132,40 +100,40 @@ export function HiringComponent({ id }: { id: string }) {
           {metrics.map((m) => {
             const active = m.key === metric?.key;
             return (
-              <Box
+              <Chip
                 key={m.key}
+                clickable
+                label={t(m.label)}
                 onClick={() => setMetricKey(m.key)}
                 sx={{
-                  p: "7px 14px",
-                  borderRadius: "999px",
+                  px: "4px",
+                  py: "16px",
                   fontSize: 12.5,
                   fontWeight: 600,
-                  cursor: "pointer",
-                  color: active ? "#F0B27C" : "#9A968E",
-                  background: active ? "rgba(242,106,27,.14)" : "transparent",
-                  border: `1px solid ${active ? "rgba(242,106,27,.35)" : "rgba(255,255,255,.1)"}`,
+                  bgcolor: active ? "rgba(255,255,255,.1)" : "transparent",
+                  color: active ? "#ECEAE7" : "#9A968E",
+                  border: active
+                    ? "1px solid transparent"
+                    : "1px solid rgba(255,255,255,.1)",
                 }}
-              >
-                {t(m.label)}
-              </Box>
+              />
             );
           })}
         </Box>
         <Box sx={{ display: "flex", gap: "8px" }}>
-          <Box
+          <IconButton
+            color={showValues ? "primary" : "default"}
             onClick={() => setShowValues((v) => !v)}
             title={t("showValues", "Show values")}
-            sx={iconBtn(showValues)}
           >
             <IconRenderer name="bar-chart" size={16} />
-          </Box>
-          <Box sx={iconBtn(false)}>
+          </IconButton>
+          <IconButton>
             <IconRenderer name="more" size={16} />
-          </Box>
+          </IconButton>
         </Box>
       </Box>
 
-      {/* Bars + axes */}
       <Box
         sx={{
           display: "grid",
@@ -184,8 +152,9 @@ export function HiringComponent({ id }: { id: string }) {
             pb: "18px",
           }}
         >
-          {yLabels.map((y) => (
-            <span key={y}>{y}</span>
+          {yLabels.map((y, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: y-axis labels are positional.
+            <span key={i}>{y}</span>
           ))}
         </Box>
         <Box>
@@ -211,8 +180,8 @@ export function HiringComponent({ id }: { id: string }) {
                     borderRadius: "6px 6px 0 0",
                     position: "relative",
                     background: peak
-                      ? `linear-gradient(180deg, ${color}, ${color}CC)`
-                      : `linear-gradient(180deg, ${color}B0, ${color}3A)`,
+                      ? "linear-gradient(180deg,#FF8A3C,#C24509)"
+                      : "#2A2A28",
                   }}
                 >
                   {peak ? (
@@ -288,6 +257,6 @@ export function HiringComponent({ id }: { id: string }) {
           </Box>
         </Box>
       </Box>
-    </Box>
+    </Card>
   );
 }

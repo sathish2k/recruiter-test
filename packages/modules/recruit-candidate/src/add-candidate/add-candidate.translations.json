@@ -1,0 +1,51 @@
+{
+  "back": "Back to Candidates",
+  "title": "Add Candidate",
+  "description": "Add someone manually, or drop a resume and let AI fill this in.",
+  "save": "Save candidate",
+  "cancel": "Cancel",
+  "toast": {
+    "saved": "Candidate saved",
+    "savedSub": "{{name}} added to your pool"
+  },
+  "sections": {
+    "personal": "Personal information",
+    "position": "Position",
+    "skills": "Skills"
+  },
+  "fields": {
+    "firstName": "First name",
+    "firstNamePlaceholder": "e.g. Savannah",
+    "firstNameRequired": "First name is required",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "e.g. Nguyen",
+    "email": "Email",
+    "emailPlaceholder": "name@email.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Seattle, WA",
+    "linkedin": "LinkedIn URL",
+    "linkedinPlaceholder": "linkedin.com/in/…",
+    "job": "Applying for",
+    "source": "Source",
+    "currentTitle": "Current title",
+    "currentTitlePlaceholder": "e.g. Staff Engineer",
+    "years": "Years of experience",
+    "yearsPlaceholder": "7",
+    "skills": "Skills",
+    "skillsPlaceholder": "Add skill + Enter",
+    "notes": "Notes",
+    "notesPlaceholder": "Anything worth flagging for the hiring team…"
+  },
+  "panel": {
+    "autofill": "Resume autofill",
+    "drop": "Drop resume here",
+    "dropHint": "PDF, DOCX up to 10 MB",
+    "autofillHint": "Troy parses the resume, fills this form, and scores the candidate against the selected job.",
+    "screenNow": "Screen immediately after adding",
+    "duplicate": "Duplicate check",
+    "noDuplicate": "No matching candidate found",
+    "duplicateHint": "We check email, phone, and LinkedIn against your existing pool as you type."
+  }
+}

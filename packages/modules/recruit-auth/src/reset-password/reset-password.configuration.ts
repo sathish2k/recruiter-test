@@ -1,9 +1,21 @@
-import type { JsonSchema } from "@recruit/shared";
+import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
+
+const accentSx = {
+  fontWeight: 600,
+  color: "#F0B27C",
+  textDecoration: "none",
+  "&:hover": { color: "#FF8A3C" },
+};
 
 const schema: JsonSchema = {
   type: "object",
-  required: ["password"],
-  errorMessage: { required: { password: "password.errors.required" } },
+  required: ["password", "confirmPassword"],
+  errorMessage: {
+    required: {
+      password: "password.errors.required",
+      confirmPassword: "confirmPassword.errors.required",
+    },
+  },
   properties: {
     password: {
       type: "string",
@@ -16,7 +28,26 @@ const schema: JsonSchema = {
       placeholder: "password.placeholder",
       errorMessage: { minLength: "password.errors.minLength" },
     },
+    confirmPassword: {
+      type: "string",
+      format: "password",
+      icon: "lock-reset",
+      hideLabel: true,
+      matchesField: "password",
+      title: "confirmPassword.label",
+      placeholder: "confirmPassword.placeholder",
+      errorMessage: { matches: "confirmPassword.errors.matches" },
+    },
   },
 };
 
-export const ResetPasswordConfiguration = { schema };
+const links: Record<string, LinkRendererConfig> = {
+  signIn: {
+    routeId: "Auth.Login.Route",
+    text: "backToLogin",
+    underline: "none",
+    sx: accentSx,
+  },
+};
+
+export const ResetPasswordConfiguration = { schema, links };

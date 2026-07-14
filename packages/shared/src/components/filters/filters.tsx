@@ -1,7 +1,8 @@
 "use client";
 
-import CloseRounded from "@mui/icons-material/CloseRounded";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckboxFilterComponent,
@@ -17,6 +18,7 @@ import {
 } from "./components";
 import type { DateRangeValue } from "./components/daterange-filter";
 import type { RangeValue } from "./components/range-filter";
+import { IconRenderer } from "../renderers";
 import type { FilterConfig } from "./types";
 import { type FilterValue, useFilters } from "./use-filters";
 
@@ -29,17 +31,17 @@ export interface FiltersProps {
   showActiveFilters?: boolean;
   /** Show a "Clear all" action when any filter is active. */
   showClearAll?: boolean;
+  clearAllLabel?: string;
 }
 
 const GAP = 10;
 const MORE_WIDTH = 130;
 const BUFFER = 8;
 
-// Rough width estimate per control, to decide inline vs overflow.
 function widthEstimate(filter: FilterConfig): number {
   switch (filter.type) {
     case "search":
-      return 300;
+      return filter.width ?? 300;
     case "segmented":
       return 40 + filter.options.length * 78;
     case "toggle":
@@ -49,8 +51,6 @@ function widthEstimate(filter: FilterConfig): number {
   }
 }
 
-// Split filters into those that fit `containerWidth` and the overflow. Search
-// filters always stay inline.
 function splitFilters(options: FilterConfig[], containerWidth: number) {
   if (!containerWidth)
     return { visible: options, hidden: [] as FilterConfig[] };
@@ -123,6 +123,7 @@ function control(
 ) {
   const value = filters[filter.key];
   const onChange = (v: unknown) => setFilter(filter.key, v);
+  const active = isSet(value);
   switch (filter.type) {
     case "search":
       return (
@@ -146,6 +147,7 @@ function control(
           config={filter}
           value={value as string | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     case "radio":
@@ -154,6 +156,7 @@ function control(
           config={filter}
           value={value as string | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     case "checkbox":
@@ -163,6 +166,7 @@ function control(
           config={filter}
           value={value as string[] | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     case "toggle":
@@ -179,6 +183,7 @@ function control(
           config={filter}
           value={value as string | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     case "daterange":
@@ -187,6 +192,7 @@ function control(
           config={filter}
           value={value as DateRangeValue | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     case "range":
@@ -195,6 +201,7 @@ function control(
           config={filter}
           value={value as RangeValue | undefined}
           onChange={onChange}
+          active={active}
         />
       );
     default:
@@ -202,16 +209,13 @@ function control(
   }
 }
 
-// Config-driven filter bar: renders each filter with its own control component
-// and manages state via useFilters (URL-synced). Optional active-filter chips
-// and Clear All. Add a filter type by creating a control in ./components,
-// exporting it, and wiring a case here.
 export function Filters({
   options,
   responsive = false,
   moreLabel = "More filters",
   showActiveFilters = false,
   showClearAll = false,
+  clearAllLabel = "Clear all",
 }: FiltersProps) {
   const { filters, setFilter, clearFilter, clearAllFilters, hasActiveFilters } =
     useFilters();
@@ -265,55 +269,40 @@ export function Filters({
           <MoreFilters
             filters={hidden}
             label={moreLabel}
+            activeCount={hidden.filter((f) => isSet(filters[f.key])).length}
             renderControl={(filter) => control(filter, filters, setFilter)}
           />
         ) : null}
         {showClearAll && hasActiveFilters ? (
-          <Box
+          <Button
+            variant="text"
+            size="small"
             onClick={clearAllFilters}
+            startIcon={<IconRenderer name="close" size={14} />}
             sx={{
+              ml: "auto",
+              flex: "none",
               fontSize: 12.5,
               fontWeight: 600,
               color: "#F0B27C",
-              cursor: "pointer",
-              px: "8px",
               "&:hover": { color: "#FF8A3C" },
             }}
           >
-            Clear all
-          </Box>
+            {clearAllLabel}
+          </Button>
         ) : null}
       </Box>
 
       {showActiveFilters && activeChips.length ? (
         <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {activeChips.map((chip) => (
-            <Box
+            <Chip
               key={chip.key}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                px: "10px",
-                py: "4px",
-                borderRadius: "999px",
-                background: "rgba(255,255,255,.06)",
-                border: "1px solid rgba(255,255,255,.12)",
-                fontSize: 12,
-                color: "#ECEAE7",
-              }}
-            >
-              {chip.text}
-              <CloseRounded
-                onClick={() => clearFilter(chip.key)}
-                sx={{
-                  fontSize: 14,
-                  cursor: "pointer",
-                  color: "#9A968E",
-                  "&:hover": { color: "#ECEAE7" },
-                }}
-              />
-            </Box>
+              variant="soft"
+              size="small"
+              label={chip.text}
+              onDelete={() => clearFilter(chip.key)}
+            />
           ))}
         </Box>
       ) : null}

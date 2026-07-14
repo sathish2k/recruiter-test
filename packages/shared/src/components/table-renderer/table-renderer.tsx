@@ -1,6 +1,7 @@
 "use client";
 
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,7 +11,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
-import type { ActionHandler } from "../renderers";
+import { type ActionHandler, IconRenderer } from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
 import type { Row, TableRendererConfig } from "./table-renderer.types";
@@ -24,12 +25,6 @@ function compare(a: unknown, b: unknown): number {
   return String(a ?? "").localeCompare(String(b ?? ""));
 }
 
-// A config-driven table. `id` resolves its configuration, translations and data.
-// Sort + pagination live in the useSort / usePagination hooks and drive the
-// fetch server-side: the `filters` prop is merged with sort/page into the query
-// and `meta.totalCount` gives the page count. Injecting `data` instead switches
-// to client-side sort/pagination (standalone use). The header/row/footer are
-// split into their own renderers; all chrome comes from the theme.
 export function TableRenderer({
   id,
   config: configProp,
@@ -55,7 +50,6 @@ export function TableRenderer({
   const server = dataProp === undefined;
 
   const { sort, toggleSort } = useSort();
-  // Reset the page whenever the filters or the sort change.
   const resetKey = `${JSON.stringify(filters ?? {})}|${
     sort ? `${sort.key}:${sort.dir}` : ""
   }`;
@@ -75,7 +69,6 @@ export function TableRenderer({
   });
   const fetched = Array.isArray(data) ? data : [];
 
-  // Server mode: rows arrive already sorted + paged. Client mode: do it here.
   const sorted =
     server || !sort
       ? fetched
@@ -138,9 +131,43 @@ export function TableRenderer({
               <TableCell
                 colSpan={colSpan || 1}
                 align="center"
-                sx={{ color: "#7C7972", py: "32px", borderBottom: "none" }}
+                sx={{ py: "32px", borderBottom: "none" }}
               >
-                {t(config?.emptyLabel ?? "noData")}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 54,
+                      height: 54,
+                      borderRadius: "14px",
+                      border: "1.5px dashed rgba(255,255,255,.16)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <IconRenderer name="search" size={24} color="#7C7972" />
+                  </Box>
+                  <Box
+                    sx={{
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      color: "#ECEAE7",
+                      mt: "4px",
+                    }}
+                  >
+                    {t(config?.emptyLabel ?? "noData")}
+                  </Box>
+                  <Box sx={{ fontSize: 12.5, color: "#9A968E" }}>
+                    {t("emptyHint", "Try adjusting or clearing the filters.")}
+                  </Box>
+                </Box>
               </TableCell>
             </TableRow>
           ) : (

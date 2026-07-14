@@ -1,6 +1,15 @@
 import type { UserRole } from "@recruit/types";
 import { CandidateModel } from "../models/candidate.model";
+import { InterviewModel } from "../models/interview.model";
 import { JobModel } from "../models/job.model";
+
+const ymd = (d: Date) =>
+  d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+const daysAgoYmd = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return ymd(d);
+};
 
 export interface HomeDashboard {
   role: UserRole;
@@ -19,8 +28,6 @@ export async function getHomeDashboard(
   };
 }
 
-// Top stat tiles — real counts from Mongo; deltas are period-over-period and
-// seeded (no historical snapshots stored yet).
 export interface DashboardStats {
   openRoles: number;
   openRolesDelta: string;
@@ -31,23 +38,40 @@ export interface DashboardStats {
 }
 
 export async function getStats(): Promise<DashboardStats> {
-  const [openRoles, activeCandidates, hires] = await Promise.all([
+  const monthAgo = daysAgoYmd(30);
+  const [
+    openRoles,
+    newRoles,
+    activeCandidates,
+    newCandidates,
+    hires,
+    newHires,
+  ] = await Promise.all([
     JobModel.countDocuments({ status: "Active" }),
+    JobModel.countDocuments({ status: "Active", postedTs: { $gte: monthAgo } }),
     CandidateModel.countDocuments({ stage: { $ne: "Rejected" } }),
+    CandidateModel.countDocuments({
+      stage: { $ne: "Rejected" },
+      appliedTs: { $gte: monthAgo },
+    }),
     CandidateModel.countDocuments({ stage: "Offer" }),
+    CandidateModel.countDocuments({
+      stage: "Offer",
+      appliedTs: { $gte: monthAgo },
+    }),
   ]);
+  const pct = (part: number, whole: number) =>
+    whole > 0 ? `+${Math.round((part / whole) * 100)}%` : "+0%";
   return {
     openRoles,
-    openRolesDelta: "+3",
+    openRolesDelta: `+${newRoles}`,
     activeCandidates,
-    activeCandidatesDelta: "+12%",
+    activeCandidatesDelta: pct(newCandidates, activeCandidates),
     hires,
-    hiresDelta: "+8%",
+    hiresDelta: pct(newHires, Math.max(hires, 1)),
   };
 }
 
-// Hiring activity chart — 12 weekly buckets per metric. Seeded; a real build
-// would bucket applications/interviews/hires by week from event history.
 export interface HiringPoint {
   label: string;
   applications: number;
@@ -55,45 +79,50 @@ export interface HiringPoint {
   hires: number;
 }
 
-const HIRING: HiringPoint[] = [
-  { label: "W1", applications: 120, interviews: 42, hires: 6 },
-  { label: "W2", applications: 155, interviews: 51, hires: 8 },
-  { label: "W3", applications: 138, interviews: 47, hires: 5 },
-  { label: "W4", applications: 190, interviews: 63, hires: 11 },
-  { label: "W5", applications: 176, interviews: 58, hires: 9 },
-  { label: "W6", applications: 205, interviews: 71, hires: 12 },
-  { label: "W7", applications: 168, interviews: 55, hires: 7 },
-  { label: "W8", applications: 232, interviews: 78, hires: 14 },
-  { label: "W9", applications: 198, interviews: 66, hires: 10 },
-  { label: "W10", applications: 245, interviews: 83, hires: 15 },
-  { label: "W11", applications: 221, interviews: 74, hires: 13 },
-  { label: "W12", applications: 268, interviews: 90, hires: 18 },
-];
-
 export interface HiringResponse {
   total: number;
   points: HiringPoint[];
 }
 
 export async function getHiring(): Promise<HiringResponse> {
-  const total = HIRING.reduce((sum, p) => sum + p.applications, 0);
-  return { total, points: HIRING };
+  const [candidates, interviews] = await Promise.all([
+    CandidateModel.find().select("appliedTs stage").lean(),
+    InterviewModel.find().select("ts").lean(),
+  ]);
+  const weekIndex = (ts: number) => {
+    if (!ts) return -1;
+    const date = new Date(
+      Math.floor(ts / 10000),
+      Math.floor((ts % 10000) / 100) - 1,
+      ts % 100,
+    );
+    const days = Math.floor((Date.now() - date.getTime()) / 86400000);
+    return 11 - Math.floor(days / 7);
+  };
+  const points: HiringPoint[] = Array.from({ length: 12 }, (_, i) => ({
+    label: `W${i + 1}`,
+    applications: 0,
+    interviews: 0,
+    hires: 0,
+  }));
+  for (const c of candidates) {
+    const w = weekIndex(c.appliedTs ?? 0);
+    const point = points[w];
+    if (!point) continue;
+    point.applications++;
+    if (c.stage === "Offer") point.hires++;
+  }
+  for (const iv of interviews) {
+    const point = points[weekIndex(Math.floor((iv.ts ?? 0) / 10000))];
+    if (point) point.interviews++;
+  }
+  const total = points.reduce((sum, p) => sum + p.applications, 0);
+  return { total, points };
 }
 
-// Recent candidates for the dashboard table — real docs, newest first. The
-// interview slot isn't modelled yet, so it's seeded per row.
-const INTERVIEW_SLOTS = [
-  "Tomorrow 2:00 PM",
-  "Thu 11:00 AM",
-  "—",
-  "Today 4:30 PM",
-  "Fri 9:00 AM",
-];
-
 function matchColor(match: number): string {
-  if (match >= 90) return "#8FD6AC";
-  if (match >= 75) return "#F0C27C";
-  return "#C9C5BD";
+  if (match >= 75) return "#FF9D57";
+  return "#9A968E";
 }
 
 export interface RecentCandidate {
@@ -116,18 +145,19 @@ export interface RecentCandidatesResponse {
 }
 
 export async function getRecentCandidates(): Promise<RecentCandidatesResponse> {
-  const [docs, all, interviewing] = await Promise.all([
+  const [docs, addedThisWeek, interviewing, upcoming] = await Promise.all([
     CandidateModel.find().sort({ appliedTs: -1 }).limit(5).lean(),
-    CandidateModel.find().select("appliedTs").lean(),
+    CandidateModel.countDocuments({ appliedTs: { $gte: daysAgoYmd(7) } }),
     CandidateModel.countDocuments({ stage: "Interviewing" }),
+    InterviewModel.find({ status: "upcoming" })
+      .select("candidateId when")
+      .lean(),
   ]);
-  // appliedTs is a YYYYMMDD int; "this week" ≈ within 7 of the latest date.
-  const maxTs = all.reduce((m, c) => Math.max(m, c.appliedTs ?? 0), 0);
-  const addedThisWeek = all.filter(
-    (c) => (c.appliedTs ?? 0) >= maxTs - 7,
-  ).length;
+  const nextByCandidate = new Map(
+    upcoming.map((iv) => [iv.candidateId, iv.when]),
+  );
 
-  const data = docs.map((c, i) => ({
+  const data = docs.map((c) => ({
     id: String((c as { _id: unknown })._id),
     name: c.name,
     initials: c.initials,
@@ -137,13 +167,12 @@ export async function getRecentCandidates(): Promise<RecentCandidatesResponse> {
     client: c.client,
     match: c.match,
     matchColor: matchColor(c.match),
-    interview: INTERVIEW_SLOTS[i % INTERVIEW_SLOTS.length] ?? "—",
+    interview: nextByCandidate.get(String((c as { _id: unknown })._id)) ?? "—",
     stage: c.stage,
   }));
   return { data, meta: { addedThisWeek, interviewing } };
 }
 
-// Interviews rail — next + upcoming. Seeded (no interview collection yet).
 export interface InterviewsResponse {
   next: {
     name: string;
@@ -165,65 +194,60 @@ export interface InterviewsResponse {
   }[];
 }
 
-export async function getInterviews(): Promise<InterviewsResponse> {
+export async function getInterviews(): Promise<InterviewsResponse | null> {
+  const upcoming = await InterviewModel.find({ status: "upcoming" })
+    .sort({ ts: 1 })
+    .limit(4)
+    .lean();
+  const next = upcoming[0];
+  if (!next) return null;
   return {
     next: {
-      name: "Savannah Nguyen",
-      initials: "SN",
-      avatarBg: "#4A3A5B",
-      avatarFg: "#E3CFF5",
-      role: "Senior Backend Eng · Nortech",
-      when: "Today · 2:00 – 2:45 PM",
-      inLabel: "in 45 min",
+      name: next.candidateName,
+      initials: next.initials,
+      avatarBg: next.avatarBg,
+      avatarFg: next.avatarFg,
+      role: next.meta,
+      when: next.when,
+      inLabel: next.inLabel,
     },
-    upcoming: [
-      {
-        id: "1",
-        name: "Marcus Lee",
-        initials: "ML",
-        avatarBg: "#3A4A5B",
-        avatarFg: "#CFE3F5",
-        meta: "Frontend Eng · Fablio",
-        time: "3:30 PM",
-      },
-      {
-        id: "2",
-        name: "Priya Shah",
-        initials: "PS",
-        avatarBg: "#3A5B4A",
-        avatarFg: "#CFF5DE",
-        meta: "Product Designer · Vantor",
-        time: "Tomorrow",
-      },
-      {
-        id: "3",
-        name: "Diego Torres",
-        initials: "DT",
-        avatarBg: "#5B4A3A",
-        avatarFg: "#F5DECF",
-        meta: "Data Scientist · Corely",
-        time: "Thu 10 AM",
-      },
-    ],
+    upcoming: upcoming.slice(1).map((iv) => ({
+      id: String((iv as { _id: unknown })._id),
+      name: iv.candidateName,
+      initials: iv.initials,
+      avatarBg: iv.avatarBg,
+      avatarFg: iv.avatarFg,
+      meta: iv.meta,
+      time: iv.time,
+    })),
   };
 }
 
-// AI screening quota + match-score distribution. Seeded.
 export interface ScreeningResponse {
   screened: number;
   quota: number;
   distribution: { label: string; pct: number; color: string }[];
 }
 
+const SCREENING_QUOTA = 200;
+
 export async function getScreening(): Promise<ScreeningResponse> {
+  const matches = await CandidateModel.find({ match: { $gt: 0 } })
+    .select("match")
+    .lean();
+  const total = matches.length;
+  const band = (min: number, max: number) =>
+    matches.filter((c) => c.match >= min && c.match <= max).length;
+  const pct = (count: number) =>
+    total > 0 ? Math.round((count / total) * 100) : 0;
   return {
-    screened: 146,
-    quota: 200,
+    screened: total,
+    quota: SCREENING_QUOTA,
     distribution: [
-      { label: "90%+ match", pct: 32, color: "#F26A1B" },
-      { label: "75–89%", pct: 26, color: "#D98E5A" },
-      { label: "60–74%", pct: 24, color: "#B9A18C" },
-      { label: "Below 60%", pct: 18, color: "#F5F3F0" },
+      { label: "90%+ match", pct: pct(band(90, 100)), color: "#F26A1B" },
+      { label: "75–89%", pct: pct(band(75, 89)), color: "#D98E5A" },
+      { label: "60–74%", pct: pct(band(60, 74)), color: "#B9A18C" },
+      { label: "Below 60%", pct: pct(band(1, 59)), color: "#F5F3F0" },
     ],
   };
 }

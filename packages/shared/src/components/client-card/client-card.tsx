@@ -1,7 +1,9 @@
 "use client";
 
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "@recruit/sdk";
 import {
@@ -130,10 +132,6 @@ const METRIC_VALUE_SX = {
   letterSpacing: "-.01em",
 };
 
-// The client card. `id` resolves labels via useTranslation; `config` drives the
-// name (string renderer), status (status renderer), metric row (value renderer +
-// label), pipeline breakdown (static-translation renderers), and footer actions
-// (link renderer). `index` selects a logo color.
 export function ClientCard({
   id,
   client,
@@ -159,7 +157,6 @@ export function ClientCard({
     ),
   };
   const metrics = config?.metrics ?? DEFAULT_METRICS;
-  // The static-translation + link renderers resolve their own keys via `id`.
   const pipeline = (config?.pipeline ?? DEFAULT_PIPELINE).map((p) => ({
     ...p,
     id,
@@ -167,40 +164,33 @@ export function ClientCard({
   const actions = (config?.actions ?? []).map((action) => ({ ...action, id }));
 
   return (
-    <Box
+    <Card
+      variant="interactive"
       sx={{
-        background:
-          "linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 60%),#1C1C1B",
-        border: "1px solid rgba(255,255,255,.07)",
-        borderRadius: "18px",
         p: "22px",
         display: "flex",
         flexDirection: "column",
         gap: "18px",
-        transition: "border-color .15s, transform .15s",
-        "&:hover": {
-          borderColor: "rgba(242,106,27,.45)",
-          transform: "translateY(-2px)",
-        },
+        borderRadius: "18px",
+        background:
+          "linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 60%),#1C1C1B",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: "13px" }}>
-        <Box
+        <Avatar
+          variant="rounded"
           sx={{
             width: 46,
             height: 46,
             borderRadius: "13px",
-            background: logo.bg,
+            bgcolor: logo.bg,
             color: logo.fg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             fontSize: 18,
             fontWeight: 700,
           }}
         >
           {client.name.charAt(0).toUpperCase()}
-        </Box>
+        </Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <TextRenderer config={nameConfig} data={record} />
           <Typography sx={{ fontSize: 12, color: "#9A968E", mt: "2px" }}>
@@ -339,6 +329,6 @@ export function ClientCard({
           <ArrowForwardRounded sx={{ fontSize: 14 }} />
         </Box>
       </Box>
-    </Box>
+    </Card>
   );
 }

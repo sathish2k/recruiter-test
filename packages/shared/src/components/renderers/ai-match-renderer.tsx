@@ -12,7 +12,6 @@ export interface AiMatchRendererConfig {
   colorPath?: string;
 }
 
-// A sparkle icon + value (e.g. AI-match score), tinted by `color`/`colorPath`.
 export function AiMatchRenderer({
   config,
   data = {},

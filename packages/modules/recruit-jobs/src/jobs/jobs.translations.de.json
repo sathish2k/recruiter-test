@@ -3,6 +3,7 @@
   "export": "Exportieren",
   "exportAs": "EXPORTIEREN ALS",
   "moreFilters": "Filter",
+  "clearAll": "Alle löschen",
   "newJob": "Neuer Job",
   "filters": {
     "role": "Rolle",
@@ -34,5 +35,6 @@
   },
   "showing": "Zeige {{shown}} von {{total}} Jobs · Seite {{page}} von {{pages}}",
   "noData": "Keine Jobs entsprechen diesen Filtern",
+  "emptyHint": "Versuchen Sie, die Filter anzupassen oder zu löschen.",
   "loadError": "Beim Laden der Jobs ist ein Fehler aufgetreten."
 }

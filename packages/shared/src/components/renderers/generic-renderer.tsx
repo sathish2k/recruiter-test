@@ -45,8 +45,6 @@ export type GenericRendererConfig =
   | ({ type: "icon" } & IconRendererConfig)
   | ({ type: "link" } & LinkRendererConfig);
 
-// Dispatch a config `type` to its renderer. `path` reads the value out of
-// `data`; currency/number/date are locale-aware (each uses useFormatters).
 export function GenericRenderer({
   config,
   data = {},

@@ -1,0 +1,74 @@
+{
+  "back": "Back to Jobs",
+  "title": "New Job",
+  "description": "Publish a role and let Troy start sourcing and screening.",
+  "publish": "Publish job",
+  "cancel": "Cancel",
+  "saveDraft": "Save draft",
+  "toast": {
+    "published": "Job published",
+    "publishedSub": "{{title}} · {{client}}",
+    "draftSaved": "Draft saved",
+    "draftSavedSub": "{{title}} — finish it anytime from Jobs"
+  },
+  "discard": {
+    "title": "Discard this job?",
+    "body": "You have unsaved changes. Leave now and they're gone — or save a draft and finish later.",
+    "keep": "Keep editing",
+    "confirm": "Discard"
+  },
+  "sections": {
+    "basics": "Basics",
+    "description": "Description",
+    "skills": "Must-have skills"
+  },
+  "markdown": {
+    "write": "Write",
+    "preview": "Preview",
+    "hint": "Markdown supported",
+    "empty": "Nothing to preview yet — write some markdown first."
+  },
+  "panel": {
+    "screening": "AI Screening",
+    "screeningHint": "Scores applicants against skills + description",
+    "threshold": "Match threshold",
+    "broad": "50 · broad",
+    "strict": "95 · strict",
+    "autoAdvance": "Auto-advance to shortlist",
+    "estimate": "≈ {{count}} candidates/week expected above this threshold for similar roles",
+    "knockout": "Knockout questions",
+    "edit": "Edit",
+    "digest": "Daily digest of new matches",
+    "team": "Assigned team",
+    "teamHint": "Who sources and who reviews for this role",
+    "employee": "Employee (sourcer)",
+    "lead": "Profile lead (reviews & submits)",
+    "inviteTarget": "Daily invite target",
+    "publishTo": "Publish to",
+    "channels": {
+      "careers": "Client careers page",
+      "linkedin": "LinkedIn",
+      "indeed": "Indeed",
+      "wellfound": "Wellfound"
+    }
+  },
+  "fields": {
+    "title": "Job title",
+    "titlePlaceholder": "e.g. Senior Backend Engineer",
+    "titleRequired": "Job title is required to publish",
+    "client": "Client",
+    "openings": "Openings",
+    "openingsPlaceholder": "1",
+    "empType": "Employment type",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Remote (US)",
+    "salaryMin": "Salary min (USD)",
+    "salaryMinPlaceholder": "150,000",
+    "salaryMax": "Salary max (USD)",
+    "salaryMaxPlaceholder": "180,000",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the role, responsibilities, and what a great candidate looks like…",
+    "skills": "Must-have skills",
+    "skillsPlaceholder": "Add skill + Enter"
+  }
+}

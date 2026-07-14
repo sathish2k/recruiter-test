@@ -199,7 +199,7 @@ function RenderElements({
             </RenderContainer>
           );
           return element.gridItem ? (
-            <Grid key={element.id} {...element.gridItem}>
+            <Grid key={element.id} {...element.gridItem} sx={element.sx}>
               {nestedContent}
             </Grid>
           ) : (

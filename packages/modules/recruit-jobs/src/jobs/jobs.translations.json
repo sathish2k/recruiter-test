@@ -3,6 +3,7 @@
   "export": "Export",
   "exportAs": "EXPORT AS",
   "moreFilters": "Filters",
+  "clearAll": "Clear all",
   "newJob": "New Job",
   "filters": {
     "role": "Role",
@@ -34,5 +35,6 @@
   },
   "showing": "Showing {{shown}} of {{total}} jobs · page {{page}} of {{pages}}",
   "noData": "No jobs match these filters",
+  "emptyHint": "Try adjusting or clearing the filters.",
   "loadError": "Something went wrong loading jobs."
 }

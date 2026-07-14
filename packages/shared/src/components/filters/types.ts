@@ -14,6 +14,7 @@ interface BaseFilter {
 export interface SearchFilter extends BaseFilter {
   type: "search";
   placeholder?: string;
+  width?: number;
 }
 
 export interface SegmentedFilter extends BaseFilter {
