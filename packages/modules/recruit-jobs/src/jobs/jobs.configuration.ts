@@ -109,7 +109,12 @@ export const JobsConfiguration: TableFilterExportConfig = {
     ],
   },
   ctas: [
-    { label: { name: "newJob" }, icon: "add", routeId: "Recruit.AddJob.Route" },
+    {
+      label: { name: "newJob" },
+      icon: "add",
+      routeId: "Recruit.AddJob.Route",
+      access: { resource: "jobs", action: ["create"] },
+    },
   ],
   columns: [
     {
@@ -167,8 +172,18 @@ export const JobsConfiguration: TableFilterExportConfig = {
       routeId: "Recruit.JobDetail.Route",
       params: { id: { type: "dynamic", path: "id" } },
     },
-    { type: "edit", icon: "edit", label: { name: "actionsMenu.edit" } },
-    { type: "delete", icon: "delete", label: { name: "actionsMenu.delete" } },
+    {
+      type: "edit",
+      icon: "edit",
+      label: { name: "actionsMenu.edit" },
+      access: { resource: "jobs", action: ["edit"] },
+    },
+    {
+      type: "delete",
+      icon: "delete",
+      label: { name: "actionsMenu.delete" },
+      access: { resource: "jobs", action: ["delete"] },
+    },
   ],
   pagination: { pageSize: 5 },
 };

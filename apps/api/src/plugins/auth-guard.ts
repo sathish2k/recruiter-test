@@ -29,4 +29,11 @@ export const authGuard = new Elysia({ name: "auth-guard" })
         return {};
       },
     },
+    requireAdmin: {
+      resolve(ctx) {
+        const auth = (ctx as { auth?: AuthClaims }).auth;
+        if (auth?.role !== "admin") return status(403, "Admins only");
+        return {};
+      },
+    },
   });

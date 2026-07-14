@@ -4,6 +4,7 @@ import { ClientModule } from "@recruit/module-client";
 import { CoreModule } from "@recruit/module-core";
 import { DashboardModule } from "@recruit/module-dashboard";
 import { JobsModule } from "@recruit/module-jobs";
+import { SettingsModule } from "@recruit/module-settings";
 import type { Module } from "@recruit/sdk";
 
 export const AllModules: Module[] = [
@@ -13,4 +14,5 @@ export const AllModules: Module[] = [
   CoreModule,
   DashboardModule,
   JobsModule,
+  SettingsModule,
 ];

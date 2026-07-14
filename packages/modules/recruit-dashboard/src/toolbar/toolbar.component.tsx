@@ -54,13 +54,15 @@ export function ToolbarComponent({ id }: { id: string }) {
       {config?.export ? (
         <Export id={id} config={config.export} data={[]} filename="dashboard" />
       ) : null}
-      <Button
-        variant="contained"
-        startIcon={<IconRenderer name="add" size={17} />}
-        onClick={() => addModal.open()}
-      >
-        {t("newJob")}
-      </Button>
+      {config?.addForm ? (
+        <Button
+          variant="contained"
+          startIcon={<IconRenderer name="add" size={17} />}
+          onClick={() => addModal.open()}
+        >
+          {t("newJob")}
+        </Button>
+      ) : null}
       {config?.addForm ? (
         <FormModal
           open={addModal.isOpen}

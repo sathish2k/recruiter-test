@@ -2,10 +2,11 @@
 
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -25,6 +26,17 @@ const AuthUserContext = createContext<AuthUser | null>(null);
 /** The logged-in user from the session (null when unauthenticated). */
 export function useAuthUser(): AuthUser | null {
   return useContext(AuthUserContext);
+}
+
+/** Signs the user out and redirects to NEXT_PUBLIC_LOGOUT_CALLBACK_URL (default
+ * "/login"). Clears the in-memory auth token and SWR cache via the full reload
+ * next-auth performs. */
+export function useLogout(): () => void {
+  return useCallback(() => {
+    setAuthToken(undefined);
+    const callbackUrl = process.env.NEXT_PUBLIC_LOGOUT_CALLBACK_URL || "/login";
+    void signOut({ callbackUrl });
+  }, []);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

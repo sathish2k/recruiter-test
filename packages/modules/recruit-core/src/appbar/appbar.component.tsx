@@ -3,15 +3,20 @@
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import {
   type Route,
   useAuthUser,
+  useLogout,
   usePortalRouter,
   useTranslation,
 } from "@recruit/sdk";
 import { IconRenderer } from "@recruit/shared";
-import type { AppbarAction } from "./appbar.configuration";
+import { useState } from "react";
+import type { AppbarAction, AppbarMenuItem } from "./appbar.configuration";
 
 function initials(name?: string | null): string {
   if (!name) return "";
@@ -38,8 +43,16 @@ export function AppbarComponent({
   const router = usePortalRouter();
   const { t } = useTranslation(id);
   const user = useAuthUser();
+  const logout = useLogout();
+  const [avatarMenu, setAvatarMenu] = useState<HTMLElement | null>(null);
   const titleKey = configuration?.titles?.[currentRoute?.id ?? ""];
   const actions = configuration?.actions ?? [];
+
+  const runMenuItem = (item: AppbarMenuItem) => {
+    setAvatarMenu(null);
+    if (item.action === "logout") logout();
+    else if (item.routeId) router.push(item.routeId);
+  };
 
   return (
     <Box
@@ -60,15 +73,65 @@ export function AppbarComponent({
         {actions.map((action) => {
           const go = () => action.routeId && router.push(action.routeId);
           if (action.kind === "avatar") {
+            const menu = action.menu ?? [];
             return (
-              <Avatar
-                key="avatar"
-                onClick={go}
-                title={user?.name ?? undefined}
-                sx={{ bgcolor: "#5B4A3A", color: "#FFD9BC", cursor: "pointer" }}
-              >
-                {initials(user?.name) || t(action.label ?? "")}
-              </Avatar>
+              <Box key="avatar">
+                <Avatar
+                  onClick={(e) =>
+                    menu.length ? setAvatarMenu(e.currentTarget) : go()
+                  }
+                  title={user?.name ?? undefined}
+                  sx={{
+                    bgcolor: "#5B4A3A",
+                    color: "#FFD9BC",
+                    cursor: "pointer",
+                  }}
+                >
+                  {initials(user?.name) || t(action.label ?? "")}
+                </Avatar>
+                <Menu
+                  anchorEl={avatarMenu}
+                  open={Boolean(avatarMenu)}
+                  onClose={() => setAvatarMenu(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "right" }}
+                >
+                  {user?.name ? (
+                    <Box sx={{ px: "14px", py: "6px" }}>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                        {user.name}
+                      </Typography>
+                      <Typography
+                        sx={{ fontSize: 11.5, color: "text.disabled" }}
+                      >
+                        {user.email}
+                      </Typography>
+                    </Box>
+                  ) : null}
+                  {menu.map((item) => (
+                    <MenuItem
+                      key={item.label}
+                      onClick={() => runMenuItem(item)}
+                      sx={{
+                        gap: "10px",
+                        minWidth: 172,
+                        color: item.danger ? "error.light" : undefined,
+                      }}
+                    >
+                      {item.icon ? (
+                        <ListItemIcon sx={{ minWidth: "0 !important" }}>
+                          <IconRenderer
+                            name={item.icon}
+                            size={16}
+                            color={item.danger ? "inherit" : undefined}
+                          />
+                        </ListItemIcon>
+                      ) : null}
+                      {t(item.label)}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
             );
           }
           return (

@@ -1,9 +1,17 @@
 {
   "avatar": "RK",
+  "menu": {
+    "profile": "My profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
   "titles": {
     "dashboard": "Dashboard",
     "clients": "Clients",
     "jobs": "Jobs",
-    "candidates": "Candidates"
+    "candidates": "Candidates",
+    "settings": "Settings · Team & permissions",
+    "profile": "Settings · My profile",
+    "templates": "Settings · Email templates"
   }
 }

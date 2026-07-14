@@ -1,12 +1,14 @@
+import type { AccessRule } from "@recruit/sdk";
 import type { ExportConfig, JsonSchema } from "@recruit/shared";
 
 export interface ToolbarConfiguration {
   manageClientsRouteId?: string;
   export?: ExportConfig;
-  addForm?: JsonSchema;
+  addForm?: JsonSchema & { access?: AccessRule };
 }
 
-const addForm: JsonSchema = {
+const addForm: JsonSchema & { access?: AccessRule } = {
+  access: { resource: "jobs", action: ["create"] },
   type: "object",
   properties: {
     title: {

@@ -54,18 +54,21 @@ import InsightsRounded from "@mui/icons-material/InsightsRounded";
 import LockOutlined from "@mui/icons-material/LockOutlined";
 import LockResetRounded from "@mui/icons-material/LockResetRounded";
 import LoginRounded from "@mui/icons-material/LoginRounded";
+import LogoutRounded from "@mui/icons-material/LogoutRounded";
 import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import MailRounded from "@mui/icons-material/MailRounded";
 import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
 import MoreVertRounded from "@mui/icons-material/MoreVertRounded";
 import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
 import PersonAddAlt1Rounded from "@mui/icons-material/PersonAddAlt1Rounded";
+import PersonOffRounded from "@mui/icons-material/PersonOffRounded";
 import PersonOutlineRounded from "@mui/icons-material/PersonOutlineRounded";
 import PictureAsPdfRounded from "@mui/icons-material/PictureAsPdfRounded";
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
 import SpaceDashboardRounded from "@mui/icons-material/SpaceDashboardRounded";
 import TableViewRounded from "@mui/icons-material/TableViewRounded";
+import UnfoldMoreRounded from "@mui/icons-material/UnfoldMoreRounded";
 import UploadFileRounded from "@mui/icons-material/UploadFileRounded";
 import ViewKanbanRounded from "@mui/icons-material/ViewKanbanRounded";
 import VisibilityOffRounded from "@mui/icons-material/VisibilityOffRounded";
@@ -94,7 +97,10 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "lock-reset": LockResetRounded,
   person: PersonOutlineRounded,
   "person-add": PersonAddAlt1Rounded,
+  "person-off": PersonOffRounded,
+  "unfold-more": UnfoldMoreRounded,
   login: LoginRounded,
+  logout: LogoutRounded,
   domain: DomainRounded,
   close: CloseRounded,
   check: CheckRounded,

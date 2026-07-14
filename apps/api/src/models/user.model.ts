@@ -1,12 +1,18 @@
 import { type Model, model, models, Schema } from "mongoose";
 import type { UserRole } from "@recruit/types";
 
+export type UserStatus = "active" | "invited" | "inactive";
+
 export interface UserDoc {
   agencyId: string;
   email: string;
   name: string;
   role: UserRole;
+  status: UserStatus;
   passwordHash: string;
+  phone?: string;
+  timezone?: string;
+  notificationPrefs?: Record<string, boolean>;
   resetTokenHash?: string;
   resetTokenExpires?: Date;
 }
@@ -16,8 +22,20 @@ const userSchema = new Schema<UserDoc>(
     agencyId: { type: String, required: true, index: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     name: { type: String, required: true },
-    role: { type: String, enum: ["lead", "recruiter"], required: true },
+    role: {
+      type: String,
+      enum: ["admin", "lead", "employee", "client"],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "invited", "inactive"],
+      default: "active",
+    },
     passwordHash: { type: String, required: true },
+    phone: { type: String, default: "" },
+    timezone: { type: String, default: "Asia/Kolkata (IST)" },
+    notificationPrefs: { type: Map, of: Boolean, default: {} },
     resetTokenHash: { type: String },
     resetTokenExpires: { type: Date },
   },

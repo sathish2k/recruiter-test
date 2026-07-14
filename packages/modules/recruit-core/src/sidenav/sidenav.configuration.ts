@@ -1,6 +1,9 @@
+import type { AccessRule } from "@recruit/sdk";
+
 export interface SidenavItem {
   label: string;
   icon: string;
+  access?: AccessRule;
   routeId: string;
 }
 
@@ -15,15 +18,27 @@ const groups: SidenavGroup[] = [
   {
     title: "groups.main",
     items: [
-      { label: "items.dashboard", icon: "dashboard", routeId: "Recruit.Root" },
+      {
+        label: "items.dashboard",
+        access: { resource: "dashboard" },
+        icon: "dashboard",
+        routeId: "Recruit.Root",
+      },
       {
         label: "items.clients",
+        access: { resource: "clients" },
         icon: "domain",
         routeId: "Recruit.Clients.Route",
       },
-      { label: "items.jobs", icon: "work", routeId: "Recruit.Jobs.Route" },
+      {
+        label: "items.jobs",
+        access: { resource: "jobs" },
+        icon: "work",
+        routeId: "Recruit.Jobs.Route",
+      },
       {
         label: "items.candidates",
+        access: { resource: "candidates" },
         icon: "group",
         routeId: "Recruit.Candidates.Route",
       },
@@ -74,6 +89,7 @@ const groups: SidenavGroup[] = [
     items: [
       {
         label: "items.settings",
+        access: { resource: "settings" },
         icon: "settings",
         routeId: "Recruit.Settings.Route",
       },

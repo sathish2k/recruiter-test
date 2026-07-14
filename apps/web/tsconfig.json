@@ -30,6 +30,9 @@
       ],
       "@recruit/module-client": [
         "../../packages/modules/recruit-client/src/index.ts"
+      ],
+      "@recruit/module-settings": [
+        "../../packages/modules/recruit-settings/src/index.ts"
       ]
     }
   },

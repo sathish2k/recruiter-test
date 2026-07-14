@@ -37,6 +37,11 @@ export {
 export { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 export { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 export {
+  RoleRenderer,
+  type RoleOption,
+  type RoleRendererConfig,
+} from "./role-renderer";
+export {
   StatCardRenderer,
   type StatCardRendererConfig,
 } from "./stat-card-renderer";

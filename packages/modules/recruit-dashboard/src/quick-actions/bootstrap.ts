@@ -8,8 +8,17 @@ const QUICK_ACTIONS_CONFIGURATION: ComponentDependency = {
   value: {
     title: "title",
     actions: [
-      { icon: "add", label: "addJob", routeId: "Recruit.Jobs.Route" },
-      { icon: "person-add", label: "invite" },
+      {
+        icon: "add",
+        label: "addJob",
+        routeId: "Recruit.AddJob.Route",
+        access: { resource: "jobs", action: ["create"] },
+      },
+      {
+        icon: "person-add",
+        label: "invite",
+        access: { resource: "settings" },
+      },
       {
         icon: "sparkle",
         label: "screen",

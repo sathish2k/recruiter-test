@@ -7,6 +7,23 @@ export interface RouteGuard {
 
 export type RouteGuardFn = () => void | Promise<void>;
 
+export type AccessAction = "read" | "create" | "edit" | "update" | "delete";
+
+/** Declarative access rule attachable to routes, page/layout elements and
+ * component configs. `action` defaults to ["read"]; `attributes` adds
+ * ABAC checks against the user's attributes (e.g. { role: ["lead"] }). */
+export interface AccessRule {
+  resource: string;
+  action?: AccessAction[];
+  attributes?: Record<string, unknown[]>;
+}
+
+/** The current user's access context, supplied by the app's accessResolver. */
+export interface AccessContext {
+  attributes: Record<string, unknown>;
+  permissions: Record<string, AccessAction[]>;
+}
+
 export interface Route {
   id: string;
   path: string;
@@ -14,6 +31,7 @@ export interface Route {
   page?: string;
   slot?: string;
   guard?: RouteGuard[];
+  access?: AccessRule;
   children: string[];
 }
 
@@ -29,6 +47,7 @@ export interface LayoutElement {
   gridItem?: Pick<GridProps, "size" | "offset">;
   prefetch?: boolean;
   sx?: Record<string, unknown>;
+  access?: AccessRule;
 }
 
 export interface Configuration {

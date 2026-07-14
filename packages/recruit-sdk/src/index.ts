@@ -1,3 +1,8 @@
+export {
+  canAccess,
+  canAccessRoutes,
+  filterConfigurationsAccess,
+} from "./access";
 export { createPortalApp, PortalRenderer } from "./engine/orchestrator";
 export { findBestMatchBranch, findRouteBySlug } from "./engine/router";
 export { generateRenderTree } from "./engine/renderer";
@@ -10,6 +15,9 @@ export {
 } from "./navigation";
 export * from "./providers";
 export type {
+  AccessAction,
+  AccessContext,
+  AccessRule,
   ComponentDefaults,
   ComponentDefinition,
   ComponentDependency,

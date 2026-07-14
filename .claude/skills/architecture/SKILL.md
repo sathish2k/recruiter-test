@@ -75,6 +75,28 @@ Then: add to the module's `index.ts` `components`, register the module in
   pass `{ id: row.id }` automatically when `rowRouteId` is set, and link
   configs use `params: { id: { type: "dynamic", path: "id" } }`.
 
+## Access control
+
+- **Rule shape** — routes, page/layout elements, and component-config parts
+  (columns, links, actions, sidenav items) may carry
+  `access: { resource, action?: AccessAction[], attributes? }`. `action`
+  defaults to `["read"]` — read-by-default.
+- **Source of truth** — `ROLE_PERMISSIONS` in
+  `packages/configurations/src/access.ts` (roles: admin/lead/employee/client;
+  admin = `"*"` wildcard). Static config, changed in code only.
+- **Engine filtering** — the engine verifies each rule against the user's
+  `AccessContext` (built by `accessResolver` in `apps/web/src/access.ts` from
+  the session role) before render: a denied **route** triggers
+  `onAccessDenied` → redirect to `/permission-denied`
+  (`Recruit.PermissionDenied.Route`, no access rule of its own); denied
+  **elements** and **config parts** are silently stripped. Client-side, read
+  the context with `useAccess()` → `{ context, can(rule) }`
+  (`context.attributes.userId/role/agencyId`).
+- **Server-side RBAC** — UI filtering is cosmetic; the API enforces for real.
+  The users API (`apps/api/src/routes/user.routes.ts`) requires `isAuth` +
+  `requireAdmin` (auth-guard macros) — non-admin tokens get 403 regardless of
+  what the client renders.
+
 ## Verify
 
 ```

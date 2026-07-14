@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { sendEmail } from "../lib/mailjet";
 import { UserModel } from "../models/user.model";
+import { seedAgencyPermissions } from "./permission.service";
 
 const RESET_TTL_MS = 60 * 60 * 1000;
 
@@ -23,9 +24,10 @@ export async function registerAccount(input: RegisterInput) {
     agencyId: input.agency,
     email: input.email,
     name: input.fullName,
-    role: "lead",
+    role: "admin",
     passwordHash,
   });
+  await seedAgencyPermissions(input.agency);
   return { id: String(user._id), email: user.email, name: user.name };
 }
 

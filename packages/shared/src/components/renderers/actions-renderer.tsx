@@ -2,7 +2,7 @@
 
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { usePortalRouter } from "@recruit/sdk";
+import { type AccessRule, usePortalRouter } from "@recruit/sdk";
 import { IconRenderer } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 
@@ -21,6 +21,8 @@ export type ActionItem = {
   type?: string;
   /** Icon name for the icon-button variant. */
   icon?: string;
+  /** Access rule verified + stripped by the engine before render. */
+  access?: AccessRule;
 } & Partial<LinkRendererConfig>;
 
 export interface ActionsRendererConfig {

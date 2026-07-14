@@ -1,0 +1,8 @@
+{
+  "title": "Settings",
+  "tabs": {
+    "profile": "My profile",
+    "team": "Team & permissions",
+    "templates": "Email templates"
+  }
+}

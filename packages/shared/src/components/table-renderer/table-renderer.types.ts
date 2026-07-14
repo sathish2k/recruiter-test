@@ -1,3 +1,4 @@
+import type { AccessRule } from "@recruit/sdk";
 import type { ExportConfig } from "../export";
 import type { FilterConfig } from "../filters";
 import type { JsonSchema } from "../form-renderer";
@@ -75,6 +76,8 @@ export interface TableCta {
   /** Emit this action key to the component's onCta handler on click. */
   action?: string;
   variant?: "primary" | "secondary";
+  /** Access rule verified + stripped by the engine before render. */
+  access?: AccessRule;
 }
 
 /** TableRenderer + a toolbar of filters, CTAs and an export button. */

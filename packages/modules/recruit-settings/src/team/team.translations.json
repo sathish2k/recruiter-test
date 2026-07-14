@@ -1,0 +1,55 @@
+{
+  "seatInfo": "{{count}} seats used of {{limit}}",
+  "inviteMember": "Invite member",
+  "cancel": "Cancel",
+  "you": "(you)",
+  "members": {
+    "title": "Members",
+    "empty": "No members yet",
+    "columns": {
+      "member": "Member",
+      "role": "Role",
+      "status": "Status",
+      "lastActive": "Last active",
+      "actions": ""
+    }
+  },
+  "roles": {
+    "admin": "Admin",
+    "lead": "Profile Lead",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "status": {
+    "active": "Active",
+    "invited": "Invited"
+  },
+  "changeRole": "Change role",
+  "actions": {
+    "resendInvite": "Resend invite",
+    "deactivate": "Deactivate…"
+  },
+  "inviteForm": {
+    "title": "Invite member",
+    "description": "They join with the role you pick — permissions apply instantly.",
+    "submit": "Send invite",
+    "email": "Email",
+    "emailPlaceholder": "teammate@troyconsultancy.com",
+    "role": "Role",
+    "errors": {
+      "email": "Enter a valid email address",
+      "role": "Pick a role"
+    }
+  },
+  "deactivateModal": {
+    "title": "Deactivate {{name}}?",
+    "description": "They lose access immediately. Their candidates and roles stay — reassign them to another member.",
+    "confirm": "Deactivate"
+  },
+  "toast": {
+    "inviteSent": "Invite sent",
+    "inviteResent": "Invite resent",
+    "roleChanged": "Role updated",
+    "deactivated": "Member deactivated"
+  }
+}

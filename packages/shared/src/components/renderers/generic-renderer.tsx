@@ -22,6 +22,7 @@ import { IconRenderer, type IconRendererConfig } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
+import { RoleRenderer, type RoleRendererConfig } from "./role-renderer";
 import {
   StaticTranslationRenderer,
   type StaticTranslationRendererConfig,
@@ -40,6 +41,7 @@ export type GenericRendererConfig =
   | EntityRendererConfig
   | AiMatchRendererConfig
   | PillRendererConfig
+  | RoleRendererConfig
   | ActionsRendererConfig
   | MenuRendererConfig
   | ({ type: "icon" } & IconRendererConfig)
@@ -76,6 +78,14 @@ export function GenericRenderer({
       return <AiMatchRenderer config={config} data={data} />;
     case "pill":
       return <PillRenderer config={config} data={data} />;
+    case "role":
+      return (
+        <RoleRenderer
+          config={config}
+          data={data}
+          actionHandler={actionHandler}
+        />
+      );
     case "actions":
       return (
         <ActionsRenderer

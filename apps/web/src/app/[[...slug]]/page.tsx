@@ -1,5 +1,6 @@
 import { AllModules, allConfigurations, routes } from "@recruit/configurations";
 import { createPortalApp } from "@recruit/sdk";
+import { accessResolver, onAccessDenied } from "../../access";
 import { guards } from "../../guards";
 
 const PortalApp = createPortalApp({
@@ -7,6 +8,8 @@ const PortalApp = createPortalApp({
   configurations: allConfigurations,
   modules: AllModules,
   guards,
+  accessResolver,
+  onAccessDenied,
 });
 
 export default async function Page({

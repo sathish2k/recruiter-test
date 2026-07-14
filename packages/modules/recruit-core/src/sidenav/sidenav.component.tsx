@@ -19,7 +19,9 @@ export function SidenavComponent({
 }) {
   const router = usePortalRouter();
   const { t } = useTranslation(id);
-  const groups = configuration?.groups ?? [];
+  const groups = (configuration?.groups ?? []).filter(
+    (group) => group.items.length > 0,
+  );
 
   return (
     <Box

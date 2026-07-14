@@ -1,8 +1,66 @@
 import { closeDb, connectDb } from "../src/db";
 import { CandidateModel } from "../src/models/candidate.model";
 import { ClientModel } from "../src/models/client.model";
+import { EmailTemplateModel } from "../src/models/email-template.model";
 import { InterviewModel } from "../src/models/interview.model";
 import { JobModel } from "../src/models/job.model";
+import { RolePermissionModel } from "../src/models/role-permission.model";
+import { UserModel } from "../src/models/user.model";
+import {
+  DEFAULT_TEMPLATES,
+  seedAgencyTemplates,
+} from "../src/services/email-template.service";
+import { seedAgencyPermissions } from "../src/services/permission.service";
+
+const DEMO_PASSWORD = "Passw0rd123";
+
+// Every seeded teammate shares DEMO_PASSWORD so any role can be logged into for
+// testing role-scoped screens. `riya@demo.dev` is the admin ("you").
+const team = [
+  {
+    name: "Riya Kapoor",
+    email: "riya@demo.dev",
+    role: "admin",
+    status: "active",
+  },
+  { name: "Ana Novak", email: "ana@demo.dev", role: "lead", status: "active" },
+  {
+    name: "Marcus Reid",
+    email: "marcus@demo.dev",
+    role: "lead",
+    status: "active",
+  },
+  {
+    name: "Dev Shah",
+    email: "dev@demo.dev",
+    role: "employee",
+    status: "active",
+  },
+  {
+    name: "Mira Joshi",
+    email: "mira@demo.dev",
+    role: "employee",
+    status: "active",
+  },
+  {
+    name: "Leo Franco",
+    email: "leo@demo.dev",
+    role: "employee",
+    status: "active",
+  },
+  {
+    name: "Nora Bright",
+    email: "nora@demo.dev",
+    role: "client",
+    status: "active",
+  },
+  {
+    name: "sofia.pending",
+    email: "sofia@demo.dev",
+    role: "employee",
+    status: "invited",
+  },
+] as const;
 
 const AGENCY = "demo";
 
@@ -874,8 +932,17 @@ async function seed(): Promise<void> {
     insertedCandidates as unknown as InsertedCandidate[],
   );
   await InterviewModel.insertMany(interviews);
+  await RolePermissionModel.deleteMany({ agencyId: AGENCY });
+  await seedAgencyPermissions(AGENCY);
+  await UserModel.deleteMany({ agencyId: AGENCY });
+  const passwordHash = await Bun.password.hash(DEMO_PASSWORD);
+  await UserModel.insertMany(
+    team.map((m) => ({ ...m, agencyId: AGENCY, passwordHash })),
+  );
+  await EmailTemplateModel.deleteMany({ agencyId: AGENCY });
+  await seedAgencyTemplates(AGENCY);
   console.log(
-    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews.`,
+    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, role permissions.`,
   );
   await closeDb();
 }

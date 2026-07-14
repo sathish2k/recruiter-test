@@ -7,6 +7,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.Home.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "dashboard" },
     children: [],
   },
   {
@@ -15,6 +16,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.Clients.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "clients" },
     children: [],
   },
   {
@@ -23,6 +25,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.Jobs.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "jobs" },
     children: [],
   },
   {
@@ -31,6 +34,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.AddJob.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "jobs", action: ["create"] },
     children: [],
   },
   {
@@ -39,6 +43,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.JobDetail.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "jobs" },
     children: [],
   },
   {
@@ -47,6 +52,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.Candidates.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "candidates" },
     children: [],
   },
   {
@@ -55,6 +61,7 @@ export const routes: Route[] = [
     layout: "Recruit.Core.Layout",
     page: "Recruit.AddCandidate.Page",
     guard: [{ type: "authenticationGuard" }],
+    access: { resource: "candidates", action: ["create"] },
     children: [],
   },
   {
@@ -62,6 +69,41 @@ export const routes: Route[] = [
     path: "candidates/:id",
     layout: "Recruit.Core.Layout",
     page: "Recruit.CandidateDetail.Page",
+    guard: [{ type: "authenticationGuard" }],
+    access: { resource: "candidates" },
+    children: [],
+  },
+  {
+    id: "Recruit.Settings.Route",
+    path: "settings",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Settings.Page",
+    guard: [{ type: "authenticationGuard" }],
+    access: { resource: "settings" },
+    children: [],
+  },
+  {
+    id: "Recruit.Profile.Route",
+    path: "settings/profile",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Profile.Page",
+    guard: [{ type: "authenticationGuard" }],
+    children: [],
+  },
+  {
+    id: "Recruit.EmailTemplates.Route",
+    path: "settings/templates",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.EmailTemplates.Page",
+    guard: [{ type: "authenticationGuard" }],
+    access: { resource: "settings" },
+    children: [],
+  },
+  {
+    id: "Recruit.PermissionDenied.Route",
+    path: "permission-denied",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.PermissionDenied.Page",
     guard: [{ type: "authenticationGuard" }],
     children: [],
   },

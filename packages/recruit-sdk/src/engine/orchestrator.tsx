@@ -7,10 +7,16 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import {
+  canAccessRoutes,
+  filterConfigAccess,
+  filterConfigurationsAccess,
+} from "../access";
 import { MuiAuthLayout } from "../layout-renderer/mui-auth-layout";
 import { MuiCoreLayout } from "../layout-renderer/mui-core-layout";
-import { GlobalDependencyProvider } from "../providers";
+import { AccessProvider, GlobalDependencyProvider } from "../providers";
 import type {
+  AccessContext,
   ComponentDefinition,
   Configuration,
   LayoutElement,
@@ -274,8 +280,17 @@ export function createPortalApp(sdkConfig: {
   configurations: Configuration[];
   modules: Module[];
   guards?: Record<string, RouteGuardFn>;
+  accessResolver?: () => Promise<AccessContext | null>;
+  onAccessDenied?: () => void | Promise<void>;
 }) {
-  const { routes, configurations, modules, guards } = sdkConfig;
+  const {
+    routes,
+    configurations,
+    modules,
+    guards,
+    accessResolver,
+    onAccessDenied,
+  } = sdkConfig;
   const componentRegistry: Registry = new Map();
   for (const m of modules) {
     for (const c of m.components) componentRegistry.set(c.id, c);
@@ -299,9 +314,21 @@ export function createPortalApp(sdkConfig: {
       }
     }
 
+    const accessContext = accessResolver ? await accessResolver() : null;
+    if (
+      accessResolver &&
+      matchedRoutes &&
+      !canAccessRoutes(accessContext, matchedRoutes)
+    ) {
+      await onAccessDenied?.();
+    }
+    const accessibleConfigurations = accessResolver
+      ? filterConfigurationsAccess(configurations, accessContext)
+      : configurations;
+
     const tree = generateRenderTree(
       matchedRoutes,
-      configurations,
+      accessibleConfigurations,
       routes,
       slugParts,
     );
@@ -319,8 +346,11 @@ export function createPortalApp(sdkConfig: {
       fetchTasks.push(
         (async () => {
           const deps = definition.defaults ?? definition.default;
+          const configurationValue = deps?.configuration?.value ?? {};
           const props: Record<string, unknown> = {
-            configuration: deps?.configuration?.value ?? {},
+            configuration: accessResolver
+              ? (filterConfigAccess(configurationValue, accessContext) ?? {})
+              : configurationValue,
             schema: deps?.schema?.value ?? {},
             translation: deps?.translation?.value ?? {},
           };
@@ -356,7 +386,7 @@ export function createPortalApp(sdkConfig: {
         if (element.type === "component") {
           collectFor(element);
         } else if (element.type === "configuration") {
-          const nested = configurations.find(
+          const nested = accessibleConfigurations.find(
             (c) => c.id === element.configurationId,
           );
           nested?.elements.forEach(collectFor);
@@ -369,13 +399,15 @@ export function createPortalApp(sdkConfig: {
     await Promise.all(fetchTasks);
 
     return (
-      <PortalRenderer
-        tree={tree}
-        dataMap={dataMap}
-        componentRegistry={componentRegistry}
-        currentRoute={currentRoute}
-        allConfigurations={configurations}
-      />
+      <AccessProvider value={accessContext}>
+        <PortalRenderer
+          tree={tree}
+          dataMap={dataMap}
+          componentRegistry={componentRegistry}
+          currentRoute={currentRoute}
+          allConfigurations={accessibleConfigurations}
+        />
+      </AccessProvider>
     );
   };
 }

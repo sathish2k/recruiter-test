@@ -133,11 +133,13 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       icon: "upload",
       action: "import",
       variant: "secondary",
+      access: { resource: "candidates", action: ["create"] },
     },
     {
       label: { name: "addCandidate" },
       icon: "add",
       routeId: "Recruit.AddCandidate.Route",
+      access: { resource: "candidates", action: ["create"] },
     },
   ],
   columns: [
