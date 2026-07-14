@@ -19,7 +19,13 @@
     "pipeline": "Pipeline",
     "matched": "KI-Treffer",
     "posted": "Veröffentlicht",
-    "status": "Status"
+    "status": "Status",
+    "actions": "Aktionen"
+  },
+  "actionsMenu": {
+    "view": "Job ansehen",
+    "edit": "Job bearbeiten",
+    "delete": "Job löschen"
   },
   "exportTypes": {
     "pdf": "PDF (.pdf)",

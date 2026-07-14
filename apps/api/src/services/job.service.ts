@@ -28,6 +28,37 @@ function list(value?: string): string[] {
     : [];
 }
 
+export interface CreateJobInput {
+  title: string;
+  client?: string;
+  roleCat?: string;
+  level?: string;
+  location?: string;
+  empType?: string;
+  openings?: number;
+}
+
+export async function createJob(input: CreateJobInput, agencyId: string) {
+  const clientInitial = (input.client ?? "?").trim().charAt(0).toUpperCase();
+  const doc = await JobModel.create({
+    agencyId,
+    title: input.title,
+    roleCat: input.roleCat ?? "",
+    level: input.level ?? "",
+    openings: input.openings ?? 1,
+    client: input.client ?? "",
+    clientInitial,
+    location: input.location ?? "Remote",
+    empType: input.empType ?? "Full-time",
+    pipeline: 0,
+    matched: 0,
+    posted: "Just now",
+    postedTs: Date.now(),
+    status: "Active",
+  });
+  return mapJob(doc.toObject() as JobDoc & { _id: unknown });
+}
+
 function mapJob(j: JobDoc & { _id: unknown }) {
   return {
     id: String(j._id),

@@ -1,40 +1,10 @@
 "use client";
 
-import AutoAwesomeRounded from "@mui/icons-material/AutoAwesomeRounded";
-import BoltRounded from "@mui/icons-material/BoltRounded";
-import DomainRounded from "@mui/icons-material/DomainRounded";
-import EventRounded from "@mui/icons-material/EventRounded";
-import GroupRounded from "@mui/icons-material/GroupRounded";
-import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
-import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
-import InsightsRounded from "@mui/icons-material/InsightsRounded";
-import MailRounded from "@mui/icons-material/MailRounded";
-import SettingsRounded from "@mui/icons-material/SettingsRounded";
-import SpaceDashboardRounded from "@mui/icons-material/SpaceDashboardRounded";
-import ViewKanbanRounded from "@mui/icons-material/ViewKanbanRounded";
-import WorkRounded from "@mui/icons-material/WorkRounded";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
-import type { ReactNode } from "react";
+import { IconRenderer } from "@recruit/shared";
 import type { SidenavGroup } from "./sidenav.configuration";
-
-const ICON_SX = { fontSize: 19 };
-const ICONS: Record<string, ReactNode> = {
-  dashboard: <SpaceDashboardRounded sx={ICON_SX} />,
-  domain: <DomainRounded sx={ICON_SX} />,
-  work: <WorkRounded sx={ICON_SX} />,
-  group: <GroupRounded sx={ICON_SX} />,
-  kanban: <ViewKanbanRounded sx={ICON_SX} />,
-  monitoring: <InsightsRounded sx={ICON_SX} />,
-  event: <EventRounded sx={ICON_SX} />,
-  handshake: <HandshakeRounded sx={ICON_SX} />,
-  mail: <MailRounded sx={ICON_SX} />,
-  aiScreening: <AutoAwesomeRounded sx={ICON_SX} />,
-  automation: <BoltRounded sx={ICON_SX} />,
-  settings: <SettingsRounded sx={ICON_SX} />,
-  help: <HelpOutlineRounded sx={ICON_SX} />,
-};
 
 export function SidenavComponent({
   id,
@@ -152,7 +122,7 @@ export function SidenavComponent({
                         }),
                   }}
                 >
-                  {ICONS[item.icon]}
+                  <IconRenderer name={item.icon} size={19} />
                   {t(item.label)}
                 </Box>
               );

@@ -93,9 +93,19 @@ export const JobsConfiguration: TableFilterExportConfig = {
   ],
   export: {
     types: [
-      { label: "exportTypes.pdf", value: "pdf", icon: "pdf" },
-      { label: "exportTypes.excel", value: "xlsx", icon: "excel" },
-      { label: "exportTypes.word", value: "docx", icon: "word" },
+      { label: "exportTypes.pdf", value: "pdf", icon: "pdf", color: "#E89A9A" },
+      {
+        label: "exportTypes.excel",
+        value: "xlsx",
+        icon: "excel",
+        color: "#8FD6AC",
+      },
+      {
+        label: "exportTypes.word",
+        value: "docx",
+        icon: "word",
+        color: "#9BB8D9",
+      },
     ],
   },
   ctas: [{ label: { name: "newJob" }, icon: "add", action: "add" }],
@@ -142,6 +152,18 @@ export const JobsConfiguration: TableFilterExportConfig = {
       value: { type: "pill", path: "status", styles: STATUS_PILLS },
       sort: { key: "status" },
     },
+  ],
+  // Trailing kebab (⋮) menu — a link item plus custom actions (actionHandler).
+  actionsLabel: { name: "columns.actions" },
+  actions: [
+    {
+      type: "link",
+      icon: "view",
+      label: { name: "actionsMenu.view" },
+      routeId: "Recruit.Jobs.Route",
+    },
+    { type: "edit", icon: "edit", label: { name: "actionsMenu.edit" } },
+    { type: "delete", icon: "delete", label: { name: "actionsMenu.delete" } },
   ],
   pagination: { pageSize: 5 },
 };

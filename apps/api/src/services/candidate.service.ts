@@ -68,6 +68,7 @@ const SORT_FIELDS: Record<string, string> = {
   exp: "exp",
   applied: "appliedTs",
   stage: "stage",
+  createdAt: "createdAt",
 };
 
 export async function listCandidates(filters: CandidateFilters = {}) {

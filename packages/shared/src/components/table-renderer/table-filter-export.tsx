@@ -1,8 +1,5 @@
 "use client";
 
-import AddRounded from "@mui/icons-material/AddRounded";
-import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
-import UploadFileRounded from "@mui/icons-material/UploadFileRounded";
 import Box from "@mui/material/Box";
 import {
   useConfiguration,
@@ -10,20 +7,13 @@ import {
   usePortalRouter,
   useTranslation,
 } from "@recruit/sdk";
-import type { ReactNode } from "react";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
-import type { ActionHandler } from "../renderers";
+import { type ActionHandler, IconRenderer } from "../renderers";
 import { TableRenderer } from "./table-renderer";
 import type { TableCta, TableFilterExportConfig } from "./table-renderer.types";
 
 type Row = Record<string, unknown>;
-
-const CTA_ICONS: Record<string, ReactNode> = {
-  add: <AddRounded sx={{ fontSize: 18 }} />,
-  download: <FileDownloadOutlined sx={{ fontSize: 16 }} />,
-  upload: <UploadFileRounded sx={{ fontSize: 16 }} />,
-};
 
 // TableRenderer with a toolbar: config-driven Filters (URL-synced, server-side
 // via useFetch), CTA buttons, and an Export button. `id` drives config, data
@@ -139,7 +129,12 @@ export function TableFilterExportRenderer({
                       }),
                 }}
               >
-                {cta.icon ? CTA_ICONS[cta.icon] : null}
+                {cta.icon ? (
+                  <IconRenderer
+                    name={cta.icon}
+                    size={cta.icon === "add" ? 18 : 16}
+                  />
+                ) : null}
                 {t(cta.label.name)}
               </Box>
             );

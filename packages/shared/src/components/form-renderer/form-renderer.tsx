@@ -1,11 +1,5 @@
 "use client";
 
-import DomainRounded from "@mui/icons-material/DomainRounded";
-import LockOutlined from "@mui/icons-material/LockOutlined";
-import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
-import PersonOutlineRounded from "@mui/icons-material/PersonOutlineRounded";
-import VisibilityOffRounded from "@mui/icons-material/VisibilityOffRounded";
-import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -19,7 +13,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ajvResolver } from "@hookform/resolvers/ajv";
 import { useTranslation } from "@recruit/sdk";
-import { type ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { IconRenderer } from "../renderers";
 import {
   type Control,
   Controller,
@@ -37,13 +32,6 @@ const DEFAULT_STRENGTH: Required<PasswordStrengthConfig> = {
   rules: ["^.{8,}$", "[A-Z]", "[0-9]"],
   labels: ["Weak", "Okay", "Strong"],
   colors: ["#E05B5B", "#D69B3C", "#4EA874"],
-};
-
-const ICONS: Record<string, ReactNode> = {
-  mail: <MailOutlineRounded sx={{ fontSize: 18 }} />,
-  lock: <LockOutlined sx={{ fontSize: 18 }} />,
-  person: <PersonOutlineRounded sx={{ fontSize: 18 }} />,
-  domain: <DomainRounded sx={{ fontSize: 18 }} />,
 };
 
 // Resolve a field's strengthMeter (true | config | falsy) to a full config.
@@ -196,7 +184,7 @@ function Field({
                       position="start"
                       sx={{ color: "text.disabled" }}
                     >
-                      {ICONS[prop.icon]}
+                      <IconRenderer name={prop.icon} size={18} />
                     </InputAdornment>
                   ) : undefined,
                   endAdornment: isPw ? (
@@ -205,11 +193,10 @@ function Field({
                       onClick={() => setShowPw((v) => !v)}
                       sx={{ color: "text.disabled" }}
                     >
-                      {showPw ? (
-                        <VisibilityOffRounded sx={{ fontSize: 18 }} />
-                      ) : (
-                        <VisibilityRounded sx={{ fontSize: 18 }} />
-                      )}
+                      <IconRenderer
+                        name={showPw ? "visibility-off" : "visibility"}
+                        size={18}
+                      />
                     </IconButton>
                   ) : undefined,
                 },

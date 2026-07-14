@@ -1,3 +1,4 @@
+import { ActionsMenu, type MenuRendererConfig } from "./actions-menu";
 import {
   type ActionHandler,
   ActionsRenderer,
@@ -17,6 +18,7 @@ import {
 } from "./currency-renderer";
 import { DateRenderer, type DateRendererConfig } from "./date-renderer";
 import { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
+import { IconRenderer, type IconRendererConfig } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
@@ -39,6 +41,8 @@ export type GenericRendererConfig =
   | AiMatchRendererConfig
   | PillRendererConfig
   | ActionsRendererConfig
+  | MenuRendererConfig
+  | ({ type: "icon" } & IconRendererConfig)
   | ({ type: "link" } & LinkRendererConfig);
 
 // Dispatch a config `type` to its renderer. `path` reads the value out of
@@ -82,6 +86,17 @@ export function GenericRenderer({
           actionHandler={actionHandler}
         />
       );
+    case "menu":
+      return (
+        <ActionsMenu
+          id={config.id}
+          actions={config.actions}
+          data={data}
+          actionHandler={actionHandler}
+        />
+      );
+    case "icon":
+      return <IconRenderer {...config} data={data} />;
     case "link":
       return <LinkRenderer config={config} data={data} />;
     default:

@@ -1,3 +1,4 @@
+export { ActionsMenu, type MenuRendererConfig } from "./actions-menu";
 export {
   type ActionHandler,
   type ActionItem,
@@ -22,6 +23,11 @@ export {
   GenericRenderer,
   type GenericRendererConfig,
 } from "./generic-renderer";
+export {
+  ICON_REGISTRY,
+  IconRenderer,
+  type IconRendererConfig,
+} from "./icon-renderer";
 export {
   LinkRenderer,
   type LinkParamConfig,

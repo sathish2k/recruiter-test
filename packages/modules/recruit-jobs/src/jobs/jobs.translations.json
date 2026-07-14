@@ -19,7 +19,13 @@
     "pipeline": "Pipeline",
     "matched": "AI Matched",
     "posted": "Posted",
-    "status": "Status"
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "actionsMenu": {
+    "view": "View job",
+    "edit": "Edit job",
+    "delete": "Delete job"
   },
   "exportTypes": {
     "pdf": "PDF (.pdf)",

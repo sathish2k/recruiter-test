@@ -1,16 +1,8 @@
 "use client";
 
-import AddRounded from "@mui/icons-material/AddRounded";
-import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
-import EditOutlined from "@mui/icons-material/EditOutlined";
-import EventRounded from "@mui/icons-material/EventRounded";
-import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
-import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
-import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
-import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import Box from "@mui/material/Box";
 import { usePortalRouter } from "@recruit/sdk";
-import type { ReactNode } from "react";
+import { IconRenderer } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 
 /** Row action → callback. Keyed by the action's `type` (e.g. "addData"). */
@@ -34,17 +26,6 @@ export interface ActionsRendererConfig {
   type: "actions";
   actions: ActionItem[];
 }
-
-const ICONS: Record<string, ReactNode> = {
-  event: <EventRounded sx={{ fontSize: 15 }} />,
-  mail: <MailOutlineRounded sx={{ fontSize: 15 }} />,
-  more: <MoreHorizRounded sx={{ fontSize: 15 }} />,
-  add: <AddRounded sx={{ fontSize: 15 }} />,
-  edit: <EditOutlined sx={{ fontSize: 15 }} />,
-  delete: <DeleteOutlineRounded sx={{ fontSize: 15 }} />,
-  view: <VisibilityOutlined sx={{ fontSize: 15 }} />,
-  download: <FileDownloadOutlined sx={{ fontSize: 15 }} />,
-};
 
 // A row of actions. `type: "link"` items render through LinkRenderer; the rest
 // render as circular icon-buttons (routeId nav or actionHandler[type](row)).
@@ -91,7 +72,7 @@ export function ActionsRenderer({
               "&:hover": { background: "rgba(255,255,255,.06)" },
             }}
           >
-            {a.icon ? ICONS[a.icon] : null}
+            {a.icon ? <IconRenderer name={a.icon} size={15} /> : null}
           </Box>
         );
       })}

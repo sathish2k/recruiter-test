@@ -5,6 +5,8 @@ export interface ExportType {
   value: string;
   /** Icon key: "pdf" | "excel" | "word" | "csv" | "json". */
   icon?: string;
+  /** Icon color. */
+  color?: string;
 }
 
 export interface ExportConfig {

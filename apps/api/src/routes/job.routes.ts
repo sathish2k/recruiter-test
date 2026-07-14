@@ -20,4 +20,16 @@ export default new Elysia({ name: "job.routes" })
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
     }),
+  })
+  .post("/jobs", (ctx) => jobController.postJob(ctx), {
+    isAuth: true,
+    body: t.Object({
+      title: t.String(),
+      client: t.Optional(t.String()),
+      roleCat: t.Optional(t.String()),
+      level: t.Optional(t.String()),
+      location: t.Optional(t.String()),
+      empType: t.Optional(t.String()),
+      openings: t.Optional(t.Number()),
+    }),
   });

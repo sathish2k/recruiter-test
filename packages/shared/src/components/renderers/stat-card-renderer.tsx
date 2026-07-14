@@ -8,6 +8,7 @@ import {
   GenericRenderer,
   type GenericRendererConfig,
 } from "./generic-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 
 export interface StatCardRendererConfig {
   /** `name` is a translation key resolved via useTranslation(id). */
@@ -15,8 +16,17 @@ export interface StatCardRendererConfig {
   /** The value's renderer config (e.g. { type: "number", path: "openRoles" }). */
   value: GenericRendererConfig;
   /** Delta text: `name` is a translation key (may contain `{value}`); `value`
-   * is a data path interpolated into it; `color` overrides the text color. */
-  delta?: { name: string; value?: string; color?: string };
+   * is a data path interpolated into it; `color` overrides the text color.
+   * `variant: "pill"` renders it as a colored pill on the right of the value. */
+  delta?: {
+    name: string;
+    value?: string;
+    color?: string;
+    variant?: "text" | "pill";
+  };
+  /** Wrap the card in a link — a link-renderer config (routeId + queryParams to
+   * pass filters to the target screen). Renders the tile as a clickable link. */
+  link?: LinkRendererConfig;
 }
 
 const DELTA_COLOR = "#F0B27C";
@@ -34,6 +44,8 @@ function StatCard({
   data: Record<string, unknown>;
   t: T;
 }) {
+  const pill = config.delta?.variant === "pill";
+  const clickable = Boolean(config.link);
   const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
   const valueConfig = {
     ...config.value,
@@ -53,23 +65,39 @@ function StatCard({
           : `${template} ${dynamic}`;
   }
 
-  return (
+  const deltaColor = config.delta?.color ?? DELTA_COLOR;
+
+  const card = (
     <Box
       sx={{
         background: "#1C1C1B",
         border: "1px solid rgba(255,255,255,.06)",
         borderRadius: "14px",
-        p: "16px 18px",
+        p: pill ? "18px 20px" : "16px 18px",
         color: "#ECEAE7",
+        ...(clickable
+          ? {
+              cursor: "pointer",
+              transition: "border-color .15s",
+              "&:hover": { borderColor: "rgba(242,106,27,.4)" },
+            }
+          : {}),
       }}
     >
-      <Typography sx={{ fontSize: 12.5, color: "#9A968E", mb: "8px" }}>
+      <Typography
+        sx={{
+          fontSize: pill ? 13 : 12.5,
+          color: "#9A968E",
+          mb: pill ? "10px" : "8px",
+        }}
+      >
         {config.label ? t(config.label.name) : ""}
       </Typography>
       <Box
         sx={{
           display: "flex",
-          alignItems: "baseline",
+          alignItems: pill ? "center" : "baseline",
+          justifyContent: pill ? "space-between" : "flex-start",
           gap: "9px",
         }}
       >
@@ -79,11 +107,19 @@ function StatCard({
         {deltaText ? (
           <Box
             component="span"
-            sx={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: config.delta?.color ?? DELTA_COLOR,
-            }}
+            sx={
+              pill
+                ? {
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: deltaColor,
+                    background: "rgba(242,106,27,.14)",
+                    border: "1px solid rgba(242,106,27,.3)",
+                    p: "4px 9px",
+                    borderRadius: "999px",
+                  }
+                : { fontSize: 12, fontWeight: 600, color: deltaColor }
+            }
           >
             {deltaText}
           </Box>
@@ -91,6 +127,17 @@ function StatCard({
       </Box>
     </Box>
   );
+
+  if (config.link) {
+    return (
+      <LinkRenderer
+        config={{ ...config.link, sx: { display: "block", ...config.link.sx } }}
+      >
+        {card}
+      </LinkRenderer>
+    );
+  }
+  return card;
 }
 
 // Renders one or many stat cards. Config comes from the prop (single or array)

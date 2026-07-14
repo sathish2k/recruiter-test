@@ -15,6 +15,7 @@ import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
 import type { Row, TableRendererConfig } from "./table-renderer.types";
 import { TableRowRenderer } from "./table-row";
+import { TableTitle } from "./table-title";
 import { usePagination } from "./use-pagination";
 import { useSort } from "./use-sort";
 
@@ -105,6 +106,9 @@ export function TableRenderer({
 
   return (
     <TableContainer>
+      {config?.header ? (
+        <TableTitle config={config.header} meta={meta} t={t} />
+      ) : null}
       <Table size="small">
         <TableHead>
           <TableHeaderRenderer
@@ -148,6 +152,7 @@ export function TableRenderer({
                 columns={columns}
                 actions={actions}
                 actionHandler={actionHandler}
+                rowRouteId={config?.rowRouteId}
               />
             ))
           )}

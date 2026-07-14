@@ -1,0 +1,13 @@
+{
+  "title": "Hiring Activity",
+  "showValues": "Show values",
+  "metrics": {
+    "applications": "Applications",
+    "interviews": "Interviews",
+    "hires": "Hires"
+  },
+  "periods": {
+    "weekly": "Weekly",
+    "monthly": "Monthly"
+  }
+}

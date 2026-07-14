@@ -17,7 +17,7 @@ export const AppbarConfiguration = {
   } as Record<string, string>,
   actions: [
     { icon: "notifications", badge: true },
-    { icon: "mail", routeId: "Recruit.Messages.Route" },
+    { icon: "mail-filled", routeId: "Recruit.Messages.Route" },
     { kind: "avatar", label: "avatar", routeId: "Recruit.Profile.Route" },
   ] as AppbarAction[],
 };

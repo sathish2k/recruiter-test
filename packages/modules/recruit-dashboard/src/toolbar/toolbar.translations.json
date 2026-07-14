@@ -1,0 +1,28 @@
+{
+  "manageClients": "Manage Clients",
+  "newJob": "New Job",
+  "export": "Export",
+  "exportAs": "EXPORT AS",
+  "cancel": "Cancel",
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "excel": "Excel (.xlsx)",
+    "word": "Word (.docx)"
+  },
+  "addForm": {
+    "title": "New Job",
+    "description": "Create a new open role for your agency.",
+    "submit": "Create job"
+  },
+  "fields": {
+    "role": "Job title",
+    "rolePlaceholder": "e.g. Senior Backend Engineer",
+    "roleRequired": "Job title is required",
+    "client": "Client",
+    "clientPlaceholder": "Client name",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Remote",
+    "empType": "Employment type",
+    "level": "Experience level"
+  }
+}

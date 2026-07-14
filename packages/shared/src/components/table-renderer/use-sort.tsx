@@ -1,20 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import type { SortState } from "./table-renderer.types";
 
-// Sort state for a table. A header click cycles the column
-// asc → desc → cleared (matches the design). Server- and client-side tables
-// both read `sort`; the table decides whether to sort locally or in the query.
+// Sort state for a table, synced to the URL (`?sortKey=…&sortDir=…`) so it
+// survives reloads, is shareable, and can be set by a link (e.g. the dashboard
+// "See all" → Candidates sorted by created date). A header click cycles the
+// column asc → desc → cleared. Server- and client-side tables both read `sort`.
 export function useSort() {
-  const [sort, setSort] = useState<SortState>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const key = searchParams.get("sortKey");
+  const dir = searchParams.get("sortDir") === "desc" ? "desc" : "asc";
+  const sort: SortState = key ? { key, dir } : null;
 
-  const toggleSort = (key: string) =>
-    setSort((prev) => {
-      if (prev?.key !== key) return { key, dir: "asc" };
-      if (prev.dir === "asc") return { key, dir: "desc" };
-      return null;
-    });
+  const toggleSort = useCallback(
+    (columnKey: string) => {
+      let next: SortState;
+      if (key !== columnKey) next = { key: columnKey, dir: "asc" };
+      else if (dir === "asc") next = { key: columnKey, dir: "desc" };
+      else next = null;
+
+      const params = new URLSearchParams(Array.from(searchParams.entries()));
+      if (next) {
+        params.set("sortKey", next.key);
+        params.set("sortDir", next.dir);
+      } else {
+        params.delete("sortKey");
+        params.delete("sortDir");
+      }
+      const query = params.toString();
+      router.push(`${window.location.pathname}${query ? `?${query}` : ""}`);
+    },
+    [key, dir, searchParams, router],
+  );
 
   return { sort, toggleSort };
 }

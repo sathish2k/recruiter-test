@@ -111,9 +111,19 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
   ],
   export: {
     types: [
-      { label: "exportTypes.pdf", value: "pdf", icon: "pdf" },
-      { label: "exportTypes.excel", value: "xlsx", icon: "excel" },
-      { label: "exportTypes.word", value: "docx", icon: "word" },
+      { label: "exportTypes.pdf", value: "pdf", icon: "pdf", color: "#E89A9A" },
+      {
+        label: "exportTypes.excel",
+        value: "xlsx",
+        icon: "excel",
+        color: "#8FD6AC",
+      },
+      {
+        label: "exportTypes.word",
+        value: "docx",
+        icon: "word",
+        color: "#9BB8D9",
+      },
     ],
   },
   ctas: [

@@ -1,7 +1,5 @@
 "use client";
 
-import MailRounded from "@mui/icons-material/MailRounded";
-import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import {
@@ -10,7 +8,7 @@ import {
   usePortalRouter,
   useTranslation,
 } from "@recruit/sdk";
-import type { ReactNode } from "react";
+import { IconRenderer } from "@recruit/shared";
 import type { AppbarAction } from "./appbar.configuration";
 
 function initials(name?: string | null): string {
@@ -22,11 +20,6 @@ function initials(name?: string | null): string {
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
 }
-
-const ICONS: Record<string, ReactNode> = {
-  notifications: <NotificationsRounded sx={{ fontSize: 16 }} />,
-  mail: <MailRounded sx={{ fontSize: 16 }} />,
-};
 
 const iconButtonSx = {
   position: "relative",
@@ -103,7 +96,9 @@ export function AppbarComponent({
           }
           return (
             <Box key={action.icon} onClick={go} sx={iconButtonSx}>
-              {ICONS[action.icon ?? ""]}
+              {action.icon ? (
+                <IconRenderer name={action.icon} size={16} />
+              ) : null}
               {action.badge ? (
                 <Box
                   sx={{

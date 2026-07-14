@@ -1,0 +1,14 @@
+{
+  "title": "Recent candidates",
+  "subtitle": "{{addedThisWeek}} added this week · {{interviewing}} interviewing",
+  "viewAll": "View all",
+  "noData": "No candidates found",
+  "columns": {
+    "candidate": "Candidate",
+    "role": "Role",
+    "client": "Client",
+    "match": "AI Match",
+    "interview": "Interview",
+    "status": "Status"
+  }
+}

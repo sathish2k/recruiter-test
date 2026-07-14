@@ -49,7 +49,7 @@ const groups: SidenavGroup[] = [
       },
       {
         label: "items.messages",
-        icon: "mail",
+        icon: "mail-filled",
         routeId: "Recruit.Messages.Route",
       },
     ],

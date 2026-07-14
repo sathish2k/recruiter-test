@@ -1,26 +1,13 @@
 "use client";
 
-import DescriptionRounded from "@mui/icons-material/DescriptionRounded";
-import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
-import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
-import PictureAsPdfRounded from "@mui/icons-material/PictureAsPdfRounded";
-import TableViewRounded from "@mui/icons-material/TableViewRounded";
 import Box from "@mui/material/Box";
 import { useTranslation } from "@recruit/sdk";
-import type { ReactNode } from "react";
 import { useState } from "react";
+import { IconRenderer } from "../renderers";
 import type { ExportConfig } from "./types";
 import { useExport } from "./use-export";
 
 type Row = Record<string, unknown>;
-
-const ICONS: Record<string, ReactNode> = {
-  pdf: <PictureAsPdfRounded sx={{ fontSize: 17, color: "#E89A9A" }} />,
-  excel: <TableViewRounded sx={{ fontSize: 17, color: "#8FD6AC" }} />,
-  word: <DescriptionRounded sx={{ fontSize: 17, color: "#9BB8D9" }} />,
-  csv: <TableViewRounded sx={{ fontSize: 17, color: "#8FD6AC" }} />,
-  json: <DescriptionRounded sx={{ fontSize: 17, color: "#9BB8D9" }} />,
-};
 
 // A config-driven export button styled like the Troy design: a pill with a
 // chevron that opens an "EXPORT AS" menu of formats. Downloads via useExport
@@ -64,9 +51,9 @@ export function Export({
           "&:hover": { background: "rgba(255,255,255,.06)" },
         }}
       >
-        <FileDownloadOutlined sx={{ fontSize: 16 }} />
+        <IconRenderer name="download" size={16} />
         {label ? t(label) : t("export")}
-        <ExpandMoreRounded sx={{ fontSize: 15, color: "#9A968E" }} />
+        <IconRenderer name="expand-more" size={15} color="#9A968E" />
       </Box>
       {open ? (
         <>
@@ -117,7 +104,9 @@ export function Export({
                   },
                 }}
               >
-                {type.icon ? ICONS[type.icon] : null}
+                {type.icon ? (
+                  <IconRenderer name={type.icon} size={17} color={type.color} />
+                ) : null}
                 {id ? t(type.label) : type.label}
               </Box>
             ))}

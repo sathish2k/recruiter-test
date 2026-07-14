@@ -1,0 +1,6 @@
+{
+  "title": "AI Screening",
+  "screened": "screened",
+  "quota": "of {{quota}} daily quota",
+  "distribution": "Match score distribution"
+}

@@ -11,9 +11,11 @@ export type {
   TableColumnConfig,
   TableCta,
   TableFilterExportConfig,
+  TableHeaderConfig,
   TableRendererConfig,
   TFunc,
 } from "./table-renderer.types";
 export { TableRowRenderer } from "./table-row";
+export { TableTitle } from "./table-title";
 export { usePagination } from "./use-pagination";
 export { useSort } from "./use-sort";
