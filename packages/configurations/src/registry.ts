@@ -5,6 +5,7 @@ import { ClientModule } from "@recruit/module-client";
 import { CoreModule } from "@recruit/module-core";
 import { DashboardModule } from "@recruit/module-dashboard";
 import { JobsModule } from "@recruit/module-jobs";
+import { OpsModule } from "@recruit/module-ops";
 import { PipelineModule } from "@recruit/module-pipeline";
 import { SettingsModule } from "@recruit/module-settings";
 import type { Module } from "@recruit/sdk";
@@ -17,6 +18,7 @@ export const AllModules: Module[] = [
   CoreModule,
   DashboardModule,
   JobsModule,
+  OpsModule,
   PipelineModule,
   SettingsModule,
 ];

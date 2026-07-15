@@ -10,6 +10,7 @@ export async function getClients(ctx: {
   query: ClientFilters;
 }) {
   const { data, counts, summary, totalCount } = await listClients(
+    ctx.auth.agencyId,
     ctx.query ?? {},
   );
   return { data, meta: { totalCount, counts, summary } };

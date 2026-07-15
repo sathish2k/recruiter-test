@@ -171,8 +171,8 @@ const fromYmd = (ts: number) =>
     ts % 100,
   );
 
-export async function getJob(id: string) {
-  const doc = await JobModel.findById(id)
+export async function getJob(id: string, agencyId: string) {
+  const doc = await JobModel.findOne({ _id: id, agencyId })
     .lean()
     .catch(() => null);
   if (!doc) return null;
@@ -201,8 +201,13 @@ export async function getJob(id: string) {
     hasSection(description, "Qualifications") ||
     hasSection(description, "Responsibilities");
   const [screenedCount, matchedCount] = await Promise.all([
-    CandidateModel.countDocuments({ client: j.client, match: { $gt: 0 } }),
     CandidateModel.countDocuments({
+      agencyId,
+      client: j.client,
+      match: { $gt: 0 },
+    }),
+    CandidateModel.countDocuments({
+      agencyId,
       client: j.client,
       match: { $gte: threshold },
     }),
@@ -281,10 +286,9 @@ const SORT_FIELDS: Record<string, string> = {
   posted: "postedTs",
 };
 
-export async function listJobs(filters: JobFilters = {}) {
+export async function listJobs(agencyId: string, filters: JobFilters = {}) {
   const { search, scope, sortKey, sortDir } = filters;
-  // ponytail: scope by ctx.auth.agencyId when multi-tenancy lands.
-  const query: Record<string, unknown> = {};
+  const query: Record<string, unknown> = { agencyId };
 
   if (search?.trim()) {
     const rx = new RegExp(escapeRegExp(search.trim()), "i");

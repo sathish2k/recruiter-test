@@ -12,7 +12,10 @@ export async function getCandidates(ctx: {
   auth: AuthClaims;
   query: CandidateFilters;
 }) {
-  const { data, totalCount } = await listCandidates(ctx.query ?? {});
+  const { data, totalCount } = await listCandidates(
+    ctx.auth.agencyId,
+    ctx.query ?? {},
+  );
   return { data, meta: { totalCount } };
 }
 
@@ -20,7 +23,11 @@ export async function getCandidate(ctx: {
   auth: AuthClaims;
   params: { id: string };
 }) {
-  const candidate = await getCandidateById(ctx.params.id, ctx.auth.sub);
+  const candidate = await getCandidateById(
+    ctx.params.id,
+    ctx.auth.agencyId,
+    ctx.auth.sub,
+  );
   if (!candidate) return status(404, "Candidate not found");
   return { data: candidate };
 }

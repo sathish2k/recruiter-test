@@ -66,9 +66,22 @@ export function defaultFor(prop: JsonSchemaProperty): unknown {
   return "";
 }
 
+function stripEmptyOptional(
+  schema: JsonSchema,
+  values: FieldValues,
+): FieldValues {
+  const required = new Set(schema.required ?? []);
+  const cleaned: FieldValues = { ...values };
+  for (const key of Object.keys(cleaned)) {
+    if (cleaned[key] === "" && !required.has(key)) delete cleaned[key];
+  }
+  return cleaned;
+}
+
 export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
   const base = ajvResolver(schema as never, { strict: false });
-  return async (values, context, options) => {
+  return async (rawValues, context, options) => {
+    const values = stripEmptyOptional(schema, rawValues);
     const result = await base(values, context, options);
     const errors = { ...result.errors };
     for (const [key, prop] of Object.entries(schema.properties)) {

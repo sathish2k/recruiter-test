@@ -26,10 +26,12 @@ function mapClient(c: ClientDoc & { _id: unknown }) {
   };
 }
 
-export async function listClients(filters: ClientFilters = {}) {
+export async function listClients(
+  agencyId: string,
+  filters: ClientFilters = {},
+) {
   const { search, status } = filters;
-  // ponytail: scope by ctx.auth.agencyId when multi-tenancy lands.
-  const searchMatch: Record<string, unknown> = {};
+  const searchMatch: Record<string, unknown> = { agencyId };
   if (search?.trim()) {
     const rx = new RegExp(escapeRegExp(search.trim()), "i");
     searchMatch.$or = [{ name: rx }, { industry: rx }];

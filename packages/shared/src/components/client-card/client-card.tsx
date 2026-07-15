@@ -308,26 +308,28 @@ export function ClientCard({
         <Typography sx={{ fontSize: 12, color: "#7C7972" }}>
           {client.activity}
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: "#F0B27C",
-            "&:hover": { color: "#FF8A3C" },
-          }}
-        >
-          {actions.map((action, i) => (
-            <LinkRenderer
-              key={action.routeId ?? action.href ?? i}
-              config={{ color: "inherit", underline: "none", ...action }}
-              data={record}
-            />
-          ))}
-          <ArrowForwardRounded sx={{ fontSize: 14 }} />
-        </Box>
+        {actions.length ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: "#F0B27C",
+              "&:hover": { color: "#FF8A3C" },
+            }}
+          >
+            {actions.map((action, i) => (
+              <LinkRenderer
+                key={action.routeId ?? action.href ?? i}
+                config={{ color: "inherit", underline: "none", ...action }}
+                data={record}
+              />
+            ))}
+            <ArrowForwardRounded sx={{ fontSize: 14 }} />
+          </Box>
+        ) : null}
       </Box>
     </Card>
   );

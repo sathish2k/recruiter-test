@@ -89,6 +89,11 @@ import TuneRounded from "@mui/icons-material/TuneRounded";
 import WorkHistoryRounded from "@mui/icons-material/WorkHistoryRounded";
 import PaymentsRounded from "@mui/icons-material/PaymentsRounded";
 import ErrorOutlineRounded from "@mui/icons-material/ErrorOutlineRounded";
+import AdminPanelSettingsRounded from "@mui/icons-material/AdminPanelSettingsRounded";
+import SupervisorAccountRounded from "@mui/icons-material/SupervisorAccountRounded";
+import ReceiptLongRounded from "@mui/icons-material/ReceiptLongRounded";
+import NotificationsActiveRounded from "@mui/icons-material/NotificationsActiveRounded";
+import VerifiedUserRounded from "@mui/icons-material/VerifiedUserRounded";
 import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
@@ -189,6 +194,11 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "work-history": WorkHistoryRounded,
   payments: PaymentsRounded,
   error: ErrorOutlineRounded,
+  "shield-person": AdminPanelSettingsRounded,
+  "supervisor-account": SupervisorAccountRounded,
+  contract: ReceiptLongRounded,
+  "notifications-active": NotificationsActiveRounded,
+  "verified-user": VerifiedUserRounded,
 };
 
 export interface IconRendererConfig {

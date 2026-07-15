@@ -5,6 +5,7 @@ import { ClientModel } from "../src/models/client.model";
 import { EmailTemplateModel } from "../src/models/email-template.model";
 import { InterviewModel } from "../src/models/interview.model";
 import { JobModel } from "../src/models/job.model";
+import { PlacementModel } from "../src/models/placement.model";
 import { RolePermissionModel } from "../src/models/role-permission.model";
 import { UserModel } from "../src/models/user.model";
 import {
@@ -854,6 +855,74 @@ const INTERVIEW_TIMES = [
   },
 ];
 
+const placements = [
+  {
+    candidateName: "Alexis Kim",
+    initials: "AK",
+    avatarBg: "#5B3A3A",
+    avatarFg: "#F5CFCF",
+    role: "Data Scientist",
+    client: "Vantor",
+    ctc: 182000,
+    feePct: 20,
+    status: "Accepted",
+    invoiceStatus: "invoiced",
+    joinDate: "Aug 4",
+  },
+  {
+    candidateName: "Savannah Nguyen",
+    initials: "SN",
+    avatarBg: "#4A3A5B",
+    avatarFg: "#E3CFF5",
+    role: "Senior Backend Engineer",
+    client: "Nortech",
+    ctc: 175000,
+    feePct: 20,
+    status: "Negotiating",
+    invoiceStatus: "none",
+    joinDate: "",
+  },
+  {
+    candidateName: "Omar Aziz",
+    initials: "OA",
+    avatarBg: "#5B4A3A",
+    avatarFg: "#FFD9BC",
+    role: "Frontend Engineer",
+    client: "Fablio",
+    ctc: 138000,
+    feePct: 20,
+    status: "Sent",
+    invoiceStatus: "none",
+    joinDate: "",
+  },
+  {
+    candidateName: "Leo Martins",
+    initials: "LM",
+    avatarBg: "#3A5B4A",
+    avatarFg: "#CFF5E0",
+    role: "ML Engineer",
+    client: "Vantor",
+    ctc: 205000,
+    feePct: 20,
+    status: "Accepted",
+    invoiceStatus: "paid",
+    joinDate: "Jul 28",
+  },
+  {
+    candidateName: "Jonas Berg",
+    initials: "JB",
+    avatarBg: "#5B3A3A",
+    avatarFg: "#F5CFCF",
+    role: "Product Manager",
+    client: "Corely",
+    ctc: 160000,
+    feePct: 20,
+    status: "Declined",
+    invoiceStatus: "none",
+    joinDate: "",
+  },
+] as const;
+
 interface InsertedCandidate {
   _id: unknown;
   name: string;
@@ -937,6 +1006,10 @@ async function seed(): Promise<void> {
     insertedCandidates as unknown as InsertedCandidate[],
   );
   await InterviewModel.insertMany(interviews);
+  await PlacementModel.deleteMany({ agencyId: AGENCY });
+  await PlacementModel.insertMany(
+    placements.map((p, i) => ({ ...p, agencyId: AGENCY, ts: Date.now() - i })),
+  );
   await RolePermissionModel.deleteMany({ agencyId: AGENCY });
   await seedAgencyPermissions(AGENCY);
   await UserModel.deleteMany({ agencyId: AGENCY });
@@ -949,7 +1022,7 @@ async function seed(): Promise<void> {
   await AutomationModel.deleteMany({ agencyId: AGENCY });
   await seedAgencyAutomations(AGENCY);
   console.log(
-    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, ${DEFAULT_AUTOMATIONS.length} automations, role permissions.`,
+    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${placements.length} placements, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, ${DEFAULT_AUTOMATIONS.length} automations, role permissions.`,
   );
   await closeDb();
 }

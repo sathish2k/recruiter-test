@@ -37,7 +37,7 @@ export interface DashboardStats {
   hiresDelta: string;
 }
 
-export async function getStats(): Promise<DashboardStats> {
+export async function getStats(agencyId: string): Promise<DashboardStats> {
   const monthAgo = daysAgoYmd(30);
   const [
     openRoles,
@@ -47,15 +47,21 @@ export async function getStats(): Promise<DashboardStats> {
     hires,
     newHires,
   ] = await Promise.all([
-    JobModel.countDocuments({ status: "Active" }),
-    JobModel.countDocuments({ status: "Active", postedTs: { $gte: monthAgo } }),
-    CandidateModel.countDocuments({ stage: { $ne: "Rejected" } }),
+    JobModel.countDocuments({ agencyId, status: "Active" }),
+    JobModel.countDocuments({
+      agencyId,
+      status: "Active",
+      postedTs: { $gte: monthAgo },
+    }),
+    CandidateModel.countDocuments({ agencyId, stage: { $ne: "Rejected" } }),
     CandidateModel.countDocuments({
+      agencyId,
       stage: { $ne: "Rejected" },
       appliedTs: { $gte: monthAgo },
     }),
-    CandidateModel.countDocuments({ stage: "Offer" }),
+    CandidateModel.countDocuments({ agencyId, stage: "Offer" }),
     CandidateModel.countDocuments({
+      agencyId,
       stage: "Offer",
       appliedTs: { $gte: monthAgo },
     }),
@@ -84,10 +90,10 @@ export interface HiringResponse {
   points: HiringPoint[];
 }
 
-export async function getHiring(): Promise<HiringResponse> {
+export async function getHiring(agencyId: string): Promise<HiringResponse> {
   const [candidates, interviews] = await Promise.all([
-    CandidateModel.find().select("appliedTs stage").lean(),
-    InterviewModel.find().select("ts").lean(),
+    CandidateModel.find({ agencyId }).select("appliedTs stage").lean(),
+    InterviewModel.find({ agencyId }).select("ts").lean(),
   ]);
   const weekIndex = (ts: number) => {
     if (!ts) return -1;
@@ -144,12 +150,17 @@ export interface RecentCandidatesResponse {
   meta: { addedThisWeek: number; interviewing: number };
 }
 
-export async function getRecentCandidates(): Promise<RecentCandidatesResponse> {
+export async function getRecentCandidates(
+  agencyId: string,
+): Promise<RecentCandidatesResponse> {
   const [docs, addedThisWeek, interviewing, upcoming] = await Promise.all([
-    CandidateModel.find().sort({ appliedTs: -1 }).limit(5).lean(),
-    CandidateModel.countDocuments({ appliedTs: { $gte: daysAgoYmd(7) } }),
-    CandidateModel.countDocuments({ stage: "Interviewing" }),
-    InterviewModel.find({ status: "upcoming" })
+    CandidateModel.find({ agencyId }).sort({ appliedTs: -1 }).limit(5).lean(),
+    CandidateModel.countDocuments({
+      agencyId,
+      appliedTs: { $gte: daysAgoYmd(7) },
+    }),
+    CandidateModel.countDocuments({ agencyId, stage: "Interviewing" }),
+    InterviewModel.find({ agencyId, status: "upcoming" })
       .select("candidateId when")
       .lean(),
   ]);
@@ -194,8 +205,10 @@ export interface InterviewsResponse {
   }[];
 }
 
-export async function getInterviews(): Promise<InterviewsResponse | null> {
-  const upcoming = await InterviewModel.find({ status: "upcoming" })
+export async function getInterviews(
+  agencyId: string,
+): Promise<InterviewsResponse | null> {
+  const upcoming = await InterviewModel.find({ agencyId, status: "upcoming" })
     .sort({ ts: 1 })
     .limit(4)
     .lean();
@@ -231,8 +244,10 @@ export interface ScreeningResponse {
 
 const SCREENING_QUOTA = 200;
 
-export async function getScreening(): Promise<ScreeningResponse> {
-  const matches = await CandidateModel.find({ match: { $gt: 0 } })
+export async function getScreening(
+  agencyId: string,
+): Promise<ScreeningResponse> {
+  const matches = await CandidateModel.find({ agencyId, match: { $gt: 0 } })
     .select("match")
     .lean();
   const total = matches.length;

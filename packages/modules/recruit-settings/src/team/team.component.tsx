@@ -68,24 +68,30 @@ export function TeamComponent({ id }: { id: string }) {
   const tableConfig = useMemo<TableRendererConfig>(
     () => ({
       ...config.table,
-      columns: config.table.columns.map((column) =>
-        column.value.type === "status" && "labels" in column.value
-          ? {
-              ...column,
-              value: {
-                ...column.value,
-                labels: Object.fromEntries(
-                  Object.entries(column.value.labels ?? {}).map(([k, v]) => [
-                    k,
-                    t(v),
-                  ]),
-                ),
-              },
-            }
-          : column,
-      ),
+      columns: config.table.columns.map((column) => {
+        if (column.value.type === "status" && "labels" in column.value) {
+          return {
+            ...column,
+            value: {
+              ...column.value,
+              labels: Object.fromEntries(
+                Object.entries(column.value.labels ?? {}).map(([k, v]) => [
+                  k,
+                  t(v),
+                ]),
+              ),
+            },
+          };
+        }
+        // The role cell resolves its option labels via useTranslation(id) — bind
+        // it to this element's id so `roles.*` keys resolve.
+        if (column.value.type === "role") {
+          return { ...column, value: { ...column.value, id } };
+        }
+        return column;
+      }),
     }),
-    [config.table, t],
+    [config.table, t, id],
   );
 
   const inviteSchema = useMemo(() => {

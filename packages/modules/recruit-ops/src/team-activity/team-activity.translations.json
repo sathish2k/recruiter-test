@@ -1,0 +1,55 @@
+{
+  "toolbar": {
+    "adminView": "Admin — all team",
+    "leadView": "{{name}} — lead view",
+    "allRoles": "All roles",
+    "period": "Period",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "export": "CSV"
+  },
+  "banner": "Lead view — showing only employees on {{name}}'s roles",
+  "kpis": {
+    "invites": "Invites",
+    "invitesSub": "of {{invitesTarget}} target · {{periodLabel}}",
+    "connections": "Connections",
+    "connectionsSub": "Replies to outreach {{periodLabel}}",
+    "cvs": "CVs received",
+    "cvsSub": "Parsed & scored {{periodLabel}}",
+    "submitted": "Submitted to client",
+    "submittedSub": "Profiles sent {{periodLabel}}",
+    "approval": "Client approval",
+    "approvalSub": "Approved of submitted"
+  },
+  "byEmployee": {
+    "title": "By employee",
+    "empty": "No employee activity for this view.",
+    "columns": {
+      "employee": "Employee",
+      "invites": "Invites today",
+      "connected": "Connected",
+      "jds": "JDs shared",
+      "cvs": "CVs",
+      "submitted": "Submitted",
+      "approval": "Approval rate"
+    }
+  },
+  "byRole": {
+    "title": "By role",
+    "empty": "No roles for this view.",
+    "columns": {
+      "role": "Role",
+      "employee": "Employee",
+      "lead": "Profile lead",
+      "invites": "Invites",
+      "connected": "Connected",
+      "cvs": "CVs",
+      "submitted": "Submitted"
+    }
+  },
+  "toast": {
+    "csvTitle": "Export started",
+    "csvSub": "Team activity CSV is being prepared for download."
+  }
+}

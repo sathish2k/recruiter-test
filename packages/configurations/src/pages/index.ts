@@ -5,5 +5,6 @@ export { ClientPages } from "./client";
 export { CorePages } from "./core";
 export { DashboardPages } from "./dashboard";
 export { JobsPages } from "./jobs";
+export { OpsPages } from "./ops";
 export { PipelinePages } from "./pipeline";
 export { SettingsPages } from "./settings";

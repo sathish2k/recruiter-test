@@ -49,11 +49,8 @@ function mapUser(u: UserRecord, index: number) {
   };
 }
 
-export async function listUsers(_agencyId: string) {
-  // ponytail: not scoped by agencyId yet — matches the candidate/job services'
-  // pre-multi-tenancy behaviour. Add `{ agencyId: _agencyId }` here (and there)
-  // together when tenant isolation lands.
-  const docs = await UserModel.find({ status: { $ne: "inactive" } })
+export async function listUsers(agencyId: string) {
+  const docs = await UserModel.find({ agencyId, status: { $ne: "inactive" } })
     .sort({ createdAt: 1 })
     .lean<UserRecord[]>();
   const data = docs.map((u, i) => mapUser(u, i));

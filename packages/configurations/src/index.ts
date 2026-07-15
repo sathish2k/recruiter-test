@@ -8,6 +8,7 @@ import {
   CorePages,
   DashboardPages,
   JobsPages,
+  OpsPages,
   PipelinePages,
   SettingsPages,
 } from "./pages";
@@ -23,6 +24,7 @@ export const allConfigurations: Configuration[] = [
   ...Object.values(AuthPages),
   ...Object.values(ClientPages),
   ...Object.values(JobsPages),
+  ...Object.values(OpsPages),
   ...Object.values(PipelinePages),
   ...Object.values(CandidatePages),
   ...Object.values(CorePages),

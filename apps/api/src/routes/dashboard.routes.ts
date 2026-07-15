@@ -7,20 +7,22 @@ export default new Elysia({ name: "dashboard.routes" })
   .get("/home", (ctx) => dashboardController.getHomeDashboard(ctx), {
     isAuth: true,
   })
-  .get("/dashboard/stats", () => dashboardController.getStats(), {
+  .get("/dashboard/stats", (ctx) => dashboardController.getStats(ctx), {
     isAuth: true,
   })
-  .get("/dashboard/hiring", () => dashboardController.getHiring(), {
+  .get("/dashboard/hiring", (ctx) => dashboardController.getHiring(ctx), {
     isAuth: true,
   })
   .get(
     "/dashboard/recent-candidates",
-    () => dashboardController.getRecentCandidates(),
+    (ctx) => dashboardController.getRecentCandidates(ctx),
     { isAuth: true },
   )
-  .get("/dashboard/interviews", () => dashboardController.getInterviews(), {
-    isAuth: true,
-  })
-  .get("/dashboard/screening", () => dashboardController.getScreening(), {
+  .get(
+    "/dashboard/interviews",
+    (ctx) => dashboardController.getInterviews(ctx),
+    { isAuth: true },
+  )
+  .get("/dashboard/screening", (ctx) => dashboardController.getScreening(ctx), {
     isAuth: true,
   });

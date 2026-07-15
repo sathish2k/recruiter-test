@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { sendEmail } from "../lib/mailjet";
+import { isEmailConfigured, sendEmail } from "../lib/mailjet";
 import { UserModel } from "../models/user.model";
 import { seedAgencyPermissions } from "./permission.service";
 
@@ -50,22 +50,46 @@ export async function verifyCredentials({ email, password }: Credentials) {
   };
 }
 
+export interface PasswordResetResult {
+  devResetToken?: string;
+}
+
 // Emails a reset link. Silent when the email is unknown so the endpoint never
-// reveals which addresses have accounts.
-export async function requestPasswordReset(email: string): Promise<void> {
+// reveals which addresses have accounts. A mail failure is swallowed (logged)
+// so the endpoint still returns 200 and never leaks account existence.
+export async function requestPasswordReset(
+  email: string,
+): Promise<PasswordResetResult> {
   const user = await UserModel.findOne({ email: email.toLowerCase() });
-  if (!user) return;
+  if (!user) return {};
   const token = randomBytes(32).toString("hex");
   user.resetTokenHash = hashToken(token);
   user.resetTokenExpires = new Date(Date.now() + RESET_TTL_MS);
   await user.save();
   const origin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
   const link = `${origin}/reset-password?token=${token}`;
-  await sendEmail({
-    to: { email: user.email, name: user.name },
-    subject: "Reset your password",
-    html: `<p>Reset your password with the link below (valid for 1 hour):</p><p><a href="${link}">${link}</a></p>`,
-  });
+  const mailConfigured = isEmailConfigured();
+  if (mailConfigured) {
+    try {
+      await sendEmail({
+        to: { email: user.email, name: user.name },
+        subject: "Reset your password",
+        html: `<p>Reset your password with the link below (valid for 1 hour):</p><p><a href="${link}">${link}</a></p>`,
+      });
+    } catch (e) {
+      console.error("[auth] password reset email failed to send:", e);
+    }
+  } else {
+    console.warn(
+      "[auth] mail not configured — skipping password reset email send",
+    );
+  }
+  // ponytail: expose the raw token only in non-production when mail can't be
+  // sent, so E2E can complete the reset flow. Never leaks in production.
+  if (process.env.NODE_ENV !== "production" && !mailConfigured) {
+    return { devResetToken: token };
+  }
+  return {};
 }
 
 // Consumes a reset token and sets the new password. Returns false when the

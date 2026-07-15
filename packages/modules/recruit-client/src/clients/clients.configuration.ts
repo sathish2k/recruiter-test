@@ -91,14 +91,10 @@ export const ClientsConfiguration: {
         sx: { fontSize: 11.5 },
       },
     ],
-    actions: [
-      {
-        routeId: "Recruit.ClientDetail.Route",
-        label: { name: "viewDetails" },
-        color: "inherit",
-        params: { id: { type: "dynamic", path: "id" } },
-      },
-    ],
+    // ponytail: no client-detail screen exists yet, so the card exposes no
+    // "View details" action. Add an actions entry (routeId +
+    // Recruit.ClientDetail.Route) once that screen is built.
+    actions: [],
   },
   filters: [
     { type: "search", key: "search", placeholder: "search" },

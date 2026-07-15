@@ -1,0 +1,62 @@
+{
+  "cancel": "Cancel",
+  "kpis": {
+    "offersOut": "Offers out",
+    "offersOutSub": "1 expiring Fri",
+    "acceptedJoining": "Accepted — joining",
+    "acceptedJoiningSub": "next: {{nextJoinDate}}",
+    "placementsYtd": "Placements YTD",
+    "placementsYtdSub": "+18% vs 2025",
+    "feesThisQuarter": "Fees this quarter",
+    "feesThisQuarterSub": "{{feesPending}}"
+  },
+  "offers": {
+    "title": "Offers",
+    "record": "+ Record offer",
+    "empty": "No offers recorded yet.",
+    "columns": {
+      "candidate": "Candidate",
+      "roleClient": "Role · Client",
+      "ctc": "Offer CTC",
+      "fee": "Troy fee (20%)",
+      "invoice": "Invoice",
+      "status": "Status"
+    }
+  },
+  "statuses": {
+    "sent": "Sent",
+    "accepted": "Accepted",
+    "negotiating": "Negotiating",
+    "declined": "Declined"
+  },
+  "joins": {
+    "title": "Upcoming joins",
+    "joins": "Joins {{date}}",
+    "guaranteeBanner": "90-day replacement guarantee active on all accepted offers."
+  },
+  "rail": {
+    "feesTitle": "Fees by client",
+    "invoicesTitle": "Invoices",
+    "sendReminder": "Send overdue reminder",
+    "guaranteeTitle": "Guarantee watch"
+  },
+  "addForm": {
+    "title": "Record offer",
+    "description": "Save the offer and Troy calculates the 20% fee automatically.",
+    "candidate": "Candidate",
+    "candidateRequired": "Pick a candidate",
+    "ctc": "Offer CTC",
+    "ctcPlaceholder": "e.g. 180000",
+    "ctcHelp": "Troy fee is 20% of the offer CTC.",
+    "ctcRequired": "Enter the offer CTC",
+    "submit": "Save & send offer"
+  },
+  "toast": {
+    "savedTitle": "Offer recorded",
+    "savedSub": "The offer was saved and sent to the candidate.",
+    "remindTitle": "Reminder sent",
+    "remindSub": "An overdue invoice reminder was emailed to the client.",
+    "invoiceTitle": "Invoice updated",
+    "invoiceSub": "The invoice status was updated."
+  }
+}

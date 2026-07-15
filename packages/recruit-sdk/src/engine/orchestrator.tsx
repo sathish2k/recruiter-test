@@ -376,22 +376,27 @@ export function createPortalApp(sdkConfig: {
       );
     };
 
+    // Recurses through nested `configuration` elements at ANY depth so
+    // deeply-nested components (e.g. a card inside a row-config inside a
+    // dashboard-config) still get their config/translation/data collected.
+    const collectElement = (element: LayoutElement) => {
+      if (element.type === "component") {
+        collectFor(element);
+      } else if (element.type === "configuration") {
+        const nested = accessibleConfigurations.find(
+          (c) => c.id === element.configurationId,
+        );
+        nested?.elements.forEach(collectElement);
+      }
+    };
+
     const collectFetchTasks = (t: RenderTree | null) => {
       if (!t) return;
       const elements = [
         ...t.layouts.flatMap((l) => l.elements),
         ...(t.page?.elements ?? []),
       ];
-      for (const element of elements) {
-        if (element.type === "component") {
-          collectFor(element);
-        } else if (element.type === "configuration") {
-          const nested = accessibleConfigurations.find(
-            (c) => c.id === element.configurationId,
-          );
-          nested?.elements.forEach(collectFor);
-        }
-      }
+      for (const element of elements) collectElement(element);
       for (const slot of Object.values(t.slots)) collectFetchTasks(slot);
     };
 

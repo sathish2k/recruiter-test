@@ -1,0 +1,75 @@
+{
+  "schedule": "+ Schedule interview",
+  "tabs": {
+    "today": "Today",
+    "week": "This week",
+    "past": "Past"
+  },
+  "kpis": {
+    "today": "Interviews today",
+    "todaySub": "Live rooms open 5 min early",
+    "thisWeek": "This week",
+    "thisWeekSub": "Across all clients",
+    "upcoming": "Upcoming",
+    "upcomingSub": "Confirmed + pending",
+    "passed": "Completed",
+    "passedSub": "Feedback drives next step"
+  },
+  "today": {
+    "title": "Today's schedule",
+    "empty": "No interviews scheduled today.",
+    "withPrefix": "with",
+    "join": "Join call"
+  },
+  "upcoming": {
+    "title": "Upcoming this week",
+    "empty": "Nothing else on the calendar this week.",
+    "columns": {
+      "when": "When",
+      "candidate": "Candidate",
+      "roleClient": "Role · Client",
+      "round": "Round",
+      "interviewer": "Interviewer",
+      "status": "Status"
+    }
+  },
+  "status": {
+    "confirmed": "Confirmed",
+    "pending": "Pending"
+  },
+  "past": {
+    "title": "Past interviews",
+    "empty": "No past interviews yet."
+  },
+  "needsScheduling": {
+    "title": "Needs scheduling",
+    "subtitle": "Client approved — call, or send a self-schedule link",
+    "call": "Call"
+  },
+  "calendarSync": {
+    "title": "Calendar sync",
+    "google": "Google Calendar",
+    "outlook": "Outlook",
+    "connected": "Connected ✓",
+    "connect": "Connect",
+    "hint": "Invites, reschedules and cancellations sync both ways."
+  },
+  "feedback": {
+    "title": "Feedback pending",
+    "subtitle": "Click to fill the scorecard"
+  },
+  "toast": {
+    "scheduleTitle": "Schedule interview",
+    "scheduleSub": "The candidate gets an invite + reminders automatically.",
+    "joinTitle": "Joining call",
+    "joinSub": "Opening the room for {{name}}",
+    "callTitle": "Calling candidate",
+    "callSub": "Dialling {{name}} to confirm a slot",
+    "gcalTitle": "Google Calendar updated",
+    "gcalSub": "Interview sync toggled",
+    "outlookTitle": "Outlook updated",
+    "outlookSub": "Interview sync toggled",
+    "feedbackTitle": "Opening scorecard",
+    "feedbackSub": "{{title}}"
+  }
+}

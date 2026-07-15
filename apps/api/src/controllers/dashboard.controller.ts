@@ -12,22 +12,22 @@ export async function getHomeDashboard(ctx: { auth: AuthClaims }) {
   return getHomeDashboardService(ctx.auth.role, ctx.auth.sub);
 }
 
-export async function getStats() {
-  return getStatsService();
+export async function getStats(ctx: { auth: AuthClaims }) {
+  return getStatsService(ctx.auth.agencyId);
 }
 
-export async function getHiring() {
-  return getHiringService();
+export async function getHiring(ctx: { auth: AuthClaims }) {
+  return getHiringService(ctx.auth.agencyId);
 }
 
-export async function getRecentCandidates() {
-  return getRecentCandidatesService();
+export async function getRecentCandidates(ctx: { auth: AuthClaims }) {
+  return getRecentCandidatesService(ctx.auth.agencyId);
 }
 
-export async function getInterviews() {
-  return getInterviewsService();
+export async function getInterviews(ctx: { auth: AuthClaims }) {
+  return getInterviewsService(ctx.auth.agencyId);
 }
 
-export async function getScreening() {
-  return getScreeningService();
+export async function getScreening(ctx: { auth: AuthClaims }) {
+  return getScreeningService(ctx.auth.agencyId);
 }

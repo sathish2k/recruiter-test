@@ -32,8 +32,8 @@ export async function login(ctx: { body: Credentials; jwt: JwtSigner }) {
 }
 
 export async function forgotPassword(ctx: { body: { email: string } }) {
-  await requestPasswordReset(ctx.body.email);
-  return { ok: true };
+  const { devResetToken } = await requestPasswordReset(ctx.body.email);
+  return devResetToken ? { ok: true, devResetToken } : { ok: true };
 }
 
 export async function resetPassword(ctx: {

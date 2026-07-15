@@ -165,9 +165,13 @@ const STAGE_STEP: Record<string, number> = {
 
 const clampScore = (value: number) => Math.max(0, Math.min(99, value));
 
-export async function getCandidate(id: string, userId?: string) {
+export async function getCandidate(
+  id: string,
+  agencyId: string,
+  userId?: string,
+) {
   const doc = isValidObjectId(id)
-    ? await CandidateModel.findById(id).lean()
+    ? await CandidateModel.findOne({ _id: id, agencyId }).lean()
     : null;
   if (!doc) return null;
   const c = doc as CandidateDoc & { _id: unknown };
@@ -200,6 +204,7 @@ export async function getCandidate(id: string, userId?: string) {
   }));
 
   const interviewDocs = await InterviewModel.find({
+    agencyId,
     candidateId: String(c._id),
   })
     .sort({ ts: -1 })
@@ -300,10 +305,12 @@ export async function getCandidate(id: string, userId?: string) {
   };
 }
 
-export async function listCandidates(filters: CandidateFilters = {}) {
+export async function listCandidates(
+  agencyId: string,
+  filters: CandidateFilters = {},
+) {
   const { search, scope, sortKey, sortDir } = filters;
-  // ponytail: scope by ctx.auth.agencyId when multi-tenancy lands.
-  const query: Record<string, unknown> = {};
+  const query: Record<string, unknown> = { agencyId };
   const and: Record<string, unknown>[] = [];
 
   if (search?.trim()) {
