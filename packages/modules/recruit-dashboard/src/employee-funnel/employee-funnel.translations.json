@@ -1,0 +1,9 @@
+{
+  "title": "My funnel",
+  "stage.invitesSent": "Invites sent",
+  "stage.connected": "Connected",
+  "stage.jdShared": "JD shared",
+  "stage.cvsReceived": "CVs received",
+  "stageValue": "{count} · {pct}%",
+  "insight": "Biggest drop-off at \"{stage}\" — {drop}% fall away here. A quick nudge could help."
+}

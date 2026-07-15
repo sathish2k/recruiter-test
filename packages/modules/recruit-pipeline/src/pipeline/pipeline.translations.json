@@ -1,0 +1,51 @@
+{
+  "filters": {
+    "allClients": "All clients",
+    "searchPlaceholder": "Search candidate, role or client…"
+  },
+  "actions": {
+    "add": "Add",
+    "addToColumn": "Add candidate"
+  },
+  "workload": {
+    "title": "Working on this:",
+    "summary": "{{roles}} roles · {{candidates}} candidates"
+  },
+  "sla": {
+    "banner": "{{count}} candidates over stage SLA — {{names}}"
+  },
+  "columns": {
+    "sourcing": {
+      "label": "Sourcing",
+      "hint": "New leads to qualify"
+    },
+    "cvReceived": {
+      "label": "CV Received",
+      "hint": "Awaiting CV review"
+    },
+    "leadReview": {
+      "label": "Lead Review",
+      "hint": "Ready for lead sign-off"
+    },
+    "submitted": {
+      "label": "Submitted",
+      "hint": "Sent to the client"
+    },
+    "interview": {
+      "label": "Interview",
+      "hint": "Interview in progress"
+    }
+  },
+  "card": {
+    "daysInStage": "{{days}}d in stage"
+  },
+  "empty": {
+    "title": "Nothing in {{stage}}"
+  },
+  "toast": {
+    "movedTitle": "Moved to {{stage}}",
+    "movedSub": "{{name}} is now in {{stage}}"
+  },
+  "loading": "Loading pipeline…",
+  "error": "Could not load the pipeline."
+}

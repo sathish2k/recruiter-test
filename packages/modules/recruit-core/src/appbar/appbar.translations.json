@@ -10,6 +10,9 @@
     "clients": "Clients",
     "jobs": "Jobs",
     "candidates": "Candidates",
+    "pipeline": "Pipeline",
+    "aiScreening": "AI Screening",
+    "automation": "Automation",
     "settings": "Settings · Team & permissions",
     "profile": "Settings · My profile",
     "templates": "Settings · Email templates"

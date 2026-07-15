@@ -15,6 +15,7 @@ declare module "@mui/material/Paper" {
     feature: true;
     ghost: true;
     inset: true;
+    highlight: true;
     dropdown: true;
   }
 }
@@ -289,6 +290,13 @@ export const theme = createTheme({
             border: "1px solid rgba(255,255,255,0.05)",
             borderRadius: 11,
             padding: "11px 13px",
+          },
+        },
+        {
+          props: { variant: "highlight" },
+          style: {
+            background: "#1C1C1B",
+            border: "1px solid rgba(242,106,27,0.35)",
           },
         },
       ],

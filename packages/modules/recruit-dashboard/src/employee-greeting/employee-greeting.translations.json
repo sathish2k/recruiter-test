@@ -1,0 +1,4 @@
+{
+  "greeting": "Good morning, {name}",
+  "summary": "{invitesSent} of {invitesTarget} invites sent today · {cvsReceived} CVs received"
+}

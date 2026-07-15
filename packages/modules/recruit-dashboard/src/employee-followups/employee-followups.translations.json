@@ -1,0 +1,14 @@
+{
+  "title": "Today's follow-ups",
+  "empty": "You're all caught up on follow-ups.",
+  "kind.shareJd": "Accepted your invite · {role}",
+  "kind.message": "Hasn't sent a CV yet · {role}",
+  "kind.send": "Ready to forward to client · {role}",
+  "action.shareJd": "Share JD",
+  "action.message": "Message",
+  "action.send": "Send",
+  "toast.shareJd": "JD shared with {name}",
+  "toast.message": "Message sent to {name}",
+  "toast.send": "{name}'s CV sent to client",
+  "toast.sub": "We'll let you know when they respond."
+}

@@ -1,4 +1,11 @@
 import type { Module } from "@recruit/sdk";
+import { EMPLOYEE_AI_ACTIVITY_COMPONENT } from "./employee-ai-activity/bootstrap";
+import { EMPLOYEE_FOLLOWUPS_COMPONENT } from "./employee-followups/bootstrap";
+import { EMPLOYEE_FUNNEL_COMPONENT } from "./employee-funnel/bootstrap";
+import { EMPLOYEE_GREETING_COMPONENT } from "./employee-greeting/bootstrap";
+import { EMPLOYEE_INVITES_CHART_COMPONENT } from "./employee-invites-chart/bootstrap";
+import { EMPLOYEE_KPIS_COMPONENT } from "./employee-kpis/bootstrap";
+import { EMPLOYEE_ROLES_COMPONENT } from "./employee-roles/bootstrap";
 import { HIRING_COMPONENT } from "./hiring/bootstrap";
 import { LEAD_CLIENT_DECISIONS_COMPONENT } from "./lead-client-decisions/bootstrap";
 import { LEAD_CV_QUEUE_COMPONENT } from "./lead-cv-queue/bootstrap";
@@ -35,5 +42,12 @@ export const DashboardModule: Module = {
     LEAD_INTERVIEWS_TODAY_COMPONENT,
     LEAD_FUNNEL_COMPONENT,
     LEAD_SOURCERS_COMPONENT,
+    EMPLOYEE_GREETING_COMPONENT,
+    EMPLOYEE_KPIS_COMPONENT,
+    EMPLOYEE_ROLES_COMPONENT,
+    EMPLOYEE_FOLLOWUPS_COMPONENT,
+    EMPLOYEE_AI_ACTIVITY_COMPONENT,
+    EMPLOYEE_FUNNEL_COMPONENT,
+    EMPLOYEE_INVITES_CHART_COMPONENT,
   ],
 };

@@ -1,0 +1,6 @@
+{
+  "title": "AI activity on my roles",
+  "empty": "No AI activity yet.",
+  "activity.screened": "Screened {count} CVs for {role}",
+  "activity.flagged": "Flagged {count} CVs needing your review for {role}"
+}

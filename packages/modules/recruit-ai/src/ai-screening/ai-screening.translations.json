@@ -1,0 +1,59 @@
+{
+  "kpis": {
+    "cvsScoredToday": "CVs scored today",
+    "cvsScoredTodaySub": "auto-scored on upload",
+    "avgMatch": "Avg match score",
+    "aboveThreshold": "Above threshold",
+    "aboveThresholdSub": "forwarded to leads",
+    "timeSaved": "Time saved",
+    "timeSavedSub": "vs manual screening"
+  },
+  "recent": {
+    "title": "Recent screenings",
+    "subtitle": "AI-scored candidates, newest first",
+    "columns": {
+      "candidate": "Candidate",
+      "roleClient": "Role · Client",
+      "score": "Score",
+      "verdict": "Verdict",
+      "when": "When",
+      "report": "Report"
+    },
+    "report": "Report →",
+    "empty": "No screenings yet"
+  },
+  "verdicts": {
+    "Strong": "Strong",
+    "Consider": "Consider",
+    "Below": "Below bar"
+  },
+  "settings": {
+    "title": "Default screening settings",
+    "threshold": "Match threshold",
+    "thresholdHint": "Candidates at or above this score are treated as strong.",
+    "autoScore": "Score CVs on upload",
+    "autoForward": "Auto-forward to profile lead"
+  },
+  "perRole": {
+    "title": "Per-role thresholds",
+    "subtitle": "Override the default per open role",
+    "empty": "No active roles"
+  },
+  "distribution": {
+    "title": "Score distribution",
+    "subtitle": "Across all scored candidates"
+  },
+  "scores": {
+    "title": "What the AI scores",
+    "items": {
+      "skills": "Skills vs JD",
+      "experience": "Experience depth",
+      "domain": "Domain fit",
+      "compensation": "Compensation fit"
+    }
+  },
+  "toast": {
+    "savedTitle": "Screening settings saved",
+    "savedSub": "New defaults apply to future uploads."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "header": {
+    "summary": "{{active}} of {{total}} automations active · {{runs}} runs this week",
+    "newAutomation": "New automation"
+  },
+  "card": {
+    "runs": "{{runs}} runs this week",
+    "edit": "Edit"
+  },
+  "recentRuns": {
+    "title": "Recent runs",
+    "subtitle": "Latest automation activity",
+    "retry": "Retry now"
+  },
+  "impact": {
+    "title": "Impact this month"
+  },
+  "toast": {
+    "enabledTitle": "Automation turned on",
+    "disabledTitle": "Automation turned off",
+    "toggleSub": "{{title}} is now {{state}}.",
+    "on": "on",
+    "off": "off",
+    "builderTitle": "Automation builder coming soon",
+    "builderSub": "Custom automations aren't available yet.",
+    "editTitle": "Editing coming soon",
+    "editSub": "{{title}} can't be edited yet.",
+    "retryTitle": "Re-running automation",
+    "retrySub": "We'll retry the failed run shortly."
+  }
+}

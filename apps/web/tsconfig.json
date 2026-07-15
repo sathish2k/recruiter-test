@@ -33,7 +33,11 @@
       ],
       "@recruit/module-settings": [
         "../../packages/modules/recruit-settings/src/index.ts"
-      ]
+      ],
+      "@recruit/module-pipeline": [
+        "../../packages/modules/recruit-pipeline/src/index.ts"
+      ],
+      "@recruit/module-ai": ["../../packages/modules/recruit-ai/src/index.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

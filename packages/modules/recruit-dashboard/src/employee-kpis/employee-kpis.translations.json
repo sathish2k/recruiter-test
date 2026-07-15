@@ -1,0 +1,14 @@
+{
+  "invitesSent.label": "Invites sent today",
+  "invitesSent.sub": "Toward your daily target",
+  "invitesSent.ofTarget": "{pct}% of target",
+  "connections.label": "Connections made",
+  "connections.sub": "Candidates who replied",
+  "jdsShared.label": "JDs shared",
+  "jdsShared.sub": "Across your active roles",
+  "cvsReceived.label": "CVs received",
+  "cvsReceived.sub": "{cvsNew} new to review",
+  "log": "Log",
+  "toast.logged": "Invite logged",
+  "toast.loggedSub": "Your daily count has been updated."
+}

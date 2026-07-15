@@ -1,4 +1,5 @@
 import { closeDb, connectDb } from "../src/db";
+import { AutomationModel } from "../src/models/automation.model";
 import { CandidateModel } from "../src/models/candidate.model";
 import { ClientModel } from "../src/models/client.model";
 import { EmailTemplateModel } from "../src/models/email-template.model";
@@ -6,6 +7,10 @@ import { InterviewModel } from "../src/models/interview.model";
 import { JobModel } from "../src/models/job.model";
 import { RolePermissionModel } from "../src/models/role-permission.model";
 import { UserModel } from "../src/models/user.model";
+import {
+  DEFAULT_AUTOMATIONS,
+  seedAgencyAutomations,
+} from "../src/services/automation.service";
 import {
   DEFAULT_TEMPLATES,
   seedAgencyTemplates,
@@ -941,8 +946,10 @@ async function seed(): Promise<void> {
   );
   await EmailTemplateModel.deleteMany({ agencyId: AGENCY });
   await seedAgencyTemplates(AGENCY);
+  await AutomationModel.deleteMany({ agencyId: AGENCY });
+  await seedAgencyAutomations(AGENCY);
   console.log(
-    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, role permissions.`,
+    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, ${DEFAULT_AUTOMATIONS.length} automations, role permissions.`,
   );
   await closeDb();
 }

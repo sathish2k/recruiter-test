@@ -14,6 +14,7 @@ import ManageSearchRounded from "@mui/icons-material/ManageSearchRounded";
 import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
 import PsychologyRounded from "@mui/icons-material/PsychologyRounded";
 import ScheduleRounded from "@mui/icons-material/ScheduleRounded";
+import SendRounded from "@mui/icons-material/SendRounded";
 import SchoolRounded from "@mui/icons-material/SchoolRounded";
 import ShareRounded from "@mui/icons-material/ShareRounded";
 import SourceRounded from "@mui/icons-material/SourceRounded";
@@ -78,6 +79,16 @@ import VisibilityOffRounded from "@mui/icons-material/VisibilityOffRounded";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
 import WorkRounded from "@mui/icons-material/WorkRounded";
+import TimerOutlined from "@mui/icons-material/TimerOutlined";
+import AttachFileRounded from "@mui/icons-material/AttachFileRounded";
+import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRounded";
+import PersonSearchRounded from "@mui/icons-material/PersonSearchRounded";
+import RemoveRounded from "@mui/icons-material/RemoveRounded";
+import ReplayRounded from "@mui/icons-material/ReplayRounded";
+import TuneRounded from "@mui/icons-material/TuneRounded";
+import WorkHistoryRounded from "@mui/icons-material/WorkHistoryRounded";
+import PaymentsRounded from "@mui/icons-material/PaymentsRounded";
+import ErrorOutlineRounded from "@mui/icons-material/ErrorOutlineRounded";
 import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
@@ -163,6 +174,21 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   fact_check: FactCheckOutlined,
   done_all: DoneAllRounded,
   task_alt: TaskAltRounded,
+  description: DescriptionRounded,
+  insights: InsightsRounded,
+  send: SendRounded,
+  timer: TimerOutlined,
+  "attach-file": AttachFileRounded,
+  attach_file: AttachFileRounded,
+  comment: ChatBubbleOutlineRounded,
+  chat_bubble: ChatBubbleOutlineRounded,
+  "person-search": PersonSearchRounded,
+  remove: RemoveRounded,
+  replay: ReplayRounded,
+  tune: TuneRounded,
+  "work-history": WorkHistoryRounded,
+  payments: PaymentsRounded,
+  error: ErrorOutlineRounded,
 };
 
 export interface IconRendererConfig {

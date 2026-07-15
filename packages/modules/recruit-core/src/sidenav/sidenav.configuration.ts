@@ -44,6 +44,7 @@ const groups: SidenavGroup[] = [
       },
       {
         label: "items.pipeline",
+        access: { resource: "candidates" },
         icon: "kanban",
         routeId: "Recruit.Pipeline.Route",
       },
@@ -74,11 +75,13 @@ const groups: SidenavGroup[] = [
     items: [
       {
         label: "items.aiScreening",
-        icon: "aiScreening",
+        access: { resource: "candidates" },
+        icon: "sparkle",
         routeId: "Recruit.AiScreening.Route",
       },
       {
         label: "items.automation",
+        access: { resource: "settings" },
         icon: "automation",
         routeId: "Recruit.Automation.Route",
       },

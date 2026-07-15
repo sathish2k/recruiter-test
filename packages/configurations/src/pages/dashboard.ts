@@ -2,12 +2,17 @@ import type { AccessRule, Configuration } from "@recruit/sdk";
 
 const NON_LEAD_ACCESS: AccessRule = {
   resource: "dashboard",
-  attributes: { role: ["admin", "employee", "client"] },
+  attributes: { role: ["admin", "client"] },
 };
 
 const LEAD_ACCESS: AccessRule = {
   resource: "dashboard",
   attributes: { role: ["lead"] },
+};
+
+const EMPLOYEE_ACCESS: AccessRule = {
+  resource: "dashboard",
+  attributes: { role: ["employee"] },
 };
 
 export const DashboardPages: Record<string, Configuration> = {
@@ -37,6 +42,13 @@ export const DashboardPages: Record<string, Configuration> = {
         configurationId: "Recruit.LeadDashboard.Configuration",
         gridItem: { size: 12 },
         access: LEAD_ACCESS,
+      },
+      {
+        id: "employee-dashboard",
+        type: "configuration",
+        configurationId: "Recruit.EmployeeDashboard.Configuration",
+        gridItem: { size: 12 },
+        access: EMPLOYEE_ACCESS,
       },
     ],
   },
@@ -191,6 +203,94 @@ export const DashboardPages: Record<string, Configuration> = {
         componentType: "Recruit.LeadSourcers.Component",
         gridItem: { size: "auto" },
         sx: { width: "420px", flex: "0 0 420px" },
+      },
+    ],
+  },
+  "Recruit.EmployeeDashboard.Configuration": {
+    id: "Recruit.EmployeeDashboard.Configuration",
+    gridContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "employee-greeting",
+        type: "component",
+        componentType: "Recruit.EmployeeGreeting.Component",
+        gridItem: { size: 12 },
+      },
+      {
+        id: "employee-kpis",
+        type: "component",
+        componentType: "Recruit.EmployeeKpis.Component",
+        gridItem: { size: 12 },
+      },
+      {
+        id: "employee-roles-row",
+        type: "configuration",
+        configurationId: "Recruit.EmployeeRolesRow.Configuration",
+        gridItem: { size: 12 },
+      },
+      {
+        id: "employee-analytics-row",
+        type: "configuration",
+        configurationId: "Recruit.EmployeeAnalyticsRow.Configuration",
+        gridItem: { size: 12 },
+      },
+    ],
+  },
+  "Recruit.EmployeeRolesRow.Configuration": {
+    id: "Recruit.EmployeeRolesRow.Configuration",
+    gridContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "employee-roles",
+        type: "component",
+        componentType: "Recruit.EmployeeRoles.Component",
+        gridItem: { size: "grow" },
+        sx: { minWidth: 0 },
+      },
+      {
+        id: "employee-right-column",
+        type: "configuration",
+        configurationId: "Recruit.EmployeeRightColumn.Configuration",
+        gridItem: { size: "auto" },
+        sx: { width: "380px", flex: "0 0 380px" },
+      },
+    ],
+  },
+  "Recruit.EmployeeRightColumn.Configuration": {
+    id: "Recruit.EmployeeRightColumn.Configuration",
+    gridContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "employee-followups",
+        type: "component",
+        componentType: "Recruit.EmployeeFollowups.Component",
+        gridItem: { size: 12 },
+      },
+      {
+        id: "employee-ai-activity",
+        type: "component",
+        componentType: "Recruit.EmployeeAiActivity.Component",
+        gridItem: { size: 12 },
+      },
+    ],
+  },
+  "Recruit.EmployeeAnalyticsRow.Configuration": {
+    id: "Recruit.EmployeeAnalyticsRow.Configuration",
+    gridContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "employee-funnel",
+        type: "component",
+        componentType: "Recruit.EmployeeFunnel.Component",
+        gridItem: { size: "auto" },
+        sx: { width: "420px", flex: "0 0 420px" },
+      },
+      {
+        id: "employee-invites-chart",
+        type: "component",
+        componentType: "Recruit.EmployeeInvitesChart.Component",
+        gridItem: { size: "grow" },
+        sx: { minWidth: 0 },
       },
     ],
   },

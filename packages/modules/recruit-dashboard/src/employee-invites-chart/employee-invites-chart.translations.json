@@ -1,0 +1,10 @@
+{
+  "title": "Invites this week",
+  "subtitle": "Daily target of {target}",
+  "target": "Target {target}",
+  "day.mon": "Mon",
+  "day.tue": "Tue",
+  "day.wed": "Wed",
+  "day.thu": "Thu",
+  "day.fri": "Fri"
+}
