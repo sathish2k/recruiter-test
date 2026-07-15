@@ -28,7 +28,9 @@ import CloseRounded from "@mui/icons-material/CloseRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import DescriptionRounded from "@mui/icons-material/DescriptionRounded";
 import DomainRounded from "@mui/icons-material/DomainRounded";
+import DoneAllRounded from "@mui/icons-material/DoneAllRounded";
 import EditOutlined from "@mui/icons-material/EditOutlined";
+import FactCheckOutlined from "@mui/icons-material/FactCheckOutlined";
 import EventRounded from "@mui/icons-material/EventRounded";
 import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
@@ -68,6 +70,7 @@ import SearchRounded from "@mui/icons-material/SearchRounded";
 import SettingsRounded from "@mui/icons-material/SettingsRounded";
 import SpaceDashboardRounded from "@mui/icons-material/SpaceDashboardRounded";
 import TableViewRounded from "@mui/icons-material/TableViewRounded";
+import TaskAltRounded from "@mui/icons-material/TaskAltRounded";
 import UnfoldMoreRounded from "@mui/icons-material/UnfoldMoreRounded";
 import UploadFileRounded from "@mui/icons-material/UploadFileRounded";
 import ViewKanbanRounded from "@mui/icons-material/ViewKanbanRounded";
@@ -157,6 +160,9 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   automation: BoltRounded,
   settings: SettingsRounded,
   help: HelpOutlineRounded,
+  fact_check: FactCheckOutlined,
+  done_all: DoneAllRounded,
+  task_alt: TaskAltRounded,
 };
 
 export interface IconRendererConfig {

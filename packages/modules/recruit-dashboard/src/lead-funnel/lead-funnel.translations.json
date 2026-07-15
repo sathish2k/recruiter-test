@@ -1,0 +1,10 @@
+{
+  "title": "Submission funnel",
+  "stage.received": "CVs received",
+  "stage.reviewed": "Reviewed",
+  "stage.submitted": "Submitted",
+  "stage.approved": "Client approved",
+  "stage.interviewsSet": "Interviews set",
+  "stageValue": "{count} · {pct}%",
+  "insight": "Biggest drop-off at \"{stage}\" — {drop}% of candidates fall away here. Worth a closer look."
+}

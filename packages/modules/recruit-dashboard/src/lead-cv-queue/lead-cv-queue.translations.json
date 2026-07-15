@@ -1,0 +1,17 @@
+{
+  "title": "CV review queue",
+  "subtitle": "Sorted by AI score",
+  "submitAll": "Submit all {threshold}%+",
+  "aiMatch": "AI match",
+  "sourcedBy": "Sourced by",
+  "rowMeta": "{role} · {client} · {when}",
+  "reviewPdf": "Review PDF",
+  "submit": "Submit",
+  "submitted": "Submitted",
+  "empty.title": "All caught up!",
+  "empty.subtitle": "Every CV in your queue has been submitted.",
+  "toast.submitted": "{name} submitted to client",
+  "toast.submittedSub": "The client will be notified for review.",
+  "toast.submittedAll": "All top matches submitted",
+  "toast.submittedAllSub": "Every candidate at {threshold}%+ is now with the client."
+}

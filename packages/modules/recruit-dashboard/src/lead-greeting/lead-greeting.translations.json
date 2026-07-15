@@ -1,0 +1,4 @@
+{
+  "greeting": "Good morning, {name}",
+  "summary": "{cvs} CVs waiting for your review · {approvals} client approvals came in overnight"
+}

@@ -1,0 +1,10 @@
+{
+  "cvsToReview.label": "CVs to review",
+  "cvsToReview.sub": "AI-scored and sorted for you",
+  "withClients.label": "With clients",
+  "withClients.sub": "Awaiting a decision",
+  "approvedToSchedule.label": "Approved — to schedule",
+  "approvedToSchedule.sub": "{approvedNew} new since yesterday",
+  "interviewsThisWeek.label": "Interviews this week",
+  "interviewsThisWeek.sub": "Across your open roles"
+}

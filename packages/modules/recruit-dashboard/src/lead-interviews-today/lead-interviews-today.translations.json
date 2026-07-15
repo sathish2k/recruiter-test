@@ -1,0 +1,7 @@
+{
+  "title": "Interviews today",
+  "empty": "No interviews scheduled for today.",
+  "join": "Join",
+  "toast.join": "Joining {name}'s interview",
+  "toast.joinSub": "Opening the interview room."
+}

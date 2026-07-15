@@ -1,0 +1,9 @@
+{
+  "title": "By sourcer",
+  "subtitle": "Team sourcing performance this month",
+  "columns.employee": "Employee",
+  "columns.cvs": "CVs",
+  "columns.submitted": "Submitted",
+  "columns.approval": "Approval %",
+  "noData": "No sourcing activity yet."
+}

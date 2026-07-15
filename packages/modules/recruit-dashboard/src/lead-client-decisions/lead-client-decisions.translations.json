@@ -1,0 +1,9 @@
+{
+  "title": "Client decisions",
+  "approved": "Approved",
+  "awaiting": "Awaiting review",
+  "callSchedule": "Call & schedule",
+  "rowMeta": "{client} · {when}",
+  "toast.call": "Scheduling with {name}",
+  "toast.callSub": "We'll set up the interview call with the client."
+}
