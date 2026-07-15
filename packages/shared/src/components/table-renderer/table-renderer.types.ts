@@ -1,4 +1,5 @@
 import type { AccessRule } from "@recruit/sdk";
+import type { ReactNode } from "react";
 import type { ExportConfig } from "../export";
 import type { FilterConfig } from "../filters";
 import type { JsonSchema } from "../form-renderer";
@@ -10,6 +11,20 @@ import type {
 
 export type Row = Record<string, unknown>;
 export type SortState = { key: string; dir: "asc" | "desc" } | null;
+
+/** A one-off cell whose `type` is a key into the table's `cells` map (any
+ * `type` not handled by a built-in GenericRenderer type). */
+export interface CustomCellConfig {
+  type: string;
+}
+
+/** A column/footer cell: a built-in GenericRenderer config, or a custom cell
+ * resolved by its `type` from the table's `cells` map. */
+export type CellConfig = GenericRendererConfig | CustomCellConfig;
+
+/** One-off cell renderers passed to TableRenderer via `cells`, keyed by a
+ * custom cell's `type`; each receives the row and returns the cell content. */
+export type Cells = Record<string, (row: Row) => ReactNode>;
 /** The translation function returned by useTranslation(id). */
 export type TFunc = (
   key: string,
@@ -28,8 +43,9 @@ export interface ColumnSort {
 
 export interface TableColumnConfig {
   label: ColumnLabel;
-  /** Cell renderer config, dispatched by GenericRenderer (type + path + …). */
-  value: GenericRendererConfig;
+  /** Cell config: a built-in GenericRenderer type, or a custom `type` resolved
+   * from the table's `cells` map. */
+  value: CellConfig;
   align?: "left" | "center" | "right";
   width?: number | string;
   sort?: ColumnSort;
@@ -65,6 +81,9 @@ export interface TableRendererConfig {
   emptyLabel?: string;
   /** Client-side pagination; omit to render every row. */
   pagination?: { pageSize: number };
+  /** Optional totals row rendered after the body. One cell config per column
+   * (aligned to `columns`); rendered against the `footerData` row. */
+  footer?: { cells: CellConfig[] };
 }
 
 /** A toolbar call-to-action button (e.g. "Add"). */

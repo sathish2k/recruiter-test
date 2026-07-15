@@ -69,7 +69,7 @@ export function TeamComponent({ id }: { id: string }) {
     () => ({
       ...config.table,
       columns: config.table.columns.map((column) =>
-        column.value.type === "status"
+        column.value.type === "status" && "labels" in column.value
           ? {
               ...column,
               value: {

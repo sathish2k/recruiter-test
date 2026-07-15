@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { LeadSourcersComponent } from "./lead-sourcers.component";
+import { TableRenderer } from "@recruit/shared";
 import { LeadSourcersConfiguration } from "./lead-sourcers.configuration";
 import { leadSourcersDatasource } from "./lead-sourcers.datasource";
 import fallbackTranslation from "./lead-sourcers.translations.json";
@@ -25,7 +25,7 @@ const LEAD_SOURCERS_DATASOURCE: ComponentDependency = {
 export const LEAD_SOURCERS_COMPONENT: ComponentDefinition = {
   id: "Recruit.LeadSourcers.Component",
   type: "COMPONENT",
-  value: LeadSourcersComponent,
+  value: TableRenderer,
   default: {
     configuration: LEAD_SOURCERS_CONFIGURATION,
     translation: LEAD_SOURCERS_TRANSLATION,

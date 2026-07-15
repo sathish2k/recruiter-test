@@ -23,14 +23,20 @@ skill); no inline chrome, no comments in `.tsx`.
 | `boolean` / `status` | yes-no / status dot | `path` |
 | `entity` | tile/avatar + title + subtitle | `shape`, `bgPath/fgPath/textPath`, `title`, `subtitle` |
 | `ai-match` | sparkle + value | `path`, `suffix`, `color`/`colorPath` |
-| `pill` | colored pill | `path`, `styles: { [value]: { fg, bg, border } }` |
+| `pill` | colored pill (label = raw value) | `path`, `styles: { [value]: { fg, bg, border } }` |
+| `status` | translated colored chip | `path`, `labels: { [value]: <t-key> }`, `colors`, `variant`, `dot` |
+| `score-bar` | `{score}%` + gradient progress bar (band-colored text) | `path`, `suffix?: "%"`, `threshold?` |
 | `actions` | inline icon-button row | `actions: ActionItem[]` |
 | `menu` | kebab (⋮) dropdown | `actions: ActionItem[]` |
 | `icon` | IconRenderer | `name`/`src`/`path`, `size`, `color` |
 | `link` | LinkRenderer | LinkRendererConfig |
 
-New cell/value looks = a new renderer file here + a case in
-`generic-renderer.tsx` — never bespoke markup in a feature or table.
+Repeated cell/value look = a new renderer file here + a case in
+`generic-renderer.tsx` — never bespoke markup in a feature or table. A
+genuinely one-off cell = a **custom table cell**: give the column
+`value: { type: "myKey" }` and pass `<TableRenderer cells={{ myKey: (row) => … }} />`.
+Custom cells are a TableRenderer concern (resolved in TableCellRenderer, not
+GenericRenderer) — see the table-renderer skill.
 
 ## IconRenderer — the ONLY icon source
 
@@ -54,8 +60,33 @@ Route ids resolve via `usePortalRouter` → SPA `next/link`. Two modes:
 
 ## StatCardRenderer
 
-Config (single or array — array auto-grids): `{ label: { name }, value: <GenericRenderer cfg>, delta?: { name, value, variant?: "pill" }, link?: LinkRendererConfig }`.
-Renders a theme `Card` (`interactive` when `link` is set, else `base`).
+Config (single or array — array auto-grids; `data` prop feeds it a row directly,
+like TableRenderer, so a screen with one combined fetch can drive the grid):
+`{ label: { name }, value: <GenericRenderer cfg>, delta?, variant?, icon?, sub?, progress?, action?, link? }`.
+Renders a theme `Card` (`variant` overrides the default: `interactive` when
+`link` is set, else `base`). Two layouts:
+- **Classic** (no `icon`/`sub`/`progress`): label, then value + optional `delta`
+  (`variant:"pill"` = Chip; else inline text). `delta` still does single-brace
+  `{value}` replacement from one data path.
+- **KPI** (`icon` and/or `sub` present): header row = label + top-right `icon`
+  (`{ name, size?, color? }`), then value, then a `sub` line
+  (`{ name, sx? }`). `sub`/`progress` text interpolates against the **full data
+  row** via i18next `{{token}}` (e.g. `"{{invPct}}% of target"`).
+- The accent "Invites sent today" special: `progress: { targetPath }` renders a
+  target bar (value = data path + optimistic local increments) and
+  `action: { label, icon?, toast? }` renders a "+ Log" button that bumps the
+  count and toasts. Kept on the renderer (not a bespoke module) so the whole
+  4-card grid stays on one component — ponytail-noted in the source.
+
+## FunnelRenderer
+
+`<FunnelRenderer id config? data? />` — a titled `Card` of labeled horizontal
+gradient bars (label + bar at `pct%` + a `valueFormat` value) plus an optional
+trailing amber `Alert` insight note. Config:
+`{ title: { name }, stageLabelPrefix?, valueFormat: { name }, insight?: { name, icon? } }`;
+data: `{ stages: [{ key, count, pct, tone? }], insightStage?, insightDrop? }`.
+`valueFormat`/`insight` interpolate via i18next `{{token}}` (stage row / `{ stage, drop }`).
+`tone: "success"` swaps a stage's bar to the green gradient (default orange).
 
 ## GraphRenderer / Chart (ApexCharts)
 

@@ -14,9 +14,10 @@ import delve from "dlv";
 import { type ActionHandler, IconRenderer } from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
-import type { Row, TableRendererConfig } from "./table-renderer.types";
+import type { Cells, Row, TableRendererConfig } from "./table-renderer.types";
 import { TableRowRenderer } from "./table-row";
 import { TableTitle } from "./table-title";
+import { TableTotalsRenderer } from "./table-totals";
 import { usePagination } from "./use-pagination";
 import { useSort } from "./use-sort";
 
@@ -31,6 +32,8 @@ export function TableRenderer({
   data: dataProp,
   filters,
   actionHandler,
+  cells,
+  footerData,
 }: {
   id: string;
   config?: TableRendererConfig;
@@ -38,6 +41,11 @@ export function TableRenderer({
   /** External filter params merged into the server query (server mode). */
   filters?: Record<string, unknown>;
   actionHandler?: ActionHandler;
+  /** One-off cell renderers, keyed by a custom cell's `type` (a `type` not
+   * handled by a built-in GenericRenderer type). Each receives the row. */
+  cells?: Cells;
+  /** Row the `footer` totals cells render against (default `{}`). */
+  footerData?: Row;
 }) {
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<TableRendererConfig>(id);
@@ -47,7 +55,10 @@ export function TableRenderer({
   const actions = config?.actions ?? [];
   const pageSize = config?.pagination?.pageSize;
   const colSpan = columns.length + (actions.length ? 1 : 0);
-  const server = dataProp === undefined;
+  // The engine injects `data={}` when a renderer is used directly as a
+  // bootstrap value; only a real array counts as client-provided rows.
+  const clientRows = Array.isArray(dataProp) ? dataProp : undefined;
+  const server = clientRows === undefined;
 
   const { sort, toggleSort } = useSort();
   const resetKey = `${JSON.stringify(filters ?? {})}|${
@@ -64,7 +75,7 @@ export function TableRenderer({
     : undefined;
 
   const { data, meta, isLoading, error } = useFetch<Row[]>(id, {
-    data: dataProp,
+    data: clientRows,
     filters: query,
   });
   const fetched = Array.isArray(data) ? data : [];
@@ -179,10 +190,20 @@ export function TableRenderer({
                 columns={columns}
                 actions={actions}
                 actionHandler={actionHandler}
+                cells={cells}
                 rowRouteId={config?.rowRouteId}
               />
             ))
           )}
+          {config?.footer && !isLoading && paged.length > 0 ? (
+            <TableTotalsRenderer
+              cells={config.footer.cells}
+              columns={columns}
+              data={footerData ?? {}}
+              hasActions={actions.length > 0}
+              customCells={cells}
+            />
+          ) : null}
         </TableBody>
       </Table>
       {pageSize && totalCount > 0 ? (

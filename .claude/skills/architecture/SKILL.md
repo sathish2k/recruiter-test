@@ -30,11 +30,24 @@ tree in providers. Components read their slice by id — never prop-drill.
 ## Adding a feature component (the 5-file pattern)
 
 `packages/modules/recruit-<domain>/src/<feature>/`:
-1. `<feature>.component.tsx` — thin; usually just delegates to a shared renderer by id.
+1. `<feature>.component.tsx` — the React component. **Skip this file entirely
+   when it would only be `return <SharedRenderer id={id} />`** — instead point
+   the bootstrap's `value` straight at the shared renderer (see below). Write a
+   component only when it adds real logic (an `actionHandler`, a `data`-slice, a
+   modal, composed sections).
 2. `<feature>.configuration.ts` — structure (schema, columns, links, route ids). No text.
 3. `<feature>.translations.json` — all text. Per-language files: `<feature>.translations.de.json` → `value: { fallback, de }` in bootstrap.
 4. `<feature>.datasource.ts` — optional factory `() => ({ get, create, ... })` using `httpClient`.
 5. `bootstrap.ts` — `ComponentDefinition` binding them under a dot-id (`Recruit.<Name>.Component` + `.Configuration/.Translation/.Datasource`).
+
+**A `ComponentDefinition.value` can be a shared renderer directly** — the engine
+injects `id` (+ `configuration`/`data`/`translation`), and the renderer reads
+its slice via `useConfiguration(id)`/`useFetch(id)`. So a table/stat/funnel
+screen is just `value: TableRenderer` (or `StatCardRenderer`, `FunnelRenderer`,
+`TableFilterExportRenderer`) with a `.configuration.ts` + `.datasource.ts` — no
+`.component.tsx`. (The engine injects `data={}` when there's no prefetch; those
+renderers treat an empty/non-array `data` as "no data → fetch", so direct use
+Just Works.)
 
 Then: add to the module's `index.ts` `components`, register the module in
 `registry.ts`, reference from a page by `componentType`, point a route at the page.

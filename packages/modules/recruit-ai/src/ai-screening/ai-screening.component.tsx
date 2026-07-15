@@ -1,16 +1,10 @@
 "use client";
 
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import Switch from "@mui/material/Switch";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import {
   useConfiguration,
@@ -18,7 +12,13 @@ import {
   usePortalRouter,
   useTranslation,
 } from "@recruit/sdk";
-import { IconRenderer, LinkRenderer, Toast, useToast } from "@recruit/shared";
+import {
+  IconRenderer,
+  StatCardRenderer,
+  TableRenderer,
+  Toast,
+  useToast,
+} from "@recruit/shared";
 import { useEffect, useState } from "react";
 import type { AiScreeningConfig } from "./ai-screening.configuration";
 
@@ -54,169 +54,21 @@ interface ScreeningData {
 
 type Translate = (key: string, vars?: Record<string, unknown>) => string;
 
-function scoreColor(score: number): string {
-  if (score >= 80) return "success.light";
-  if (score >= 60) return "warning.light";
-  return "text.disabled";
-}
-
-function KpiCard({
-  label,
-  value,
-  sub,
-  icon,
-  accent,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  icon: string;
-  accent?: boolean;
-}) {
-  return (
-    <Card
-      variant={accent ? "accent" : "base"}
-      sx={{ display: "flex", flexDirection: "column", gap: "10px" }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
-          {label}
-        </Typography>
-        <IconRenderer
-          name={icon}
-          size={16}
-          color={accent ? "#FF9D57" : "#7C7972"}
-        />
-      </Box>
-      <Typography
-        sx={{ fontSize: 27, fontWeight: 700, letterSpacing: "-.01em" }}
-      >
-        {value}
-      </Typography>
-      <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
-        {sub}
-      </Typography>
-    </Card>
-  );
-}
-
 function RecentScreenings({
+  id,
   rows,
   config,
-  t,
 }: {
+  id: string;
   rows: RecentScreening[];
   config: AiScreeningConfig;
-  t: Translate;
 }) {
   return (
-    <Card variant="base">
-      <Box sx={{ mb: "14px" }}>
-        <Typography sx={{ fontSize: 14.5, fontWeight: 600 }}>
-          {t("recent.title")}
-        </Typography>
-        <Typography sx={{ fontSize: 12.5, color: "text.secondary", mt: "2px" }}>
-          {t("recent.subtitle")}
-        </Typography>
-      </Box>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>{t("recent.columns.candidate")}</TableCell>
-            <TableCell>{t("recent.columns.roleClient")}</TableCell>
-            <TableCell sx={{ width: 160 }}>
-              {t("recent.columns.score")}
-            </TableCell>
-            <TableCell>{t("recent.columns.verdict")}</TableCell>
-            <TableCell>{t("recent.columns.when")}</TableCell>
-            <TableCell align="right">{t("recent.columns.report")}</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: "10px" }}
-                >
-                  <Avatar
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      fontSize: 11.5,
-                      fontWeight: 600,
-                      bgcolor: row.avatarBg,
-                      color: row.avatarFg,
-                    }}
-                  >
-                    {row.initials}
-                  </Avatar>
-                  <Typography sx={{ fontSize: 13.5, fontWeight: 600 }} noWrap>
-                    {row.name}
-                  </Typography>
-                </Box>
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary" }}>
-                {row.roleClient}
-              </TableCell>
-              <TableCell>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: "10px" }}
-                >
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, width: 34 }}>
-                    {row.score}%
-                  </Typography>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      height: 6,
-                      borderRadius: "999px",
-                      bgcolor: "rgba(255,255,255,.08)",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: `${row.score}%`,
-                        height: "100%",
-                        borderRadius: "999px",
-                        bgcolor: scoreColor(row.score),
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </TableCell>
-              <TableCell>
-                <Chip
-                  variant="soft"
-                  color={config.verdictStyles[row.verdict] ?? "default"}
-                  label={t(`verdicts.${row.verdict}`)}
-                />
-              </TableCell>
-              <TableCell sx={{ color: "text.secondary" }}>{row.when}</TableCell>
-              <TableCell align="right">
-                <LinkRenderer
-                  config={{
-                    routeId: config.reportRouteId,
-                    params: { id: { type: "dynamic", path: "id" } },
-                    text: t("recent.report"),
-                    color: "primary",
-                    sx: { fontSize: 12.5, fontWeight: 600 },
-                  }}
-                  data={row as unknown as Record<string, unknown>}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Card>
+    <TableRenderer
+      id={id}
+      config={config.recent}
+      data={rows as unknown as Record<string, unknown>[]}
+    />
   );
 }
 
@@ -385,12 +237,6 @@ export function AiScreeningComponent({ id }: { id: string }) {
     void persist({ autoForward: next });
   };
 
-  const kpiValue = (key: string): string => {
-    const raw = data.kpis[key as keyof ScreeningData["kpis"]];
-    const kpi = config.kpis.find((k) => k.key === key);
-    return `${raw ?? "—"}${kpi?.suffix ?? ""}`;
-  };
-
   return (
     <Box sx={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
       <Box
@@ -402,25 +248,13 @@ export function AiScreeningComponent({ id }: { id: string }) {
           gap: "20px",
         }}
       >
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "16px",
-          }}
-        >
-          {config.kpis.map((kpi) => (
-            <KpiCard
-              key={kpi.key}
-              label={t(kpi.label)}
-              value={kpiValue(kpi.key)}
-              sub={t(`kpis.${kpi.key}Sub`)}
-              icon={kpi.icon}
-              accent={kpi.accent}
-            />
-          ))}
-        </Box>
-        <RecentScreenings rows={data.recent} config={config} t={t} />
+        <StatCardRenderer
+          id={id}
+          config={config.kpiCards}
+          data={data.kpis as unknown as Record<string, unknown>}
+          gap="16px"
+        />
+        <RecentScreenings id={id} rows={data.recent} config={config} />
       </Box>
 
       <Box

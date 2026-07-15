@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { RecentCandidatesComponent } from "./recent-candidates.component";
+import { TableRenderer } from "@recruit/shared";
 import { RecentCandidatesConfiguration } from "./recent-candidates.configuration";
 import { recentCandidatesDatasource } from "./recent-candidates.datasource";
 import fallbackTranslation from "./recent-candidates.translations.json";
@@ -25,7 +25,7 @@ const RECENT_CANDIDATES_DATASOURCE: ComponentDependency = {
 export const RECENT_CANDIDATES_COMPONENT: ComponentDefinition = {
   id: "Recruit.RecentCandidates.Component",
   type: "COMPONENT",
-  value: RecentCandidatesComponent,
+  value: TableRenderer,
   default: {
     configuration: RECENT_CANDIDATES_CONFIGURATION,
     translation: RECENT_CANDIDATES_TRANSLATION,

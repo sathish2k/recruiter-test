@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { LeadKpisComponent } from "./lead-kpis.component";
+import { StatCardRenderer } from "@recruit/shared";
 import { LeadKpisConfiguration } from "./lead-kpis.configuration";
 import { leadKpisDatasource } from "./lead-kpis.datasource";
 import fallbackTranslation from "./lead-kpis.translations.json";
@@ -25,7 +25,7 @@ const LEAD_KPIS_DATASOURCE: ComponentDependency = {
 export const LEAD_KPIS_COMPONENT: ComponentDefinition = {
   id: "Recruit.LeadKpis.Component",
   type: "COMPONENT",
-  value: LeadKpisComponent,
+  value: StatCardRenderer,
   default: {
     configuration: LEAD_KPIS_CONFIGURATION,
     translation: LEAD_KPIS_TRANSLATION,

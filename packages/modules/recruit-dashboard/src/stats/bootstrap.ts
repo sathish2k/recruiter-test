@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { StatsComponent } from "./stats.component";
+import { StatCardRenderer } from "@recruit/shared";
 import { StatsConfiguration } from "./stats.configuration";
 import { statsDatasource } from "./stats.datasource";
 import fallbackTranslation from "./stats.translations.json";
@@ -25,7 +25,7 @@ const STATS_DATASOURCE: ComponentDependency = {
 export const STATS_COMPONENT: ComponentDefinition = {
   id: "Recruit.Stats.Component",
   type: "COMPONENT",
-  value: StatsComponent,
+  value: StatCardRenderer,
   default: {
     configuration: STATS_CONFIGURATION,
     translation: STATS_TRANSLATION,

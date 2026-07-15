@@ -5,7 +5,7 @@ import TableRow from "@mui/material/TableRow";
 import { usePortalRouter } from "@recruit/sdk";
 import { type ActionHandler, ActionsMenu, type ActionItem } from "../renderers";
 import { TableCellRenderer } from "./table-cell";
-import type { Row, TableColumnConfig } from "./table-renderer.types";
+import type { Cells, Row, TableColumnConfig } from "./table-renderer.types";
 
 export function TableRowRenderer({
   id,
@@ -13,6 +13,7 @@ export function TableRowRenderer({
   columns,
   actions,
   actionHandler,
+  cells,
   rowRouteId,
 }: {
   id: string;
@@ -20,6 +21,7 @@ export function TableRowRenderer({
   columns: TableColumnConfig[];
   actions: ActionItem[];
   actionHandler?: ActionHandler;
+  cells?: Cells;
   rowRouteId?: string;
 }) {
   const router = usePortalRouter();
@@ -38,6 +40,7 @@ export function TableRowRenderer({
           column={column}
           row={row}
           actionHandler={actionHandler}
+          cells={cells}
         />
       ))}
       {actions.length ? (

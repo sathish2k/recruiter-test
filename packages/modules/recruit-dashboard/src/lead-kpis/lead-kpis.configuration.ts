@@ -1,44 +1,36 @@
-export interface LeadKpiCard {
-  key: string;
-  label: string;
-  sub: string;
-  icon: string;
-  variant: "accent" | "base";
-}
+import type { StatCardRendererConfig } from "@recruit/shared";
 
-export interface LeadKpisConfig {
-  cards: LeadKpiCard[];
-}
+const value = (path: string) =>
+  ({
+    type: "number",
+    path,
+    sx: { fontSize: 30, lineHeight: 1, letterSpacing: "normal" },
+  }) as const;
 
-export const LeadKpisConfiguration: LeadKpisConfig = {
-  cards: [
-    {
-      key: "cvsToReview",
-      label: "cvsToReview.label",
-      sub: "cvsToReview.sub",
-      icon: "fact_check",
-      variant: "accent",
-    },
-    {
-      key: "withClients",
-      label: "withClients.label",
-      sub: "withClients.sub",
-      icon: "handshake",
-      variant: "base",
-    },
-    {
-      key: "approvedToSchedule",
-      label: "approvedToSchedule.label",
-      sub: "approvedToSchedule.sub",
-      icon: "task_alt",
-      variant: "base",
-    },
-    {
-      key: "interviewsThisWeek",
-      label: "interviewsThisWeek.label",
-      sub: "interviewsThisWeek.sub",
-      icon: "event",
-      variant: "base",
-    },
-  ],
-};
+export const LeadKpisConfiguration: StatCardRendererConfig[] = [
+  {
+    variant: "accent",
+    icon: { name: "fact_check" },
+    label: { name: "cvsToReview.label" },
+    value: value("cvsToReview"),
+    sub: { name: "cvsToReview.sub" },
+  },
+  {
+    icon: { name: "handshake" },
+    label: { name: "withClients.label" },
+    value: value("withClients"),
+    sub: { name: "withClients.sub" },
+  },
+  {
+    icon: { name: "task_alt" },
+    label: { name: "approvedToSchedule.label" },
+    value: value("approvedToSchedule"),
+    sub: { name: "approvedToSchedule.sub" },
+  },
+  {
+    icon: { name: "event" },
+    label: { name: "interviewsThisWeek.label" },
+    value: value("interviewsThisWeek"),
+    sub: { name: "interviewsThisWeek.sub" },
+  },
+];

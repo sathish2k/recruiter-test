@@ -4,7 +4,7 @@
   "withClients.label": "With clients",
   "withClients.sub": "Awaiting a decision",
   "approvedToSchedule.label": "Approved — to schedule",
-  "approvedToSchedule.sub": "{approvedNew} new since yesterday",
+  "approvedToSchedule.sub": "{{approvedNew}} new since yesterday",
   "interviewsThisWeek.label": "Interviews this week",
   "interviewsThisWeek.sub": "Across your open roles"
 }

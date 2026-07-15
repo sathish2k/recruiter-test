@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 import { useCallback, useState } from "react";
-import { IconRenderer } from "../renderers";
+import { IconRenderer } from "../renderers/icon-renderer";
 
 export interface ToastState {
   title: string;

@@ -20,6 +20,12 @@ export {
 export { DateRenderer, type DateRendererConfig } from "./date-renderer";
 export { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
 export {
+  type FunnelData,
+  FunnelRenderer,
+  type FunnelRendererConfig,
+  type FunnelStage,
+} from "./funnel-renderer";
+export {
   GenericRenderer,
   type GenericRendererConfig,
 } from "./generic-renderer";
@@ -41,6 +47,10 @@ export {
   type RoleOption,
   type RoleRendererConfig,
 } from "./role-renderer";
+export {
+  ScoreBarRenderer,
+  type ScoreBarRendererConfig,
+} from "./score-bar-renderer";
 export {
   StatCardRenderer,
   type StatCardRendererConfig,

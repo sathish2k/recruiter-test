@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { CandidatesComponent } from "./candidates.component";
+import { TableFilterExportRenderer } from "@recruit/shared";
 import { CandidatesConfiguration } from "./candidates.configuration";
 import { candidatesDatasource } from "./candidates.datasource";
 import fallbackTranslation from "./candidates.translations.json";
@@ -25,7 +25,7 @@ const DATASOURCE: ComponentDependency = {
 export const CANDIDATES_COMPONENT: ComponentDefinition = {
   id: "Recruit.Candidates.Component",
   type: "COMPONENT",
-  value: CandidatesComponent,
+  value: TableFilterExportRenderer,
   default: {
     configuration: CONFIGURATION,
     translation: TRANSLATION,

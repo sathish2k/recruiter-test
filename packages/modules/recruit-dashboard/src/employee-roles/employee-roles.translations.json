@@ -7,11 +7,11 @@
   "columns.connected": "Connected",
   "columns.cvs": "CVs",
   "columns.nextStep": "Next step",
-  "cvsNew": "{count} new",
+  "cvsNew": "{{count}} new",
   "nextStep.reviewCvs": "Review new CVs",
   "nextStep.shareJd": "Share JD with connections",
   "nextStep.sourceMore": "Source more candidates",
-  "totals": "Totals · {roles} roles",
-  "totalsClients": "{clients} clients",
+  "totals": "Totals · {value} roles",
+  "totalsClients": "{value} clients",
   "noData": "No active roles yet."
 }

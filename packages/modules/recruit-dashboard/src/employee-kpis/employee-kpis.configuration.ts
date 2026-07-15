@@ -1,51 +1,42 @@
-export interface EmployeeKpiCard {
-  key: string;
-  label: string;
-  sub: string;
-  icon: string;
-  variant: "accent" | "base";
-  /** Accent card only — renders the target progress bar and "+ Log" button. */
-  progress?: boolean;
-}
+import type { StatCardRendererConfig } from "@recruit/shared";
 
-export interface EmployeeKpisConfig {
-  cards: EmployeeKpiCard[];
-  targetKey: string;
-  pctKey: string;
-}
+const value = (path: string) =>
+  ({
+    type: "number",
+    path,
+    sx: { fontSize: 30, lineHeight: 1, letterSpacing: "normal" },
+  }) as const;
 
-export const EmployeeKpisConfiguration: EmployeeKpisConfig = {
-  targetKey: "invitesTarget",
-  pctKey: "invitesPct",
-  cards: [
-    {
-      key: "invitesSent",
-      label: "invitesSent.label",
-      sub: "invitesSent.sub",
-      icon: "mail",
-      variant: "accent",
-      progress: true,
+export const EmployeeKpisConfiguration: StatCardRendererConfig[] = [
+  {
+    variant: "accent",
+    icon: { name: "mail" },
+    label: { name: "invitesSent.label" },
+    value: value("invitesSent"),
+    sub: { name: "invitesSent.ofTarget" },
+    progress: { targetPath: "invitesTarget" },
+    action: {
+      label: { name: "log" },
+      icon: "add",
+      toast: { title: "toast.logged", sub: "toast.loggedSub" },
     },
-    {
-      key: "connections",
-      label: "connections.label",
-      sub: "connections.sub",
-      icon: "handshake",
-      variant: "base",
-    },
-    {
-      key: "jdsShared",
-      label: "jdsShared.label",
-      sub: "jdsShared.sub",
-      icon: "description",
-      variant: "base",
-    },
-    {
-      key: "cvsReceived",
-      label: "cvsReceived.label",
-      sub: "cvsReceived.sub",
-      icon: "sparkle",
-      variant: "base",
-    },
-  ],
-};
+  },
+  {
+    icon: { name: "handshake" },
+    label: { name: "connections.label" },
+    value: value("connections"),
+    sub: { name: "connections.sub" },
+  },
+  {
+    icon: { name: "description" },
+    label: { name: "jdsShared.label" },
+    value: value("jdsShared"),
+    sub: { name: "jdsShared.sub" },
+  },
+  {
+    icon: { name: "sparkle" },
+    label: { name: "cvsReceived.label" },
+    value: value("cvsReceived"),
+    sub: { name: "cvsReceived.sub" },
+  },
+];

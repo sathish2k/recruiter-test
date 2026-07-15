@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { EmployeeKpisComponent } from "./employee-kpis.component";
+import { StatCardRenderer } from "@recruit/shared";
 import { EmployeeKpisConfiguration } from "./employee-kpis.configuration";
 import { employeeKpisDatasource } from "./employee-kpis.datasource";
 import fallbackTranslation from "./employee-kpis.translations.json";
@@ -25,7 +25,7 @@ const EMPLOYEE_KPIS_DATASOURCE: ComponentDependency = {
 export const EMPLOYEE_KPIS_COMPONENT: ComponentDefinition = {
   id: "Recruit.EmployeeKpis.Component",
   type: "COMPONENT",
-  value: EmployeeKpisComponent,
+  value: StatCardRenderer,
   default: {
     configuration: EMPLOYEE_KPIS_CONFIGURATION,
     translation: EMPLOYEE_KPIS_TRANSLATION,
