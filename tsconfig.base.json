@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "paths": {
+      "@recruit/sdk": ["./packages/recruit-sdk/src/index.ts"],
+      "@recruit/types": ["./packages/types/src/index.ts"],
+      "@recruit/ui": ["./packages/ui/src/index.ts"],
+      "@recruit/shared": ["./packages/shared/src/index.ts"],
+      "@recruit/module-auth": ["./packages/modules/recruit-auth/src/index.ts"]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@recruit/desktop",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "dev:web": "vite",
+    "build": "tauri build",
+    "build:web": "vite build",
+    "typecheck": "tsc --noEmit"
+  }
+}

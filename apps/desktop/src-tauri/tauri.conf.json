@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "AI Recruiter",
+  "version": "0.0.0",
+  "identifier": "com.airecruiter.desktop",
+  "build": {
+    "beforeDevCommand": "bun run --filter=@recruit/desktop dev:web",
+    "devUrl": "http://localhost:3003",
+    "beforeBuildCommand": "bun run --filter=@recruit/desktop build:web",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "AI Recruiter",
+        "width": 1280,
+        "height": 800,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/icon.png"]
+  }
+}
