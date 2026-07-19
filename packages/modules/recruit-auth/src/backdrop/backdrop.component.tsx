@@ -1,7 +1,7 @@
 "use client";
 
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import { BrandLogo, BrandWordmark } from "@recruit/shared";
 
 export function AuthBackdropComponent() {
   return (
@@ -23,8 +23,7 @@ export function AuthBackdropComponent() {
           width: "34%",
           height: "180%",
           transform: "rotate(24deg)",
-          background:
-            "linear-gradient(90deg,transparent,rgba(255,138,60,.13),transparent)",
+          background: "linear-gradient(90deg,transparent,rgba(255,138,60,.13),transparent)",
           filter: "blur(24px)",
         }}
       />
@@ -36,8 +35,7 @@ export function AuthBackdropComponent() {
           width: "22%",
           height: "180%",
           transform: "rotate(24deg)",
-          background:
-            "linear-gradient(90deg,transparent,rgba(255,183,128,.09),transparent)",
+          background: "linear-gradient(90deg,transparent,rgba(255,183,128,.09),transparent)",
           filter: "blur(20px)",
         }}
       />
@@ -49,8 +47,7 @@ export function AuthBackdropComponent() {
           width: "30%",
           height: "180%",
           transform: "rotate(24deg)",
-          background:
-            "linear-gradient(90deg,transparent,rgba(228,86,15,.15),transparent)",
+          background: "linear-gradient(90deg,transparent,rgba(228,86,15,.15),transparent)",
           filter: "blur(28px)",
         }}
       />
@@ -58,13 +55,10 @@ export function AuthBackdropComponent() {
         sx={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px)",
+          backgroundImage: "radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px)",
           backgroundSize: "28px 28px",
-          maskImage:
-            "radial-gradient(60% 60% at 50% 50%,black,transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(60% 60% at 50% 50%,black,transparent 80%)",
+          maskImage: "radial-gradient(60% 60% at 50% 50%,black,transparent 80%)",
+          WebkitMaskImage: "radial-gradient(60% 60% at 50% 50%,black,transparent 80%)",
         }}
       />
       <Box
@@ -74,8 +68,7 @@ export function AuthBackdropComponent() {
           right: 0,
           bottom: "-20%",
           height: "50%",
-          background:
-            "radial-gradient(50% 60% at 50% 100%,rgba(242,106,27,.3),transparent 70%)",
+          background: "radial-gradient(50% 60% at 50% 100%,rgba(242,106,27,.3),transparent 70%)",
           filter: "blur(40px)",
         }}
       />
@@ -88,24 +81,11 @@ export function AuthBackdropComponent() {
           display: "flex",
           alignItems: "center",
           gap: 1.25,
+          color: "#ECEAE7",
         }}
       >
-        <Avatar
-          variant="rounded"
-          sx={{
-            width: 34,
-            height: 34,
-            background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-            fontWeight: 700,
-            fontSize: 16,
-            color: "#fff",
-          }}
-        >
-          T
-        </Avatar>
-        <Box sx={{ fontWeight: 700, fontSize: 15.5, color: "#ECEAE7" }}>
-          Troy
-        </Box>
+        <BrandLogo size={34} />
+        <BrandWordmark fontSize={18} />
       </Box>
     </Box>
   );

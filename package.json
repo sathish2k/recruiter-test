@@ -6,7 +6,7 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "bun run free-ports && turbo run dev",
+    "dev": "bun run free-ports && turbo run dev --filter=!@recruit/desktop",
     "free-ports": "lsof -ti:3000,3001,3002,3003,3004 | xargs kill -9 2>/dev/null || true",
     "build": "turbo run build",
     "lint": "biome lint .",

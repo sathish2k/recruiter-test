@@ -7,34 +7,24 @@ const accentSx = {
   "&:hover": { color: "#FF8A3C" },
 };
 
+// No validation on the login screen — fields submit as-is and the API decides.
 const schema: JsonSchema = {
   type: "object",
-  required: ["email", "password"],
-  errorMessage: {
-    required: {
-      email: "email.errors.required",
-      password: "password.errors.required",
-    },
-  },
   properties: {
     email: {
       type: "string",
-      format: "email",
       icon: "mail",
       hideLabel: true,
       title: "email.label",
       placeholder: "email.placeholder",
-      errorMessage: { format: "email.errors.format" },
     },
     password: {
       type: "string",
       format: "password",
-      minLength: 8,
       icon: "lock",
       hideLabel: true,
       title: "password.label",
       placeholder: "password.placeholder",
-      errorMessage: { minLength: "password.errors.minLength" },
     },
   },
 };

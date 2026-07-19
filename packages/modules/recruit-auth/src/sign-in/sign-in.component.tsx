@@ -12,6 +12,7 @@ export function AuthLoginComponent({ id }: { id: string }) {
         const res = await signIn.email({
           email: values.email,
           password: values.password,
+          rememberMe: values.rememberMe,
         });
         if (!res.error) router.push("Recruit.Root");
       }}

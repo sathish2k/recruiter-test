@@ -16,8 +16,6 @@ export const auth = betterAuth({
     enabled: true,
     async sendResetPassword({ user, url }) {
       if (!isEmailConfigured()) {
-        // ponytail: no Mailjet creds in dev — log the link so the flow is
-        // testable. Configure MAILJET_* to send real mail.
         console.warn(`[auth] mail not configured — reset link for ${user.email}: ${url}`);
         return;
       }

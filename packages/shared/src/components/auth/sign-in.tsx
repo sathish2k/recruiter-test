@@ -1,20 +1,20 @@
 "use client";
 
-import LoginRounded from "@mui/icons-material/LoginRounded";
+import FlightTakeoffRounded from "@mui/icons-material/FlightTakeoffRounded";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
+import { useState } from "react";
 import { FormRenderer } from "../form-renderer";
 import type { FormValues, JsonSchema } from "../form-renderer/types";
-import {
-  LinkRenderer,
-  type LinkRendererConfig,
-} from "../renderers/link-renderer";
+import { IconRenderer } from "../renderers/icon-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface SignInValues {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 interface SignInConfig {
@@ -31,6 +31,7 @@ export function SignIn({
 }) {
   const { schema, links } = useConfiguration<SignInConfig>(id);
   const { t } = useTranslation(id);
+  const [remember, setRemember] = useState(true);
   const link = (config?: LinkRendererConfig) =>
     config ? { ...config, text: t(config.text ?? "") } : undefined;
   const forgot = link(links?.forgot);
@@ -38,7 +39,7 @@ export function SignIn({
 
   return (
     <AuthCard
-      icon={<LoginRounded sx={{ fontSize: 26 }} />}
+      icon={<FlightTakeoffRounded sx={{ fontSize: 26 }} />}
       title={t("title")}
       subtitle={t("subtitle")}
     >
@@ -46,19 +47,55 @@ export function SignIn({
         <FormRenderer
           id={id}
           schema={schema}
-          onSubmit={(v: FormValues) => onSubmit(v as unknown as SignInValues)}
+          onSubmit={(v: FormValues) =>
+            onSubmit({ ...(v as unknown as SignInValues), rememberMe: remember })
+          }
           beforeSubmit={
-            forgot ? (
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <LinkRenderer config={forgot} />
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box
+                onClick={() => setRemember((r) => !r)}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "5px",
+                    border: remember
+                      ? "1px solid rgba(242,106,27,.8)"
+                      : "1px solid rgba(255,255,255,.25)",
+                    background: remember
+                      ? "linear-gradient(135deg,#FF8A3C,#E4560F)"
+                      : "transparent",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    transition: "background .15s",
+                  }}
+                >
+                  {remember ? <IconRenderer name="check" size={12} /> : null}
+                </Box>
+                <Typography sx={{ fontSize: 12.5, color: "#9A968E" }}>{t("rememberMe")}</Typography>
               </Box>
-            ) : undefined
+              {forgot ? <LinkRenderer config={forgot} /> : null}
+            </Box>
           }
         />
       ) : null}
-      <Typography
-        sx={{ mt: "22px", fontSize: 13, color: "#9A968E", textAlign: "center" }}
-      >
+      <Typography sx={{ mt: "22px", fontSize: 13, color: "#9A968E", textAlign: "center" }}>
         {t("footerText")} {signUp ? <LinkRenderer config={signUp} /> : null}
       </Typography>
     </AuthCard>

@@ -8,5 +8,8 @@
     "start": "next start -p 3004",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
   }
 }

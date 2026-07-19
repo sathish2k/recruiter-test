@@ -1,0 +1,27 @@
+{
+  "avatar": "RK",
+  "theme": "Toggle theme",
+  "language": "Language",
+  "menu": {
+    "profile": "My profile",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "titles": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "jobs": "Jobs",
+    "candidates": "Candidates",
+    "pipeline": "Pipeline",
+    "teamActivity": "Team Activity",
+    "interviews": "Interviews",
+    "placements": "Placements",
+    "aiScreening": "AI Screening",
+    "automation": "Automation",
+    "settings": "Settings · Team & permissions",
+    "profile": "Settings · My profile",
+    "templates": "Settings · Email templates",
+    "notifications": "Notifications",
+    "helpCenter": "Help center"
+  }
+}
