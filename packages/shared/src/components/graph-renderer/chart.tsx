@@ -2,7 +2,7 @@
 
 import Box from "@mui/material/Box";
 import type { ApexOptions } from "apexcharts";
-import { useEffect, useMemo, useRef } from "react";
+import { type ReactNode, useEffect, useMemo, useRef } from "react";
 
 export type ApexChartType = "bar" | "line" | "area" | "pie" | "donut";
 
@@ -11,11 +11,14 @@ export function Chart({
   series,
   options,
   height = 300,
+  overlay,
 }: {
   type: ApexChartType;
   series: ApexOptions["series"];
   options: ApexOptions;
   height?: number;
+  /** Centered content laid over a faint axis frame when the series is empty. */
+  overlay?: ReactNode;
 }) {
   const elRef = useRef<HTMLDivElement | null>(null);
   const key = useMemo(
@@ -48,6 +51,25 @@ export function Chart({
       chart?.destroy();
     };
   }, [key]);
+
+  if (overlay) {
+    return (
+      <Box sx={{ position: "relative", width: "100%", minHeight: height }}>
+        <Box ref={elRef} sx={{ width: "100%", minHeight: height, opacity: 0.35 }} />
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {overlay}
+        </Box>
+      </Box>
+    );
+  }
 
   return <Box ref={elRef} sx={{ width: "100%", minHeight: height }} />;
 }

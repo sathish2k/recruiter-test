@@ -1,0 +1,59 @@
+{
+  "heading": "Commissions",
+  "subheading": "Incentive earnings per placement — {{periodLabel}}",
+  "toggle": {
+    "quarter": "This quarter",
+    "year": "This year",
+    "period": "Period"
+  },
+  "export": "Export",
+  "runPayout": "Run payout",
+  "kpis": {
+    "total": "Total commissions",
+    "totalSub": "across {{placementCount}} placements",
+    "paid": "Paid out",
+    "paidSub": "{{pct}}% of commission released",
+    "pending": "Pending payout",
+    "pendingSub": "{{pendingCount}} placements awaiting",
+    "topEarner": "Top earner"
+  },
+  "byMember": {
+    "title": "By team member",
+    "subtitle": "Sourcer 7% · Profile lead 5% of placement fee",
+    "empty": "No commissions for this period.",
+    "columns": {
+      "member": "Member",
+      "placements": "Placements",
+      "commission": "Commission",
+      "paid": "Paid",
+      "pending": "Pending",
+      "payout": "Payout"
+    }
+  },
+  "placements": {
+    "title": "Placement commissions",
+    "subtitle": "Released once the client invoice is paid",
+    "empty": "No placements for this period.",
+    "markPaid": "Mark paid",
+    "columns": {
+      "candidate": "Candidate",
+      "roleClient": "Role · Client",
+      "fee": "Fee",
+      "sourcer": "Sourcer",
+      "lead": "Profile lead",
+      "status": "Status"
+    }
+  },
+  "footer": {
+    "text": "Commission is calculated automatically from each placement's fee and released once the client invoice is paid. Rates are set per role in ",
+    "link": "Team & Permissions"
+  },
+  "toast": {
+    "exportTitle": "Export started",
+    "exportSub": "Commission_Q3.xlsx is being prepared for download.",
+    "payoutTitle": "Payout scheduled",
+    "payoutSub": "{{amount}} across {{count}} placements queued.",
+    "paidTitle": "Commission paid",
+    "paidSub": "{{name}}'s commission has been marked paid."
+  }
+}

@@ -38,9 +38,15 @@ export const AppbarConfiguration = {
     "Recruit.Settings.Route": "titles.settings",
     "Recruit.Profile.Route": "titles.profile",
     "Recruit.EmailTemplates.Route": "titles.templates",
+    "Recruit.Notifications.Route": "titles.notifications",
+    "Recruit.HelpCenter.Route": "titles.helpCenter",
   } as Record<string, string>,
   actions: [
-    { icon: "notifications", badge: true },
+    {
+      icon: "notifications",
+      badge: true,
+      routeId: "Recruit.Notifications.Route",
+    },
     { icon: "mail-filled", routeId: "Recruit.Messages.Route" },
     {
       kind: "avatar",

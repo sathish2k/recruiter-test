@@ -36,5 +36,11 @@
   "showing": "Showing {{shown}} of {{total}} jobs · page {{page}} of {{pages}}",
   "noData": "No jobs match these filters",
   "emptyHint": "Try adjusting or clearing the filters.",
+  "firstRun": {
+    "title": "No open roles yet",
+    "description": "Create your first role for a client — Troy drafts the JD, generates sourcing keywords, and starts screening applicants.",
+    "createRole": "Create a role",
+    "addClient": "Add a client"
+  },
   "loadError": "Something went wrong loading jobs."
 }

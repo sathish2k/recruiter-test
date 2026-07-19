@@ -4,8 +4,11 @@ import {
   type CandidateFilters,
   type CreateCandidateInput,
   createCandidate,
+  deleteCandidate,
   getCandidate as getCandidateById,
   listCandidates,
+  type UpdateCandidateInput,
+  updateCandidate,
 } from "../services/candidate.service";
 
 export async function getCandidates(ctx: {
@@ -37,4 +40,27 @@ export async function postCandidate(ctx: {
   body: CreateCandidateInput;
 }) {
   return createCandidate(ctx.body, ctx.auth.agencyId);
+}
+
+export async function patchCandidate(ctx: {
+  auth: AuthClaims;
+  params: { id: string };
+  body: UpdateCandidateInput;
+}) {
+  const candidate = await updateCandidate(
+    ctx.params.id,
+    ctx.auth.agencyId,
+    ctx.body ?? {},
+  );
+  if (!candidate) return status(404, "Candidate not found");
+  return { data: candidate };
+}
+
+export async function removeCandidate(ctx: {
+  auth: AuthClaims;
+  params: { id: string };
+}) {
+  const result = await deleteCandidate(ctx.params.id, ctx.auth.agencyId);
+  if (!result) return status(404, "Candidate not found");
+  return { data: result };
 }

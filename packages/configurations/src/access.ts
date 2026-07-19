@@ -6,6 +6,8 @@ export type Resource =
   | "jobs"
   | "candidates"
   | "interviews"
+  | "commissions"
+  | "audit"
   | "settings";
 
 /** Offline fallback for the engine's `accessResolver` when the permissions API

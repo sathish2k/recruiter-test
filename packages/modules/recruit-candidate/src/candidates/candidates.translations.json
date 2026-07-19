@@ -24,6 +24,11 @@
     "stage": "Stage",
     "actions": "Actions"
   },
+  "actionsMenu": {
+    "view": "View candidate",
+    "review": "Review CV",
+    "edit": "Edit candidate"
+  },
   "exportTypes": {
     "pdf": "PDF (.pdf)",
     "excel": "Excel (.xlsx)",
@@ -32,5 +37,9 @@
   "showing": "Showing {{shown}} of {{total}} candidates",
   "noData": "No candidates match these filters",
   "emptyHint": "Try adjusting or clearing the filters.",
+  "firstRun": {
+    "title": "No candidates yet",
+    "description": "Source candidates from LinkedIn & Naukri, add them manually, or import a CSV. Their AI match scores and stages will show up here."
+  },
   "loadError": "Something went wrong loading candidates."
 }

@@ -38,9 +38,20 @@ export interface StatCardRendererConfig {
   /** Sub-metric line below the value. `name` is a translation key interpolated
    * against the full data row (i18next `{{token}}` style). */
   sub?: { name: string; sx?: TypographyProps["sx"] };
+  /** First-run treatment: when the resolved value is 0, the value renders in a
+   * muted color and this plain sub string replaces the delta/trend. */
+  zeroSub?: { name: string };
   /** Renders a target progress bar under the value. `targetPath` is the data
-   * path for the target; the bar fills to value/target. */
-  progress?: { targetPath: string };
+   * path for the target; the bar fills to value/target. `valuePath` overrides
+   * the numerator path (defaults to the value config's `path`) so the big value
+   * can stay a formatted GenericRenderer while the bar reads a raw number.
+   * `color`/`trackColor` override the fill/track. */
+  progress?: {
+    targetPath: string;
+    valuePath?: string;
+    color?: string;
+    trackColor?: string;
+  };
   /** Renders a button that optimistically increments the value and toasts. */
   action?: {
     label: { name: string };
@@ -74,20 +85,32 @@ function ProgressStatBody({
   t: T;
 }) {
   const [logged, setLogged] = useState(0);
-  const valuePath = (config.value as { path?: string }).path ?? "";
-  const base = Number(delve(data, valuePath) ?? 0);
+  const hasAction = Boolean(config.action);
+  const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
+  const numeratorPath =
+    config.progress?.valuePath ??
+    (config.value as { path?: string }).path ??
+    "";
+  const base = Number(delve(data, numeratorPath) ?? 0);
   const value = base + logged;
   const target = config.progress
     ? Number(delve(data, config.progress.targetPath) ?? 0)
     : 0;
   const pct = target > 0 ? Math.round((value / target) * 100) : 0;
-  const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
+  const valueConfig = {
+    ...config.value,
+    sx: { ...VALUE_SX, ...(overrideSx ?? {}) },
+  } as GenericRendererConfig;
 
   return (
     <>
-      <Typography sx={{ ...VALUE_SX, ...(overrideSx ?? {}) }}>
-        {value}
-      </Typography>
+      {hasAction ? (
+        <Typography sx={{ ...VALUE_SX, ...(overrideSx ?? {}) }}>
+          {value}
+        </Typography>
+      ) : (
+        <GenericRenderer config={valueConfig} data={data} />
+      )}
       {config.sub ? (
         <Typography sx={{ fontSize: 12, color: "text.secondary", mt: "8px" }}>
           {t(config.sub.name, { ...data, pct })}
@@ -97,7 +120,7 @@ function ProgressStatBody({
         sx={{
           height: 6,
           borderRadius: "999px",
-          background: "rgba(255,255,255,.18)",
+          background: config.progress?.trackColor ?? "rgba(255,255,255,.18)",
           overflow: "hidden",
           mt: "10px",
         }}
@@ -107,7 +130,7 @@ function ProgressStatBody({
             width: `${Math.min(pct, 100)}%`,
             height: "100%",
             borderRadius: "999px",
-            background: "rgba(255,255,255,.9)",
+            background: config.progress?.color ?? "rgba(255,255,255,.9)",
           }}
         />
       </Box>
@@ -178,9 +201,18 @@ function StatCard({
   const kpiMode = Boolean(config.icon || config.sub || config.progress);
   const variant = config.variant ?? (clickable ? "interactive" : "base");
   const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
+  const valuePath = (config.value as { path?: string })?.path;
+  const isZero =
+    Boolean(config.zeroSub) &&
+    valuePath != null &&
+    Number(delve(data, valuePath) ?? 0) === 0;
   const valueConfig = {
     ...config.value,
-    sx: { ...VALUE_SX, ...(overrideSx ?? {}) },
+    sx: {
+      ...VALUE_SX,
+      ...(overrideSx ?? {}),
+      ...(isZero ? { color: "text.disabled" } : {}),
+    },
   } as GenericRendererConfig;
 
   let deltaText = "";
@@ -247,7 +279,13 @@ function StatCard({
           {config.value ? (
             <GenericRenderer config={valueConfig} data={data} />
           ) : null}
-          {config.sub ? (
+          {isZero && config.zeroSub ? (
+            <Typography
+              sx={{ fontSize: 12, color: "text.disabled", mt: "8px" }}
+            >
+              {t(config.zeroSub.name)}
+            </Typography>
+          ) : config.sub ? (
             <Typography
               sx={{
                 fontSize: 12,
@@ -260,6 +298,17 @@ function StatCard({
             </Typography>
           ) : null}
         </>
+      ) : isZero && config.zeroSub ? (
+        <Box>
+          {config.value ? (
+            <GenericRenderer config={valueConfig} data={data} />
+          ) : null}
+          <Typography
+            sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}
+          >
+            {t(config.zeroSub.name)}
+          </Typography>
+        </Box>
       ) : (
         <Box
           sx={{

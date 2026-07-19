@@ -41,4 +41,30 @@ export default new Elysia({ name: "candidate.routes" })
       skills: t.Optional(t.Array(t.String())),
       notes: t.Optional(t.String()),
     }),
-  });
+  })
+  .patch("/candidates/:id", (ctx) => candidateController.patchCandidate(ctx), {
+    isAuth: true,
+    params: t.Object({ id: t.String() }),
+    body: t.Object({
+      firstName: t.Optional(t.String()),
+      lastName: t.Optional(t.String()),
+      email: t.Optional(t.String()),
+      phone: t.Optional(t.String()),
+      location: t.Optional(t.String()),
+      linkedin: t.Optional(t.String()),
+      job: t.Optional(t.String()),
+      source: t.Optional(t.String()),
+      currentTitle: t.Optional(t.String()),
+      years: t.Optional(t.Number()),
+      skills: t.Optional(t.Array(t.String())),
+      notes: t.Optional(t.String()),
+    }),
+  })
+  .delete(
+    "/candidates/:id",
+    (ctx) => candidateController.removeCandidate(ctx),
+    {
+      isAuth: true,
+      params: t.Object({ id: t.String() }),
+    },
+  );

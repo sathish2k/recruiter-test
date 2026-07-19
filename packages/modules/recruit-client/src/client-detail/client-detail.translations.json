@@ -1,0 +1,104 @@
+{
+  "back": "Back to Clients",
+  "cancel": "Cancel",
+  "since": "Client since {{since}}",
+  "lead": "Account lead: {{lead}}",
+  "status": {
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
+  "actions": {
+    "weeklyReport": "Weekly report",
+    "newRole": "New role",
+    "edit": "Edit client",
+    "fees": "Fees & invoices",
+    "delete": "Delete client"
+  },
+  "kpi": {
+    "openRoles": "Open roles",
+    "pipeline": "In pipeline",
+    "awaiting": "Awaiting client decision",
+    "awaitingSub": "Oldest waiting 2 days",
+    "hires": "Hires",
+    "hiresSub": "{{avgTimeToHire}} days avg time to hire"
+  },
+  "submissions": {
+    "title": "Submitted CVs — awaiting {{name}}",
+    "empty": "No CVs are awaiting a decision right now.",
+    "ai": "AI {{score}}%",
+    "meta": "{{role}} · submitted {{when}} by {{sourcer}}",
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "roles": {
+    "title": "Roles with {{name}}",
+    "empty": "No roles yet for this client.",
+    "cols": {
+      "role": "Role",
+      "employee": "Employee",
+      "lead": "Profile lead",
+      "pipeline": "Pipeline",
+      "submitted": "Submitted",
+      "status": "Status"
+    }
+  },
+  "contacts": {
+    "title": "Client contacts"
+  },
+  "agreement": {
+    "title": "Agreement",
+    "feeModel": "Fee model",
+    "guarantee": "Replacement guarantee",
+    "paymentTerms": "Payment terms",
+    "renews": "Contract renews",
+    "signed": "Signed {{date}}"
+  },
+  "activity": {
+    "title": "Recent activity"
+  },
+  "edit": {
+    "title": "Edit client",
+    "description": "Update company details, account lead and status.",
+    "submit": "Save changes",
+    "fields": {
+      "name": "Company name",
+      "industry": "Industry",
+      "manager": "Account lead",
+      "primaryContact": "Primary contact",
+      "placementFee": "Placement fee",
+      "status": "Status",
+      "nameRequired": "Company name is required"
+    }
+  },
+  "reject": {
+    "title": "Reject this CV?",
+    "description": "Let the sourcer know why {{name}} isn't a fit so they can refine the pipeline.",
+    "confirm": "Reject CV",
+    "placeholder": "Reason for rejection (shared with the sourcer)…"
+  },
+  "delete": {
+    "title": "Delete {{name}}?",
+    "body": "{{name}} and its {{count}} roles will be removed. Prefer to pause sourcing instead? Set the client to Paused.",
+    "keep": "Keep client",
+    "confirm": "Delete client"
+  },
+  "report": {
+    "title": "{{name}} — weekly report",
+    "description": "A snapshot of this week's pipeline activity, by role.",
+    "download": "Download PDF",
+    "downloaded": "Report downloaded",
+    "downloadedSub": "The weekly PDF is saving to your device",
+    "email": "Email report",
+    "emailed": "Report emailed",
+    "emailedSub": "The weekly report was sent to the client contacts"
+  },
+  "toast": {
+    "approved": "CV approved",
+    "rejected": "CV rejected",
+    "decisionSub": "{{name}}'s submission was updated",
+    "updated": "Client updated",
+    "updatedSub": "{{name}}'s details were saved",
+    "deleted": "Client deleted",
+    "deletedSub": "{{name}} and its roles were removed"
+  }
+}

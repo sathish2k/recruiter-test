@@ -1,0 +1,50 @@
+{
+  "fallback": {
+    "heading": "How can we help?",
+    "subheading": "Search the guide or browse a category to get unblocked fast.",
+    "searchPlaceholder": "Search articles…",
+    "articleCount": "{{count}} articles",
+    "popular": "Popular right now",
+    "noMatch": "No articles match \"{{query}}\" — try a different search.",
+    "categories": {
+      "gettingStarted": {
+        "name": "Getting started",
+        "desc": "Set up your agency, invite the team and learn the basics."
+      },
+      "sourcing": {
+        "name": "Sourcing & invites",
+        "desc": "Find candidates and send outreach that gets replies."
+      },
+      "aiScreening": {
+        "name": "AI screening",
+        "desc": "How CV scoring, thresholds and match signals work."
+      },
+      "clientReview": {
+        "name": "Client review",
+        "desc": "Share shortlists and collect client decisions."
+      },
+      "interviews": {
+        "name": "Interviews & offers",
+        "desc": "Schedule panels, capture scorecards and send offers."
+      },
+      "adminBilling": {
+        "name": "Admin & billing",
+        "desc": "Manage roles, permissions, placements and invoices."
+      }
+    },
+    "articles": {
+      "scoring": "How AI CV scoring works",
+      "invites": "Inviting candidates from LinkedIn",
+      "threshold": "Setting a role's screening threshold",
+      "shortlist": "Sharing a shortlist with a client",
+      "panel": "Scheduling an interview panel",
+      "permissions": "Managing team roles and permissions",
+      "invoices": "Exporting placements and invoices"
+    },
+    "support": {
+      "title": "Still stuck?",
+      "body": "Pro accounts get priority support — we usually reply within a couple of hours.",
+      "cta": "Message support"
+    }
+  }
+}

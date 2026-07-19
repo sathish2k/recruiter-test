@@ -11,7 +11,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
-import { type ActionHandler, IconRenderer } from "../renderers";
+import {
+  type ActionHandler,
+  EmptyStateRenderer,
+  IconRenderer,
+} from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
 import type { Cells, Row, TableRendererConfig } from "./table-renderer.types";
@@ -34,6 +38,7 @@ export function TableRenderer({
   actionHandler,
   cells,
   footerData,
+  onEmptyAction,
 }: {
   id: string;
   config?: TableRendererConfig;
@@ -41,6 +46,8 @@ export function TableRenderer({
   /** External filter params merged into the server query (server mode). */
   filters?: Record<string, unknown>;
   actionHandler?: ActionHandler;
+  /** Handler for a first-run empty-state `action` CTA (e.g. open a modal). */
+  onEmptyAction?: (action: string) => void;
   /** One-off cell renderers, keyed by a custom cell's `type` (a `type` not
    * handled by a built-in GenericRenderer type). Each receives the row. */
   cells?: Cells;
@@ -100,6 +107,16 @@ export function TableRenderer({
       ? sorted
       : sorted.slice((page - 1) * pageSize, page * pageSize);
 
+  const hasActiveFilter =
+    !!filters &&
+    Object.values(filters).some(
+      (v) =>
+        v != null &&
+        v !== "" &&
+        !(Array.isArray(v) && v.length === 0),
+    );
+  const showFirstRun = Boolean(config?.emptyState) && !hasActiveFilter;
+
   if (error) {
     return (
       <Alert severity="error">
@@ -142,43 +159,51 @@ export function TableRenderer({
               <TableCell
                 colSpan={colSpan || 1}
                 align="center"
-                sx={{ py: "32px", borderBottom: "none" }}
+                sx={{ py: showFirstRun ? "16px" : "32px", borderBottom: "none" }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
+                {showFirstRun && config?.emptyState ? (
+                  <EmptyStateRenderer
+                    config={config.emptyState}
+                    t={t}
+                    onAction={onEmptyAction}
+                  />
+                ) : (
                   <Box
                     sx={{
-                      width: 54,
-                      height: 54,
-                      borderRadius: "14px",
-                      border: "1.5px dashed rgba(255,255,255,.16)",
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: "center",
+                      gap: "8px",
                     }}
                   >
-                    <IconRenderer name="search" size={24} color="#7C7972" />
+                    <Box
+                      sx={{
+                        width: 54,
+                        height: 54,
+                        borderRadius: "14px",
+                        border: "1.5px dashed rgba(255,255,255,.16)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <IconRenderer name="search" size={24} color="#7C7972" />
+                    </Box>
+                    <Box
+                      sx={{
+                        fontSize: 14.5,
+                        fontWeight: 700,
+                        color: "#ECEAE7",
+                        mt: "4px",
+                      }}
+                    >
+                      {t(config?.emptyLabel ?? "noData")}
+                    </Box>
+                    <Box sx={{ fontSize: 12.5, color: "#9A968E" }}>
+                      {t("emptyHint", "Try adjusting or clearing the filters.")}
+                    </Box>
                   </Box>
-                  <Box
-                    sx={{
-                      fontSize: 14.5,
-                      fontWeight: 700,
-                      color: "#ECEAE7",
-                      mt: "4px",
-                    }}
-                  >
-                    {t(config?.emptyLabel ?? "noData")}
-                  </Box>
-                  <Box sx={{ fontSize: 12.5, color: "#9A968E" }}>
-                    {t("emptyHint", "Try adjusting or clearing the filters.")}
-                  </Box>
-                </Box>
+                )}
               </TableCell>
             </TableRow>
           ) : (

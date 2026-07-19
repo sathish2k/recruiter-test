@@ -137,6 +137,46 @@ export async function apiCreateClient(
   return (body.data ?? body) as { id: string; name: string };
 }
 
+/**
+ * Create a placement/offer via the API (POST /placements). The offer is created
+ * in status "Sent"; role/client/avatar are copied from the matching candidate
+ * (looked up by name), and Troy's 20% fee is computed server-side.
+ */
+export async function apiCreatePlacement(
+  request: APIRequestContext,
+  token: string,
+  data: { candidateName: string; ctc: number; role?: string; client?: string },
+): Promise<{ id: string; candidateName: string; feeLabel: string }> {
+  const res = await request.post(`${API}/placements`, {
+    headers: { authorization: `Bearer ${token}` },
+    data,
+  });
+  expect(res.ok(), `POST /placements: ${res.status()}`).toBeTruthy();
+  const body = await res.json();
+  return (body.data ?? body) as {
+    id: string;
+    candidateName: string;
+    feeLabel: string;
+  };
+}
+
+/** Set a placement's offer status (PATCH /placements/:id/status). */
+export async function apiSetPlacementStatus(
+  request: APIRequestContext,
+  token: string,
+  id: string,
+  status: "Sent" | "Accepted" | "Negotiating" | "Declined",
+): Promise<void> {
+  const res = await request.patch(`${API}/placements/${id}/status`, {
+    headers: { authorization: `Bearer ${token}` },
+    data: { status },
+  });
+  expect(
+    res.ok(),
+    `PATCH placement status ${status}: ${res.status()}`,
+  ).toBeTruthy();
+}
+
 /** Move a candidate to a pipeline stage (PATCH /pipeline/:id/stage). */
 export async function apiMoveStage(
   request: APIRequestContext,

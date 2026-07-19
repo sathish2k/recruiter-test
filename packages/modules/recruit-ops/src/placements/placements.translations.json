@@ -42,13 +42,12 @@
   },
   "addForm": {
     "title": "Record offer",
-    "description": "Save the offer and Troy calculates the 20% fee automatically.",
+    "description": "Fee is calculated at the client's contracted rate (20%).",
     "candidate": "Candidate",
-    "candidateRequired": "Pick a candidate",
-    "ctc": "Offer CTC",
+    "ctc": "Offer CTC (USD)",
     "ctcPlaceholder": "e.g. 180000",
-    "ctcHelp": "Troy fee is 20% of the offer CTC.",
-    "ctcRequired": "Enter the offer CTC",
+    "feeLabel": "Troy fee (20%)",
+    "generate": "Generate letter",
     "submit": "Save & send offer"
   },
   "toast": {
@@ -57,6 +56,10 @@
     "remindTitle": "Reminder sent",
     "remindSub": "An overdue invoice reminder was emailed to the client.",
     "invoiceTitle": "Invoice updated",
-    "invoiceSub": "The invoice status was updated."
+    "invoiceSub": "The invoice status was updated.",
+    "statusTitle": "Offer updated",
+    "statusSub": "Status changed to {{status}}.",
+    "letterTitle": "Offer letter generated",
+    "letterSub": "{{name}} — created from the Offer letter template."
   }
 }

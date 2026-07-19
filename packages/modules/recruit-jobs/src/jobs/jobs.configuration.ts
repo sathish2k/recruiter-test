@@ -162,6 +162,26 @@ export const JobsConfiguration: TableFilterExportConfig = {
     },
   ],
   rowRouteId: "Recruit.JobDetail.Route",
+  emptyState: {
+    icon: "work",
+    tone: "primary",
+    title: "firstRun.title",
+    description: "firstRun.description",
+    actions: [
+      {
+        text: "firstRun.createRole",
+        routeId: "Recruit.AddJob.Route",
+        variant: "contained",
+        icon: "add",
+      },
+      {
+        text: "firstRun.addClient",
+        routeId: "Recruit.Clients.Route",
+        variant: "outlined",
+        icon: "domain",
+      },
+    ],
+  },
   // Trailing kebab (⋮) menu — a link item plus custom actions (actionHandler).
   actionsLabel: { name: "columns.actions" },
   actions: [
@@ -173,9 +193,11 @@ export const JobsConfiguration: TableFilterExportConfig = {
       params: { id: { type: "dynamic", path: "id" } },
     },
     {
-      type: "edit",
+      type: "link",
       icon: "edit",
       label: { name: "actionsMenu.edit" },
+      routeId: "Recruit.EditJob.Route",
+      params: { id: { type: "dynamic", path: "id" } },
       access: { resource: "jobs", action: ["edit"] },
     },
     {

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessibility Audit — AI Recruiter</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#272c37;
+    --ink:#e9ecf2; --muted:#a6adbb; --faint:#7d8494;
+    --crit:#e0575b; --serious:#e0913c; --moderate:#d8c24a; --minor:#5aa9e6; --good:#4fb783;
+    --accent:#ff8a3c;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea;
+      --ink:#1a1d23; --muted:#4d5562; --faint:#79818f; }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 22px 80px}
+  header.top{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
+  h1{font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink);font-weight:600}
+  h2{font-size:21px;margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line);letter-spacing:-.01em}
+  h3{font-size:16px;margin:0 0 4px}
+  p{margin:0 0 12px}
+  .lead{color:var(--muted);font-size:15px}
+  /* summary cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .card .n{font-size:30px;font-weight:700;line-height:1}
+  .card .l{font-size:12px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+  .card.crit{border-color:color-mix(in srgb,var(--crit) 55%,var(--line))}
+  .card.crit .n{color:var(--crit)}
+  .card.serious .n{color:var(--serious)} .card.moderate .n{color:var(--moderate)}
+  .card.minor .n{color:var(--minor)} .card.good .n{color:var(--good)}
+  /* finding */
+  .finding{background:var(--panel);border:1px solid var(--line);border-left-width:4px;
+    border-radius:12px;padding:16px 18px;margin:14px 0}
+  .finding.crit{border-left-color:var(--crit)}
+  .finding.serious{border-left-color:var(--serious)}
+  .finding.moderate{border-left-color:var(--moderate)}
+  .finding.minor{border-left-color:var(--minor)}
+  .fhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px}
+  .fid{font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--faint)}
+  .badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    padding:3px 8px;border-radius:999px;color:#0f1115}
+  .badge.crit{background:var(--crit);color:#fff} .badge.serious{background:var(--serious);color:#1a1200}
+  .badge.moderate{background:var(--moderate);color:#1a1600} .badge.minor{background:var(--minor);color:#04121e}
+  .badge.good{background:var(--good);color:#03150d}
+  .wcag{font-size:12px;color:var(--muted);margin:2px 0 10px}
+  .wcag b{color:var(--ink)}
+  .loc{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--faint);
+    background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+    overflow:auto;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);margin:10px 0}
+  .fix{margin-top:10px;font-size:14px}
+  .fix b{color:var(--good)}
+  table.summary{width:100%;border-collapse:collapse;margin:6px 0 4px;font-size:14px}
+  table.summary th,table.summary td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  table.summary th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  ol.order{padding-left:20px} ol.order li{margin:7px 0}
+  ul.good{list-style:none;padding:0;margin:0}
+  ul.good li{padding:9px 0 9px 26px;position:relative;border-bottom:1px solid var(--line)}
+  ul.good li::before{content:"✓";position:absolute;left:2px;color:var(--good);font-weight:700}
+  .note{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    font-size:13.5px;color:var(--muted);margin-top:26px}
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:20px 0}
+  .toc a{display:inline-block;margin:3px 14px 3px 0;font-size:13.5px;text-decoration:none}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Accessibility Audit — AI Recruiter</h1>
+  <div class="sub">Static source-code review against WCAG 2.2 Level AA</div>
+  <div class="meta">
+    <span><b>Stack:</b> Next.js 16 · React 19 · MUI 9 (dark) · react-hook-form + AJV · i18next</span>
+    <span><b>Scope:</b> packages/shared · packages/modules · recruit-sdk · apps/web (~119 TSX)</span>
+    <span><b>Date:</b> 15 Jul 2026</span>
+    <span><b>Method:</b> manual code review + contrast calc (no live/axe scan)</span>
+  </div>
+</header>
+
+<section id="summary">
+  <h2>Executive summary</h2>
+  <p class="lead">MUI gives the app good defaults in places — semantic tables, focus-trapped menus/dialogs,
+  <code>lang="en"</code>, and landmarks. But the custom design-system layer re-implements several controls as
+  plain <code>&lt;div&gt;</code>/<code>&lt;Box&gt;</code> and detaches labels from inputs. As a result the core
+  flows — logging in, filling forms, navigating pages, filtering tables, and moving pipeline cards — are partially
+  or wholly unusable with a keyboard or a screen reader.</p>
+  <p>The problems are <b>systemic, not one-off</b>: they live in shared primitives
+  (<code>form-renderer</code>, <code>sidenav</code>, the filter widgets, the theme), so a single fix propagates to
+  every screen — which keeps remediation effort low relative to impact.</p>
+
+  <div class="cards">
+    <div class="card crit"><div class="n">3</div><div class="l">Critical</div></div>
+    <div class="card serious"><div class="n">8</div><div class="l">Serious</div></div>
+    <div class="card moderate"><div class="n">9</div><div class="l">Moderate</div></div>
+    <div class="card minor"><div class="n">4</div><div class="l">Minor</div></div>
+    <div class="card good"><div class="n">7</div><div class="l">Done well</div></div>
+  </div>
+
+  <table class="summary">
+    <thead><tr><th>Severity</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge crit">Critical</span></td><td>Blocks a core task for keyboard or screen-reader users.</td></tr>
+      <tr><td><span class="badge serious">Serious</span></td><td>Major barrier with a workaround, or limited to part of a flow.</td></tr>
+      <tr><td><span class="badge moderate">Moderate</span></td><td>Meaningful barrier or a clear AA failure.</td></tr>
+      <tr><td><span class="badge minor">Minor</span></td><td>Best-practice / AAA / polish.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="toc">
+    <a href="#critical">Critical (3)</a>
+    <a href="#serious">Serious (8)</a>
+    <a href="#moderate">Moderate (9)</a>
+    <a href="#minor">Minor (4)</a>
+    <a href="#good">What's good</a>
+    <a href="#order">Remediation order</a>
+  </div>
+</section>
+
+<section id="critical">
+  <h2>Critical</h2>
+
+  <article class="finding crit">
+    <div class="fhead"><span class="fid">C1</span><span class="badge crit">Critical</span><h3>Form inputs have no programmatic label</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 Info &amp; Relationships · 3.3.2 Labels or Instructions · 4.1.2 Name, Role, Value</div>
+    <p><span class="loc">packages/shared/src/components/form-renderer/form-renderer.tsx</span> — <code>FieldLabel</code> and every <code>TextField</code></p>
+    <p><code>FieldLabel</code> renders a standalone <code>&lt;Typography&gt;</code> with no <code>htmlFor</code>/<code>id</code> link, and the field uses <code>hiddenLabel</code> with no <code>label</code>, <code>aria-label</code>, or <code>aria-labelledby</code>:</p>
+    <pre>export function FieldLabel({ label }) {
+  return &lt;Typography&gt;{label}&lt;/Typography&gt;;   // detached text, no association
+}
+&lt;TextField {...field} hiddenLabel placeholder={...} /&gt;   // no accessible name</pre>
+    <p>Screen readers announce these as “edit text, blank”. <code>FormRenderer</code> drives sign-in, sign-up, reset-password, add-candidate, add-job and settings — so this hits <b>essentially every form</b>. Highest-impact issue in the audit.</p>
+    <p class="fix"><b>Fix:</b> pass MUI’s <code>label</code> prop (drop <code>hiddenLabel</code>) so a real <code>&lt;label&gt;</code> is associated; or give <code>FieldLabel</code> an <code>id</code> and set <code>aria-labelledby</code> on the input. Apply to the chips input, markdown editor, and segmented control too.</p>
+  </article>
+
+  <article class="finding crit">
+    <div class="fhead"><span class="fid">C2</span><span class="badge crit">Critical</span><h3>Primary navigation items are non-focusable &lt;div&gt;s</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.1.1 Keyboard · 4.1.2 Name, Role, Value · 2.4.4 Link Purpose</div>
+    <p><span class="loc">packages/modules/recruit-core/src/sidenav/sidenav.component.tsx</span></p>
+    <pre>&lt;Box onClick={() =&gt; router.push(item.routeId)} sx={{ cursor:"pointer" }}&gt;
+  &lt;IconRenderer name={item.icon} /&gt; {t(item.label)}
+&lt;/Box&gt;</pre>
+    <p>Each nav link is a <code>&lt;div&gt;</code> with no <code>tabindex</code>, <code>role</code>, or key handler, so keyboard users can’t focus or activate it and screen readers don’t expose it as a link. Active state is colour/weight only (no <code>aria-current</code>). <b>A keyboard-only user cannot move between pages.</b></p>
+    <p class="fix"><b>Fix:</b> render each item as <code>&lt;Link component={NextLink} href&gt;</code> (or a <code>Button</code>/<code>MenuItem</code>) and add <code>aria-current="page"</code> to the active item — this also restores a visible focus ring.</p>
+  </article>
+
+  <article class="finding crit">
+    <div class="fhead"><span class="fid">C3</span><span class="badge crit">Critical</span><h3>Custom radio &amp; checkbox filters are inaccessible</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 · 2.1.1 Keyboard · 4.1.2 Name, Role, Value</div>
+    <p><span class="loc">filters/components/radio-filter.tsx</span> · <span class="loc">checkbox-filter.tsx</span></p>
+    <p>Option rows are clickable <code>&lt;Box&gt;</code>s with a purely visual dot/checkmark — no <code>&lt;input&gt;</code>, no <code>role="radio"/"checkbox"</code>, no <code>aria-checked</code>, no group semantics, no keyboard handling. AT sees plain text; keyboard users can’t operate them, so table filtering is keyboard-inaccessible.</p>
+    <p class="fix"><b>Fix:</b> use MUI <code>RadioGroup</code>/<code>Radio</code> and <code>FormGroup</code>/<code>Checkbox</code> (correct roles, <code>aria-checked</code>, arrow/space handling), styled to match. If keeping the look, add the roles + <code>aria-checked</code> + <code>tabIndex</code> + <code>onKeyDown</code> manually.</p>
+  </article>
+</section>
+
+<section id="serious">
+  <h2>Serious</h2>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S1</span><span class="badge serious">Serious</span><h3>No semantic headings / document outline</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 · 2.4.6 Headings and Labels</div>
+    <p>App-wide. <span class="loc">renderers/text-renderer.tsx</span> forces <code>component="span"</code>; <b>zero</b> <code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> exist. Page titles (appbar, modal) are plain <code>&lt;Typography&gt;</code>. Screen-reader users lose the primary way to scan a page.</p>
+    <p class="fix"><b>Fix:</b> render titles as real headings (<code>Typography component="h1|h2…"</code>); give every route one <code>&lt;h1&gt;</code> (the appbar title is ideal) and nest section headings under it.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S2</span><span class="badge serious">Serious</span><h3>Account-menu trigger (avatar) is a clickable &lt;div&gt;</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.1.1 Keyboard · 4.1.2 Name, Role, Value</div>
+    <p><span class="loc">recruit-core/src/appbar/appbar.component.tsx</span> — <code>&lt;Avatar onClick=…&gt;</code></p>
+    <p>The avatar opens the profile/logout menu but is non-interactive (only <code>title</code> + <code>cursor:pointer</code>). Keyboard users can’t reach logout; no button role/name.</p>
+    <p class="fix"><b>Fix:</b> wrap it in <code>&lt;IconButton aria-label={t('account')} aria-haspopup="menu" aria-expanded&gt;</code>.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S3</span><span class="badge serious">Serious</span><h3>Icon-only buttons without accessible names</h3></div>
+    <div class="wcag"><b>WCAG</b> 4.1.2 Name, Role, Value · 2.4.4 Link Purpose</div>
+    <p>Representative: <span class="loc">renderers/actions-renderer.tsx</span> (row actions), <span class="loc">modal.tsx</span> (close), <span class="loc">toast/toast.tsx</span> (close), <span class="loc">form-renderer.tsx</span> (show/hide password), <span class="loc">appbar.component.tsx</span> (notifications), plus candidate-detail, hiring, add-job-panel, ai-screening…</p>
+    <p>Of ~53 <code>IconButton</code>s only a handful have <code>aria-label</code>. MUI icons are <code>aria-hidden</code>, so these announce as just “button”. Some rely on <code>title=</code>, which is unreliable (not shown on keyboard focus/touch).</p>
+    <p class="fix"><b>Fix:</b> add a translated <code>aria-label</code> to every icon-only control; prefer <code>aria-label</code> over <code>title</code>.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S4</span><span class="badge serious">Serious</span><h3>Clickable table rows are not keyboard operable</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.1.1 Keyboard</div>
+    <p><span class="loc">table-renderer/table-row.tsx</span> — <code>&lt;TableRow onClick&gt;</code> when <code>rowRouteId</code> is set. Row navigation is mouse-only (no <code>tabindex</code>/<code>role</code>/key handler).</p>
+    <p class="fix"><b>Fix:</b> make the primary cell a real link (best — free keyboard + open-in-new-tab), or add <code>tabIndex={0}</code>, <code>role="link"</code>, and an Enter/Space handler to the row.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S5</span><span class="badge serious">Serious</span><h3>Kanban drag-and-drop has no keyboard / single-pointer alternative</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.1.1 Keyboard · 2.5.7 Dragging Movements (AA, WCAG 2.2)</div>
+    <p><span class="loc">recruit-pipeline/src/pipeline/pipeline.component.tsx</span> — HTML5 <code>draggable</code>/<code>onDragStart</code>/<code>onDrop</code>. Moving a candidate between stages requires a mouse drag; card <i>open</i> is clickable but <i>move</i> is not.</p>
+    <p class="fix"><b>Fix:</b> add a “Move to…” menu per card (reuse <code>ActionsMenu</code>) and/or adopt a keyboard-capable DnD lib (<code>@dnd-kit</code> keyboard sensor).</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S6</span><span class="badge serious">Serious</span><h3>Primary button text fails colour contrast</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.4.3 Contrast (Minimum)</div>
+    <p><span class="loc">packages/ui/src/theme.ts</span> — contained/primary gradient <code>#FF8A3C→#E4560F</code>, white 13px text.</p>
+    <p>Measured: white on <code>#F26A1B</code> = <b>3.06:1</b>, on <code>#E4560F</code> = <b>3.73:1</b>, on hover <code>#FF8A3C</code> = <b>2.35:1</b>. AA needs 4.5:1. The app’s main CTA is below threshold.</p>
+    <p class="fix"><b>Fix:</b> darken the gradient (base ≈ <code>#B23E08</code>) or the text; re-check ≥4.5:1 including hover.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S7</span><span class="badge serious">Serious</span><h3>Dialogs/modals are not labelled</h3></div>
+    <div class="wcag"><b>WCAG</b> 4.1.2 · 1.3.1</div>
+    <p><span class="loc">modal/modal.tsx</span> — <code>Dialog</code> has no <code>aria-labelledby</code>/<code>aria-describedby</code>; title has no <code>id</code>; close <code>IconButton</code> has no <code>aria-label</code>.</p>
+    <p class="fix"><b>Fix:</b> give the title an <code>id</code> and pass <code>aria-labelledby</code> (+ <code>aria-describedby</code>) to <code>Dialog</code>; label the close button.</p>
+  </article>
+
+  <article class="finding serious">
+    <div class="fhead"><span class="fid">S8</span><span class="badge serious">Serious</span><h3>Native date/number inputs remove focus outline &amp; have no label</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.4.7 Focus Visible · 1.3.1 · 3.3.2</div>
+    <p><span class="loc">filters/components/filter-popover.tsx</span> <code>DARK_INPUT_STYLE</code> (<code>outline:"none"</code>) used by date/daterange/range filters. Raw <code>&lt;input&gt;</code>s lose the focus ring with no replacement and have no associated <code>&lt;label&gt;</code>.</p>
+    <p class="fix"><b>Fix:</b> remove <code>outline:none</code> (or add a <code>:focus-visible</code> ring) and add <code>aria-label</code> (from/to, min/max) to each input.</p>
+  </article>
+</section>
+
+<section id="moderate">
+  <h2>Moderate</h2>
+
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M1</span><span class="badge moderate">Moderate</span><h3>Search field labelled only by placeholder</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 · 3.3.2 · 4.1.2 — <span class="loc">filters/components/search-filter.tsx</span></div>
+    <p>Add <code>inputProps={{ 'aria-label': t('search') }}</code>. Placeholder also disappears on input and is low-contrast (see M4).</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M2</span><span class="badge moderate">Moderate</span><h3>No status-message live regions</h3></div>
+    <div class="wcag"><b>WCAG</b> 4.1.3 Status Messages</div>
+    <p><b>Zero</b> <code>aria-live</code>/<code>role="status"</code>/<code>role="alert"</code> in the codebase. Toasts (<span class="loc">toast/toast.tsx</span>) and async results aren’t announced. Wrap toast content in <code>role="status" aria-live="polite"</code> (assertive for errors).</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M3</span><span class="badge moderate">Moderate</span><h3>Segmented control uses tab semantics for a form value</h3></div>
+    <div class="wcag"><b>WCAG</b> 4.1.2 — <span class="loc">form-renderer.tsx</span> “segmented” widget</div>
+    <p><code>Tabs</code>/<code>Tab</code> (tablist/tab roles) are used to pick a field value; AT hears “tab” for a single-select. Use a <code>RadioGroup</code> or <code>ToggleButtonGroup</code> with a label.</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M4</span><span class="badge moderate">Moderate</span><h3>Secondary / hint / placeholder text fails AA contrast</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.4.3 — theme <code>text.disabled #7C7972</code></div>
+    <p>Measured <b>3.93:1</b> on panel / <b>4.24:1</b> on input bg; used for placeholders, hints, sidenav group titles, <code>overline</code>. Below 4.5:1 for small text. Lighten toward <code>#9A968E</code> (which passes at ~5.8:1).</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M5</span><span class="badge moderate">Moderate</span><h3>No “skip to main content” link</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.4.1 Bypass Blocks</div>
+    <p>Keyboard users tab through the full sidenav on every page. Add a visually-hidden-until-focused skip link targeting the <code>&lt;main&gt;</code> in <span class="loc">mui-core-layout.tsx</span>.</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M6</span><span class="badge moderate">Moderate</span><h3>Charts likely lack a text alternative</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.1.1 Non-text Content</div>
+    <p>ApexCharts is used in dashboard funnels/KPIs (<span class="loc">graph-renderer</span>). SVG charts are typically opaque to AT — provide a caption/summary or an equivalent data table and an <code>aria-label</code>. <i>Verify per chart.</i></p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M7</span><span class="badge moderate">Moderate</span><h3>Multiple unnamed &lt;nav&gt; landmarks</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 / 2.4.1 — <span class="loc">sidenav.component.tsx</span></div>
+    <p><code>component="nav"</code> renders once <b>per group</b>, producing several unnamed <code>&lt;nav&gt;</code> landmarks. Use one <code>&lt;nav aria-label={t('primary')}&gt;</code> around all groups.</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M8</span><span class="badge moderate">Moderate</span><h3>IconRenderer image alt defaults to empty</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.1.1 — <span class="loc">renderers/icon-renderer.tsx</span></div>
+    <p><code>&lt;Box component="img" alt=""&gt;</code>: meaningful images passed via <code>src</code> (logos, avatars) default to decorative and are dropped by AT. Propagate a meaningful <code>alt</code>.</p>
+  </article>
+  <article class="finding moderate">
+    <div class="fhead"><span class="fid">M9</span><span class="badge moderate">Moderate</span><h3>Chips input &amp; delete affordance in forms</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.3.1 / 4.1.2 — <span class="loc">form-renderer.tsx</span> chips widget</div>
+    <p>The <code>InputBase</code> has no label association and the per-chip <code>onDelete</code> may lack a name (e.g. “Remove React”). Associate the label and set an <code>aria-label</code> on delete.</p>
+  </article>
+</section>
+
+<section id="minor">
+  <h2>Minor / best-practice</h2>
+  <article class="finding minor">
+    <div class="fhead"><span class="fid">L1</span><span class="badge minor">Minor</span><h3>Active nav/tab state relies on colour + weight only</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.4.1 Use of Colour</div>
+    <p>Add <code>aria-current</code> to sidenav (covered by C2). MUI <code>Tabs</code> already sets <code>aria-selected</code>.</p>
+  </article>
+  <article class="finding minor">
+    <div class="fhead"><span class="fid">L2</span><span class="badge minor">Minor</span><h3>Notification “unread” indicated by a colour dot only</h3></div>
+    <div class="wcag"><b>WCAG</b> 1.4.1 / 1.1.1 — <span class="loc">appbar.component.tsx</span> badge dot</div>
+    <p>Add an <code>aria-label</code> (“unread notifications”) or a visually-hidden count.</p>
+  </article>
+  <article class="finding minor">
+    <div class="fhead"><span class="fid">L3</span><span class="badge minor">Minor</span><h3>No prefers-reduced-motion handling</h3></div>
+    <div class="wcag"><b>WCAG</b> 2.3.3 Animation from Interactions (AAA — advisory)</div>
+    <p>Card hover <code>translateY</code>, transitions, and toast motion ignore reduced-motion. Gate non-essential motion behind <code>@media (prefers-reduced-motion: reduce)</code>.</p>
+  </article>
+  <article class="finding minor">
+    <div class="fhead"><span class="fid">L4</span><span class="badge minor">Minor</span><h3>Hard-coded English accessible name</h3></div>
+    <div class="wcag">Consistency / localisation — <span class="loc">renderers/actions-menu.tsx</span></div>
+    <p><code>aria-label="actions"</code> is untranslated while the app is i18n-driven. Route it through <code>t()</code>.</p>
+  </article>
+</section>
+
+<section id="good">
+  <h2>What’s already good</h2>
+  <ul class="good">
+    <li><code>lang="en"</code> is set on <code>&lt;html&gt;</code> (<span class="loc">apps/web/src/app/layout.tsx</span>).</li>
+    <li>Tables use <b>semantic</b> MUI <code>Table</code>/<code>TableHead</code>/<code>TableCell</code> — header cells render as <code>&lt;th scope="col"&gt;</code>, sortable headers use <code>TableSortLabel</code>.</li>
+    <li><code>&lt;main&gt;</code> and <code>&lt;aside&gt;</code> landmarks exist (core layout + sidenav).</li>
+    <li>MUI <code>Menu</code>/<code>Dialog</code>/<code>Popover</code> provide focus trapping, focus return, and Escape-to-close for free.</li>
+    <li>Form <b>validation errors</b> are wired correctly — <code>TextField</code> <code>helperText</code> + <code>error</code> give <code>aria-describedby</code> and <code>aria-invalid</code>.</li>
+    <li>External links get <code>rel="noopener noreferrer"</code> + <code>target</code> handling.</li>
+    <li>Most body text and all “soft” status chips comfortably pass AA (5.6:1–8.1:1); switch/checkbox widgets use <code>FormControlLabel</code>.</li>
+  </ul>
+</section>
+
+<section id="order">
+  <h2>Suggested remediation order</h2>
+  <ol class="order">
+    <li><b>C1 form labels</b> &amp; <b>C2 sidenav links</b> — highest impact, each a single shared-component fix.</li>
+    <li><b>C3 filter controls</b>, <b>S2 avatar button</b>, <b>S3 icon-button labels</b> — swap to semantic MUI / add <code>aria-label</code>.</li>
+    <li><b>S6 / M4 contrast</b> — a theme-only change (button gradient + <code>text.disabled</code>).</li>
+    <li><b>S1 headings</b>, <b>S7 dialog labelling</b>, <b>S4 table rows</b>, <b>S8 focus outline</b> — structural but localized.</li>
+    <li><b>S5 kanban</b>, <b>M2 live regions</b>, <b>M3 segmented</b>, <b>M5 skip link</b>, <b>M6 charts</b> — larger / feature-specific.</li>
+    <li>Minor items + an automated pass (<code>@axe-core/playwright</code>) wired into the existing e2e suite to catch regressions.</li>
+  </ol>
+  <div class="note">This is a static code review — it catches structural and code-level issues but not everything a live
+  assistive-technology test would (focus order, reading order, real screen-reader output). A follow-up axe scan plus a
+  manual keyboard/VoiceOver pass on the running app is recommended before claiming conformance.</div>
+</section>
+</div>
+</body>
+</html>

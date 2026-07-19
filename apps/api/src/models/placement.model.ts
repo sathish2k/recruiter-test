@@ -18,6 +18,12 @@ export interface PlacementDoc {
   invoiceStatus: InvoiceStatus;
   joinDate: string;
   ts: number;
+  fee: number;
+  sourcer: string;
+  lead: string;
+  commissionPaid: boolean;
+  placedWhen: string;
+  placedMonth: number;
 }
 
 const placementSchema = new Schema<PlacementDoc>(
@@ -43,6 +49,12 @@ const placementSchema = new Schema<PlacementDoc>(
     },
     joinDate: { type: String, default: "" },
     ts: { type: Number, default: 0 },
+    fee: { type: Number, default: 0 },
+    sourcer: { type: String, default: "" },
+    lead: { type: String, default: "" },
+    commissionPaid: { type: Boolean, default: false },
+    placedWhen: { type: String, default: "" },
+    placedMonth: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

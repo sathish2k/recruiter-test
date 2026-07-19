@@ -114,6 +114,7 @@ export function TableFilterExportRenderer({
         config={config}
         filters={filters}
         actionHandler={actionHandler}
+        onEmptyAction={onCta}
       />
     </Box>
   );

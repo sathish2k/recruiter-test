@@ -32,4 +32,9 @@ export const layouts: Configuration[] = [
       { id: "Auth.Outlet.Layout", type: "outlet" },
     ],
   },
+  {
+    id: "Recruit.Bare.Layout",
+    template: "custom",
+    elements: [{ id: "Recruit.Bare.Outlet.Layout", type: "outlet" }],
+  },
 ];

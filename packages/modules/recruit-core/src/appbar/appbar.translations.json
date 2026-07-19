@@ -18,6 +18,8 @@
     "automation": "Automation",
     "settings": "Settings · Team & permissions",
     "profile": "Settings · My profile",
-    "templates": "Settings · Email templates"
+    "templates": "Settings · Email templates",
+    "notifications": "Notifications",
+    "helpCenter": "Help center"
   }
 }

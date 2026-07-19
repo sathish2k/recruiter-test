@@ -11,4 +11,14 @@ export const ClientPages: Record<string, Configuration> = {
       },
     ],
   },
+  "Recruit.ClientDetail.Page": {
+    id: "Recruit.ClientDetail.Page",
+    elements: [
+      {
+        id: "client-detail",
+        type: "component",
+        componentType: "Recruit.ClientDetail.Component",
+      },
+    ],
+  },
 };

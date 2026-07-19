@@ -1,0 +1,64 @@
+{
+  "back": "Back to candidate",
+  "title": "Edit Candidate",
+  "description": "Update this candidate's details, position and skills.",
+  "save": "Save changes",
+  "cancel": "Cancel",
+  "toast": {
+    "saved": "Changes saved",
+    "savedSub": "{{name}}'s profile is up to date",
+    "removed": "Candidate removed",
+    "removedSub": "{{name}} was removed from your pool"
+  },
+  "sections": {
+    "personal": "Personal information",
+    "position": "Position",
+    "skills": "Skills"
+  },
+  "fields": {
+    "firstName": "First name",
+    "firstNamePlaceholder": "e.g. Savannah",
+    "firstNameRequired": "First name is required",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "e.g. Nguyen",
+    "email": "Email",
+    "emailPlaceholder": "name@email.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "location": "Location",
+    "locationPlaceholder": "e.g. Seattle, WA",
+    "linkedin": "LinkedIn URL",
+    "linkedinPlaceholder": "linkedin.com/in/…",
+    "job": "Applying for",
+    "source": "Source",
+    "currentTitle": "Current title",
+    "currentTitlePlaceholder": "e.g. Staff Engineer",
+    "years": "Years of experience",
+    "yearsPlaceholder": "7",
+    "skills": "Skills",
+    "skillsPlaceholder": "Add skill + Enter",
+    "notes": "Notes",
+    "notesPlaceholder": "Anything worth flagging for the hiring team…"
+  },
+  "danger": {
+    "title": "Remove this candidate",
+    "hint": "This deletes the candidate and their screening history from your pool. This can't be undone.",
+    "remove": "Remove candidate"
+  },
+  "removeModal": {
+    "title": "Remove candidate?",
+    "body": "This permanently removes this candidate and all associated screening records. This action can't be undone.",
+    "keep": "Keep candidate",
+    "confirm": "Remove candidate"
+  },
+  "panel": {
+    "autofill": "Resume autofill",
+    "drop": "Drop resume here",
+    "dropHint": "PDF, DOCX up to 10 MB",
+    "autofillHint": "Troy re-parses the resume, updates this form, and re-scores the candidate against the selected job.",
+    "screenNow": "Re-screen after saving",
+    "record": "Record",
+    "recordMeta": "Added recently · sourced by your team",
+    "recordHint": "Edits are logged to the activity trail and audit log."
+  }
+}

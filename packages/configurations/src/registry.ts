@@ -7,7 +7,9 @@ import { DashboardModule } from "@recruit/module-dashboard";
 import { JobsModule } from "@recruit/module-jobs";
 import { OpsModule } from "@recruit/module-ops";
 import { PipelineModule } from "@recruit/module-pipeline";
+import { PortalModule } from "@recruit/module-portal";
 import { SettingsModule } from "@recruit/module-settings";
+import { SupportModule } from "@recruit/module-support";
 import type { Module } from "@recruit/sdk";
 
 export const AllModules: Module[] = [
@@ -20,5 +22,7 @@ export const AllModules: Module[] = [
   JobsModule,
   OpsModule,
   PipelineModule,
+  PortalModule,
   SettingsModule,
+  SupportModule,
 ];

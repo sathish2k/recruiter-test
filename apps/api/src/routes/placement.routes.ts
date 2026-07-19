@@ -37,4 +37,20 @@ export default new Elysia({ name: "placement.routes" })
         ]),
       }),
     },
+  )
+  .patch(
+    "/placements/:id/status",
+    (ctx) => placementController.patchStatus(ctx),
+    {
+      isAuth: true,
+      params: t.Object({ id: t.String() }),
+      body: t.Object({
+        status: t.Union([
+          t.Literal("Sent"),
+          t.Literal("Accepted"),
+          t.Literal("Negotiating"),
+          t.Literal("Declined"),
+        ]),
+      }),
+    },
   );

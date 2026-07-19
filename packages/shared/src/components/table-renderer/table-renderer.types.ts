@@ -5,6 +5,7 @@ import type { FilterConfig } from "../filters";
 import type { JsonSchema } from "../form-renderer";
 import type {
   ActionItem,
+  EmptyStateConfig,
   GenericRendererConfig,
   LinkRendererConfig,
 } from "../renderers";
@@ -79,6 +80,10 @@ export interface TableRendererConfig {
   rowRouteId?: string;
   /** Translation key shown when there are no rows (default "noData"). */
   emptyLabel?: string;
+  /** First-run empty state (icon tile + heading + subtext + CTAs) shown when
+   * there are zero rows AND no active filter/search. A filter/search that
+   * empties the list keeps the plain `emptyLabel` "no results" treatment. */
+  emptyState?: EmptyStateConfig;
   /** Client-side pagination; omit to render every row. */
   pagination?: { pageSize: number };
   /** Optional totals row rendered after the body. One cell config per column

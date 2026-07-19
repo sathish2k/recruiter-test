@@ -17,6 +17,26 @@ const initialsOf = (name: string) =>
 const feeOf = (doc: { ctc: number; feePct: number }) =>
   Math.round((doc.ctc * doc.feePct) / 100);
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const joinDateFrom = (daysOut: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + daysOut);
+  return `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+};
+
 const money = (value: number) =>
   value >= 1000 ? `$${Math.round(value / 1000)}k` : `$${value}`;
 
@@ -205,6 +225,27 @@ export async function updateInvoiceStatus(
   const doc = await PlacementModel.findOneAndUpdate(
     { _id: id, agencyId },
     { invoiceStatus: status },
+    { new: true },
+  ).lean();
+  return doc ? mapOffer(doc as PlacementRecord) : null;
+}
+
+export async function updateStatus(
+  agencyId: string,
+  id: string,
+  status: PlacementStatus,
+) {
+  const existing = await PlacementModel.findOne({ _id: id, agencyId }).lean();
+  if (!existing) return null;
+  const update: Record<string, unknown> = { status };
+  // Accepting an offer schedules a join (~3 weeks out) so it flows into the
+  // upcoming-joins, fees, invoices and guarantee-watch rail.
+  if (status === "Accepted" && !existing.joinDate) {
+    update.joinDate = joinDateFrom(21);
+  }
+  const doc = await PlacementModel.findOneAndUpdate(
+    { _id: id, agencyId },
+    update,
     { new: true },
   ).lean();
   return doc ? mapOffer(doc as PlacementRecord) : null;

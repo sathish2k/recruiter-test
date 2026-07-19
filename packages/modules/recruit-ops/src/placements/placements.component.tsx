@@ -4,19 +4,22 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import {
   type Cells,
-  FormModal,
-  type FormValues,
   IconRenderer,
+  Modal,
   StatCardRenderer,
   TableRenderer,
   Toast,
   useModal,
   useToast,
 } from "@recruit/shared";
+import { useState } from "react";
 import type { PlacementsConfig } from "./placements.configuration";
 
 interface JoinRow {
@@ -80,6 +83,141 @@ const INVOICE_STATUS_COLOR: Record<string, "error" | "warning" | "success"> = {
   Due: "warning",
   Paid: "success",
 };
+
+const STATUS_NEXT: Record<string, string> = {
+  Sent: "Negotiating",
+  Negotiating: "Accepted",
+  Accepted: "Declined",
+  Declined: "Sent",
+};
+
+const STATUS_COLOR: Record<
+  string,
+  "warning" | "success" | "info" | "error" | "default"
+> = {
+  Sent: "warning",
+  Accepted: "success",
+  Negotiating: "info",
+  Declined: "error",
+};
+
+const STATUS_LABEL_KEY: Record<string, string> = {
+  Sent: "statuses.sent",
+  Accepted: "statuses.accepted",
+  Negotiating: "statuses.negotiating",
+  Declined: "statuses.declined",
+};
+
+const parseMoney = (value: string) =>
+  Number(value.replace(/[^0-9.]/g, "")) || 0;
+const money = (value: number) => `$${Math.round(value).toLocaleString()}`;
+
+function RecordOfferModal({
+  open,
+  onClose,
+  candidates,
+  onGenerate,
+  onSave,
+  t,
+}: {
+  open: boolean;
+  onClose: () => void;
+  candidates: string[];
+  onGenerate: (candidate: string) => void;
+  onSave: (candidate: string, ctc: number) => void;
+  t: Translate;
+}) {
+  const [candidate, setCandidate] = useState("");
+  const [ctc, setCtc] = useState("");
+  const ctcNum = parseMoney(ctc);
+  const fee = Math.round(ctcNum * 0.2);
+  const selected = candidate || candidates[0] || "";
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      width={420}
+      title={t("addForm.title")}
+      description={t("addForm.description")}
+      footer={
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+          <Button variant="outlined" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<IconRenderer name="contract" size={15} />}
+            disabled={!selected}
+            onClick={() => onGenerate(selected)}
+          >
+            {t("addForm.generate")}
+          </Button>
+          <Button
+            variant="contained"
+            disabled={!selected || ctcNum <= 0}
+            onClick={() => onSave(selected, ctcNum)}
+          >
+            {t("addForm.submit")}
+          </Button>
+        </Box>
+      }
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "14px",
+          mt: "8px",
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+          <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>
+            {t("addForm.candidate")}
+          </Typography>
+          <Select
+            value={selected}
+            onChange={(e) => setCandidate(e.target.value)}
+            displayEmpty
+          >
+            {candidates.map((name) => (
+              <MenuItem key={name} value={name}>
+                {name}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+          <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>
+            {t("addForm.ctc")}
+          </Typography>
+          <TextField
+            value={ctc}
+            onChange={(e) => setCtc(e.target.value)}
+            placeholder={t("addForm.ctcPlaceholder")}
+          />
+        </Box>
+        <Card
+          variant="highlight"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: "12px 14px",
+          }}
+        >
+          <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+            {t("addForm.feeLabel")}
+          </Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, color: "#FF9D57" }}>
+            {ctcNum ? money(fee) : "—"}
+          </Typography>
+        </Card>
+      </Box>
+    </Modal>
+  );
+}
 
 function MiniAvatar({
   initials,
@@ -316,13 +454,25 @@ export function PlacementsComponent({ id }: { id: string }) {
     await mutate();
   };
 
-  const createOffer = async (values: FormValues) => {
-    await mutation.create?.({
-      candidateName: values.candidateName,
-      ctc: Number(values.ctc),
-    });
+  const cycleStatus = async (rowId: string, current: string) => {
+    const next = STATUS_NEXT[current] ?? "Accepted";
+    await mutation.updateStatus?.(rowId, next);
+    await mutate();
+    show(
+      t("toast.statusTitle"),
+      t("toast.statusSub", { status: t(STATUS_LABEL_KEY[next] ?? next) }),
+    );
+  };
+
+  const saveOffer = async (candidate: string, ctc: number) => {
+    addModal.close();
+    await mutation.create?.({ candidateName: candidate, ctc });
     await mutate();
     show(t("toast.savedTitle"), t("toast.savedSub"));
+  };
+
+  const generateLetter = (candidate: string) => {
+    show(t("toast.letterTitle"), t("toast.letterSub", { name: candidate }));
   };
 
   const cells: Cells = {
@@ -344,16 +494,17 @@ export function PlacementsComponent({ id }: { id: string }) {
         </Box>
       );
     },
-  };
-
-  const addSchema = {
-    ...config.addForm,
-    properties: {
-      ...config.addForm.properties,
-      candidateName: {
-        ...config.addForm.properties?.candidateName,
-        enum: data.candidateOptions,
-      },
+    statusCell: (row) => {
+      const status = String(row.status);
+      return (
+        <Chip
+          variant="soft"
+          color={STATUS_COLOR[status] ?? "default"}
+          label={t(STATUS_LABEL_KEY[status] ?? status)}
+          onClick={() => cycleStatus(String(row.id), status)}
+          sx={{ cursor: "pointer" }}
+        />
+      );
     },
   };
 
@@ -423,16 +574,13 @@ export function PlacementsComponent({ id }: { id: string }) {
         <GuaranteeWatch rows={data.guaranteeWatch} t={t} />
       </Box>
 
-      <FormModal
+      <RecordOfferModal
         open={addModal.isOpen}
         onClose={addModal.close}
-        id={id}
-        title={t("addForm.title")}
-        description={t("addForm.description")}
-        schema={addSchema}
-        submitLabel="addForm.submit"
-        cancelLabel="cancel"
-        onSubmit={createOffer}
+        candidates={data.candidateOptions}
+        onGenerate={generateLetter}
+        onSave={saveOffer}
+        t={t}
       />
 
       <Toast toast={toast} onClose={clear} />

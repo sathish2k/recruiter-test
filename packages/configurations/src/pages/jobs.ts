@@ -31,4 +31,14 @@ export const JobsPages: Record<string, Configuration> = {
       },
     ],
   },
+  "Recruit.EditJob.Page": {
+    id: "Recruit.EditJob.Page",
+    elements: [
+      {
+        id: "edit-job",
+        type: "component",
+        componentType: "Recruit.EditJob.Component",
+      },
+    ],
+  },
 };

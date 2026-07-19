@@ -1,5 +1,6 @@
 import type {
   ClientCardConfig,
+  EmptyStateConfig,
   FilterConfig,
   JsonSchema,
   StatCardRendererConfig,
@@ -12,7 +13,22 @@ export const ClientsConfiguration: {
   stats: StatCardRendererConfig[];
   card: ClientCardConfig;
   addForm: JsonSchema;
+  emptyState: EmptyStateConfig;
 } = {
+  emptyState: {
+    icon: "domain",
+    tone: "primary",
+    title: "firstRun.title",
+    description: "firstRun.description",
+    actions: [
+      {
+        text: "addClient",
+        action: "add",
+        variant: "contained",
+        icon: "add",
+      },
+    ],
+  },
   addForm: {
     type: "object",
     properties: {
@@ -91,10 +107,13 @@ export const ClientsConfiguration: {
         sx: { fontSize: 11.5 },
       },
     ],
-    // ponytail: no client-detail screen exists yet, so the card exposes no
-    // "View details" action. Add an actions entry (routeId +
-    // Recruit.ClientDetail.Route) once that screen is built.
-    actions: [],
+    actions: [
+      {
+        routeId: "Recruit.ClientDetail.Route",
+        label: { name: "viewDetails" },
+        params: { id: { type: "dynamic", path: "id" } },
+      },
+    ],
   },
   filters: [
     { type: "search", key: "search", placeholder: "search" },

@@ -1,0 +1,29 @@
+{
+  "heading": "Audit Log",
+  "adminOnly": "admin only",
+  "subheading": "Every sensitive action across the agency, newest first.",
+  "exportJson": "Export JSON",
+  "empty": "No events for this filter.",
+  "filters": {
+    "all": "All",
+    "permissions": "Permissions",
+    "candidates": "Candidates",
+    "client": "Client actions",
+    "jobs": "Jobs",
+    "billing": "Billing",
+    "system": "System"
+  },
+  "kinds": {
+    "permissions": "permissions",
+    "candidates": "candidates",
+    "client": "client",
+    "jobs": "jobs",
+    "billing": "billing",
+    "system": "system"
+  },
+  "footer": "Events are retained for 12 months on Pro. Exports include the full JSON payload per event.",
+  "toast": {
+    "exportTitle": "Export started ✓",
+    "exportSub": "audit-log.json is being prepared with the full event payload."
+  }
+}

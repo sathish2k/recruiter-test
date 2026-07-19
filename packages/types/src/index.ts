@@ -28,6 +28,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, RolePermissions> = {
     jobs: ALL,
     candidates: ["read", "create", "edit", "update"],
     interviews: ALL,
+    commissions: READ,
     settings: READ,
   },
   employee: {

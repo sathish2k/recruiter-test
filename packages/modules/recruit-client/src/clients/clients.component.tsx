@@ -9,6 +9,8 @@ import {
   ClientCard,
   type ClientCardConfig,
   type ClientCardData,
+  type EmptyStateConfig,
+  EmptyStateRenderer,
   type FilterConfig,
   Filters,
   FormModal,
@@ -27,6 +29,7 @@ interface ClientsConfig {
   stats?: StatCardRendererConfig[];
   card?: ClientCardConfig;
   addForm?: JsonSchema;
+  emptyState?: EmptyStateConfig;
 }
 
 export function ClientsComponent({ id }: { id: string }) {
@@ -118,23 +121,35 @@ export function ClientsComponent({ id }: { id: string }) {
 
       <StatCardRenderer id={id} config={config.stats} data={summary} />
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "14px",
-        }}
-      >
-        {clients.map((client, i) => (
-          <ClientCard
-            key={client.id}
-            id={id}
-            client={client}
-            index={i}
-            config={config.card}
+      {clients.length === 0 && !hasActiveFilter && config.emptyState ? (
+        <Card variant="base">
+          <EmptyStateRenderer
+            config={config.emptyState}
+            t={t}
+            onAction={(action) => {
+              if (action === "add") addModal.open();
+            }}
           />
-        ))}
-      </Box>
+        </Card>
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "14px",
+          }}
+        >
+          {clients.map((client, i) => (
+            <ClientCard
+              key={client.id}
+              id={id}
+              client={client}
+              index={i}
+              config={config.card}
+            />
+          ))}
+        </Box>
+      )}
 
       <Toast toast={toast} onClose={clear} />
     </Box>

@@ -1,10 +1,12 @@
 import { closeDb, connectDb } from "../src/db";
+import { AuditLogModel } from "../src/models/audit-log.model";
 import { AutomationModel } from "../src/models/automation.model";
 import { CandidateModel } from "../src/models/candidate.model";
 import { ClientModel } from "../src/models/client.model";
 import { EmailTemplateModel } from "../src/models/email-template.model";
 import { InterviewModel } from "../src/models/interview.model";
 import { JobModel } from "../src/models/job.model";
+import { NotificationModel } from "../src/models/notification.model";
 import { PlacementModel } from "../src/models/placement.model";
 import { RolePermissionModel } from "../src/models/role-permission.model";
 import { UserModel } from "../src/models/user.model";
@@ -16,6 +18,11 @@ import {
   DEFAULT_TEMPLATES,
   seedAgencyTemplates,
 } from "../src/services/email-template.service";
+import {
+  DEFAULT_NOTIFICATIONS,
+  seedAgencyNotifications,
+} from "../src/services/notification.service";
+import { seedAuditLog } from "../src/services/audit-log.service";
 import { seedAgencyPermissions } from "../src/services/permission.service";
 
 const DEMO_PASSWORD = "Passw0rd123";
@@ -855,20 +862,21 @@ const INTERVIEW_TIMES = [
   },
 ];
 
+const COMMISSION_DEFAULTS = {
+  feePct: 20,
+  status: "Accepted",
+  fee: 0,
+  sourcer: "",
+  lead: "",
+  commissionPaid: false,
+  placedWhen: "",
+  placedMonth: 0,
+} as const;
+
+// The 6 commission placements drive both the Placements screen (accepted hires)
+// and the Commissions screen (sourcer 7% / lead 5% of `fee`). Two extra
+// non-accepted rows keep the offers pipeline varied. `ctc` = fee / 20%.
 const placements = [
-  {
-    candidateName: "Alexis Kim",
-    initials: "AK",
-    avatarBg: "#5B3A3A",
-    avatarFg: "#F5CFCF",
-    role: "Data Scientist",
-    client: "Vantor",
-    ctc: 182000,
-    feePct: 20,
-    status: "Accepted",
-    invoiceStatus: "invoiced",
-    joinDate: "Aug 4",
-  },
   {
     candidateName: "Savannah Nguyen",
     initials: "SN",
@@ -876,11 +884,106 @@ const placements = [
     avatarFg: "#E3CFF5",
     role: "Senior Backend Engineer",
     client: "Nortech",
-    ctc: 175000,
-    feePct: 20,
-    status: "Negotiating",
-    invoiceStatus: "none",
-    joinDate: "",
+    ctc: 144000,
+    invoiceStatus: "paid",
+    joinDate: "Jul 9",
+    ...COMMISSION_DEFAULTS,
+    fee: 28800,
+    sourcer: "Dev Shah",
+    lead: "Ana Novak",
+    commissionPaid: true,
+    placedWhen: "Jul 9",
+    placedMonth: 7,
+  },
+  {
+    candidateName: "Tomas Vieira",
+    initials: "TV",
+    avatarBg: "#3A4A5B",
+    avatarFg: "#CFE3F5",
+    role: "Data Engineer",
+    client: "Vantor",
+    ctc: 157500,
+    invoiceStatus: "invoiced",
+    joinDate: "Jul 22",
+    ...COMMISSION_DEFAULTS,
+    fee: 31500,
+    sourcer: "Mira Joshi",
+    lead: "Riya Kapoor",
+    commissionPaid: false,
+    placedWhen: "Jul 22",
+    placedMonth: 7,
+  },
+  {
+    candidateName: "Jordan Lee",
+    initials: "JL",
+    avatarBg: "#3A5B4A",
+    avatarFg: "#CFF5E0",
+    role: "Frontend Engineer",
+    client: "Fablio",
+    ctc: 99000,
+    invoiceStatus: "paid",
+    joinDate: "Aug 3",
+    ...COMMISSION_DEFAULTS,
+    fee: 19800,
+    sourcer: "Riya Kapoor",
+    lead: "Ana Novak",
+    commissionPaid: true,
+    placedWhen: "Aug 3",
+    placedMonth: 8,
+  },
+  {
+    candidateName: "Priya Raman",
+    initials: "PR",
+    avatarBg: "#5B4A3A",
+    avatarFg: "#F5E1CF",
+    role: "Product Designer",
+    client: "Fablio",
+    ctc: 108000,
+    invoiceStatus: "invoiced",
+    joinDate: "Aug 15",
+    ...COMMISSION_DEFAULTS,
+    fee: 21600,
+    sourcer: "Dev Shah",
+    lead: "Riya Kapoor",
+    commissionPaid: false,
+    placedWhen: "Aug 15",
+    placedMonth: 8,
+  },
+  {
+    candidateName: "Alexis Kim",
+    initials: "AK",
+    avatarBg: "#5B3A3A",
+    avatarFg: "#F5CFCF",
+    role: "Data Scientist",
+    client: "Vantor",
+    ctc: 135000,
+    invoiceStatus: "paid",
+    joinDate: "Sep 1",
+    ...COMMISSION_DEFAULTS,
+    fee: 27000,
+    sourcer: "Mira Joshi",
+    lead: "Ana Novak",
+    commissionPaid: true,
+    placedWhen: "Sep 1",
+    placedMonth: 9,
+  },
+  {
+    candidateName: "Marcus Bell",
+    initials: "MB",
+    avatarBg: "#4A5B3A",
+    avatarFg: "#E0F5CF",
+    role: "ML Engineer",
+    client: "Nortech",
+    ctc: 121500,
+    invoiceStatus: "invoiced",
+    joinDate: "May 12",
+    ...COMMISSION_DEFAULTS,
+    fee: 24300,
+    sourcer: "Riya Kapoor",
+    lead: "Riya Kapoor",
+    commissionPaid: false,
+    placedWhen: "May 12",
+    placedMonth: 5,
   },
   {
     candidateName: "Omar Aziz",
@@ -894,19 +997,12 @@ const placements = [
     status: "Sent",
     invoiceStatus: "none",
     joinDate: "",
-  },
-  {
-    candidateName: "Leo Martins",
-    initials: "LM",
-    avatarBg: "#3A5B4A",
-    avatarFg: "#CFF5E0",
-    role: "ML Engineer",
-    client: "Vantor",
-    ctc: 205000,
-    feePct: 20,
-    status: "Accepted",
-    invoiceStatus: "paid",
-    joinDate: "Jul 28",
+    fee: 0,
+    sourcer: "",
+    lead: "",
+    commissionPaid: false,
+    placedWhen: "",
+    placedMonth: 0,
   },
   {
     candidateName: "Jonas Berg",
@@ -920,6 +1016,12 @@ const placements = [
     status: "Declined",
     invoiceStatus: "none",
     joinDate: "",
+    fee: 0,
+    sourcer: "",
+    lead: "",
+    commissionPaid: false,
+    placedWhen: "",
+    placedMonth: 0,
   },
 ] as const;
 
@@ -983,11 +1085,160 @@ function buildInterviews(docs: InsertedCandidate[]) {
   return interviews;
 }
 
+const CLIENT_SINCE = [
+  "Jan 2024",
+  "Aug 2023",
+  "Mar 2023",
+  "Nov 2022",
+  "Feb 2024",
+  "Jun 2023",
+];
+
+const CONTACT_AVATARS = [
+  { bg: "#3A4A5B", fg: "#CFE3F5" },
+  { bg: "#4A3A5B", fg: "#E3CFF5" },
+  { bg: "#3A5B4A", fg: "#CFF5E0" },
+];
+
+const SUBMISSION_NAMES = [
+  {
+    name: "Harper Ellis",
+    initials: "HE",
+    exp: "9 yrs",
+    comp: "$180k target",
+    why: "Scaled a payments platform from 2M to 20M users at Stripe — the exact growth curve Nortech is heading into. Strong on Go, distributed systems and mentoring.",
+  },
+  {
+    name: "Sanjay Rao",
+    initials: "SR",
+    exp: "7 yrs",
+    comp: "$165k target",
+    why: "Deep Kubernetes and platform-reliability background; led the migration that cut infra spend 30% at his current SaaS employer. Comp expectation sits inside your band.",
+  },
+  {
+    name: "Lena Fischer",
+    initials: "LF",
+    exp: "8 yrs",
+    comp: "$175k target",
+    why: "Product-minded backend engineer with system-design chops and a track record shipping customer-facing APIs. Warm on the mission and available to start in 4 weeks.",
+  },
+  {
+    name: "Omar Haddad",
+    initials: "OH",
+    exp: "6 yrs",
+    comp: "$160k target",
+    why: "Fast-rising engineer with AWS and PostgreSQL depth; strongest take-home submission in the batch. A stretch on tenure but exceptional on raw ability.",
+  },
+  {
+    name: "Grace Okafor",
+    initials: "GO",
+    exp: "10 yrs",
+    comp: "$190k target",
+    why: "Senior IC who has owned core platform services at two high-growth startups. Precisely the profile your VP of Engineering described in the intake call.",
+  },
+];
+
+const NORTECH_PORTAL_TOKEN = "demo-portal-nortech-8f2a4c";
+
+const FALLBACK_AVATAR = { bg: "#3A4A5B", fg: "#CFE3F5" };
+const avatarAt = (index: number) =>
+  CONTACT_AVATARS[index % CONTACT_AVATARS.length] ?? FALLBACK_AVATAR;
+const sinceAt = (index: number) =>
+  CLIENT_SINCE[index % CLIENT_SINCE.length] ?? "2024";
+
+function enrichClient(c: (typeof clients)[number], i: number) {
+  const contacts = [
+    {
+      name: c.manager === "Riya Kapoor" ? "Elena Ford" : "Marcus Bell",
+      role: "VP of Talent",
+      email: `talent@${c.name.toLowerCase()}.com`,
+      initials: c.manager === "Riya Kapoor" ? "EF" : "MB",
+      avatarBg: avatarAt(0).bg,
+      avatarFg: avatarAt(0).fg,
+    },
+    {
+      name: "Priya Nair",
+      role: "Head of Engineering",
+      email: `eng@${c.name.toLowerCase()}.com`,
+      initials: "PN",
+      avatarBg: avatarAt(1).bg,
+      avatarFg: avatarAt(1).fg,
+    },
+  ];
+  const pendingCount = c.status === "hiring" ? (i === 0 ? 3 : 2) : 0;
+  const submissions = SUBMISSION_NAMES.slice(0, pendingCount + 1).map(
+    (person, si) => {
+      const av = avatarAt(si);
+      return {
+        name: person.name,
+        initials: person.initials,
+        avatarBg: av.bg,
+        avatarFg: av.fg,
+        score: 92 - si * 4,
+        role: si % 2 === 0 ? "Senior Backend Engineer" : "Product Designer",
+        submittedWhen: si === 0 ? "2 days ago" : `${si + 1} days ago`,
+        sourcer: si % 2 === 0 ? "Dev Shah" : "Mira Joshi",
+        decision: (si < pendingCount ? "pending" : "approved") as
+          | "pending"
+          | "approved",
+        reason: "",
+        exp: person.exp,
+        comp: person.comp,
+        why: person.why,
+      };
+    },
+  );
+  return {
+    ...c,
+    since: sinceAt(i),
+    primaryContact: contacts[0]?.name ?? "",
+    placementFee: "20% of CTC",
+    contacts,
+    submissions,
+    portalToken: i === 0 ? NORTECH_PORTAL_TOKEN : "",
+    portalExpires: i === 0 ? Date.now() + 7 * 24 * 60 * 60 * 1000 : 0,
+    agreement: {
+      feeModel: "20% of CTC",
+      guarantee: "90 days replacement",
+      paymentTerms: "Net 30",
+      renews: sinceAt(i + 1),
+      contractFile: `MSA_${c.name}.pdf`,
+      signedDate: sinceAt(i),
+    },
+    activityLog: [
+      {
+        icon: "check-circle",
+        text: `${SUBMISSION_NAMES[0]?.name ?? "A candidate"}'s CV approved for Senior Backend Engineer`,
+        when: "2h ago",
+        tone: "success",
+      },
+      {
+        icon: "person-search",
+        text: "Dev Shah submitted 2 new CVs for review",
+        when: "5h ago",
+        tone: "default",
+      },
+      {
+        icon: "close",
+        text: "A CV was rejected — comp expectations out of band",
+        when: "1d ago",
+        tone: "default",
+      },
+      {
+        icon: "handshake",
+        text: "Candidate joined — Data Scientist role closed",
+        when: "3d ago",
+        tone: "success",
+      },
+    ],
+  };
+}
+
 async function seed(): Promise<void> {
   await connectDb();
   await ClientModel.deleteMany({ agencyId: AGENCY });
   await ClientModel.insertMany(
-    clients.map((c) => ({ ...c, agencyId: AGENCY })),
+    clients.map((c, i) => ({ ...enrichClient(c, i), agencyId: AGENCY })),
   );
   await JobModel.deleteMany({ agencyId: AGENCY });
   await JobModel.insertMany(
@@ -1021,8 +1272,12 @@ async function seed(): Promise<void> {
   await seedAgencyTemplates(AGENCY);
   await AutomationModel.deleteMany({ agencyId: AGENCY });
   await seedAgencyAutomations(AGENCY);
+  await NotificationModel.deleteMany({ agencyId: AGENCY });
+  await seedAgencyNotifications(AGENCY);
+  await AuditLogModel.deleteMany({ agencyId: AGENCY });
+  await seedAuditLog(AGENCY);
   console.log(
-    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${placements.length} placements, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, ${DEFAULT_AUTOMATIONS.length} automations, role permissions.`,
+    `Seeded ${clients.length} clients, ${jobs.length} jobs, ${candidates.length} candidates, ${interviews.length} interviews, ${placements.length} placements, ${team.length} team members, ${DEFAULT_TEMPLATES.length} email templates, ${DEFAULT_AUTOMATIONS.length} automations, ${DEFAULT_NOTIFICATIONS.length} notifications, role permissions.`,
   );
   await closeDb();
 }

@@ -7,4 +7,6 @@ export { DashboardPages } from "./dashboard";
 export { JobsPages } from "./jobs";
 export { OpsPages } from "./ops";
 export { PipelinePages } from "./pipeline";
+export { PortalPages } from "./portal";
 export { SettingsPages } from "./settings";
+export { SupportPages } from "./support";

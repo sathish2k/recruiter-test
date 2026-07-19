@@ -1,0 +1,19 @@
+{
+  "brand": "Troy",
+  "brandTag": "Client Portal",
+  "enter.title": "Review your candidates",
+  "enter.subtitle": "No password needed — we'll email you a secure link that signs you straight in.",
+  "enter.emailPlaceholder": "you@company.com",
+  "enter.submit": "Email me a magic link",
+  "sent.title": "Check your inbox",
+  "sent.subtitle": "We sent a sign-in link to {{email}}. It's valid for 15 minutes and opens straight into your candidate review.",
+  "sent.open": "Open the link (demo)",
+  "sent.resendPrompt": "Didn't get it?",
+  "sent.resend": "Send again",
+  "footer.invited": "Access is limited to contacts your agency has invited. Wrong place?",
+  "footer.teamSignIn": "Troy team sign-in",
+  "toast.sent": "Magic link sent",
+  "toast.sentSub": "Check {{email}} for your secure sign-in link.",
+  "toast.error": "Something went wrong",
+  "toast.errorSub": "Please try again in a moment."
+}

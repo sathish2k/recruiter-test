@@ -14,6 +14,7 @@ import {
 } from "../access";
 import { MuiAuthLayout } from "../layout-renderer/mui-auth-layout";
 import { MuiCoreLayout } from "../layout-renderer/mui-core-layout";
+import { NotFound } from "../not-found";
 import { AccessProvider, GlobalDependencyProvider } from "../providers";
 import type {
   AccessContext,
@@ -56,7 +57,7 @@ export function PortalRenderer({
   allConfigurations?: Configuration[];
 }) {
   if (!tree?.page) {
-    return <h1>404 - Page Not Found</h1>;
+    return <NotFound />;
   }
 
   const configurationMap = new Map<string, Record<string, unknown>>();

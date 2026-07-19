@@ -8,7 +8,10 @@ const todayYmd = () => {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
 };
 
-const dateOfTs = (ts: number) => Math.floor(ts / 10000);
+// Interview `ts` is stored as YYYYMMDD (8 digits); some rows append a HHMM time
+// (12 digits). Normalize to the YYYYMMDD day for "today" comparisons.
+const dateOfTs = (ts: number) =>
+  ts > 99_999_999 ? Math.floor(ts / 10000) : ts;
 
 const withOf = (note: string) => {
   const idx = note.indexOf("with ");

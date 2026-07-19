@@ -1,15 +1,21 @@
 import { expect, test } from "@playwright/test";
 import { login, newAccount, register } from "./helpers";
 
-// Admin walks the whole left sidenav. Only the items below have declared routes;
-// the remaining nav entries (Team Activity, Interviews, Placements, Messages,
-// Help center) point at routeIds NOT in configurations/routes.ts — they're inert
-// placeholders, so they're intentionally not exercised here.
-const NAV: { label: string; url: RegExp }[] = [
+// Admin walks the whole left sidenav. Every item below now has a declared route.
+// The remaining nav entries (Messages, Help center) still point at routeIds NOT
+// in configurations/routes.ts — they're inert placeholders, so they're
+// intentionally not exercised here.
+// `heading` (when set) is an in-screen text that proves the target page rendered
+// — the three ops screens render empty for this fresh nav admin, but their table
+// / section titles are always present, so we key on those.
+const NAV: { label: string; url: RegExp; heading?: string }[] = [
   { label: "Clients", url: /\/clients$/ },
   { label: "Jobs", url: /\/jobs$/ },
   { label: "Candidates", url: /\/candidates$/ },
   { label: "Pipeline", url: /\/pipeline$/ },
+  { label: "Team Activity", url: /\/team-activity$/, heading: "By employee" },
+  { label: "Interviews", url: /\/interviews$/, heading: "Today's schedule" },
+  { label: "Placements", url: /\/placements$/, heading: "Offers" },
   { label: "AI Screening", url: /\/ai-screening$/ },
   { label: "Automation", url: /\/automation$/ },
   { label: "Settings", url: /\/settings$/ },
@@ -36,6 +42,11 @@ test.describe
         await nav.getByText(item.label, { exact: true }).click();
         await page.waitForURL(item.url);
         await expect(page).toHaveURL(item.url);
+        if (item.heading) {
+          await expect(
+            page.getByText(item.heading, { exact: true }),
+          ).toBeVisible();
+        }
       }
 
       // Dashboard returns to root.

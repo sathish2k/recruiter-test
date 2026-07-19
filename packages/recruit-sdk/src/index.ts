@@ -7,6 +7,7 @@ export { createPortalApp, PortalRenderer } from "./engine/orchestrator";
 export { findBestMatchBranch, findRouteBySlug } from "./engine/router";
 export { generateRenderTree } from "./engine/renderer";
 export { MuiAuthLayout, MuiCoreLayout } from "./layout-renderer";
+export { NotFound } from "./not-found";
 export {
   type PortalRouter,
   PortalRouterProvider,

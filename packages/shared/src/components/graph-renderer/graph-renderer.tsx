@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import type { ReactNode } from "react";
+import { EmptyStateRenderer } from "../renderers";
 import { Chart } from "./chart";
 import { buildOptions, buildSeries } from "./graph-renderer.helpers";
 import type { GraphRendererConfig, GraphRow } from "./graph-renderer.types";
@@ -29,6 +30,19 @@ export function GraphRenderer({
 
   const series = buildSeries(config, rows, t);
   const options = buildOptions(config, rows);
+  const overlay =
+    rows.length === 0 && config.emptyOverlay ? (
+      <EmptyStateRenderer
+        config={{
+          icon: config.emptyOverlay.icon,
+          title: config.emptyOverlay.title,
+          description: config.emptyOverlay.description,
+          tone: "neutral",
+          compact: true,
+        }}
+        t={t}
+      />
+    ) : undefined;
 
   return (
     <Card variant="base">
@@ -66,6 +80,7 @@ export function GraphRenderer({
         series={series}
         options={options}
         height={config.height ?? 300}
+        overlay={overlay}
       />
     </Card>
   );

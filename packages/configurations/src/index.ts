@@ -10,7 +10,9 @@ import {
   JobsPages,
   OpsPages,
   PipelinePages,
+  PortalPages,
   SettingsPages,
+  SupportPages,
 } from "./pages";
 
 export { ROLE_PERMISSIONS, type Resource } from "./access";
@@ -26,7 +28,9 @@ export const allConfigurations: Configuration[] = [
   ...Object.values(JobsPages),
   ...Object.values(OpsPages),
   ...Object.values(PipelinePages),
+  ...Object.values(PortalPages),
   ...Object.values(CandidatePages),
   ...Object.values(CorePages),
   ...Object.values(SettingsPages),
+  ...Object.values(SupportPages),
 ];

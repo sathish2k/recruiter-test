@@ -31,4 +31,24 @@ export const CandidatePages: Record<string, Configuration> = {
       },
     ],
   },
+  "Recruit.EditCandidate.Page": {
+    id: "Recruit.EditCandidate.Page",
+    elements: [
+      {
+        id: "edit-candidate",
+        type: "component",
+        componentType: "Recruit.EditCandidate.Component",
+      },
+    ],
+  },
+  "Recruit.CvReview.Page": {
+    id: "Recruit.CvReview.Page",
+    elements: [
+      {
+        id: "cv-review",
+        type: "component",
+        componentType: "Recruit.CvReview.Component",
+      },
+    ],
+  },
 };

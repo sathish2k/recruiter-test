@@ -38,6 +38,9 @@ export interface GraphRendererConfig {
   legend?: boolean;
   /** Number formatting for axis + tooltip values. */
   valueType?: "number" | "currency" | "percentage";
+  /** First-run overlay shown over a faint axis frame when there are no rows.
+   * `icon`/`title`/`description` are an ICON_REGISTRY name + translation keys. */
+  emptyOverlay?: { icon: string; title: string; description: string };
 }
 
 /** Client-side filter dropdown over a row field. */

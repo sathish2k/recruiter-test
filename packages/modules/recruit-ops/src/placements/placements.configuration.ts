@@ -1,5 +1,4 @@
 import type {
-  JsonSchema,
   StatCardRendererConfig,
   TableRendererConfig,
 } from "@recruit/shared";
@@ -8,7 +7,6 @@ export interface PlacementsConfig {
   candidateRouteId: string;
   kpiCards: StatCardRendererConfig[];
   offers: TableRendererConfig;
-  addForm: JsonSchema;
 }
 
 const ORANGE = "#FF9D57";
@@ -57,56 +55,14 @@ const offers: TableRendererConfig = {
     { label: { name: "offers.columns.invoice" }, value: { type: "invoice" } },
     {
       label: { name: "offers.columns.status" },
-      value: {
-        type: "status",
-        path: "status",
-        variant: "soft",
-        labels: {
-          Sent: "statuses.sent",
-          Accepted: "statuses.accepted",
-          Negotiating: "statuses.negotiating",
-          Declined: "statuses.declined",
-        },
-        colors: {
-          Sent: "warning",
-          Accepted: "success",
-          Negotiating: "info",
-          Declined: "error",
-        },
-      },
+      value: { type: "statusCell" },
     },
   ],
-};
-
-const addForm: JsonSchema = {
-  type: "object",
-  properties: {
-    candidateName: {
-      type: "string",
-      title: "addForm.candidate",
-      enum: [],
-    },
-    ctc: {
-      type: "string",
-      title: "addForm.ctc",
-      placeholder: "addForm.ctcPlaceholder",
-      icon: "payments",
-      help: "addForm.ctcHelp",
-    },
-  },
-  required: ["candidateName", "ctc"],
-  errorMessage: {
-    required: {
-      candidateName: "addForm.candidateRequired",
-      ctc: "addForm.ctcRequired",
-    },
-  },
 };
 
 export const PlacementsConfiguration: PlacementsConfig = {
   candidateRouteId: "Recruit.CandidateDetail.Route",
   offers,
-  addForm,
   kpiCards: [
     {
       icon: { name: "contract", size: 16, color: MUTED_ICON },

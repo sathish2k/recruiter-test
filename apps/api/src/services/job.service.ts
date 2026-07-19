@@ -69,6 +69,64 @@ export async function createJob(input: CreateJobInput, agencyId: string) {
   return mapJob(doc.toObject() as JobDoc & { _id: unknown });
 }
 
+export interface UpdateJobInput {
+  title?: string;
+  client?: string;
+  openings?: number;
+  empType?: string;
+  location?: string;
+  salaryMin?: string;
+  salaryMax?: string;
+  description?: string;
+  skills?: string[];
+  screeningOn?: boolean;
+  screeningThreshold?: number;
+  status?: string;
+}
+
+export async function updateJob(
+  id: string,
+  agencyId: string,
+  input: UpdateJobInput,
+) {
+  const set: Record<string, unknown> = {};
+  if (input.title !== undefined) set.title = input.title;
+  if (input.client !== undefined) {
+    set.client = input.client;
+    set.clientInitial = input.client.trim().charAt(0).toUpperCase();
+  }
+  if (input.openings !== undefined) set.openings = input.openings;
+  if (input.empType !== undefined) set.empType = input.empType;
+  if (input.location !== undefined) set.location = input.location;
+  if (input.salaryMin !== undefined) set.salaryMin = input.salaryMin;
+  if (input.salaryMax !== undefined) set.salaryMax = input.salaryMax;
+  if (input.description !== undefined) set.description = input.description;
+  if (input.skills !== undefined) set.skills = input.skills;
+  if (input.screeningOn !== undefined) set.screeningOn = input.screeningOn;
+  if (input.screeningThreshold !== undefined)
+    set.screeningThreshold = Math.max(
+      50,
+      Math.min(95, Math.round(input.screeningThreshold)),
+    );
+  if (input.status !== undefined) set.status = input.status;
+  const doc = await JobModel.findOneAndUpdate(
+    { _id: id, agencyId },
+    { $set: set },
+    { new: true },
+  )
+    .lean()
+    .catch(() => null);
+  if (!doc) return null;
+  return mapJob(doc as JobDoc & { _id: unknown });
+}
+
+export async function deleteJob(id: string, agencyId: string) {
+  const doc = await JobModel.findOneAndDelete({ _id: id, agencyId })
+    .lean()
+    .catch(() => null);
+  return doc ? { id } : null;
+}
+
 function mapJob(j: JobDoc & { _id: unknown }) {
   return {
     id: String(j._id),
@@ -230,6 +288,8 @@ export async function getJob(id: string, agencyId: string) {
     salary: formatSalary(j.salaryMin ?? "", j.salaryMax ?? ""),
     description,
     skills,
+    screeningOn: j.screeningOn ?? false,
+    screeningThreshold: threshold,
     posted: j.posted,
     expYears,
     workType,

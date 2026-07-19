@@ -7,4 +7,6 @@ export const placementsDatasource = (): DatasourceInstance => ({
   updateInvoice: async (id?: string, invoiceStatus?: string) =>
     (await httpClient.patch(`/placements/${id}/invoice`, { invoiceStatus }))
       .data,
+  updateStatus: async (id?: string, status?: string) =>
+    (await httpClient.patch(`/placements/${id}/status`, { status })).data,
 });

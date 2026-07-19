@@ -38,7 +38,15 @@
         "../../packages/modules/recruit-pipeline/src/index.ts"
       ],
       "@recruit/module-ai": ["../../packages/modules/recruit-ai/src/index.ts"],
-      "@recruit/module-ops": ["../../packages/modules/recruit-ops/src/index.ts"]
+      "@recruit/module-ops": [
+        "../../packages/modules/recruit-ops/src/index.ts"
+      ],
+      "@recruit/module-support": [
+        "../../packages/modules/recruit-support/src/index.ts"
+      ],
+      "@recruit/module-portal": [
+        "../../packages/modules/recruit-portal/src/index.ts"
+      ]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

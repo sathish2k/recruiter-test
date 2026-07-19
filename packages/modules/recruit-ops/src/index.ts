@@ -1,4 +1,6 @@
 import type { Module } from "@recruit/sdk";
+import { AUDIT_LOG_COMPONENT } from "./audit-log/bootstrap";
+import { COMMISSIONS_COMPONENT } from "./commissions/bootstrap";
 import { INTERVIEWS_COMPONENT } from "./interviews/bootstrap";
 import { PLACEMENTS_COMPONENT } from "./placements/bootstrap";
 import { TEAM_ACTIVITY_COMPONENT } from "./team-activity/bootstrap";
@@ -9,5 +11,7 @@ export const OpsModule: Module = {
     TEAM_ACTIVITY_COMPONENT,
     INTERVIEWS_COMPONENT,
     PLACEMENTS_COMPONENT,
+    COMMISSIONS_COMPONENT,
+    AUDIT_LOG_COMPONENT,
   ],
 };

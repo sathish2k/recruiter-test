@@ -1,0 +1,32 @@
+{
+  "fallback": {
+    "heading": "Notifications",
+    "unread": "{{count}} new",
+    "markAll": "Mark all read",
+    "filters": {
+      "all": "All",
+      "client": "Client decisions",
+      "ai": "AI & CVs",
+      "team": "Team",
+      "system": "System"
+    },
+    "groups": {
+      "TODAY": "Today",
+      "YESTERDAY": "Yesterday",
+      "EARLIER": "Earlier"
+    },
+    "kinds": {
+      "client": "Client decision",
+      "ai": "AI & CVs",
+      "team": "Team",
+      "system": "System"
+    },
+    "subline": "{{when}} · {{kind}}",
+    "empty": "Nothing here — no {{filter}} notifications right now",
+    "emptyAll": "You're all caught up — no notifications right now",
+    "footer": {
+      "prefix": "Delivery preferences live in Settings →",
+      "link": "My profile"
+    }
+  }
+}

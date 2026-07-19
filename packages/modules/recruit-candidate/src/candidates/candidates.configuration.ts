@@ -191,16 +191,50 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
       value: { type: "pill", path: "stage", styles: STAGE_PILLS },
       sort: { key: "stage" },
     },
-    {
-      label: { name: "columns.actions" },
-      value: {
-        type: "actions",
-        actions: [
-          { type: "schedule", icon: "event" },
-          { type: "message", icon: "mail" },
-          { type: "more", icon: "more" },
-        ],
+  ],
+  emptyState: {
+    icon: "group",
+    tone: "primary",
+    title: "firstRun.title",
+    description: "firstRun.description",
+    actions: [
+      {
+        text: "addCandidate",
+        routeId: "Recruit.AddCandidate.Route",
+        variant: "contained",
+        icon: "person_add",
       },
+      {
+        text: "importCsv",
+        action: "import",
+        variant: "outlined",
+        icon: "upload_file",
+      },
+    ],
+  },
+  actionsLabel: { name: "columns.actions" },
+  actions: [
+    {
+      type: "link",
+      icon: "view",
+      label: { name: "actionsMenu.view" },
+      routeId: "Recruit.CandidateDetail.Route",
+      params: { id: { type: "dynamic", path: "id" } },
+    },
+    {
+      type: "link",
+      icon: "sparkle",
+      label: { name: "actionsMenu.review" },
+      routeId: "Recruit.CvReview.Route",
+      params: { id: { type: "dynamic", path: "id" } },
+    },
+    {
+      type: "link",
+      icon: "edit",
+      label: { name: "actionsMenu.edit" },
+      routeId: "Recruit.EditCandidate.Route",
+      params: { id: { type: "dynamic", path: "id" } },
+      access: { resource: "candidates", action: ["update"] },
     },
   ],
   pagination: { pageSize: 10 },

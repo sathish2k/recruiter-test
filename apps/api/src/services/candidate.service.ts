@@ -84,6 +84,69 @@ export async function createCandidate(
   return mapCandidate(doc.toObject() as CandidateDoc & { _id: unknown });
 }
 
+export interface UpdateCandidateInput {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  linkedin?: string;
+  job?: string;
+  source?: string;
+  currentTitle?: string;
+  years?: number;
+  skills?: string[];
+  notes?: string;
+}
+
+export async function updateCandidate(
+  id: string,
+  agencyId: string,
+  input: UpdateCandidateInput,
+) {
+  if (!isValidObjectId(id)) return null;
+  const set: Record<string, unknown> = {};
+  if (input.firstName !== undefined || input.lastName !== undefined) {
+    const name = [input.firstName, input.lastName].filter(Boolean).join(" ");
+    set.name = name;
+    set.initials = [input.firstName, input.lastName]
+      .filter(Boolean)
+      .map((part) => (part ?? "").charAt(0).toUpperCase())
+      .join("");
+  }
+  if (input.email !== undefined) set.email = input.email;
+  if (input.phone !== undefined) set.phone = input.phone;
+  if (input.location !== undefined) set.location = input.location;
+  if (input.linkedin !== undefined) set.linkedin = input.linkedin;
+  if (input.source !== undefined) set.source = input.source;
+  if (input.years !== undefined) set.exp = input.years;
+  if (input.skills !== undefined) set.skills = input.skills;
+  if (input.notes !== undefined) set.notes = input.notes;
+  const [jobRole, jobClient] = (input.job ?? "")
+    .split("·")
+    .map((s) => s.trim());
+  if (input.currentTitle !== undefined || jobRole)
+    set.role = input.currentTitle || jobRole || "";
+  if (input.job !== undefined && jobClient) set.client = jobClient;
+
+  const doc = await CandidateModel.findOneAndUpdate(
+    { _id: id, agencyId },
+    { $set: set },
+    { new: true },
+  ).lean();
+  if (!doc) return null;
+  return mapCandidate(doc as CandidateDoc & { _id: unknown });
+}
+
+export async function deleteCandidate(id: string, agencyId: string) {
+  if (!isValidObjectId(id)) return null;
+  const doc = await CandidateModel.findOneAndDelete({
+    _id: id,
+    agencyId,
+  }).lean();
+  return doc ? { id } : null;
+}
+
 function list(value?: string): string[] {
   return value
     ? value

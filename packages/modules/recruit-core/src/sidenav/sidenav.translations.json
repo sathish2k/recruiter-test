@@ -14,10 +14,12 @@
     "teamActivity": "Team Activity",
     "interviews": "Interviews",
     "placements": "Placements",
+    "commissions": "Commissions",
     "messages": "Messages",
     "aiScreening": "AI Screening",
     "automation": "Automation",
     "settings": "Settings",
+    "auditLog": "Audit Log",
     "helpCenter": "Help center"
   }
 }

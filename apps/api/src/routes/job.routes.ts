@@ -41,4 +41,26 @@ export default new Elysia({ name: "job.routes" })
       skills: t.Optional(t.Array(t.String())),
       status: t.Optional(t.String()),
     }),
+  })
+  .patch("/jobs/:id", (ctx) => jobController.patchJob(ctx), {
+    isAuth: true,
+    params: t.Object({ id: t.String() }),
+    body: t.Object({
+      title: t.Optional(t.String()),
+      client: t.Optional(t.String()),
+      openings: t.Optional(t.Number()),
+      empType: t.Optional(t.String()),
+      location: t.Optional(t.String()),
+      salaryMin: t.Optional(t.String()),
+      salaryMax: t.Optional(t.String()),
+      description: t.Optional(t.String()),
+      skills: t.Optional(t.Array(t.String())),
+      screeningOn: t.Optional(t.Boolean()),
+      screeningThreshold: t.Optional(t.Number()),
+      status: t.Optional(t.String()),
+    }),
+  })
+  .delete("/jobs/:id", (ctx) => jobController.removeJob(ctx), {
+    isAuth: true,
+    params: t.Object({ id: t.String() }),
   });

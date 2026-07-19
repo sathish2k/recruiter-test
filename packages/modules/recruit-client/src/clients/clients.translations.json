@@ -25,6 +25,10 @@
     "created": "Client created",
     "createdSub": "{{name}} — add the first role to start sourcing"
   },
+  "firstRun": {
+    "title": "No clients yet",
+    "description": "Add the companies you recruit for. Each client gets a review portal, an agreement, and its own roles & pipeline."
+  },
   "filters": {
     "all": "All",
     "hiring": "Hiring",

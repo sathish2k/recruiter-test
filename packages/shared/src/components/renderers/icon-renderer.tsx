@@ -14,6 +14,7 @@ import ManageSearchRounded from "@mui/icons-material/ManageSearchRounded";
 import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
 import PsychologyRounded from "@mui/icons-material/PsychologyRounded";
 import ScheduleRounded from "@mui/icons-material/ScheduleRounded";
+import SaveRounded from "@mui/icons-material/SaveRounded";
 import SendRounded from "@mui/icons-material/SendRounded";
 import SchoolRounded from "@mui/icons-material/SchoolRounded";
 import ShareRounded from "@mui/icons-material/ShareRounded";
@@ -54,8 +55,10 @@ import GroupRounded from "@mui/icons-material/GroupRounded";
 import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
 import InsightsRounded from "@mui/icons-material/InsightsRounded";
+import LockOpenRounded from "@mui/icons-material/LockOpenRounded";
 import LockOutlined from "@mui/icons-material/LockOutlined";
 import LockResetRounded from "@mui/icons-material/LockResetRounded";
+import MarkEmailReadRounded from "@mui/icons-material/MarkEmailReadRounded";
 import LoginRounded from "@mui/icons-material/LoginRounded";
 import LogoutRounded from "@mui/icons-material/LogoutRounded";
 import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
@@ -86,6 +89,7 @@ import PersonSearchRounded from "@mui/icons-material/PersonSearchRounded";
 import RemoveRounded from "@mui/icons-material/RemoveRounded";
 import ReplayRounded from "@mui/icons-material/ReplayRounded";
 import TuneRounded from "@mui/icons-material/TuneRounded";
+import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import WorkHistoryRounded from "@mui/icons-material/WorkHistoryRounded";
 import PaymentsRounded from "@mui/icons-material/PaymentsRounded";
 import ErrorOutlineRounded from "@mui/icons-material/ErrorOutlineRounded";
@@ -94,6 +98,11 @@ import SupervisorAccountRounded from "@mui/icons-material/SupervisorAccountRound
 import ReceiptLongRounded from "@mui/icons-material/ReceiptLongRounded";
 import NotificationsActiveRounded from "@mui/icons-material/NotificationsActiveRounded";
 import VerifiedUserRounded from "@mui/icons-material/VerifiedUserRounded";
+import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
+import SupportAgentRounded from "@mui/icons-material/SupportAgentRounded";
+import EventAvailableRounded from "@mui/icons-material/EventAvailableRounded";
+import EventBusyRounded from "@mui/icons-material/EventBusyRounded";
+import CalendarMonthRounded from "@mui/icons-material/CalendarMonthRounded";
 import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
@@ -113,7 +122,10 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   more: MoreHorizRounded,
   "more-vert": MoreVertRounded,
   lock: LockOutlined,
+  "lock-open": LockOpenRounded,
   "lock-reset": LockResetRounded,
+  "mark-email-read": MarkEmailReadRounded,
+  "magic-button": AutoAwesomeRounded,
   person: PersonOutlineRounded,
   "person-add": PersonAddAlt1Rounded,
   "person-off": PersonOffRounded,
@@ -181,6 +193,7 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   task_alt: TaskAltRounded,
   description: DescriptionRounded,
   insights: InsightsRounded,
+  save: SaveRounded,
   send: SendRounded,
   timer: TimerOutlined,
   "attach-file": AttachFileRounded,
@@ -192,6 +205,7 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   replay: ReplayRounded,
   tune: TuneRounded,
   "work-history": WorkHistoryRounded,
+  history: HistoryRounded,
   payments: PaymentsRounded,
   error: ErrorOutlineRounded,
   "shield-person": AdminPanelSettingsRounded,
@@ -199,6 +213,16 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   contract: ReceiptLongRounded,
   "notifications-active": NotificationsActiveRounded,
   "verified-user": VerifiedUserRounded,
+  article: ArticleOutlined,
+  "support-agent": SupportAgentRounded,
+  person_search: PersonSearchRounded,
+  event_upcoming: EventAvailableRounded,
+  event_busy: EventBusyRounded,
+  calendar_month: CalendarMonthRounded,
+  view_kanban: ViewKanbanRounded,
+  bar_chart: BarChartRounded,
+  person_add: PersonAddAlt1Rounded,
+  upload_file: UploadFileRounded,
 };
 
 export interface IconRendererConfig {

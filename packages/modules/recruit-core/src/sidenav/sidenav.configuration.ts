@@ -64,6 +64,12 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Placements.Route",
       },
       {
+        label: "items.commissions",
+        access: { resource: "commissions" },
+        icon: "payments",
+        routeId: "Recruit.Commissions.Route",
+      },
+      {
         label: "items.messages",
         icon: "mail-filled",
         routeId: "Recruit.Messages.Route",
@@ -95,6 +101,12 @@ const groups: SidenavGroup[] = [
         access: { resource: "settings" },
         icon: "settings",
         routeId: "Recruit.Settings.Route",
+      },
+      {
+        label: "items.auditLog",
+        access: { resource: "audit", action: ["read"] },
+        icon: "history",
+        routeId: "Recruit.AuditLog.Route",
       },
       {
         label: "items.helpCenter",
