@@ -44,9 +44,7 @@ export function ActionsMenu({
       Object.entries(a.params ?? {}).map(([key, param]) => [
         key,
         String(
-          (param.type === "dynamic" && param.path
-            ? delve(data, param.path)
-            : param.value) ?? "",
+          (param.type === "dynamic" && param.path ? delve(data, param.path) : param.value) ?? "",
         ),
       ]),
     );
@@ -62,8 +60,7 @@ export function ActionsMenu({
     }
   };
 
-  const labelOf = (a: ActionItem) =>
-    (a.label ? t(a.label.name) : a.text) ?? a.type ?? "";
+  const labelOf = (a: ActionItem) => (a.label ? t(a.label.name) : a.text) ?? a.type ?? "";
 
   if (!actions.length) return null;
 
@@ -81,10 +78,7 @@ export function ActionsMenu({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         {actions.map((a, i) => (
-          <MenuItem
-            key={a.type ?? a.routeId ?? a.href ?? i}
-            onClick={handle(a)}
-          >
+          <MenuItem key={a.type ?? a.routeId ?? a.href ?? i} onClick={handle(a)}>
             {a.icon ? (
               <ListItemIcon sx={{ minWidth: "0 !important" }}>
                 <IconRenderer name={a.icon} size={16} />

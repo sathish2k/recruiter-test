@@ -25,12 +25,7 @@ export function NumberRenderer({
   const { formatNumber } = useFormatters();
   const value = Number(delve(data, config.path) ?? 0);
   return (
-    <Typography
-      component="span"
-      variant={config.variant}
-      color={config.color}
-      sx={config.sx}
-    >
+    <Typography component="span" variant={config.variant} color={config.color} sx={config.sx}>
       {config.prefix ?? ""}
       {formatNumber(value, config.options)}
       {config.suffix ?? ""}

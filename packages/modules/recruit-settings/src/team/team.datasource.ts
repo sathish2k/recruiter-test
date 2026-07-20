@@ -4,7 +4,7 @@ export const teamDatasource = (): DatasourceInstance => ({
   get: async (query?: Record<string, unknown>) =>
     (await httpClient.get("/users", { params: query })).data,
   create: async (body?: Record<string, unknown>) =>
-    (await httpClient.post("/users/invite", body)).data,
+    (await httpClient.post("/invitations", body)).data,
   update: async (body?: Record<string, unknown>) =>
     (
       await httpClient.patch(`/users/${String(body?.id)}/role`, {

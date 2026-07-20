@@ -7,10 +7,7 @@ import { IconRenderer } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 
 /** Row action → callback. Keyed by the action's `type` (e.g. "addData"). */
-export type ActionHandler = Record<
-  string,
-  (row: Record<string, unknown>) => void
->;
+export type ActionHandler = Record<string, (row: Record<string, unknown>) => void>;
 
 /**
  * A row action. `type: "link"` renders a LinkRenderer (spread the link config).
@@ -44,13 +41,7 @@ export function ActionsRenderer({
     <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
       {config.actions.map((a, i) => {
         if (a.type === "link") {
-          return (
-            <LinkRenderer
-              key={a.routeId ?? a.href ?? a.text ?? i}
-              config={a}
-              data={data}
-            />
-          );
+          return <LinkRenderer key={a.routeId ?? a.href ?? a.text ?? i} config={a} data={data} />;
         }
         return (
           <IconButton

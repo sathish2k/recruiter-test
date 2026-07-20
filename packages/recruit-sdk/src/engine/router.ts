@@ -46,29 +46,16 @@ export const findBestMatchBranch = (
   if (remainingSlugs.length === 0) return [bestCandidate.route];
 
   if (childIds.length > 0) {
-    const childRoutes = childIds
-      .map((id) => routeMap.get(id))
-      .filter((r): r is Route => !!r);
-    const childBranch = findBestMatchBranch(
-      remainingSlugs,
-      childRoutes,
-      routeMap,
-    );
+    const childRoutes = childIds.map((id) => routeMap.get(id)).filter((r): r is Route => !!r);
+    const childBranch = findBestMatchBranch(remainingSlugs, childRoutes, routeMap);
     if (childBranch) return [bestCandidate.route, ...childBranch];
   }
   return null;
 };
 
-export const findRouteBySlug = (
-  slugParts: string[] = [],
-  routeList: Route[],
-): Route[] | null => {
+export const findRouteBySlug = (slugParts: string[] = [], routeList: Route[]): Route[] | null => {
   const mainRoutes = routeList.filter((r) => !r.slot);
-  if (
-    !slugParts ||
-    slugParts.length === 0 ||
-    (slugParts.length === 1 && slugParts[0] === "")
-  ) {
+  if (!slugParts || slugParts.length === 0 || (slugParts.length === 1 && slugParts[0] === "")) {
     const rootRoute = mainRoutes.find((route) => route.path === "/");
     return rootRoute ? [rootRoute] : null;
   }

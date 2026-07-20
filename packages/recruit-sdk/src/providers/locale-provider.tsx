@@ -1,10 +1,7 @@
 "use client";
 
 import { type ReactNode, useState } from "react";
-import {
-  I18nextProvider,
-  useTranslation as useI18nextTranslation,
-} from "react-i18next";
+import { I18nextProvider, useTranslation as useI18nextTranslation } from "react-i18next";
 import { createI18n } from "./i18n";
 
 export interface LocaleContextValue {

@@ -30,11 +30,7 @@ export function FilterPopover({
           fontWeight: 600,
           background: active ? "rgba(242,106,27,.12)" : "#1C1C1B",
           borderColor: active ? "rgba(242,106,27,.5)" : undefined,
-          color: active
-            ? "#F0B27C"
-            : summary
-              ? "text.primary"
-              : "text.secondary",
+          color: active ? "#F0B27C" : summary ? "text.primary" : "text.secondary",
         }}
       >
         {summary ?? label ?? ""}

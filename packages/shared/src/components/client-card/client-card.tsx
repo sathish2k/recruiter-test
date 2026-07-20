@@ -207,8 +207,7 @@ export function ClientCard({
         }}
       >
         {metrics.map((metric, i) => {
-          const overrideSx = (metric.value as { sx?: Record<string, unknown> })
-            ?.sx;
+          const overrideSx = (metric.value as { sx?: Record<string, unknown> })?.sx;
           const valueConfig = {
             ...metric.value,
             sx: { ...METRIC_VALUE_SX, ...(overrideSx ?? {}) },
@@ -305,9 +304,7 @@ export function ClientCard({
           pt: "14px",
         }}
       >
-        <Typography sx={{ fontSize: 12, color: "#7C7972" }}>
-          {client.activity}
-        </Typography>
+        <Typography sx={{ fontSize: 12, color: "#7C7972" }}>{client.activity}</Typography>
         {actions.length ? (
           <Box
             sx={{

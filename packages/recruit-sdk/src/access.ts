@@ -1,17 +1,8 @@
-import type {
-  AccessAction,
-  AccessContext,
-  AccessRule,
-  Configuration,
-  Route,
-} from "./types";
+import type { AccessAction, AccessContext, AccessRule, Configuration, Route } from "./types";
 
 const DEFAULT_ACTIONS: AccessAction[] = ["read"];
 
-export function canAccess(
-  context: AccessContext | null | undefined,
-  rule?: AccessRule,
-): boolean {
+export function canAccess(context: AccessContext | null | undefined, rule?: AccessRule): boolean {
   if (!rule) return true;
   if (!context) return false;
   const actions = rule.action?.length ? rule.action : DEFAULT_ACTIONS;

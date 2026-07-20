@@ -1,11 +1,7 @@
 "use client";
 
 import TableCell from "@mui/material/TableCell";
-import {
-  type ActionHandler,
-  GenericRenderer,
-  type GenericRendererConfig,
-} from "../renderers";
+import { type ActionHandler, GenericRenderer, type GenericRendererConfig } from "../renderers";
 import type { Cells, Row, TableColumnConfig } from "./table-renderer.types";
 
 export function TableCellRenderer({

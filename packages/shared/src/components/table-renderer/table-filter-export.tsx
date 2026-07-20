@@ -2,12 +2,7 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import {
-  useConfiguration,
-  useFetch,
-  usePortalRouter,
-  useTranslation,
-} from "@recruit/sdk";
+import { useConfiguration, useFetch, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
 import { type ActionHandler, IconRenderer } from "../renderers";
@@ -87,10 +82,7 @@ export function TableFilterExportRenderer({
               onClick={() => handleCta(cta)}
               startIcon={
                 cta.icon ? (
-                  <IconRenderer
-                    name={cta.icon}
-                    size={cta.icon === "add" ? 18 : 16}
-                  />
+                  <IconRenderer name={cta.icon} size={cta.icon === "add" ? 18 : 16} />
                 ) : undefined
               }
             >

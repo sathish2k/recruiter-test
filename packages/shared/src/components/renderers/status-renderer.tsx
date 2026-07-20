@@ -26,10 +26,7 @@ export function StatusRenderer({
     <Chip
       label={
         config.dot ? (
-          <Box
-            component="span"
-            sx={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
-          >
+          <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
             <Box
               component="span"
               sx={{

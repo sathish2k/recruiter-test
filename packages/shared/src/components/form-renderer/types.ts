@@ -1,9 +1,4 @@
-export type JsonSchemaType =
-  | "string"
-  | "number"
-  | "integer"
-  | "boolean"
-  | "array";
+export type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "array";
 
 export type Widget =
   | "text"
@@ -99,8 +94,7 @@ export interface FormSection {
   fields: FormSectionField[];
 }
 
-export interface FormWithSectionsProps
-  extends Omit<FormRendererProps, "beforeSubmit"> {
+export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSubmit"> {
   sections: FormSection[];
   /** Page heading translation key rendered above the sections. */
   title?: string;

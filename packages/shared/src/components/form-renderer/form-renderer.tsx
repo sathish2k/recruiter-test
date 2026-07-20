@@ -1,5 +1,6 @@
 "use client";
 
+import { ajvResolver } from "@hookform/resolvers/ajv";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -15,11 +16,8 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { ajvResolver } from "@hookform/resolvers/ajv";
 import { useTranslation } from "@recruit/sdk";
 import { useMemo, useState } from "react";
-import { IconRenderer } from "../renderers";
-import { MarkdownEditor } from "./markdown-editor";
 import {
   type Control,
   Controller,
@@ -27,6 +25,8 @@ import {
   type Resolver,
   useForm,
 } from "react-hook-form";
+import { IconRenderer } from "../renderers";
+import { MarkdownEditor } from "./markdown-editor";
 import type {
   FormRendererProps,
   JsonSchema,
@@ -45,9 +45,7 @@ function resolveStrength(
   strengthMeter: JsonSchemaProperty["strengthMeter"],
 ): Required<PasswordStrengthConfig> | null {
   if (!strengthMeter) return null;
-  return strengthMeter === true
-    ? DEFAULT_STRENGTH
-    : { ...DEFAULT_STRENGTH, ...strengthMeter };
+  return strengthMeter === true ? DEFAULT_STRENGTH : { ...DEFAULT_STRENGTH, ...strengthMeter };
 }
 
 function widgetFor(prop: JsonSchemaProperty): Widget {
@@ -66,10 +64,7 @@ export function defaultFor(prop: JsonSchemaProperty): unknown {
   return "";
 }
 
-function stripEmptyOptional(
-  schema: JsonSchema,
-  values: FieldValues,
-): FieldValues {
+function stripEmptyOptional(schema: JsonSchema, values: FieldValues): FieldValues {
   const required = new Set(schema.required ?? []);
   const cleaned: FieldValues = { ...values };
   for (const key of Object.keys(cleaned)) {
@@ -90,9 +85,7 @@ export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
         errors[key] = {
           type: "matches",
           message:
-            typeof prop.errorMessage === "object"
-              ? prop.errorMessage.matches
-              : prop.errorMessage,
+            typeof prop.errorMessage === "object" ? prop.errorMessage.matches : prop.errorMessage,
         };
       }
     }
@@ -105,9 +98,7 @@ export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
 export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
   if (hide) return null;
   return (
-    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "#C9C5BD" }}>
-      {label}
-    </Typography>
+    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "#C9C5BD" }}>{label}</Typography>
   );
 }
 
@@ -123,8 +114,7 @@ function StrengthMeter({
   const score = value
     ? config.rules.reduce((n, r) => (new RegExp(r).test(value) ? n + 1 : n), 0)
     : 0;
-  const color =
-    config.colors[score - 1] ?? config.colors[config.colors.length - 1];
+  const color = config.colors[score - 1] ?? config.colors[config.colors.length - 1];
   const levels = config.rules.map((_, i) => i + 1);
 
   return (
@@ -140,9 +130,7 @@ function StrengthMeter({
           }}
         />
       ))}
-      <Typography
-        sx={{ fontSize: 11, color: "text.secondary", ml: 0.75, minWidth: 34 }}
-      >
+      <Typography sx={{ fontSize: 11, color: "text.secondary", ml: 0.75, minWidth: 34 }}>
         {score > 0 ? t(config.labels[score - 1] ?? "") : ""}
       </Typography>
     </Box>
@@ -170,9 +158,7 @@ export function Field({
       control={control}
       render={({ field, fieldState }) => {
         if (widget === "chips") {
-          const values: string[] = Array.isArray(field.value)
-            ? field.value
-            : [];
+          const values: string[] = Array.isArray(field.value) ? field.value : [];
           return (
             <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
               <FieldLabel label={label} hide={prop.hideLabel} />
@@ -190,15 +176,11 @@ export function Field({
                     key={`${value}-${i}`}
                     variant="soft"
                     label={value}
-                    onDelete={() =>
-                      field.onChange(values.filter((_, j) => j !== i))
-                    }
+                    onDelete={() => field.onChange(values.filter((_, j) => j !== i))}
                   />
                 ))}
                 <InputBase
-                  placeholder={
-                    prop.placeholder ? t(prop.placeholder) : undefined
-                  }
+                  placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
                   onKeyDown={(e) => {
                     if (e.key !== "Enter") return;
                     e.preventDefault();
@@ -329,10 +311,7 @@ export function Field({
               slotProps={{
                 input: {
                   startAdornment: prop.icon ? (
-                    <InputAdornment
-                      position="start"
-                      sx={{ color: "text.disabled" }}
-                    >
+                    <InputAdornment position="start" sx={{ color: "text.disabled" }}>
                       <IconRenderer name={prop.icon} size={18} />
                     </InputAdornment>
                   ) : undefined,
@@ -343,21 +322,14 @@ export function Field({
                       onClick={() => setShowPw((v) => !v)}
                       sx={{ color: "text.disabled" }}
                     >
-                      <IconRenderer
-                        name={showPw ? "visibility-off" : "visibility"}
-                        size={18}
-                      />
+                      <IconRenderer name={showPw ? "visibility-off" : "visibility"} size={18} />
                     </IconButton>
                   ) : undefined,
                 },
               }}
             />
             {strength ? (
-              <StrengthMeter
-                value={String(field.value ?? "")}
-                config={strength}
-                t={t}
-              />
+              <StrengthMeter value={String(field.value ?? "")} config={strength} t={t} />
             ) : null}
           </Box>
         );
@@ -397,13 +369,7 @@ export function FormRenderer({
     <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <Stack spacing={1.5}>
         {Object.entries(schema.properties).map(([fieldName, prop]) => (
-          <Field
-            key={fieldName}
-            name={fieldName}
-            prop={prop}
-            control={control}
-            t={t}
-          />
+          <Field key={fieldName} name={fieldName} prop={prop} control={control} t={t} />
         ))}
         {beforeSubmit}
         {onCancel ? (
@@ -416,11 +382,7 @@ export function FormRenderer({
               pt: "16px",
             }}
           >
-            <Button
-              variant="outlined"
-              onClick={onCancel}
-              sx={{ px: "18px", fontSize: 12.5 }}
-            >
+            <Button variant="outlined" onClick={onCancel} sx={{ px: "18px", fontSize: 12.5 }}>
               {t(cancelLabel)}
             </Button>
             <Button

@@ -28,12 +28,7 @@ export function CurrencyRenderer({
     ? String(delve(data, config.currencyPath) ?? config.currency ?? "USD")
     : (config.currency ?? "USD");
   return (
-    <Typography
-      component="span"
-      variant={config.variant}
-      color={config.color}
-      sx={config.sx}
-    >
+    <Typography component="span" variant={config.variant} color={config.color} sx={config.sx}>
       {formatCurrency(value, currency)}
     </Typography>
   );

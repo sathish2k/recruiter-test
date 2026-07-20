@@ -10,7 +10,5 @@ export type Resource =
   | "audit"
   | "settings";
 
-/** Offline fallback for the engine's `accessResolver` when the permissions API
- * is unreachable. The runtime source of truth is the DB (per agency); see
- * `DEFAULT_ROLE_PERMISSIONS` in `@recruit/types`. */
+
 export const ROLE_PERMISSIONS = DEFAULT_ROLE_PERMISSIONS;

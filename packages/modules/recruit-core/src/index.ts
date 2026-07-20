@@ -5,9 +5,5 @@ import { SIDENAV_COMPONENT } from "./sidenav/bootstrap";
 
 export const CoreModule: Module = {
   id: "Core.Module",
-  components: [
-    SIDENAV_COMPONENT,
-    APPBAR_COMPONENT,
-    PERMISSION_DENIED_COMPONENT,
-  ],
+  components: [SIDENAV_COMPONENT, APPBAR_COMPONENT, PERMISSION_DENIED_COMPONENT],
 };

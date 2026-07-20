@@ -38,10 +38,7 @@ export interface EmptyStateConfig {
 
 type TFunc = (key: string, vars?: string | Record<string, unknown>) => string;
 
-const TONES: Record<
-  EmptyStateTone,
-  { bg: string; border: string; icon: string }
-> = {
+const TONES: Record<EmptyStateTone, { bg: string; border: string; icon: string }> = {
   primary: {
     bg: "rgba(242,106,27,.1)",
     border: "rgba(242,106,27,.24)",
@@ -145,11 +142,7 @@ export function EmptyStateRenderer({
                 else if (cta.href) window.location.assign(cta.href);
                 else if (cta.action) onAction?.(cta.action);
               }}
-              startIcon={
-                cta.icon ? (
-                  <IconRenderer name={cta.icon} size={16} />
-                ) : undefined
-              }
+              startIcon={cta.icon ? <IconRenderer name={cta.icon} size={16} /> : undefined}
             >
               {t(cta.text)}
             </Button>

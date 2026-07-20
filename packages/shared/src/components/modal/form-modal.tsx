@@ -1,14 +1,11 @@
 "use client";
 
-import { FormRenderer } from "../form-renderer";
 import type { FormRendererProps, FormValues } from "../form-renderer";
+import { FormRenderer } from "../form-renderer";
 import { Modal, type ModalProps } from "./modal";
 
 export interface FormModalProps
-  extends Pick<
-      ModalProps,
-      "open" | "onClose" | "title" | "description" | "width"
-    >,
+  extends Pick<ModalProps, "open" | "onClose" | "title" | "description" | "width">,
     Omit<FormRendererProps, "onCancel"> {
   /** Translation key for the cancel button (default "cancel"). */
   cancelLabel?: string;
@@ -32,13 +29,7 @@ export function FormModal({
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={title}
-      description={description}
-      width={width}
-    >
+    <Modal open={open} onClose={onClose} title={title} description={description} width={width}>
       <FormRenderer {...formProps} onSubmit={handleSubmit} onCancel={onClose} />
     </Modal>
   );

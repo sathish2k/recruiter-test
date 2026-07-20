@@ -1,48 +1,137 @@
 import type { Configuration } from "@recruit/sdk";
 
-const tabsElement = {
-  id: "settings-tabs",
-  type: "component" as const,
-  componentType: "Recruit.SettingsTabs.Component",
-};
-
-function settingsPage(pageId: string, elementId: string, componentType: string): Configuration {
-  return {
-    id: pageId,
-    stackContainer: { spacing: 2.5 },
-    elements: [tabsElement, { id: elementId, type: "component", componentType }],
-  };
-}
-
 export const SettingsPages: Record<string, Configuration> = {
-  "Recruit.Settings.Page": settingsPage(
-    "Recruit.Settings.Page",
-    "settings-workspace",
-    "Recruit.SettingsWorkspace.Component",
-  ),
-  "Recruit.SettingsMembers.Page": settingsPage(
-    "Recruit.SettingsMembers.Page",
-    "settings-members",
-    "Recruit.SettingsMembers.Component",
-  ),
-  "Recruit.EmailTemplates.Page": settingsPage(
-    "Recruit.EmailTemplates.Page",
-    "settings-email-templates",
-    "Recruit.EmailTemplates.Component",
-  ),
-  "Recruit.SettingsBilling.Page": settingsPage(
-    "Recruit.SettingsBilling.Page",
-    "settings-billing",
-    "Recruit.SettingsBilling.Component",
-  ),
-  "Recruit.SettingsIntegrations.Page": settingsPage(
-    "Recruit.SettingsIntegrations.Page",
-    "settings-integrations",
-    "Recruit.SettingsIntegrations.Component",
-  ),
-  "Recruit.SettingsSecurity.Page": settingsPage(
-    "Recruit.SettingsSecurity.Page",
-    "settings-security",
-    "Recruit.SettingsSecurity.Component",
-  ),
+  "Recruit.Settings.Page": {
+    id: "Recruit.Settings.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-workspace",
+        type: "component",
+        componentType: "Recruit.SettingsWorkspace.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsMembers.Page": {
+    id: "Recruit.SettingsMembers.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-members",
+        type: "component",
+        componentType: "Recruit.SettingsMembers.Component",
+      },
+      {
+        id: "settings-invitations",
+        type: "component",
+        componentType: "Recruit.SettingsInvitations.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsRoles.Page": {
+    id: "Recruit.SettingsRoles.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-permissions",
+        type: "component",
+        componentType: "Recruit.Permissions.Component",
+      },
+    ],
+  },
+  "Recruit.EmailTemplates.Page": {
+    id: "Recruit.EmailTemplates.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-email-templates",
+        type: "component",
+        componentType: "Recruit.EmailTemplates.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsIntegrations.Page": {
+    id: "Recruit.SettingsIntegrations.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-integrations",
+        type: "component",
+        componentType: "Recruit.SettingsIntegrations.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsBilling.Page": {
+    id: "Recruit.SettingsBilling.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-billing",
+        type: "component",
+        componentType: "Recruit.SettingsBilling.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsSecurity.Page": {
+    id: "Recruit.SettingsSecurity.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-security",
+        type: "component",
+        componentType: "Recruit.SettingsSecurity.Component",
+      },
+    ],
+  },
+  "Recruit.SettingsAuditLog.Page": {
+    id: "Recruit.SettingsAuditLog.Page",
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      {
+        id: "settings-tabs",
+        type: "component",
+        componentType: "Recruit.SettingsTabs.Component",
+      },
+      {
+        id: "settings-audit-log",
+        type: "component",
+        componentType: "Recruit.SettingsAuditLog.Component",
+      },
+    ],
+  },
 };

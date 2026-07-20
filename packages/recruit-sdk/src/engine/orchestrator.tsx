@@ -1,17 +1,8 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
-import {
-  cloneElement,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-} from "react";
-import {
-  canAccessRoutes,
-  filterConfigAccess,
-  filterConfigurationsAccess,
-} from "../access";
+import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
+import { canAccessRoutes, filterConfigAccess, filterConfigurationsAccess } from "../access";
 import { MuiAuthLayout } from "../layout-renderer/mui-auth-layout";
 import { MuiCoreLayout } from "../layout-renderer/mui-core-layout";
 import { NotFound } from "../not-found";
@@ -65,8 +56,7 @@ export function PortalRenderer({
   const translationMap = new Map<string, Record<string, unknown>>();
   const datasourceRefMap = new Map<string, string>();
   dataMap.forEach((value, key) => {
-    const { configuration, data, translation, datasourceId } =
-      splitComponentData(value);
+    const { configuration, data, translation, datasourceId } = splitComponentData(value);
     configurationMap.set(key, configuration);
     serverDataMap.set(key, data);
     translationMap.set(key, translation);
@@ -183,14 +173,8 @@ function RenderElements({
           ) : null;
         }
 
-        if (
-          element.type === "configuration" &&
-          element.configurationId &&
-          allConfigurations
-        ) {
-          const nestedConfig = allConfigurations.find(
-            (c) => c.id === element.configurationId,
-          );
+        if (element.type === "configuration" && element.configurationId && allConfigurations) {
+          const nestedConfig = allConfigurations.find((c) => c.id === element.configurationId);
           if (!nestedConfig) return null;
           const nestedContent = (
             <RenderContainer key={element.id} config={nestedConfig}>
@@ -218,8 +202,9 @@ function RenderElements({
           const definition = componentRegistry.get(element.componentType ?? "");
           if (!definition) return null;
           const Component = definition.value;
-          const { configuration, data, translation, schema } =
-            splitComponentData(dataMap.get(element.id));
+          const { configuration, data, translation, schema } = splitComponentData(
+            dataMap.get(element.id),
+          );
 
           const rendered = (
             <Component
@@ -256,13 +241,7 @@ function RenderElements({
   );
 }
 
-function RenderContainer({
-  config,
-  children,
-}: {
-  config: Configuration;
-  children: ReactNode;
-}) {
+function RenderContainer({ config, children }: { config: Configuration; children: ReactNode }) {
   if (config.stackContainer) {
     return <Stack {...config.stackContainer}>{children}</Stack>;
   }
@@ -284,24 +263,13 @@ export function createPortalApp(sdkConfig: {
   accessResolver?: () => Promise<AccessContext | null>;
   onAccessDenied?: () => void | Promise<void>;
 }) {
-  const {
-    routes,
-    configurations,
-    modules,
-    guards,
-    accessResolver,
-    onAccessDenied,
-  } = sdkConfig;
+  const { routes, configurations, modules, guards, accessResolver, onAccessDenied } = sdkConfig;
   const componentRegistry: Registry = new Map();
   for (const m of modules) {
     for (const c of m.components) componentRegistry.set(c.id, c);
   }
 
-  return async function PortalApp({
-    slugParts,
-  }: {
-    slugParts: string[];
-  }): Promise<ReactElement> {
+  return async function PortalApp({ slugParts }: { slugParts: string[] }): Promise<ReactElement> {
     const matchedRoutes = findRouteBySlug(slugParts, routes);
 
     if (matchedRoutes && guards) {
@@ -316,26 +284,15 @@ export function createPortalApp(sdkConfig: {
     }
 
     const accessContext = accessResolver ? await accessResolver() : null;
-    if (
-      accessResolver &&
-      matchedRoutes &&
-      !canAccessRoutes(accessContext, matchedRoutes)
-    ) {
+    if (accessResolver && matchedRoutes && !canAccessRoutes(accessContext, matchedRoutes)) {
       await onAccessDenied?.();
     }
     const accessibleConfigurations = accessResolver
       ? filterConfigurationsAccess(configurations, accessContext)
       : configurations;
 
-    const tree = generateRenderTree(
-      matchedRoutes,
-      accessibleConfigurations,
-      routes,
-      slugParts,
-    );
-    const currentRoute = matchedRoutes
-      ? (matchedRoutes[matchedRoutes.length - 1] ?? null)
-      : null;
+    const tree = generateRenderTree(matchedRoutes, accessibleConfigurations, routes, slugParts);
+    const currentRoute = matchedRoutes ? (matchedRoutes[matchedRoutes.length - 1] ?? null) : null;
 
     const dataMap: DataMap = new Map();
     const fetchTasks: Promise<void>[] = [];
@@ -359,16 +316,10 @@ export function createPortalApp(sdkConfig: {
             if (deps.datasource.id) props.datasourceId = deps.datasource.id;
             if (element.prefetch) {
               const source = deps.datasource.value as unknown;
-              const factory =
-                typeof source === "function"
-                  ? (source as () => unknown)()
-                  : source;
+              const factory = typeof source === "function" ? (source as () => unknown)() : source;
               const instance =
-                typeof factory === "function"
-                  ? (factory as () => unknown)()
-                  : factory;
-              const getter = (instance as { get?: () => Promise<unknown> })
-                ?.get;
+                typeof factory === "function" ? (factory as () => unknown)() : factory;
+              const getter = (instance as { get?: () => Promise<unknown> })?.get;
               if (typeof getter === "function") props.data = await getter();
             }
           }
@@ -384,19 +335,14 @@ export function createPortalApp(sdkConfig: {
       if (element.type === "component") {
         collectFor(element);
       } else if (element.type === "configuration") {
-        const nested = accessibleConfigurations.find(
-          (c) => c.id === element.configurationId,
-        );
+        const nested = accessibleConfigurations.find((c) => c.id === element.configurationId);
         nested?.elements.forEach(collectElement);
       }
     };
 
     const collectFetchTasks = (t: RenderTree | null) => {
       if (!t) return;
-      const elements = [
-        ...t.layouts.flatMap((l) => l.elements),
-        ...(t.page?.elements ?? []),
-      ];
+      const elements = [...t.layouts.flatMap((l) => l.elements), ...(t.page?.elements ?? [])];
       for (const element of elements) collectElement(element);
       for (const slot of Object.values(t.slots)) collectFetchTasks(slot);
     };

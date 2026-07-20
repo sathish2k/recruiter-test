@@ -77,9 +77,7 @@ export interface DatasourceInstance {
   [method: string]: (...args: any[]) => Promise<unknown>;
 }
 
-export type DatasourceFactory = () =>
-  | DatasourceInstance
-  | (() => DatasourceInstance);
+export type DatasourceFactory = () => DatasourceInstance | (() => DatasourceInstance);
 
 export interface DatasourceExportModel {
   id: string;

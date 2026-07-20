@@ -21,11 +21,8 @@ export interface EntityRendererConfig {
   subtitle?: string;
 }
 
-const read = (
-  data: Record<string, unknown>,
-  path?: string,
-  literal?: string,
-) => (path ? String(delve(data, path) ?? "") : (literal ?? ""));
+const read = (data: Record<string, unknown>, path?: string, literal?: string) =>
+  path ? String(delve(data, path) ?? "") : (literal ?? "");
 
 export function EntityRenderer({
   config,
@@ -54,9 +51,7 @@ export function EntityRenderer({
       <Box sx={{ minWidth: 0 }}>
         <Box sx={{ fontWeight: 600 }}>{read(data, config.title)}</Box>
         {config.subtitle ? (
-          <Box sx={{ fontSize: 11.5, color: "text.disabled" }}>
-            {read(data, config.subtitle)}
-          </Box>
+          <Box sx={{ fontSize: 11.5, color: "text.disabled" }}>{read(data, config.subtitle)}</Box>
         ) : null}
       </Box>
     </Box>

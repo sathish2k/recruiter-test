@@ -1,0 +1,57 @@
+{
+  "title": "Members",
+  "seats": "{{used}} of {{total}} seats used",
+  "empty": "No members yet",
+  "columns": {
+    "member": "Member",
+    "role": "Role",
+    "status": "Status",
+    "lastActive": "Last active",
+    "actions": "Actions"
+  },
+  "roles": {
+    "admin": "Admin",
+    "lead": "Profile lead",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "status": {
+    "active": "Active",
+    "invited": "Invited"
+  },
+  "filters": {
+    "search": "Search members",
+    "role": "Role"
+  },
+  "export": "Export",
+  "exportAs": "Export as",
+  "exportTypes": {
+    "csv": "CSV",
+    "xlsx": "Excel"
+  },
+  "actions": {
+    "invite": "Invite member",
+    "changeRole": "Change role",
+    "resendInvite": "Resend invite",
+    "deactivate": "Deactivate"
+  },
+  "inviteForm": {
+    "title": "Invite a member",
+    "description": "They'll get access once they set a password.",
+    "submit": "Send invite",
+    "email": "Work email",
+    "emailPlaceholder": "name@company.com",
+    "role": "Role",
+    "errors": {
+      "email": "Enter a valid work email",
+      "role": "Pick a role"
+    }
+  },
+  "cancel": "Cancel",
+  "toast": {
+    "invited": "Invite sent",
+    "invitedSub": "{{email}} can now join your workspace",
+    "roleChanged": "Role updated",
+    "deactivated": "Member deactivated"
+  }
+}

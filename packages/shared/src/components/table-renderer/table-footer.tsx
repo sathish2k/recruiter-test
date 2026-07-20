@@ -37,8 +37,7 @@ export function TableFooterRenderer({
           total,
           page,
           pages: totalPages,
-          defaultValue:
-            "Showing {{shown}} of {{total}} · page {{page}} of {{pages}}",
+          defaultValue: "Showing {{shown}} of {{total}} · page {{page}} of {{pages}}",
         })}
       </Box>
       <Pagination

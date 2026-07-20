@@ -5,10 +5,7 @@ import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { FormRenderer } from "../form-renderer";
 import type { FormValues, JsonSchema } from "../form-renderer/types";
-import {
-  LinkRenderer,
-  type LinkRendererConfig,
-} from "../renderers/link-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface SignUpValues {
@@ -62,13 +59,11 @@ export function SignUp({
           textAlign: "center",
         }}
       >
-        {t("terms.text")} {tos ? <LinkRenderer config={tos} /> : null}{" "}
-        {t("terms.and")} {privacy ? <LinkRenderer config={privacy} /> : null}.
+        {t("terms.text")} {tos ? <LinkRenderer config={tos} /> : null} {t("terms.and")}{" "}
+        {privacy ? <LinkRenderer config={privacy} /> : null}.
       </Typography>
 
-      <Typography
-        sx={{ mt: "20px", fontSize: 13, color: "#9A968E", textAlign: "center" }}
-      >
+      <Typography sx={{ mt: "20px", fontSize: 13, color: "#9A968E", textAlign: "center" }}>
         {t("footerText")} {signIn ? <LinkRenderer config={signIn} /> : null}
       </Typography>
     </AuthCard>

@@ -1,13 +1,16 @@
 "use client";
 
 import type { SvgIconComponent } from "@mui/icons-material";
+import AdminPanelSettingsRounded from "@mui/icons-material/AdminPanelSettingsRounded";
 import BusinessRounded from "@mui/icons-material/BusinessRounded";
 import CreditCardRounded from "@mui/icons-material/CreditCardRounded";
 import GroupRounded from "@mui/icons-material/GroupRounded";
+import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import HubRounded from "@mui/icons-material/HubRounded";
 import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import ShieldRounded from "@mui/icons-material/ShieldRounded";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
 import type { SettingsTabItem, SettingsTabsConfiguration } from "./settings-tabs.configuration";
@@ -15,10 +18,12 @@ import type { SettingsTabItem, SettingsTabsConfiguration } from "./settings-tabs
 const ICONS: Record<string, SvgIconComponent> = {
   workspace: BusinessRounded,
   members: GroupRounded,
+  roles: AdminPanelSettingsRounded,
   templates: MailOutlineRounded,
   billing: CreditCardRounded,
   integrations: HubRounded,
   security: ShieldRounded,
+  auditLog: HistoryRounded,
 };
 
 export function SettingsTabsComponent({
@@ -73,6 +78,9 @@ export function SettingsTabsComponent({
             >
               {Icon ? <Icon sx={{ fontSize: 16 }} /> : null}
               {t(tab.label)}
+              {tab.badge ? (
+                <Chip variant="soft" size="small" color="warning" label={t(tab.badge)} />
+              ) : null}
             </Box>
           );
         })}

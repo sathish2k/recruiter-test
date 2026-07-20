@@ -1,7 +1,5 @@
 import type { Route } from "@recruit/sdk";
 
-// Auth-scoped route tree. Domain routes (dashboard, jobs, …) are added as their
-// modules are ported over.
 export const routes: Route[] = [
   {
     id: "Auth.Login.Route",
@@ -38,51 +36,56 @@ export const routes: Route[] = [
     page: "Recruit.Settings.Page",
     guard: [{ type: "authenticationGuard" }],
     access: { resource: "settings" },
-    children: [],
+    children: [
+      "Recruit.SettingsMembers.Route",
+      "Recruit.SettingsRoles.Route",
+      "Recruit.EmailTemplates.Route",
+      "Recruit.SettingsIntegrations.Route",
+      "Recruit.SettingsBilling.Route",
+      "Recruit.SettingsSecurity.Route",
+      "Recruit.SettingsAuditLog.Route",
+    ],
   },
   {
     id: "Recruit.SettingsMembers.Route",
-    path: "settings/members",
-    layout: "Recruit.Core.Layout",
+    path: "members",
     page: "Recruit.SettingsMembers.Page",
-    guard: [{ type: "authenticationGuard" }],
-    access: { resource: "settings" },
+    children: [],
+  },
+  {
+    id: "Recruit.SettingsRoles.Route",
+    path: "roles",
+    page: "Recruit.SettingsRoles.Page",
     children: [],
   },
   {
     id: "Recruit.EmailTemplates.Route",
-    path: "settings/templates",
-    layout: "Recruit.Core.Layout",
+    path: "templates",
     page: "Recruit.EmailTemplates.Page",
-    guard: [{ type: "authenticationGuard" }],
-    access: { resource: "settings" },
-    children: [],
-  },
-  {
-    id: "Recruit.SettingsBilling.Route",
-    path: "settings/billing",
-    layout: "Recruit.Core.Layout",
-    page: "Recruit.SettingsBilling.Page",
-    guard: [{ type: "authenticationGuard" }],
-    access: { resource: "settings" },
     children: [],
   },
   {
     id: "Recruit.SettingsIntegrations.Route",
-    path: "settings/integrations",
-    layout: "Recruit.Core.Layout",
+    path: "integrations",
     page: "Recruit.SettingsIntegrations.Page",
-    guard: [{ type: "authenticationGuard" }],
-    access: { resource: "settings" },
+    children: [],
+  },
+  {
+    id: "Recruit.SettingsBilling.Route",
+    path: "billing",
+    page: "Recruit.SettingsBilling.Page",
     children: [],
   },
   {
     id: "Recruit.SettingsSecurity.Route",
-    path: "settings/security",
-    layout: "Recruit.Core.Layout",
+    path: "security",
     page: "Recruit.SettingsSecurity.Page",
-    guard: [{ type: "authenticationGuard" }],
-    access: { resource: "settings" },
+    children: [],
+  },
+  {
+    id: "Recruit.SettingsAuditLog.Route",
+    path: "audit-log",
+    page: "Recruit.SettingsAuditLog.Page",
     children: [],
   },
   {

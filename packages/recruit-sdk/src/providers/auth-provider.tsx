@@ -1,9 +1,8 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import { createAuthClient } from "better-auth/react";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { BrandLoaderScreen } from "../brand-loader";
 import { setAuthToken } from "../client";
 
 /** Better Auth client. Uses the current (web) origin so the session cookie is
@@ -53,20 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, [isPending, token]);
 
-  if (!ready) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          minHeight: "100dvh",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  if (!ready) return <BrandLoaderScreen />;
 
   return <AuthUserContext.Provider value={user}>{children}</AuthUserContext.Provider>;
 }

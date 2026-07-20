@@ -9,10 +9,7 @@ export function formatDate(
   options?: Intl.DateTimeFormatOptions,
 ): string {
   const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat(
-    language,
-    options ?? { dateStyle: "medium" },
-  ).format(date);
+  return new Intl.DateTimeFormat(language, options ?? { dateStyle: "medium" }).format(date);
 }
 
 export function formatNumber(
@@ -23,11 +20,7 @@ export function formatNumber(
   return new Intl.NumberFormat(language, options).format(value);
 }
 
-export function formatCurrency(
-  value: number,
-  language: string,
-  currency = "USD",
-): string {
+export function formatCurrency(value: number, language: string, currency = "USD"): string {
   return new Intl.NumberFormat(language, {
     style: "currency",
     currency,
@@ -39,10 +32,8 @@ export function useFormatters() {
   return useMemo(
     () => ({
       language,
-      formatDate: (
-        value: Date | string | number,
-        options?: Intl.DateTimeFormatOptions,
-      ) => formatDate(value, language, options),
+      formatDate: (value: Date | string | number, options?: Intl.DateTimeFormatOptions) =>
+        formatDate(value, language, options),
       formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
         formatNumber(value, language, options),
       formatCurrency: (value: number, currency?: string) =>

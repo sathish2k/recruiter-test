@@ -35,12 +35,7 @@ export function StaticTranslationRenderer({
         : `${template} ${dynamic}`;
 
   return (
-    <Typography
-      component="span"
-      variant={config.variant}
-      color={config.color}
-      sx={config.sx}
-    >
+    <Typography component="span" variant={config.variant} color={config.color} sx={config.sx}>
       {text}
     </Typography>
   );

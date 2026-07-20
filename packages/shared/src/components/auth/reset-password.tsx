@@ -2,20 +2,13 @@
 
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import {
-  useConfiguration,
-  usePortalRouter,
-  useTranslation,
-} from "@recruit/sdk";
+import { useConfiguration, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FormRenderer } from "../form-renderer";
 import type { FormValues, JsonSchema } from "../form-renderer/types";
 import { IconRenderer } from "../renderers/icon-renderer";
-import {
-  LinkRenderer,
-  type LinkRendererConfig,
-} from "../renderers/link-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface ResetPasswordValues {
@@ -29,9 +22,7 @@ interface ResetPasswordConfig {
 
 interface ResetPasswordProps {
   id: string;
-  onSubmit: (
-    values: ResetPasswordValues & { token: string },
-  ) => void | Promise<void>;
+  onSubmit: (values: ResetPasswordValues & { token: string }) => void | Promise<void>;
 }
 
 export function ResetPassword(props: ResetPasswordProps) {
@@ -48,9 +39,7 @@ function ResetPasswordForm({ id, onSubmit }: ResetPasswordProps) {
   const router = usePortalRouter();
   const token = useSearchParams().get("token");
   const [done, setDone] = useState(false);
-  const back = links?.signIn
-    ? { ...links.signIn, text: t(links.signIn.text ?? "") }
-    : undefined;
+  const back = links?.signIn ? { ...links.signIn, text: t(links.signIn.text ?? "") } : undefined;
 
   return (
     <AuthCard
@@ -62,9 +51,7 @@ function ResetPasswordForm({ id, onSubmit }: ResetPasswordProps) {
         <Button
           variant="contained"
           fullWidth
-          onClick={() =>
-            links?.signIn?.routeId && router.push(links.signIn.routeId)
-          }
+          onClick={() => links?.signIn?.routeId && router.push(links.signIn.routeId)}
           sx={{
             borderRadius: "12px",
             py: "14px",

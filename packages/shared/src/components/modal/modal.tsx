@@ -45,21 +45,13 @@ export function Modal({
           mb: title ? "4px" : 0,
         }}
       >
-        {title ? (
-          <Typography sx={{ fontSize: 17, fontWeight: 700 }}>
-            {title}
-          </Typography>
-        ) : (
-          <span />
-        )}
+        {title ? <Typography sx={{ fontSize: 17, fontWeight: 700 }}>{title}</Typography> : <span />}
         <IconButton onClick={onClose} sx={{ width: 28, height: 28 }}>
           <CloseRounded sx={{ fontSize: 14 }} />
         </IconButton>
       </Box>
       {description ? (
-        <Typography
-          sx={{ fontSize: 12.5, color: "text.secondary", mb: "18px" }}
-        >
+        <Typography sx={{ fontSize: 12.5, color: "text.secondary", mb: "18px" }}>
           {description}
         </Typography>
       ) : null}

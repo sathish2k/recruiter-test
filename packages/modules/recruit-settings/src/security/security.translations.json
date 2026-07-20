@@ -1,0 +1,176 @@
+{
+  "score": {
+    "label": "Security score",
+    "cta": "Enable MFA to reach 100%"
+  },
+  "checks": {
+    "password": "Strong password",
+    "history": "Login history monitored",
+    "twoFactorOn": "Two-factor enabled",
+    "twoFactorOff": "Two-factor disabled"
+  },
+
+  "auth": { "title": "Authentication" },
+  "password": {
+    "title": "Password",
+    "meta": "Last changed {{changed}} · Strength {{strength}}",
+    "change": "Change"
+  },
+  "twoFactor": {
+    "title": "Two-factor authentication",
+    "enabled": "Enabled",
+    "disabled": "Not enabled",
+    "enable": "Enable",
+    "disable": "Disable",
+    "apps": "Works with Google Authenticator, Microsoft Authenticator & Authy",
+    "recoveryAvailable": "Recovery codes available",
+    "lastVerified": "Last verified {{when}}",
+    "generated": "Generated {{when}}",
+    "viewCodes": "View recovery codes",
+    "regenerate": "Generate new codes"
+  },
+  "sso": {
+    "title": "SSO / SAML",
+    "badge": "Enterprise",
+    "meta": "Okta, Azure AD, Google Workspace",
+    "upgrade": "Upgrade"
+  },
+
+  "sessions": {
+    "title": "Active sessions",
+    "subtitle": "Devices signed in to this workspace",
+    "viewLog": "View security log",
+    "revoke": "Revoke",
+    "signOutAll": "Sign out all other devices",
+    "signOutHint": "Recommended after a password change",
+    "empty": "No other devices signed in"
+  },
+  "chips": {
+    "current": "Current",
+    "trusted": "Trusted",
+    "mobile": "Mobile",
+    "new": "New"
+  },
+
+  "loginHistory": {
+    "title": "Login history",
+    "subtitle": "Recent sign-in attempts — separate from active sessions",
+    "when": "When",
+    "browser": "Browser",
+    "location": "Location",
+    "result": "Result",
+    "empty": "No sign-in attempts yet",
+    "filter": "Result"
+  },
+  "results": {
+    "all": "All",
+    "success": "Success",
+    "failed": "Failed",
+    "blocked": "Blocked"
+  },
+
+  "tokens": {
+    "title": "Personal access tokens",
+    "badge": "API",
+    "subtitle": "Programmatic access for your own tools — treat tokens like passwords",
+    "create": "Create token",
+    "revoke": "Revoke",
+    "empty": "No active tokens"
+  },
+  "tokenForm": {
+    "title": "Create a personal access token",
+    "description": "Give it a name so you can recognise it later.",
+    "name": "Token name",
+    "namePlaceholder": "Resume Parser",
+    "nameRequired": "Name your token",
+    "expiry": "Expires in",
+    "submit": "Create token",
+    "expiryOptions": {
+      "30": "30 days",
+      "90": "90 days",
+      "365": "1 year",
+      "0": "Never"
+    }
+  },
+  "tokenCreated": {
+    "title": "Token created",
+    "description": "Copy it now — you won't be able to see it again.",
+    "warning": "Anyone with this token can act as your workspace",
+    "copy": "Copy token",
+    "done": "Done"
+  },
+
+  "notifications": {
+    "title": "Security notifications",
+    "subtitle": "Email {{email}} when:",
+    "newDevice": "A new device signs in",
+    "passwordChange": "The password changes",
+    "twoFactorDisabled": "Two-factor is disabled",
+    "ssoChange": "SSO configuration changes"
+  },
+  "recipients": {
+    "title": "Alert recipients",
+    "label": "Email",
+    "placeholder": "add email…",
+    "required": "Enter an email address",
+    "add": "Add",
+    "owner": "Owner"
+  },
+
+  "changePassword": {
+    "title": "Change password",
+    "description": "You'll stay signed in on this device",
+    "hint": "Use 8+ characters with a mix of letters, numbers & symbols. Other devices will be signed out.",
+    "submit": "Update password"
+  },
+  "fields": {
+    "current": "Current password",
+    "currentPlaceholder": "Enter current password",
+    "currentRequired": "Enter your current password",
+    "new": "New password",
+    "newPlaceholder": "At least 8 characters",
+    "newRequired": "Enter a new password",
+    "confirm": "Confirm new password",
+    "confirmPlaceholder": "Re-enter new password",
+    "confirmRequired": "Re-enter your new password",
+    "confirmMismatch": "Passwords don't match"
+  },
+
+  "recoveryCodes": {
+    "title": "Recovery codes",
+    "description": "Each code works once — store them somewhere safe.",
+    "copy": "Copy codes",
+    "done": "Done"
+  },
+
+  "revokeSession": {
+    "title": "Sign out this device?",
+    "description": "{{device}} will be signed out immediately and will need to sign in again.",
+    "submit": "Sign out"
+  },
+
+  "cancel": "Cancel",
+
+  "toast": {
+    "passwordChanged": "Password updated",
+    "passwordChangedSub": "Other devices will be asked to sign in again",
+    "passwordFailed": "Couldn't update password",
+    "passwordFailedSub": "Your current password is incorrect",
+    "tokenCreated": "Token created",
+    "tokenRevoked": "Token revoked",
+    "tokenRevokedSub": "{{name}} can no longer access the API",
+    "tokenCopied": "Token copied",
+    "codesCopied": "Recovery codes copied",
+    "sessionRevoked": "Device signed out",
+    "signedOutAll": "Signed out everywhere else",
+    "signedOutAllSub": "Only this device stays signed in",
+    "twoFactorOn": "Two-factor enabled",
+    "twoFactorOnSub": "Store your recovery codes somewhere safe",
+    "twoFactorOff": "Two-factor disabled",
+    "codesRegenerated": "New recovery codes generated",
+    "recipientAdded": "Recipient added",
+    "recipientAddedSub": "{{email}} will get security alerts",
+    "recipientRemoved": "Recipient removed",
+    "prefsSaved": "Notification preferences saved"
+  }
+}

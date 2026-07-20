@@ -47,13 +47,9 @@ export function GraphFilterRenderer({
   );
 
   const pageSize = config.pageSize;
-  const totalPages = pageSize
-    ? Math.max(1, Math.ceil(filtered.length / pageSize))
-    : 1;
+  const totalPages = pageSize ? Math.max(1, Math.ceil(filtered.length / pageSize)) : 1;
   const current = Math.min(page, totalPages);
-  const paged = pageSize
-    ? filtered.slice((current - 1) * pageSize, current * pageSize)
-    : filtered;
+  const paged = pageSize ? filtered.slice((current - 1) * pageSize, current * pageSize) : filtered;
 
   const setFilter = (key: string, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -78,11 +74,7 @@ export function GraphFilterRenderer({
             {t(filter.label)}
           </MenuItem>
           {filter.options.map((option) => (
-            <MenuItem
-              key={option.value}
-              value={option.value}
-              sx={{ fontSize: 12.5 }}
-            >
+            <MenuItem key={option.value} value={option.value} sx={{ fontSize: 12.5 }}>
               {t(option.label)}
             </MenuItem>
           ))}
@@ -128,7 +120,5 @@ export function GraphFilterRenderer({
     </>
   );
 
-  return (
-    <GraphRenderer id={id} config={config} data={paged} toolbar={toolbar} />
-  );
+  return <GraphRenderer id={id} config={config} data={paged} toolbar={toolbar} />;
 }

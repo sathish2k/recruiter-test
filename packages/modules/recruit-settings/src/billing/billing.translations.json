@@ -1,0 +1,111 @@
+{
+  "plan": {
+    "eyebrow": "CURRENT PLAN",
+    "perYear": "/ year · billed annually",
+    "summary": "≈ {{monthly}} / month · {{seats}} seats · unlimited roles · AI screening included",
+    "change": "Change plan",
+    "compare": "Compare plans",
+    "active": "Active"
+  },
+  "seats": {
+    "title": "Seats",
+    "used": "/ {{total}} used",
+    "helper": "{{total}} included · {{used}} used · {{available}} available · {{price}}/mo per extra seat",
+    "add": "Add seat",
+    "remove": "Remove seat"
+  },
+  "usage": {
+    "title": "Usage this month",
+    "resets": "Resets {{date}}",
+    "credits": "AI credits",
+    "creditsHelper": "{{percent}}% used · top-ups at ₹500 per 1,000 credits",
+    "resumeParsing": "Resume parsing",
+    "candidateMatches": "Candidate matches",
+    "emailsSent": "Emails sent",
+    "storage": "Storage"
+  },
+  "payment": {
+    "title": "Payment method",
+    "update": "Update",
+    "nextRenewal": "Next renewal",
+    "billingAddress": "Billing address",
+    "edit": "Edit",
+    "noCard": "No card on file"
+  },
+  "paymentForm": {
+    "title": "Update billing details",
+    "description": "Used for invoices and renewal receipts.",
+    "brand": "Card brand",
+    "brandPlaceholder": "VISA",
+    "last4": "Card last 4 digits",
+    "last4Placeholder": "4218",
+    "expiry": "Expiry",
+    "expiryPlaceholder": "08/28",
+    "email": "Billing email",
+    "emailPlaceholder": "billing@company.com",
+    "name": "Registered name",
+    "namePlaceholder": "HirePilotX Pvt Ltd",
+    "gstin": "GSTIN",
+    "gstinPlaceholder": "29ABCDE1234F1Z5",
+    "address": "Address",
+    "addressPlaceholder": "Street, city, postcode, country",
+    "submit": "Save billing details"
+  },
+  "history": {
+    "title": "Billing history",
+    "invoice": "Invoice",
+    "date": "Date",
+    "plan": "Plan",
+    "amount": "Amount",
+    "status": "Status",
+    "pdf": "PDF",
+    "empty": "No invoices yet"
+  },
+  "statuses": {
+    "paid": "Paid",
+    "pending": "Pending",
+    "refunded": "Refunded"
+  },
+  "features": {
+    "title": "What's in your plan",
+    "aiMatching": "AI matching",
+    "resumeParser": "Resume parser",
+    "browserExtension": "Browser extension",
+    "whiteLabel": "White-label reports",
+    "careerPages": "Career pages",
+    "emailTemplates": "Email templates",
+    "apiAccess": "API access",
+    "sso": "SSO / SAML",
+    "footer": "Need SSO, API access or custom branding?",
+    "contact": "Contact sales →"
+  },
+  "compare": {
+    "title": "Compare plans",
+    "feature": "Feature",
+    "starter": "Starter",
+    "growth": "Growth",
+    "agency": "Agency",
+    "current": "· current",
+    "recruiters": "Recruiters",
+    "credits": "AI credits / month",
+    "whiteLabel": "White-label reports",
+    "careerPages": "Career pages",
+    "apiAccess": "API access",
+    "sso": "SSO / SAML",
+    "support": "Support",
+    "footer": "Starter ₹96,000/yr · Growth ₹2,88,000/yr · Agency ₹6,00,000/yr",
+    "close": "Close",
+    "submit": "Change plan"
+  },
+  "cancel": "Cancel",
+  "toast": {
+    "seatAdded": "Seat added",
+    "seatAddedSub": "Prorated on your next invoice",
+    "seatRemoved": "Seat removed",
+    "seatRemovedSub": "Your next renewal drops accordingly",
+    "seatsFull": "All seats are in use",
+    "seatsFullSub": "Remove a member before removing seats",
+    "planChanged": "Plan changed",
+    "paymentSaved": "Billing details saved"
+  }
+}

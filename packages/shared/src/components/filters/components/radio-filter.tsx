@@ -17,11 +17,7 @@ export function RadioFilterComponent({
 }) {
   const selected = config.options.find((o) => o.value === value);
   return (
-    <FilterPopover
-      label={config.label?.name}
-      summary={selected?.label}
-      active={activeProp}
-    >
+    <FilterPopover label={config.label?.name} summary={selected?.label} active={activeProp}>
       {(close) =>
         config.options.map((option) => {
           const active = option.value === value;

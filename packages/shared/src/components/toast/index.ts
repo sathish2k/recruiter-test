@@ -1,6 +1,6 @@
 export {
   Toast,
   type ToastState,
-  useToast,
   type UseToastResult,
+  useToast,
 } from "./toast";

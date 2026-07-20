@@ -9,5 +9,7 @@ export default new Elysia({ name: "organization.routes" })
   })
   .put("/organization", (ctx) => organizationController.putMyOrganization(ctx), {
     isAuth: true,
-    body: t.Optional(t.Object({ name: t.Optional(t.String({ minLength: 1 })) })),
+    // The workspace form posts one flat settings object — real columns are
+    // split out and the rest is merged into `settings` by the service.
+    body: t.Optional(t.Record(t.String(), t.Any())),
   });

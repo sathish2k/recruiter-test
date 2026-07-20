@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef } from "react";
 import { useTranslation as useI18nextTranslation } from "react-i18next";
 import { registerTranslations } from "./i18n";
 
@@ -18,9 +11,7 @@ export interface GlobalDependencyContextType {
   datasourceRefMap: Map<string, string>;
 }
 
-const GlobalDependencyContext = createContext<
-  GlobalDependencyContextType | undefined
->(undefined);
+const GlobalDependencyContext = createContext<GlobalDependencyContextType | undefined>(undefined);
 
 export interface GlobalDependencyProviderProps {
   children: ReactNode;
@@ -41,9 +32,7 @@ export function GlobalDependencyProvider({
 }: GlobalDependencyProviderProps) {
   const { i18n } = useI18nextTranslation();
 
-  const lastMap = useRef<
-    GlobalDependencyProviderProps["translationMap"] | null
-  >(null);
+  const lastMap = useRef<GlobalDependencyProviderProps["translationMap"] | null>(null);
   if (lastMap.current !== translationMap) {
     registerTranslations(i18n, translationMap);
     lastMap.current = translationMap;
@@ -54,25 +43,19 @@ export function GlobalDependencyProvider({
     [configurationMap, dataMap, translationMap, datasourceRefMap],
   );
   return (
-    <GlobalDependencyContext.Provider value={value}>
-      {children}
-    </GlobalDependencyContext.Provider>
+    <GlobalDependencyContext.Provider value={value}>{children}</GlobalDependencyContext.Provider>
   );
 }
 
 export function useGlobalDependencies(): GlobalDependencyContextType {
   const context = useContext(GlobalDependencyContext);
   if (context === undefined) {
-    throw new Error(
-      "useGlobalDependencies must be used within a GlobalDependencyProvider",
-    );
+    throw new Error("useGlobalDependencies must be used within a GlobalDependencyProvider");
   }
   return context;
 }
 
-export function useComponentConfiguration<T = Record<string, unknown>>(
-  componentId: string,
-): T {
+export function useComponentConfiguration<T = Record<string, unknown>>(componentId: string): T {
   const { configurationMap } = useGlobalDependencies();
   return (configurationMap.get(componentId) || {}) as T;
 }
@@ -93,8 +76,7 @@ export function useTranslation(componentId: string): {
 
   const t = useCallback(
     (key: string, fallback?: string | Record<string, unknown>): string => {
-      const options =
-        typeof fallback === "string" ? { defaultValue: fallback } : fallback;
+      const options = typeof fallback === "string" ? { defaultValue: fallback } : fallback;
       return rawT(key, options) as string;
     },
     [rawT],
@@ -109,23 +91,17 @@ export function useTranslation(componentId: string): {
   return { t, language: i18n.language, setLanguage };
 }
 
-export function useComponentData<T = Record<string, unknown>>(
-  componentId: string,
-): T {
+export function useComponentData<T = Record<string, unknown>>(componentId: string): T {
   const { dataMap } = useGlobalDependencies();
   return (dataMap.get(componentId) || {}) as T;
 }
 
-export function useComponentTranslation<T = Record<string, unknown>>(
-  componentId: string,
-): T {
+export function useComponentTranslation<T = Record<string, unknown>>(componentId: string): T {
   const { translationMap } = useGlobalDependencies();
   return (translationMap.get(componentId) || {}) as T;
 }
 
-export function useComponentDatasourceId(
-  componentId: string,
-): string | undefined {
+export function useComponentDatasourceId(componentId: string): string | undefined {
   const { datasourceRefMap } = useGlobalDependencies();
   return datasourceRefMap.get(componentId);
 }

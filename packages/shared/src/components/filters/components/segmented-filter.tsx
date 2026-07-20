@@ -20,11 +20,7 @@ export function SegmentedFilterComponent({
         <Tab
           key={option.value}
           value={option.value}
-          label={
-            option.count != null
-              ? `${option.label} (${option.count})`
-              : option.label
-          }
+          label={option.count != null ? `${option.label} (${option.count})` : option.label}
         />
       ))}
     </Tabs>

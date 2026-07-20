@@ -13,27 +13,18 @@ export interface PortalRouter {
   back: () => void;
   forward: () => void;
   refresh: () => void;
-  getPathFromRouteId: (
-    routeId: string,
-    params?: Record<string, string>,
-  ) => string;
+  getPathFromRouteId: (routeId: string, params?: Record<string, string>) => string;
 }
 
 const PortalRouterContext = createContext<PortalRouter | undefined>(undefined);
 const RoutesContext = createContext<Route[]>([]);
 
-function buildPath(
-  routes: Route[],
-  routeId: string,
-  params?: Record<string, string>,
-): string {
+function buildPath(routes: Route[], routeId: string, params?: Record<string, string>): string {
   const route = routes.find((r) => r.id === routeId);
   if (!route) return "/";
   const walk = (current: Route): string[] => {
     const parent = routes.find((r) => r.children?.includes(current.id));
-    return parent && parent.path !== "/"
-      ? [...walk(parent), current.path]
-      : [current.path];
+    return parent && parent.path !== "/" ? [...walk(parent), current.path] : [current.path];
   };
   let path = `/${walk(route).join("/")}`.replace(/\/+/g, "/");
   if (params) {
@@ -54,10 +45,8 @@ export function PortalRouterProvider({
   const router = useRouter();
 
   const value = useMemo<PortalRouter>(() => {
-    const getPathFromRouteId = (
-      routeId: string,
-      params?: Record<string, string>,
-    ) => buildPath(routes, routeId, params);
+    const getPathFromRouteId = (routeId: string, params?: Record<string, string>) =>
+      buildPath(routes, routeId, params);
     return {
       push: (id, params) => router.push(getPathFromRouteId(id, params)),
       replace: (id, params) => router.replace(getPathFromRouteId(id, params)),
@@ -80,9 +69,7 @@ export function PortalRouterProvider({
 export function usePortalRouter(): PortalRouter {
   const ctx = useContext(PortalRouterContext);
   if (!ctx) {
-    throw new Error(
-      "usePortalRouter must be used within a PortalRouterProvider",
-    );
+    throw new Error("usePortalRouter must be used within a PortalRouterProvider");
   }
   return ctx;
 }

@@ -23,10 +23,7 @@ test('findRouteBySlug: a single [""] slug also resolves root', () => {
 });
 
 test("findRouteBySlug: a static child resolves root -> child", () => {
-  expect(findRouteBySlug(["roles"], routes)?.map((r) => r.id)).toEqual([
-    "root",
-    "roles",
-  ]);
+  expect(findRouteBySlug(["roles"], routes)?.map((r) => r.id)).toEqual(["root", "roles"]);
 });
 
 test('findRouteBySlug: a param segment matches the ":id" route', () => {
@@ -46,7 +43,5 @@ test("findBestMatchBranch: a static segment outranks a param segment", () => {
     { id: "param", path: ":anything", page: "P", children: [] },
   ];
   const map = new Map(candidates.map((r) => [r.id, r]));
-  expect(
-    findBestMatchBranch(["roles"], candidates, map)?.map((r) => r.id),
-  ).toEqual(["static"]);
+  expect(findBestMatchBranch(["roles"], candidates, map)?.map((r) => r.id)).toEqual(["static"]);
 });

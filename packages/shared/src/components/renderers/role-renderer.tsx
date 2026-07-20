@@ -52,8 +52,7 @@ export function RoleRenderer({
   const choose = (value: string) => (e: MouseEvent) => {
     e.stopPropagation();
     close();
-    if (value !== current)
-      actionHandler?.[config.action]?.({ ...data, role: value });
+    if (value !== current) actionHandler?.[config.action]?.({ ...data, role: value });
   };
 
   return (
@@ -74,10 +73,7 @@ export function RoleRenderer({
         onClick={(e) => e.stopPropagation()}
       >
         {config.changeLabel ? (
-          <Typography
-            variant="overline"
-            sx={{ display: "block", px: "12px", pt: "4px" }}
-          >
+          <Typography variant="overline" sx={{ display: "block", px: "12px", pt: "4px" }}>
             {t(config.changeLabel)}
           </Typography>
         ) : null}

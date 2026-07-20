@@ -29,10 +29,7 @@ export function createI18n(lng: string = DEFAULT_LNG): I18nInstance {
   return instance;
 }
 
-export function registerTranslations(
-  instance: I18nInstance,
-  bundles: TranslationBundles,
-): void {
+export function registerTranslations(instance: I18nInstance, bundles: TranslationBundles): void {
   bundles.forEach((data, componentId) => {
     if (!data || typeof data !== "object" || !componentId) return;
     const { fallback, ...locales } = data as {
@@ -40,13 +37,7 @@ export function registerTranslations(
       [locale: string]: unknown;
     };
     if (fallback && typeof fallback === "object") {
-      instance.addResourceBundle(
-        DEFAULT_LNG,
-        componentId,
-        fallback,
-        true,
-        true,
-      );
+      instance.addResourceBundle(DEFAULT_LNG, componentId, fallback, true, true);
     }
     for (const [lng, dict] of Object.entries(locales)) {
       if (dict && typeof dict === "object") {

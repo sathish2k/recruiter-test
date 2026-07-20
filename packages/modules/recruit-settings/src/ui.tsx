@@ -81,3 +81,112 @@ export function Row({ title, desc, action }: { title: string; desc: string; acti
     </Box>
   );
 }
+
+/** Card heading + optional sub-caption and right-hand slot. */
+export function CardHeader({
+  title,
+  subtitle,
+  badge,
+  action,
+}: {
+  title: string;
+  subtitle?: string;
+  badge?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 2,
+        mb: subtitle ? "14px" : "10px",
+      }}
+    >
+      <Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{title}</Typography>
+          {badge}
+        </Box>
+        {subtitle ? (
+          <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
+            {subtitle}
+          </Typography>
+        ) : null}
+      </Box>
+      {action}
+    </Box>
+  );
+}
+
+/** Gradient progress bar used by the security score, seats and AI credits. */
+export function Meter({ percent, color }: { percent: number; color?: string }) {
+  return (
+    <Box sx={{ height: 6, borderRadius: 999, background: "rgba(255,255,255,.07)", width: "100%" }}>
+      <Box
+        sx={{
+          height: "100%",
+          borderRadius: 999,
+          width: `${Math.min(100, Math.max(0, percent))}%`,
+          background: color ?? "linear-gradient(90deg,#F0894A,#F0C27C)",
+          transition: "width .25s",
+        }}
+      />
+    </Box>
+  );
+}
+
+/** Label-over-value tile (usage stats, SSO details). */
+export function StatTile({ label, value }: { label: string; value: string }) {
+  return (
+    <Card variant="inset" sx={{ p: "12px 14px" }}>
+      <Typography sx={{ fontSize: 11, color: "text.disabled", fontWeight: 600 }}>
+        {label}
+      </Typography>
+      <Typography sx={{ fontSize: 15, fontWeight: 700, mt: "3px" }}>{value}</Typography>
+    </Card>
+  );
+}
+
+/** A list row with a leading icon: sessions, tokens, integrations. */
+export function ListRow({
+  icon,
+  title,
+  meta,
+  chips,
+  action,
+}: {
+  icon?: ReactNode;
+  title: ReactNode;
+  meta?: string;
+  chips?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "13px",
+        py: "13px",
+        borderTop: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      {icon ? <Box sx={{ display: "flex", color: "text.disabled" }}>{icon}</Box> : null}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{title}</Typography>
+          {chips}
+        </Box>
+        {meta ? (
+          <Typography sx={{ fontSize: 11.5, color: "text.secondary", mt: "2px" }}>
+            {meta}
+          </Typography>
+        ) : null}
+      </Box>
+      {action}
+    </Box>
+  );
+}

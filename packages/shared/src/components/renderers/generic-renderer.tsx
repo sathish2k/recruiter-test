@@ -4,18 +4,9 @@ import {
   ActionsRenderer,
   type ActionsRendererConfig,
 } from "./actions-renderer";
-import {
-  AiMatchRenderer,
-  type AiMatchRendererConfig,
-} from "./ai-match-renderer";
-import {
-  BooleanRenderer,
-  type BooleanRendererConfig,
-} from "./boolean-renderer";
-import {
-  CurrencyRenderer,
-  type CurrencyRendererConfig,
-} from "./currency-renderer";
+import { AiMatchRenderer, type AiMatchRendererConfig } from "./ai-match-renderer";
+import { BooleanRenderer, type BooleanRendererConfig } from "./boolean-renderer";
+import { CurrencyRenderer, type CurrencyRendererConfig } from "./currency-renderer";
 import { DateRenderer, type DateRendererConfig } from "./date-renderer";
 import { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
 import { IconRenderer, type IconRendererConfig } from "./icon-renderer";
@@ -23,10 +14,7 @@ import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 import { RoleRenderer, type RoleRendererConfig } from "./role-renderer";
-import {
-  ScoreBarRenderer,
-  type ScoreBarRendererConfig,
-} from "./score-bar-renderer";
+import { ScoreBarRenderer, type ScoreBarRendererConfig } from "./score-bar-renderer";
 import {
   StaticTranslationRenderer,
   type StaticTranslationRendererConfig,
@@ -86,21 +74,9 @@ export function GenericRenderer({
     case "score-bar":
       return <ScoreBarRenderer config={config} data={data} />;
     case "role":
-      return (
-        <RoleRenderer
-          config={config}
-          data={data}
-          actionHandler={actionHandler}
-        />
-      );
+      return <RoleRenderer config={config} data={data} actionHandler={actionHandler} />;
     case "actions":
-      return (
-        <ActionsRenderer
-          config={config}
-          data={data}
-          actionHandler={actionHandler}
-        />
-      );
+      return <ActionsRenderer config={config} data={data} actionHandler={actionHandler} />;
     case "menu":
       return (
         <ActionsMenu

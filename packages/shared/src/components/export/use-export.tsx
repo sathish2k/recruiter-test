@@ -41,10 +41,7 @@ function toHtmlTable(rows: Row[]): string {
   const headers = Object.keys(rows[0] ?? {});
   const head = headers.map((h) => `<th>${htmlEscape(h)}</th>`).join("");
   const body = rows
-    .map(
-      (row) =>
-        `<tr>${headers.map((h) => `<td>${htmlEscape(row[h])}</td>`).join("")}</tr>`,
-    )
+    .map((row) => `<tr>${headers.map((h) => `<td>${htmlEscape(row[h])}</td>`).join("")}</tr>`)
     .join("");
   return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
@@ -76,46 +73,35 @@ export function useExport(): UseExportResult {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const exportData = useCallback(
-    (format: string, rows: Row[], filename = "export") => {
-      if (!rows || rows.length === 0) {
-        setError("No data to export");
-        return;
+  const exportData = useCallback((format: string, rows: Row[], filename = "export") => {
+    if (!rows || rows.length === 0) {
+      setError("No data to export");
+      return;
+    }
+    setIsExporting(true);
+    setError(null);
+    try {
+      if (format === "json") {
+        download(
+          JSON.stringify(rows, null, 2),
+          "application/json;charset=utf-8;",
+          `${filename}.json`,
+        );
+      } else if (format === "xlsx") {
+        download(toHtmlDocument(rows, filename), "application/vnd.ms-excel", `${filename}.xls`);
+      } else if (format === "docx") {
+        download(toHtmlDocument(rows, filename), "application/msword", `${filename}.doc`);
+      } else if (format === "pdf") {
+        printPdf(rows, filename);
+      } else {
+        download(toCsv(rows), "text/csv;charset=utf-8;", `${filename}.csv`);
       }
-      setIsExporting(true);
-      setError(null);
-      try {
-        if (format === "json") {
-          download(
-            JSON.stringify(rows, null, 2),
-            "application/json;charset=utf-8;",
-            `${filename}.json`,
-          );
-        } else if (format === "xlsx") {
-          download(
-            toHtmlDocument(rows, filename),
-            "application/vnd.ms-excel",
-            `${filename}.xls`,
-          );
-        } else if (format === "docx") {
-          download(
-            toHtmlDocument(rows, filename),
-            "application/msword",
-            `${filename}.doc`,
-          );
-        } else if (format === "pdf") {
-          printPdf(rows, filename);
-        } else {
-          download(toCsv(rows), "text/csv;charset=utf-8;", `${filename}.csv`);
-        }
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Export failed");
-      } finally {
-        setIsExporting(false);
-      }
-    },
-    [],
-  );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export failed");
+    } finally {
+      setIsExporting(false);
+    }
+  }, []);
 
   return { exportData, isExporting, error };
 }

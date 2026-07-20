@@ -29,11 +29,7 @@ export function ToggleFilterComponent({
       }}
     >
       {config.label?.name}
-      <Switch
-        size="small"
-        checked={!!value}
-        onChange={(e) => onChange(e.target.checked)}
-      />
+      <Switch size="small" checked={!!value} onChange={(e) => onChange(e.target.checked)} />
     </Box>
   );
 }

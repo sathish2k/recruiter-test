@@ -68,9 +68,7 @@ export function MoreFilters({
           {filters.map((filter) => (
             <Box key={filter.key}>
               {filter.label ? (
-                <Typography
-                  sx={{ fontSize: 12, color: "text.secondary", mb: "6px" }}
-                >
+                <Typography sx={{ fontSize: 12, color: "text.secondary", mb: "6px" }}>
                   {filter.label.name}
                 </Typography>
               ) : null}

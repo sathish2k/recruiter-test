@@ -41,16 +41,16 @@ export {
   type IconRendererConfig,
 } from "./icon-renderer";
 export {
-  LinkRenderer,
   type LinkParamConfig,
+  LinkRenderer,
   type LinkRendererConfig,
   type LinkType,
 } from "./link-renderer";
 export { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 export { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 export {
-  RoleRenderer,
   type RoleOption,
+  RoleRenderer,
   type RoleRendererConfig,
 } from "./role-renderer";
 export {

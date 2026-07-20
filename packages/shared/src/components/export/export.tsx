@@ -66,9 +66,7 @@ export function Export({
         </Box>
         {types.map((type) => (
           <MenuItem key={type.value} onClick={() => pick(type.value)}>
-            {type.icon ? (
-              <IconRenderer name={type.icon} size={17} color={type.color} />
-            ) : null}
+            {type.icon ? <IconRenderer name={type.icon} size={17} color={type.color} /> : null}
             {id ? t(type.label) : type.label}
           </MenuItem>
         ))}

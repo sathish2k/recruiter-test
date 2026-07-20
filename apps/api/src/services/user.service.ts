@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, eq, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 
@@ -50,14 +50,60 @@ function mapUser(u: UserRow, index: number) {
   };
 }
 
-export async function listUsers(agencyId: string) {
-  const rows = await db
-    .select()
-    .from(user)
-    .where(and(eq(user.agencyId, agencyId), ne(user.status, "inactive")))
-    .orderBy(asc(user.createdAt));
-  const data = rows.map(mapUser);
-  return { data, totalCount: data.length };
+export interface ListUsersQuery {
+  search?: string;
+  /** Comma-joined by the datasource for multiselect filters. */
+  role?: string;
+  status?: string;
+  sortKey?: string;
+  sortDir?: string;
+  page?: string | number;
+  pageSize?: string | number;
+}
+
+const SORT_FIELDS = {
+  member: user.name,
+  displayName: user.name,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  status: user.status,
+  lastActive: user.updatedAt,
+} as const;
+
+function csv(value?: string): string[] {
+  return (value ?? "")
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+export async function listUsers(agencyId: string, query: ListUsersQuery = {}) {
+  const conditions = [eq(user.agencyId, agencyId), ne(user.status, "inactive")];
+
+  if (query.search?.trim()) {
+    const term = `%${query.search.trim()}%`;
+    const match = or(ilike(user.name, term), ilike(user.email, term));
+    if (match) conditions.push(match);
+  }
+  const roles = csv(query.role);
+  if (roles.length) conditions.push(inArray(user.role, roles));
+  const statuses = csv(query.status);
+  if (statuses.length) conditions.push(inArray(user.status, statuses));
+
+  const where = and(...conditions);
+  const sortColumn = SORT_FIELDS[query.sortKey as keyof typeof SORT_FIELDS] ?? user.createdAt;
+  const order = query.sortDir === "desc" ? desc(sortColumn) : asc(sortColumn);
+
+  const countRows = await db.select({ total: count() }).from(user).where(where);
+  const total = countRows[0]?.total ?? 0;
+
+  const pageSize = Number(query.pageSize ?? 0);
+  const page = Math.max(1, Number(query.page ?? 1));
+  const base = db.select().from(user).where(where).orderBy(order);
+  const rows = pageSize > 0 ? await base.limit(pageSize).offset((page - 1) * pageSize) : await base;
+
+  return { data: rows.map(mapUser), totalCount: total };
 }
 
 export async function updateUserRole(id: string, role: string) {
@@ -67,7 +113,7 @@ export async function updateUserRole(id: string, role: string) {
     .set({ role, updatedAt: new Date() })
     .where(eq(user.id, id))
     .returning();
-  return updated ? { id: updated.id, role: updated.role } : null;
+  return updated ? { id: updated.id, role: updated.role, displayName: updated.name } : null;
 }
 
 export async function deactivateUser(id: string) {
@@ -76,7 +122,7 @@ export async function deactivateUser(id: string) {
     .set({ status: "inactive", updatedAt: new Date() })
     .where(eq(user.id, id))
     .returning();
-  return updated ? { id: updated.id, status: updated.status } : null;
+  return updated ? { id: updated.id, status: updated.status, displayName: updated.name } : null;
 }
 
 // ponytail: invited users get a user row but no credential account until they

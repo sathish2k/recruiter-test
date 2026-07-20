@@ -1,8 +1,10 @@
 import { status } from "elysia";
 import { auth } from "../auth";
+import { record as recordAudit } from "../services/audit-log.service";
 import { getProfile, updateProfile } from "../services/profile.service";
+import { markPasswordChanged } from "../services/security.service";
 
-type Auth = { id: string };
+type Auth = { id: string; name?: string | null; agencyId?: string | null };
 
 export async function getMyProfile(ctx: { user: Auth }) {
   const profile = await getProfile(ctx.user.id);
@@ -25,6 +27,7 @@ export async function putMyProfile(ctx: {
 }
 
 export async function putMyPassword(ctx: {
+  user: Auth;
   request: Request;
   body: { currentPassword: string; newPassword: string };
 }) {
@@ -36,8 +39,24 @@ export async function putMyPassword(ctx: {
       },
       headers: ctx.request.headers,
     });
+    await markPasswordChanged(ctx.user.id);
+    await recordAudit({
+      organizationId: ctx.user.agencyId ?? "",
+      userId: ctx.user.id,
+      actorName: ctx.user.name ?? "Unknown",
+      event: "Changed the account password",
+      category: "security",
+    });
     return { ok: true };
   } catch {
+    await recordAudit({
+      organizationId: ctx.user.agencyId ?? "",
+      userId: ctx.user.id,
+      actorName: ctx.user.name ?? "Unknown",
+      event: "Password change failed — wrong current password",
+      category: "security",
+      severity: "failure",
+    });
     return status(400, "Current password is incorrect");
   }
 }

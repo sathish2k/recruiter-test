@@ -18,9 +18,7 @@ function isEmpty(value: unknown): boolean {
     value == null ||
     value === "" ||
     (Array.isArray(value) && value.length === 0) ||
-    (typeof value === "object" &&
-      value !== null &&
-      Object.keys(value).length === 0)
+    (typeof value === "object" && value !== null && Object.keys(value).length === 0)
   );
 }
 
@@ -37,18 +35,14 @@ export function useFilters(): UseFiltersResult {
     }
     try {
       const parsed = JSON.parse(decodeURIComponent(raw)) as FilterValue;
-      setFiltersState((prev) =>
-        JSON.stringify(prev) !== JSON.stringify(parsed) ? parsed : prev,
-      );
+      setFiltersState((prev) => (JSON.stringify(prev) !== JSON.stringify(parsed) ? parsed : prev));
     } catch {}
   }, [searchParams]);
 
   const updateUrl = useCallback(
     (next: FilterValue) => {
       const params = new URLSearchParams(Array.from(searchParams.entries()));
-      const encoded = Object.keys(next).length
-        ? encodeURIComponent(JSON.stringify(next))
-        : null;
+      const encoded = Object.keys(next).length ? encodeURIComponent(JSON.stringify(next)) : null;
       if (params.get("filters") === encoded) return;
       if (encoded) params.set("filters", encoded);
       else params.delete("filters");

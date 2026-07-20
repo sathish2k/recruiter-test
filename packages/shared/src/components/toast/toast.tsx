@@ -20,21 +20,12 @@ export interface UseToastResult {
 
 export function useToast(): UseToastResult {
   const [toast, setToast] = useState<ToastState | null>(null);
-  const show = useCallback(
-    (title: string, sub?: string) => setToast({ title, sub }),
-    [],
-  );
+  const show = useCallback((title: string, sub?: string) => setToast({ title, sub }), []);
   const clear = useCallback(() => setToast(null), []);
   return { toast, show, clear };
 }
 
-export function Toast({
-  toast,
-  onClose,
-}: {
-  toast: ToastState | null;
-  onClose: () => void;
-}) {
+export function Toast({ toast, onClose }: { toast: ToastState | null; onClose: () => void }) {
   return (
     <Snackbar
       open={Boolean(toast)}
@@ -57,21 +48,14 @@ export function Toast({
       >
         <IconRenderer name="check-circle" size={18} color="#8FD6AC" />
         <Box sx={{ flex: 1 }}>
-          <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
-            {toast?.title}
-          </Typography>
+          <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{toast?.title}</Typography>
           {toast?.sub ? (
-            <Typography
-              sx={{ fontSize: 11.5, color: "text.secondary", mt: "1px" }}
-            >
+            <Typography sx={{ fontSize: 11.5, color: "text.secondary", mt: "1px" }}>
               {toast.sub}
             </Typography>
           ) : null}
         </Box>
-        <IconButton
-          onClick={onClose}
-          sx={{ width: 22, height: 22, border: "none" }}
-        >
+        <IconButton onClick={onClose} sx={{ width: 22, height: 22, border: "none" }}>
           <IconRenderer name="close" size={15} />
         </IconButton>
       </Box>

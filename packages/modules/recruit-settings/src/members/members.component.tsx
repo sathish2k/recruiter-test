@@ -1,112 +1,139 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useFetch } from "@recruit/sdk";
-import { SectionCard } from "../ui";
+import { useConfiguration, useFetch, useRefresh, useTranslation } from "@recruit/sdk";
+import {
+  FormModal,
+  type FormValues,
+  type TableFilterExportConfig,
+  TableFilterExportRenderer,
+  Toast,
+  useFilters,
+  useModal,
+  useToast,
+} from "@recruit/shared";
+import { useMemo } from "react";
+import type { MembersConfiguration } from "./members.configuration";
+
+type MembersConfig = typeof MembersConfiguration;
 
 interface Member {
   id: string;
   displayName: string;
   email: string;
   role: string;
-  initials: string;
-  avatarBg: string;
-  avatarFg: string;
 }
 
-const ROLE_STYLE: Record<string, { fg: string; bg: string; border: string }> = {
-  admin: { fg: "#F0B27C", bg: "rgba(242,106,27,.14)", border: "rgba(242,106,27,.35)" },
-};
-const DEFAULT_ROLE = {
-  fg: "#C9C5BD",
-  bg: "rgba(255,255,255,.05)",
-  border: "rgba(255,255,255,.1)",
-};
-
-const SEAT_TOTAL = 5;
-
 export function SettingsMembersComponent({ id }: { id: string }) {
-  const { data: members = [] } = useFetch<Member[]>(id);
+  const { t } = useTranslation(id);
+  const config = useConfiguration<MembersConfig>(id);
+  const { filters } = useFilters();
+  const inviteModal = useModal();
+  const { toast, show, clear } = useToast();
+  const { meta, mutation } = useFetch<Member[]>(id, { filters });
+  // Inviting writes to the sibling pending-invitations element (page config id).
+  const refresh = useRefresh(id, "settings-invitations");
+
+  const total = (meta?.totalCount as number) ?? 0;
+
+  // Status labels are translated here; the role cell resolves its own option
+  // labels via useTranslation(<element id>), so bind it to this element's id.
+  const tableConfig = useMemo<TableFilterExportConfig>(
+    () => ({
+      ...config,
+      columns: (config.columns ?? []).map((column) => {
+        if (column.value.type === "status" && "labels" in column.value) {
+          return {
+            ...column,
+            value: {
+              ...column.value,
+              labels: Object.fromEntries(
+                Object.entries(column.value.labels ?? {}).map(([k, v]) => [k, t(v)]),
+              ),
+            },
+          };
+        }
+        if (column.value.type === "role") {
+          return { ...column, value: { ...column.value, id } };
+        }
+        return column;
+      }),
+    }),
+    [config, t, id],
+  );
+
+  const inviteSchema = useMemo(() => {
+    const schema = config.addForm;
+    if (!schema) return undefined;
+    const role = schema.properties?.role;
+    return {
+      ...schema,
+      properties: {
+        ...schema.properties,
+        role: {
+          ...role,
+          enumNames: (role?.enum ?? []).map((v) => t(`roles.${String(v)}`)),
+        },
+      },
+    };
+  }, [config.addForm, t]);
+
+  const invite = async (values: FormValues) => {
+    await mutation.create?.(values);
+    await refresh();
+    show(t("toast.invited"), t("toast.invitedSub", { email: String(values.email ?? "") }));
+  };
+
+  const changeRole = async (row: Member) => {
+    await mutation.update?.({ id: row.id, role: row.role });
+    await refresh();
+    show(t("toast.roleChanged"));
+  };
+
+  const deactivate = async (row: Member) => {
+    await mutation.deactivate?.(row.id);
+    await refresh();
+    show(t("toast.deactivated"));
+  };
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
-      <SectionCard>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: "16px",
-          }}
-        >
-          <Box>
-            <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>Members</Typography>
-            <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
-              {members.length} of {SEAT_TOTAL} seats used
-            </Typography>
-          </Box>
-          <Button variant="contained" size="small">
-            Manage roles &amp; permissions
-          </Button>
-        </Box>
+    <Box sx={{ maxWidth: 1100, display: "flex", flexDirection: "column", gap: "12px" }}>
+      <Box>
+        <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t("title")}</Typography>
+        <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
+          {t("seats", { used: total, total: config.seatLimit })}
+        </Typography>
+      </Box>
 
-        {members.map((m) => {
-          const rs = ROLE_STYLE[m.role] ?? DEFAULT_ROLE;
-          return (
-            <Box
-              key={m.id}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                py: "12px",
-                borderTop: "1px solid",
-                borderColor: "divider",
-              }}
-            >
-              <Box
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: "999px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  flex: "none",
-                  background: m.avatarBg,
-                  color: m.avatarFg,
-                }}
-              >
-                {m.initials}
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: 13.5, fontWeight: 600 }}>{m.displayName}</Typography>
-                <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>{m.email}</Typography>
-              </Box>
-              <Box
-                component="span"
-                sx={{
-                  fontSize: 11.5,
-                  fontWeight: 600,
-                  color: rs.fg,
-                  background: rs.bg,
-                  border: `1px solid ${rs.border}`,
-                  px: "12px",
-                  py: "4px",
-                  borderRadius: "999px",
-                  textTransform: "capitalize",
-                }}
-              >
-                {m.role}
-              </Box>
-            </Box>
-          );
-        })}
-      </SectionCard>
+      <TableFilterExportRenderer
+        id={id}
+        config={tableConfig}
+        onCta={(action) => {
+          if (action === "add") inviteModal.open();
+        }}
+        actionHandler={{
+          changeRole: (row) => changeRole(row as unknown as Member),
+          deactivate: (row) => deactivate(row as unknown as Member),
+          resendInvite: () => show(t("toast.invited")),
+        }}
+      />
+
+      {inviteSchema ? (
+        <FormModal
+          open={inviteModal.isOpen}
+          onClose={inviteModal.close}
+          id={id}
+          title={t("inviteForm.title")}
+          description={t("inviteForm.description")}
+          schema={inviteSchema}
+          submitLabel="inviteForm.submit"
+          cancelLabel="cancel"
+          onSubmit={invite}
+        />
+      ) : null}
+
+      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

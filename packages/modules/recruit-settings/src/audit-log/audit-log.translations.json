@@ -1,0 +1,55 @@
+{
+  "title": "Audit log",
+  "suffix": "· admin only",
+  "subtitle": "Every change made in this workspace",
+  "search": "Search user, candidate, client, IP…",
+  "export": "Export",
+  "exportAs": "Export as",
+  "exportTypes": { "csv": "CSV", "json": "JSON", "xlsx": "Excel" },
+  "moreFilters": "Filters",
+  "clearAll": "Clear filters",
+  "filters": {
+    "user": "User",
+    "category": "Category",
+    "result": "Result",
+    "range": "Date range"
+  },
+  "categories": {
+    "permissions": "Permissions",
+    "candidates": "Candidates",
+    "clientActions": "Client actions",
+    "requirements": "Requirements",
+    "billing": "Billing",
+    "system": "System",
+    "security": "Security",
+    "integrations": "Integrations",
+    "email": "Email"
+  },
+  "results": {
+    "success": "Success",
+    "warning": "Warning",
+    "failure": "Failure"
+  },
+  "ranges": {
+    "today": "Today",
+    "7d": "Last 7 days",
+    "30d": "Last 30 days"
+  },
+  "empty": "No events match",
+  "emptySub": "Try a different search, user or date range",
+  "retention": "Retention 12 months · Export limit 100,000 events",
+  "count": "{{shown}} of {{total}} events · page {{page}} of {{pages}}",
+  "filterHint": "Filter events by this",
+  "detail": {
+    "title": "Event details",
+    "time": "Time",
+    "user": "User",
+    "ip": "IP",
+    "copy": "Copy JSON",
+    "done": "Done"
+  },
+  "toast": {
+    "copied": "Event copied as JSON",
+    "copiedSub": "Paste it into your support ticket"
+  }
+}

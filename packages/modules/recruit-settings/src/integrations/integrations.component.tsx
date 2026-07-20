@@ -1,64 +1,312 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
-import { SectionCard } from "../ui";
+import { useConfiguration, useFetch, useSession, useTranslation } from "@recruit/sdk";
+import { IconRenderer, Modal, Toast, useToast } from "@recruit/shared";
+import { useMemo, useState } from "react";
+import { CardHeader, SectionCard } from "../ui";
+import type { IntegrationItem, IntegrationsConfig } from "./integrations.configuration";
 
-const SERVICES = [
-  { name: "Google Calendar", mark: "G", bg: "#fff", fg: "#4285F4" },
-  { name: "LinkedIn Sourcer", mark: "in", bg: "#0A66C2", fg: "#fff" },
-  { name: "Naukri", mark: "n.", bg: "#fff", fg: "#4A2FBF" },
-  { name: "Gmail", mark: "M", bg: "#fff", fg: "#EA4335" },
-];
+/** A connected row from the API. */
+interface Connection {
+  id: string;
+  provider: string;
+  status: "connected" | "warning" | "available";
+  account: string;
+  connectedBy: string;
+  lastSync: string;
+  direction: string;
+  warning: string;
+}
 
-export function SettingsIntegrationsComponent() {
+/** Catalogue entry merged with its connection state. */
+type Tile = IntegrationItem & {
+  status: "connected" | "warning" | "available";
+  connection?: Connection;
+};
+
+const STATUS_COLOR: Record<string, string> = {
+  connected: "#8FD6AC",
+  warning: "#F0C27C",
+  available: "text.disabled",
+};
+
+export function SettingsIntegrationsComponent({ id }: { id: string }) {
+  const { t } = useTranslation(id);
+  const config = useConfiguration<IntegrationsConfig>(id);
+  const { data, mutation, mutate } = useFetch<Connection[]>(id);
+  const { toast, show, clear } = useToast();
+  const session = useSession();
+  const [selected, setSelected] = useState<Tile | null>(null);
+
+  const email = session?.data?.user?.email ?? "";
+
+  const byProvider = useMemo(() => {
+    const map = new Map<string, Connection>();
+    for (const row of data ?? []) map.set(row.provider, row);
+    return map;
+  }, [data]);
+
+  const groups = useMemo(
+    () =>
+      config.groups.map((group) => ({
+        ...group,
+        tiles: group.items.map((item): Tile => {
+          const connection = byProvider.get(item.key);
+          return {
+            ...item,
+            status: connection?.status ?? "available",
+            connection,
+          };
+        }),
+      })),
+    [config.groups, byProvider],
+  );
+
+  const total = groups.reduce((sum, group) => sum + group.tiles.length, 0);
+  const connected = byProvider.size;
+
+  const connect = async (tile: Tile) => {
+    await mutation.connect?.({
+      provider: tile.key,
+      account: email,
+      direction: tile.direction,
+    });
+    await mutate();
+    setSelected(null);
+    show(t("toast.connected", { name: tile.name }), email);
+  };
+
+  const reconnect = async (tile: Tile) => {
+    await mutation.reconnect?.(tile.key);
+    await mutate();
+    setSelected(null);
+    show(t("toast.reconnected", { name: tile.name }), t("toast.reconnectedSub"));
+  };
+
+  const disconnect = async (tile: Tile) => {
+    await mutation.disconnect?.(tile.key);
+    await mutate();
+    setSelected(null);
+    show(t("toast.disconnected", { name: tile.name }), t("toast.disconnectedSub"));
+  };
+
+  /** Sub-text mirrors the design: account+sync when live, warning when stale. */
+  const subtext = (tile: Tile) => {
+    if (tile.status === "warning") return tile.connection?.warning || t(tile.description);
+    if (tile.status === "connected" && tile.connection) {
+      return t("syncedAt", {
+        account: tile.connection.account || email,
+        sync: tile.connection.lastSync,
+      });
+    }
+    return t(tile.description);
+  };
+
+  const actionLabel = (status: string) =>
+    status === "connected"
+      ? t("actions.configure")
+      : status === "warning"
+        ? t("actions.reconnect")
+        : t("actions.connect");
+
   return (
-    <Box sx={{ maxWidth: 1100 }}>
+    <Box sx={{ maxWidth: 1100, display: "flex", flexDirection: "column", gap: "16px" }}>
       <SectionCard>
-        <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>Connected services</Typography>
-        <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "6px", mb: "16px" }}>
-          Calendars, sourcing, email &amp; meetings
-        </Typography>
-        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          {SERVICES.map((c) => (
-            <Box
-              key={c.name}
+        <CardHeader
+          title={t("title")}
+          subtitle={t("subtitle", { connected, available: total - connected })}
+        />
+      </SectionCard>
+
+      {groups.map((group) => (
+        <SectionCard key={group.key}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "14px" }}>
+            <IconRenderer name={group.icon} size={16} sx={{ color: "text.disabled" }} />
+            <Typography
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "11px",
-                background: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: "11px",
-                p: "11px 13px",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: ".07em",
+                color: "text.secondary",
               }}
             >
-              <Box
+              {t(group.label)}
+            </Typography>
+            {group.badge ? (
+              <Chip variant="soft" size="small" color="warning" label={t(group.badge)} />
+            ) : null}
+          </Box>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: "10px",
+            }}
+          >
+            {group.tiles.map((tile) => (
+              <Card
+                key={tile.key}
+                variant="inset"
+                onClick={() => setSelected(tile)}
                 sx={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: "9px",
+                  p: "13px 14px",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  flex: "none",
-                  background: c.bg,
-                  color: c.fg,
+                  gap: "12px",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "rgba(255,255,255,.04)" },
                 }}
               >
-                {c.mark}
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>{c.name}</Typography>
-                <Typography sx={{ fontSize: 11, color: "success.light" }}>Connected</Typography>
-              </Box>
-            </Box>
-          ))}
-        </Box>
-      </SectionCard>
+                <Box
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    flex: "none",
+                    borderRadius: "10px",
+                    display: "grid",
+                    placeItems: "center",
+                    bgcolor: "rgba(255,255,255,.06)",
+                    fontSize: 12,
+                    fontWeight: 700,
+                  }}
+                >
+                  {tile.mark}
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{tile.name}</Typography>
+                    {tile.status !== "available" ? (
+                      <IconRenderer
+                        name={tile.status === "connected" ? "check-circle" : "warning"}
+                        size={14}
+                        sx={{ color: STATUS_COLOR[tile.status] }}
+                      />
+                    ) : null}
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: 11.5,
+                      color: "text.secondary",
+                      mt: "2px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {subtext(tile)}
+                  </Typography>
+                </Box>
+                <Chip
+                  variant="soft"
+                  size="small"
+                  label={actionLabel(tile.status)}
+                  sx={{
+                    flex: "none",
+                    ...(tile.status === "available"
+                      ? { color: "primary.main", border: "1px solid", borderColor: "primary.main" }
+                      : {}),
+                    ...(tile.status === "warning" ? { color: "#F0C27C" } : {}),
+                  }}
+                />
+              </Card>
+            ))}
+          </Box>
+        </SectionCard>
+      ))}
+
+      {/* Detail modal */}
+      <Modal
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        title={selected?.name ?? ""}
+        description={selected ? t(`status.${selected.status}`) : ""}
+      >
+        {selected ? (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {selected.status === "available" ? (
+              <>
+                <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+                  {t(selected.description)}
+                </Typography>
+                <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
+                  {t("detail.connectHint", { email })}
+                </Typography>
+                <Box sx={{ display: "flex", gap: "10px", justifyContent: "flex-end", mt: "6px" }}>
+                  <Button variant="outlined" onClick={() => setSelected(null)}>
+                    {t("cancel")}
+                  </Button>
+                  <Button variant="contained" onClick={() => connect(selected)}>
+                    {t("actions.connect")}
+                  </Button>
+                </Box>
+              </>
+            ) : (
+              <>
+                {selected.status === "warning" && selected.connection?.warning ? (
+                  <Box
+                    sx={{
+                      p: "10px 12px",
+                      borderRadius: "10px",
+                      bgcolor: "rgba(240,194,124,.12)",
+                      color: "#F0C27C",
+                      fontSize: 12,
+                    }}
+                  >
+                    {selected.connection.warning}
+                  </Box>
+                ) : null}
+                {[
+                  [t("detail.account"), selected.connection?.account || "—"],
+                  [t("detail.by"), selected.connection?.connectedBy || "—"],
+                  [t("detail.lastSync"), selected.connection?.lastSync || "—"],
+                  [
+                    t("detail.direction"),
+                    selected.connection?.direction
+                      ? t(`directions.${selected.connection.direction}`)
+                      : "—",
+                  ],
+                ].map(([label, value]) => (
+                  <Box
+                    key={label}
+                    sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
+                  >
+                    <Typography sx={{ fontSize: 12, color: "text.disabled" }}>{label}</Typography>
+                    <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>{value}</Typography>
+                  </Box>
+                ))}
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: "10px",
+                    justifyContent: "space-between",
+                    mt: "6px",
+                  }}
+                >
+                  <Button color="error" onClick={() => disconnect(selected)}>
+                    {t("actions.disconnect")}
+                  </Button>
+                  <Box sx={{ display: "flex", gap: "10px" }}>
+                    <Button variant="outlined" onClick={() => reconnect(selected)}>
+                      {t("actions.reconnect")}
+                    </Button>
+                    <Button variant="contained" onClick={() => setSelected(null)}>
+                      {t("actions.done")}
+                    </Button>
+                  </Box>
+                </Box>
+              </>
+            )}
+          </Box>
+        ) : null}
+      </Modal>
+
+      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

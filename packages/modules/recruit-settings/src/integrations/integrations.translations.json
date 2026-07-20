@@ -1,0 +1,74 @@
+{
+  "title": "Integrations",
+  "subtitle": "{{connected}} connected · {{available}} available across sourcing, email, calendars, AI & more",
+  "browse": "Browse integrations →",
+  "badges": { "enterprise": "Enterprise" },
+  "groups": {
+    "sourcing": "CANDIDATE SOURCING",
+    "communication": "COMMUNICATION",
+    "meetings": "MEETINGS & SCHEDULING",
+    "ai": "AI",
+    "storage": "STORAGE",
+    "hris": "HRIS",
+    "developer": "DEVELOPER"
+  },
+  "actions": {
+    "connect": "Connect",
+    "configure": "Configure",
+    "reconnect": "Reconnect",
+    "disconnect": "Disconnect",
+    "done": "Done"
+  },
+  "status": {
+    "connected": "Connected · Healthy",
+    "warning": "Action needed",
+    "available": "Not connected"
+  },
+  "detail": {
+    "account": "Connected account",
+    "by": "Connected by",
+    "lastSync": "Last sync",
+    "direction": "Sync direction",
+    "connectHint": "Connects as {{email}} · you can disconnect anytime"
+  },
+  "directions": {
+    "two-way": "Two-way",
+    "pull": "Pull only",
+    "push": "Push only"
+  },
+  "syncedAt": "{{account}} · synced {{sync}}",
+  "descriptions": {
+    "linkedin": "Source candidates and send InMail from the sourcing queue.",
+    "naukri": "Import applies and search the Naukri resume database.",
+    "indeed": "Post jobs and pull applies from Indeed.",
+    "monster": "Search the Monster resume database.",
+    "gmail": "Send and track recruiter email from Gmail.",
+    "outlook": "Send and track recruiter email from Outlook.",
+    "mailjet": "Deliver template emails at scale.",
+    "slack": "Pipeline alerts and daily digests in your channels.",
+    "googleCalendar": "Interview slots sync both ways with your calendar.",
+    "outlookCalendar": "Interview slots sync with Microsoft 365 calendars.",
+    "zoom": "Auto-create Zoom links on every interview invite.",
+    "teams": "Auto-create Teams meetings on interview invites.",
+    "openrouter": "Routes AI screening to your preferred model.",
+    "openai": "Use GPT models for screening and summaries.",
+    "anthropic": "Use Claude for screening and candidate summaries.",
+    "gemini": "Use Gemini for screening and candidate summaries.",
+    "googleDrive": "Store CVs and offer letters in your Drive.",
+    "onedrive": "Store CVs and offer letters in OneDrive.",
+    "workday": "Hand placements off to client Workday instances.",
+    "greenhouse": "Sync candidates into client Greenhouse pipelines.",
+    "lever": "Sync candidates into client Lever pipelines.",
+    "webhooks": "Fire events to your own endpoints on every stage change.",
+    "zapier": "Automate HirePilotX with 6,000+ apps.",
+    "apiKeys": "Programmatic access for your own tools."
+  },
+  "cancel": "Cancel",
+  "toast": {
+    "connected": "{{name}} connected",
+    "disconnected": "{{name}} disconnected",
+    "disconnectedSub": "You can reconnect anytime",
+    "reconnected": "{{name}} reconnected",
+    "reconnectedSub": "Token refreshed · sync resumed"
+  }
+}

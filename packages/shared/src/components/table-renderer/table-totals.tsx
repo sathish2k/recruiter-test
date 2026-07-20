@@ -3,12 +3,7 @@
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { GenericRenderer, type GenericRendererConfig } from "../renderers";
-import type {
-  Cells,
-  CellConfig,
-  Row,
-  TableColumnConfig,
-} from "./table-renderer.types";
+import type { CellConfig, Cells, Row, TableColumnConfig } from "./table-renderer.types";
 
 export function TableTotalsRenderer({
   cells,
@@ -44,10 +39,7 @@ export function TableTotalsRenderer({
           {customCells?.[cell.type] ? (
             customCells[cell.type](data)
           ) : (
-            <GenericRenderer
-              config={cell as GenericRendererConfig}
-              data={data}
-            />
+            <GenericRenderer config={cell as GenericRendererConfig} data={data} />
           )}
         </TableCell>
       ))}

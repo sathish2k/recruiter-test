@@ -1,5 +1,5 @@
 import { DEFAULT_ROLE_PERMISSIONS } from "@recruit/types";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { rolePermission } from "../models/role-permission.model";
 

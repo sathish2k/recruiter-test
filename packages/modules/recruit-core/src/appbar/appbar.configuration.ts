@@ -1,37 +1,7 @@
-import type { AccessRule } from "@recruit/sdk";
+import type { AppbarConfig } from "./appbar.types";
 
-export interface AppbarMenuItem {
-  label: string;
-  icon?: string;
-  routeId?: string;
-  /** Built-in action key handled by the component (e.g. "logout"). */
-  action?: "logout";
-  danger?: boolean;
-  /** Verified + stripped by the engine before render (e.g. gate Settings). */
-  access?: AccessRule;
-}
-
-export interface AppbarLanguage {
-  code: string;
-  /** Native label shown in the picker (not translated). */
-  label: string;
-}
-
-export interface AppbarAction {
-  icon?: string;
-  routeId?: string;
-  badge?: boolean;
-  kind?: "avatar" | "theme" | "language";
-  label?: string;
-  /** When present on the avatar, clicking opens this dropdown menu. */
-  menu?: AppbarMenuItem[];
-  /** Languages offered by a `kind: "language"` picker. */
-  languages?: AppbarLanguage[];
-}
-
-// `titles` maps a routeId to the heading shown on the left (translation key);
-// `actions` is the right-hand cluster. Icons/labels resolve in the component.
-export const AppbarConfiguration = {
+// Icons and labels resolve in the component; see appbar.types.ts for the shape.
+export const AppbarConfiguration: AppbarConfig = {
   titles: {
     "Recruit.Root": "titles.dashboard",
     "Recruit.Clients.Route": "titles.clients",
@@ -48,7 +18,7 @@ export const AppbarConfiguration = {
     "Recruit.EmailTemplates.Route": "titles.templates",
     "Recruit.Notifications.Route": "titles.notifications",
     "Recruit.HelpCenter.Route": "titles.helpCenter",
-  } as Record<string, string>,
+  },
   actions: [
     { kind: "theme" },
     {
@@ -89,5 +59,5 @@ export const AppbarConfiguration = {
         },
       ],
     },
-  ] as AppbarAction[],
+  ],
 };

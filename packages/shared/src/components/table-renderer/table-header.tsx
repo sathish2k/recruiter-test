@@ -3,11 +3,7 @@
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import type {
-  SortState,
-  TableColumnConfig,
-  TFunc,
-} from "./table-renderer.types";
+import type { SortState, TableColumnConfig, TFunc } from "./table-renderer.types";
 
 export function TableHeaderRenderer({
   columns,
@@ -27,11 +23,7 @@ export function TableHeaderRenderer({
   return (
     <TableRow>
       {columns.map((column) => (
-        <TableCell
-          key={column.label.name}
-          align={column.align}
-          sx={{ width: column.width }}
-        >
+        <TableCell key={column.label.name} align={column.align} sx={{ width: column.width }}>
           {column.sort ? (
             <TableSortLabel
               active={sort?.key === column.sort.key}
@@ -45,9 +37,7 @@ export function TableHeaderRenderer({
           )}
         </TableCell>
       ))}
-      {hasActions ? (
-        <TableCell align="right">{t(actionsLabelKey)}</TableCell>
-      ) : null}
+      {hasActions ? <TableCell align="right">{t(actionsLabelKey)}</TableCell> : null}
     </TableRow>
   );
 }

@@ -42,9 +42,7 @@ export function TableTitle({
         ) : null}
         <Box>
           {config.title ? (
-            <Box sx={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>
-              {t(config.title)}
-            </Box>
+            <Box sx={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>{t(config.title)}</Box>
           ) : null}
           {config.subtitle ? (
             <Box sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
@@ -62,9 +60,7 @@ export function TableTitle({
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
                 {config.action.label ? t(config.action.label.name) : ""}
-                {config.actionIcon ? (
-                  <IconRenderer name={config.actionIcon} size={15} />
-                ) : null}
+                {config.actionIcon ? <IconRenderer name={config.actionIcon} size={15} /> : null}
               </Box>
             }
             sx={{ px: "4px", py: "16px" }}

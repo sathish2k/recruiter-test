@@ -51,8 +51,7 @@ export function FunnelRenderer({
   const { t } = useTranslation(id);
   // The engine injects `data={}` when this renderer is used directly as a
   // bootstrap value; an empty object means "no data provided → fetch".
-  const seedData =
-    dataProp && Object.keys(dataProp).length > 0 ? dataProp : undefined;
+  const seedData = dataProp && Object.keys(dataProp).length > 0 ? dataProp : undefined;
   const { data } = useFetch<FunnelData>(id, { data: seedData });
   if (!data || !config) return null;
 
@@ -104,12 +103,7 @@ export function FunnelRenderer({
       {config.insight ? (
         <Alert
           severity="warning"
-          icon={
-            <IconRenderer
-              name={config.insight.icon ?? "psychology"}
-              size={18}
-            />
-          }
+          icon={<IconRenderer name={config.insight.icon ?? "psychology"} size={18} />}
           sx={{ mt: "18px" }}
         >
           {t(config.insight.name, {

@@ -1,11 +1,7 @@
 import type { ApexOptions } from "apexcharts";
 import delve from "dlv";
 import type { ApexChartType } from "./chart";
-import type {
-  GraphRendererConfig,
-  GraphRow,
-  TFuncLike,
-} from "./graph-renderer.types";
+import type { GraphRendererConfig, GraphRow, TFuncLike } from "./graph-renderer.types";
 
 export const DEFAULT_PALETTE = [
   "#FF8A3C",
@@ -21,10 +17,7 @@ export const DEFAULT_PALETTE = [
 const AXIS_COLOR = "#7C7972";
 const GRID_COLOR = "rgba(255,255,255,.06)";
 
-function formatValue(
-  value: number,
-  type?: GraphRendererConfig["valueType"],
-): string {
+function formatValue(value: number, type?: GraphRendererConfig["valueType"]): string {
   if (type === "currency") return `$${value.toLocaleString()}`;
   if (type === "percentage") return `${value}%`;
   return value.toLocaleString();
@@ -55,17 +48,12 @@ export function buildSeries(
 export function buildColors(config: GraphRendererConfig): string[] {
   if (config.colors?.length) return config.colors;
   if (!isCircular(config.type) && config.series?.some((s) => s.color)) {
-    return config.series.map(
-      (s, i) => s.color ?? DEFAULT_PALETTE[i % DEFAULT_PALETTE.length],
-    );
+    return config.series.map((s, i) => s.color ?? DEFAULT_PALETTE[i % DEFAULT_PALETTE.length]);
   }
   return DEFAULT_PALETTE;
 }
 
-export function buildOptions(
-  config: GraphRendererConfig,
-  rows: GraphRow[],
-): ApexOptions {
+export function buildOptions(config: GraphRendererConfig, rows: GraphRow[]): ApexOptions {
   const colors = buildColors(config);
   const legend = config.legend ?? isCircular(config.type);
 
@@ -103,12 +91,8 @@ export function buildOptions(
   if (isCircular(config.type)) {
     return {
       ...base,
-      labels: rows.map((r) =>
-        String(delve(r, config.labelPath ?? "label") ?? ""),
-      ),
-      ...(config.type === "donut"
-        ? { plotOptions: { pie: { donut: { size: "68%" } } } }
-        : {}),
+      labels: rows.map((r) => String(delve(r, config.labelPath ?? "label") ?? "")),
+      ...(config.type === "donut" ? { plotOptions: { pie: { donut: { size: "68%" } } } } : {}),
       stroke: { width: 0 },
     };
   }
@@ -131,9 +115,7 @@ export function buildOptions(
         }
       : {}),
     xaxis: {
-      categories: rows.map((r) =>
-        String(delve(r, config.categoryPath ?? "label") ?? ""),
-      ),
+      categories: rows.map((r) => String(delve(r, config.categoryPath ?? "label") ?? "")),
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: { style: { colors: AXIS_COLOR, fontSize: "12px" } },

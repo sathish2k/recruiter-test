@@ -3,6 +3,6 @@ export { Filters, type FiltersProps } from "./filters";
 export * from "./types";
 export {
   type FilterValue,
-  useFilters,
   type UseFiltersResult,
+  useFilters,
 } from "./use-filters";

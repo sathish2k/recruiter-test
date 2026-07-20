@@ -1,10 +1,17 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.model";
 
 /** A company/agency workspace. Everything in the ATS is scoped to one. */
 export const organization = pgTable("organization", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  website: text("website"),
+  timezone: text("timezone"),
+  placementFee: text("placement_fee"),
+  whiteLabel: boolean("white_label").notNull().default(true),
+  /** Remaining workspace settings (email branding, defaults, formats, …).
+   * Flattened into/out of the record by the organization service. */
+  settings: jsonb("settings").$type<Record<string, unknown>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

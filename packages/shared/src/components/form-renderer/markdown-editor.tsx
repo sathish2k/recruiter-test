@@ -48,8 +48,7 @@ const TOOLS: Tool[] = [
   { title: "Divider", icon: "horizontal-rule", prefix: "\n---\n" },
 ];
 
-const esc = (s: string) =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const inline = (s: string) =>
   s
@@ -60,10 +59,7 @@ const inline = (s: string) =>
       /`([^`]+)`/g,
       '<code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:12px">$1</code>',
     )
-    .replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" style="color:#F0B27C">$1</a>',
-    );
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#F0B27C">$1</a>');
 
 export function markdownToHtml(md: string): string {
   const lines = esc(md).split("\n");
@@ -95,8 +91,7 @@ export function markdownToHtml(md: string): string {
     }
     if (/^---\s*$/.test(line)) {
       closeList();
-      html +=
-        '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">';
+      html += '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">';
     } else if (/^&gt; /.test(line)) {
       closeList();
       html += `<blockquote style="margin:8px 0;padding:6px 14px;border-left:3px solid #F26A1B;background:rgba(242,106,27,.07);border-radius:0 8px 8px 0;color:#C9C5BD">${inline(line.slice(5))}</blockquote>`;
@@ -191,11 +186,7 @@ export function MarkdownEditor({
         onChange={(_, next) => setMode(next)}
         sx={{ bgcolor: "#141413", p: "3px" }}
       >
-        <Tab
-          value="write"
-          label={t("markdown.write", "Write")}
-          sx={{ py: "5px", fontSize: 12 }}
-        />
+        <Tab value="write" label={t("markdown.write", "Write")} sx={{ py: "5px", fontSize: 12 }} />
         <Tab
           value="preview"
           label={t("markdown.preview", "Preview")}
@@ -238,9 +229,7 @@ export function MarkdownEditor({
                   key={tool.title}
                   title={tool.title}
                   onClick={() =>
-                    tool.wrap
-                      ? insertWrap(...tool.wrap)
-                      : tool.prefix && insertPrefix(tool.prefix)
+                    tool.wrap ? insertWrap(...tool.wrap) : tool.prefix && insertPrefix(tool.prefix)
                   }
                   sx={{
                     width: 29,
@@ -251,11 +240,7 @@ export function MarkdownEditor({
                     fontWeight: 700,
                   }}
                 >
-                  {tool.icon ? (
-                    <IconRenderer name={tool.icon} size={17} />
-                  ) : (
-                    tool.text
-                  )}
+                  {tool.icon ? <IconRenderer name={tool.icon} size={17} /> : tool.text}
                 </IconButton>
               ),
             )}

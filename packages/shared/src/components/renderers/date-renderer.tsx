@@ -24,9 +24,7 @@ export function DateRenderer({
   const raw = delve(data, config.path);
   return (
     <Typography component="span" variant={config.variant} color={config.color}>
-      {raw
-        ? formatDate(raw as string | number | Date, config.options)
-        : (config.placeholder ?? "")}
+      {raw ? formatDate(raw as string | number | Date, config.options) : (config.placeholder ?? "")}
     </Typography>
   );
 }

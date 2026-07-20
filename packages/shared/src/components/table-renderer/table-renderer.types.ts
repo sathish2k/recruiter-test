@@ -27,10 +27,7 @@ export type CellConfig = GenericRendererConfig | CustomCellConfig;
  * custom cell's `type`; each receives the row and returns the cell content. */
 export type Cells = Record<string, (row: Row) => ReactNode>;
 /** The translation function returned by useTranslation(id). */
-export type TFunc = (
-  key: string,
-  fallback?: string | Record<string, unknown>,
-) => string;
+export type TFunc = (key: string, fallback?: string | Record<string, unknown>) => string;
 
 export interface ColumnLabel {
   /** Translation key resolved via useTranslation(id). */

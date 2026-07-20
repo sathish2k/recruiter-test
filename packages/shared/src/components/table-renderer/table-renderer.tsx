@@ -11,11 +11,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
-import {
-  type ActionHandler,
-  EmptyStateRenderer,
-  IconRenderer,
-} from "../renderers";
+import { type ActionHandler, EmptyStateRenderer, IconRenderer } from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
 import type { Cells, Row, TableRendererConfig } from "./table-renderer.types";
@@ -68,9 +64,7 @@ export function TableRenderer({
   const server = clientRows === undefined;
 
   const { sort, toggleSort } = useSort();
-  const resetKey = `${JSON.stringify(filters ?? {})}|${
-    sort ? `${sort.key}:${sort.dir}` : ""
-  }`;
+  const resetKey = `${JSON.stringify(filters ?? {})}|${sort ? `${sort.key}:${sort.dir}` : ""}`;
   const { page: requestedPage, setPage } = usePagination(resetKey);
 
   const query = server
@@ -91,45 +85,29 @@ export function TableRenderer({
     server || !sort
       ? fetched
       : [...fetched].sort(
-          (a, b) =>
-            compare(delve(a, sort.key), delve(b, sort.key)) *
-            (sort.dir === "asc" ? 1 : -1),
+          (a, b) => compare(delve(a, sort.key), delve(b, sort.key)) * (sort.dir === "asc" ? 1 : -1),
         );
-  const totalCount = server
-    ? (meta?.totalCount ?? fetched.length)
-    : sorted.length;
-  const totalPages = pageSize
-    ? Math.max(1, Math.ceil(totalCount / pageSize))
-    : 1;
+  const totalCount = server ? (meta?.totalCount ?? fetched.length) : sorted.length;
+  const totalPages = pageSize ? Math.max(1, Math.ceil(totalCount / pageSize)) : 1;
   const page = Math.min(requestedPage, totalPages);
-  const paged =
-    server || !pageSize
-      ? sorted
-      : sorted.slice((page - 1) * pageSize, page * pageSize);
+  const paged = server || !pageSize ? sorted : sorted.slice((page - 1) * pageSize, page * pageSize);
 
   const hasActiveFilter =
     !!filters &&
     Object.values(filters).some(
-      (v) =>
-        v != null &&
-        v !== "" &&
-        !(Array.isArray(v) && v.length === 0),
+      (v) => v != null && v !== "" && !(Array.isArray(v) && v.length === 0),
     );
   const showFirstRun = Boolean(config?.emptyState) && !hasActiveFilter;
 
   if (error) {
     return (
-      <Alert severity="error">
-        {t("loadError", "Something went wrong loading the data.")}
-      </Alert>
+      <Alert severity="error">{t("loadError", "Something went wrong loading the data.")}</Alert>
     );
   }
 
   return (
     <TableContainer>
-      {config?.header ? (
-        <TableTitle config={config.header} meta={meta} t={t} />
-      ) : null}
+      {config?.header ? <TableTitle config={config.header} meta={meta} t={t} /> : null}
       <Table size="small">
         <TableHead>
           <TableHeaderRenderer
@@ -162,11 +140,7 @@ export function TableRenderer({
                 sx={{ py: showFirstRun ? "16px" : "32px", borderBottom: "none" }}
               >
                 {showFirstRun && config?.emptyState ? (
-                  <EmptyStateRenderer
-                    config={config.emptyState}
-                    t={t}
-                    onAction={onEmptyAction}
-                  />
+                  <EmptyStateRenderer config={config.emptyState} t={t} onAction={onEmptyAction} />
                 ) : (
                   <Box
                     sx={{

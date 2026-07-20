@@ -74,16 +74,10 @@ export function LinkRenderer({
   const color = config.color ?? (children ? "inherit" : "primary");
 
   const finalType =
-    linkType === "auto"
-      ? isExternal(value || href || "")
-        ? "external"
-        : "route"
-      : linkType;
+    linkType === "auto" ? (isExternal(value || href || "") ? "external" : "route") : linkType;
 
   const resolveParam = (param: LinkParamConfig) =>
-    param.type === "dynamic" && param.path
-      ? delve(data, param.path)
-      : param.value;
+    param.type === "dynamic" && param.path ? delve(data, param.path) : param.value;
 
   const buildRouteUrl = (): string => {
     const targetRouteId = routeId || value;
@@ -94,10 +88,7 @@ export function LinkRenderer({
     }
     let url = getPathFromRouteId(targetRouteId, pathParams);
     const query = Object.entries(queryParams)
-      .map(
-        ([key, param]) =>
-          `${key}=${encodeURIComponent(String(resolveParam(param)))}`,
-      )
+      .map(([key, param]) => `${key}=${encodeURIComponent(String(resolveParam(param)))}`)
       .join("&");
     if (query) url += `?${query}`;
     return url;

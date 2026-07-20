@@ -17,11 +17,7 @@ export function DropdownFilterComponent({
 }) {
   const selected = config.options.find((o) => o.value === value);
   return (
-    <FilterPopover
-      label={config.label?.name}
-      summary={selected?.label}
-      active={active}
-    >
+    <FilterPopover label={config.label?.name} summary={selected?.label} active={active}>
       {(close) =>
         config.options.map((option) => (
           <Box

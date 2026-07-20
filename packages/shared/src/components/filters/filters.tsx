@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { IconRenderer } from "../renderers";
 import {
   CheckboxFilterComponent,
   DateFilterComponent,
@@ -18,7 +19,6 @@ import {
 } from "./components";
 import type { DateRangeValue } from "./components/daterange-filter";
 import type { RangeValue } from "./components/range-filter";
-import { IconRenderer } from "../renderers";
 import type { FilterConfig } from "./types";
 import { type FilterValue, useFilters } from "./use-filters";
 
@@ -52,8 +52,7 @@ function widthEstimate(filter: FilterConfig): number {
 }
 
 function splitFilters(options: FilterConfig[], containerWidth: number) {
-  if (!containerWidth)
-    return { visible: options, hidden: [] as FilterConfig[] };
+  if (!containerWidth) return { visible: options, hidden: [] as FilterConfig[] };
   const visible: FilterConfig[] = [];
   const hidden: FilterConfig[] = [];
   let used = 0;
@@ -63,11 +62,7 @@ function splitFilters(options: FilterConfig[], containerWidth: number) {
       used += widthEstimate(filter) + GAP;
       continue;
     }
-    const needed =
-      used +
-      widthEstimate(filter) +
-      GAP +
-      (hidden.length === 0 ? MORE_WIDTH : 0);
+    const needed = used + widthEstimate(filter) + GAP + (hidden.length === 0 ? MORE_WIDTH : 0);
     if (needed <= containerWidth - BUFFER) {
       visible.push(filter);
       used += widthEstimate(filter) + GAP;
@@ -79,11 +74,7 @@ function splitFilters(options: FilterConfig[], containerWidth: number) {
 }
 
 function isSet(value: unknown): boolean {
-  return !(
-    value == null ||
-    value === "" ||
-    (Array.isArray(value) && value.length === 0)
-  );
+  return !(value == null || value === "" || (Array.isArray(value) && value.length === 0));
 }
 
 function displayValue(config: FilterConfig, value: unknown): string {
@@ -91,15 +82,11 @@ function displayValue(config: FilterConfig, value: unknown): string {
     case "dropdown":
     case "radio":
     case "segmented":
-      return (
-        config.options.find((o) => o.value === value)?.label ?? String(value)
-      );
+      return config.options.find((o) => o.value === value)?.label ?? String(value);
     case "checkbox":
     case "select":
       return Array.isArray(value)
-        ? value
-            .map((v) => config.options.find((o) => o.value === v)?.label ?? v)
-            .join(", ")
+        ? value.map((v) => config.options.find((o) => o.value === v)?.label ?? v).join(", ")
         : String(value);
     case "toggle":
       return value ? "On" : "Off";
@@ -127,11 +114,7 @@ function control(
   switch (filter.type) {
     case "search":
       return (
-        <SearchFilterComponent
-          config={filter}
-          value={String(value ?? "")}
-          onChange={onChange}
-        />
+        <SearchFilterComponent config={filter} value={String(value ?? "")} onChange={onChange} />
       );
     case "segmented":
       return (
@@ -217,8 +200,7 @@ export function Filters({
   showClearAll = false,
   clearAllLabel = "Clear all",
 }: FiltersProps) {
-  const { filters, setFilter, clearFilter, clearAllFilters, hasActiveFilters } =
-    useFilters();
+  const { filters, setFilter, clearFilter, clearAllFilters, hasActiveFilters } = useFilters();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
@@ -236,10 +218,7 @@ export function Filters({
   }, [responsive]);
 
   const { visible, hidden } = useMemo(
-    () =>
-      responsive
-        ? splitFilters(options, width)
-        : { visible: options, hidden: [] },
+    () => (responsive ? splitFilters(options, width) : { visible: options, hidden: [] }),
     [responsive, options, width],
   );
 

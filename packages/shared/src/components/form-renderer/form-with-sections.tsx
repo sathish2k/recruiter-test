@@ -12,8 +12,7 @@ import { buildResolver, defaultFor, Field } from "./form-renderer";
 import type { FormSectionField, FormWithSectionsProps } from "./types";
 
 const fieldName = (f: FormSectionField) => (typeof f === "string" ? f : f.name);
-const fieldSpan = (f: FormSectionField) =>
-  typeof f === "string" ? 1 : (f.span ?? 1);
+const fieldSpan = (f: FormSectionField) => (typeof f === "string" ? 1 : (f.span ?? 1));
 
 export function FormWithSectionsRenderer({
   id,
@@ -61,27 +60,19 @@ export function FormWithSectionsRenderer({
       >
         <Box>
           {title ? (
-            <Typography
-              sx={{ fontSize: 21, fontWeight: 700, letterSpacing: "-.01em" }}
-            >
+            <Typography sx={{ fontSize: 21, fontWeight: 700, letterSpacing: "-.01em" }}>
               {t(title)}
             </Typography>
           ) : null}
           {description ? (
-            <Typography
-              sx={{ fontSize: 13, color: "text.secondary", mt: "4px" }}
-            >
+            <Typography sx={{ fontSize: 13, color: "text.secondary", mt: "4px" }}>
               {t(description)}
             </Typography>
           ) : null}
         </Box>
         <Box sx={{ display: "flex", gap: "8px", flex: "none" }}>
           {onCancel ? (
-            <Button
-              variant="outlined"
-              onClick={onCancel}
-              sx={{ fontWeight: 400 }}
-            >
+            <Button variant="outlined" onClick={onCancel} sx={{ fontWeight: 400 }}>
               {t(cancelLabel)}
             </Button>
           ) : null}
@@ -98,9 +89,7 @@ export function FormWithSectionsRenderer({
             type="submit"
             variant="contained"
             loading={loading || formState.isSubmitting}
-            startIcon={
-              submitIcon ? <IconRenderer name={submitIcon} size={16} /> : null
-            }
+            startIcon={submitIcon ? <IconRenderer name={submitIcon} size={16} /> : null}
           >
             {t(submitLabel)}
           </Button>
@@ -129,13 +118,9 @@ export function FormWithSectionsRenderer({
             >
               {section.title ? (
                 <Box>
-                  <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
-                    {t(section.title)}
-                  </Typography>
+                  <Typography sx={{ fontSize: 15, fontWeight: 700 }}>{t(section.title)}</Typography>
                   {section.description ? (
-                    <Typography
-                      sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}
-                    >
+                    <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}>
                       {t(section.description)}
                     </Typography>
                   ) : null}
@@ -163,9 +148,7 @@ export function FormWithSectionsRenderer({
           ))}
         </Box>
         {sidePanel ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {sidePanel}
-          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>{sidePanel}</Box>
         ) : null}
       </Box>
     </Box>

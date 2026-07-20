@@ -27,9 +27,7 @@ export function CheckboxFilterComponent({
     : undefined;
 
   const toggle = (v: string) =>
-    onChange(
-      values.includes(v) ? values.filter((x) => x !== v) : [...values, v],
-    );
+    onChange(values.includes(v) ? values.filter((x) => x !== v) : [...values, v]);
 
   return (
     <FilterPopover label={config.label?.name} summary={summary} active={active}>
@@ -37,11 +35,7 @@ export function CheckboxFilterComponent({
         config.options.map((option) => {
           const checked = values.includes(option.value);
           return (
-            <Box
-              key={option.value}
-              onClick={() => toggle(option.value)}
-              sx={optionRowSx(checked)}
-            >
+            <Box key={option.value} onClick={() => toggle(option.value)} sx={optionRowSx(checked)}>
               <Box
                 sx={{
                   width: 16,
@@ -56,9 +50,7 @@ export function CheckboxFilterComponent({
                   borderColor: checked ? "#F26A1B" : "rgba(255,255,255,.3)",
                 }}
               >
-                {checked ? (
-                  <CheckRounded sx={{ fontSize: 13, color: "#fff" }} />
-                ) : null}
+                {checked ? <CheckRounded sx={{ fontSize: 13, color: "#fff" }} /> : null}
               </Box>
               {option.label}
             </Box>

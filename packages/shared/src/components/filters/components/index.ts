@@ -1,9 +1,9 @@
 export { CheckboxFilterComponent } from "./checkbox-filter";
+export { DateFilterComponent } from "./date-filter";
 export {
   DateRangeFilterComponent,
   type DateRangeValue,
 } from "./daterange-filter";
-export { DateFilterComponent } from "./date-filter";
 export { DropdownFilterComponent } from "./dropdown-filter";
 export {
   DARK_INPUT_STYLE,

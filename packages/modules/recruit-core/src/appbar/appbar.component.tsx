@@ -11,11 +11,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { type Route, useAuthUser, useLogout, usePortalRouter, useTranslation } from "@recruit/sdk";
+import { useAuthUser, useLogout, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { IconRenderer } from "@recruit/shared";
 import { useColorMode } from "@recruit/ui";
 import { useState } from "react";
-import type { AppbarAction, AppbarMenuItem } from "./appbar.configuration";
+import type { AppbarComponentProps, AppbarMenuItem } from "./appbar.types";
 
 function initials(name?: string | null): string {
   if (!name) return "";
@@ -27,18 +27,7 @@ function initials(name?: string | null): string {
     .join("");
 }
 
-export function AppbarComponent({
-  id,
-  configuration,
-  currentRoute,
-}: {
-  id: string;
-  configuration?: {
-    titles?: Record<string, string>;
-    actions?: AppbarAction[];
-  };
-  currentRoute?: Route | null;
-}) {
+export function AppbarComponent({ id, configuration, currentRoute }: AppbarComponentProps) {
   const router = usePortalRouter();
   const { t, language, setLanguage } = useTranslation(id);
   const user = useAuthUser();

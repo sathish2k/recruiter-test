@@ -1,0 +1,30 @@
+{
+  "title": "Pending invitations",
+  "subtitle": "People who haven't accepted yet",
+  "empty": "No pending invitations",
+  "export": "Export",
+  "exportAs": "Export as",
+  "exportTypes": { "csv": "CSV" },
+  "columns": {
+    "email": "Email",
+    "role": "Role",
+    "sent": "Sent",
+    "expires": "Expires",
+    "actions": "Actions"
+  },
+  "filters": { "search": "Search invitations" },
+  "roles": {
+    "admin": "Admin",
+    "lead": "Profile lead",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "actions": {
+    "resend": "Resend invite",
+    "cancel": "Cancel invite"
+  },
+  "toast": {
+    "resent": "Invitation resent",
+    "cancelled": "Invitation cancelled"
+  }
+}

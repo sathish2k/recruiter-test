@@ -8,10 +8,7 @@ import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { type ReactNode, useState } from "react";
 import { FormRenderer } from "../form-renderer";
 import type { FormValues, JsonSchema } from "../form-renderer/types";
-import {
-  LinkRenderer,
-  type LinkRendererConfig,
-} from "../renderers/link-renderer";
+import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface ForgotPasswordValues {
@@ -33,9 +30,7 @@ export function ForgotPassword({
   const { schema, links } = useConfiguration<ForgotPasswordConfig>(id);
   const { t } = useTranslation(id);
   const [sentEmail, setSentEmail] = useState<string | null>(null);
-  const back = links?.signIn
-    ? { ...links.signIn, text: t(links.signIn.text ?? "") }
-    : undefined;
+  const back = links?.signIn ? { ...links.signIn, text: t(links.signIn.text ?? "") } : undefined;
 
   const sentSubtitle = (email: string): ReactNode => {
     const text = t("sent.subtitle", { email });
@@ -85,9 +80,7 @@ export function ForgotPassword({
           }}
         />
       ) : null}
-      <Typography
-        sx={{ mt: "20px", fontSize: 13, color: "#9A968E", textAlign: "center" }}
-      >
+      <Typography sx={{ mt: "20px", fontSize: 13, color: "#9A968E", textAlign: "center" }}>
         {t("footerText")} {back ? <LinkRenderer config={back} /> : null}
       </Typography>
     </AuthCard>

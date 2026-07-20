@@ -1,5 +1,9 @@
 import { status } from "elysia";
-import { getOrganization, updateOrganization } from "../services/organization.service";
+import {
+  getOrganization,
+  type UpdateOrganizationInput,
+  updateOrganization,
+} from "../services/organization.service";
 
 type Auth = { agencyId?: string | null };
 
@@ -9,7 +13,10 @@ export async function getMyOrganization(ctx: { user: Auth }) {
   return org;
 }
 
-export async function putMyOrganization(ctx: { user: Auth; body?: { name?: string } | null }) {
+export async function putMyOrganization(ctx: {
+  user: Auth;
+  body?: UpdateOrganizationInput | null;
+}) {
   const updated = await updateOrganization(ctx.user.agencyId ?? "", ctx.body ?? {});
   if (!updated) return status(404, "Organization not found");
   return updated;

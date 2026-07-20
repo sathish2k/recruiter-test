@@ -1,11 +1,6 @@
 import Box from "@mui/material/Box";
 import type { ReactNode } from "react";
-import type {
-  ComponentDefinition,
-  Configuration,
-  LayoutElement,
-  Route,
-} from "../types";
+import type { ComponentDefinition, Configuration, LayoutElement, Route } from "../types";
 
 export function MuiAuthLayout({
   layoutConfig,

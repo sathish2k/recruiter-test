@@ -21,18 +21,10 @@ export function DateRangeFilterComponent({
   active?: boolean;
 }) {
   const range = value ?? {};
-  const summary =
-    range.from || range.to
-      ? `${range.from ?? "…"} – ${range.to ?? "…"}`
-      : undefined;
+  const summary = range.from || range.to ? `${range.from ?? "…"} – ${range.to ?? "…"}` : undefined;
 
   return (
-    <FilterPopover
-      label={config.label?.name}
-      summary={summary}
-      minWidth={220}
-      active={active}
-    >
+    <FilterPopover label={config.label?.name} summary={summary} minWidth={220} active={active}>
       {() => (
         <Box
           sx={{

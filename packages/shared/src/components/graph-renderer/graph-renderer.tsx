@@ -58,9 +58,7 @@ export function GraphRenderer({
         >
           <Box>
             {config.header?.title ? (
-              <Box sx={{ fontSize: 15, fontWeight: 600 }}>
-                {t(config.header.title)}
-              </Box>
+              <Box sx={{ fontSize: 15, fontWeight: 600 }}>{t(config.header.title)}</Box>
             ) : null}
             {config.header?.subtitle ? (
               <Box sx={{ fontSize: 12.5, color: "text.disabled", mt: "2px" }}>
@@ -69,9 +67,7 @@ export function GraphRenderer({
             ) : null}
           </Box>
           {toolbar ? (
-            <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              {toolbar}
-            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>{toolbar}</Box>
           ) : null}
         </Box>
       ) : null}
