@@ -1,0 +1,34 @@
+{
+  "title": "Role permissions",
+  "note": "Editable · saved to your agency · admin only",
+  "permission": "Permission",
+  "editHint": "Click a cell to edit",
+  "roles": {
+    "admin": "Admin",
+    "lead": "Profile Lead",
+    "employee": "Employee",
+    "client": "Client"
+  },
+  "resources": {
+    "dashboard": "View dashboard & reports",
+    "clients": "Manage clients & contracts",
+    "jobs": "Manage roles / jobs",
+    "candidates": "Upload & manage candidates",
+    "interviews": "Call candidates & schedule interviews",
+    "settings": "Invite & manage team members"
+  },
+  "actions": {
+    "create": "Create",
+    "read": "Read",
+    "update": "Update",
+    "delete": "Delete"
+  },
+  "buttons": {
+    "reset": "Reset",
+    "save": "Save changes"
+  },
+  "toast": {
+    "savedTitle": "Permissions updated",
+    "savedRole": "{{role}} permissions saved"
+  }
+}

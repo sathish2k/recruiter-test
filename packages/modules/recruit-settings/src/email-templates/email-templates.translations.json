@@ -1,0 +1,29 @@
+{
+  "title": "Email templates",
+  "subtitle": "Automated emails sent to candidates across the hiring flow.",
+  "templatesLabel": "TEMPLATES",
+  "newTemplate": "New",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "namePlaceholder": "Template name",
+  "subjectLabel": "Subject",
+  "subjectPlaceholder": "Email subject line",
+  "variablesLabel": "Insert variable",
+  "variablesHint": "Click a variable to insert it into the focused field.",
+  "bodyLabel": "Body",
+  "bodyPlaceholder": "Write your email…",
+  "bodyHint": "A blank line starts a new paragraph.",
+  "save": "Save changes",
+  "delete": "Delete",
+  "previewLabel": "LIVE PREVIEW",
+  "resetDefault": "Reset to default",
+  "sendTest": "Send test to me",
+  "empty": "Select a template to start editing.",
+  "toast": {
+    "saved": "Template saved",
+    "created": "Template created",
+    "deleted": "Template deleted",
+    "reset": "Reverted to last saved",
+    "testSent": "Test email sent to you"
+  }
+}

@@ -3,19 +3,12 @@
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { createAuthClient } from "better-auth/react";
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { setAuthToken } from "../client";
 
-/** Better Auth client. Talks to the API, which hosts Better Auth at /api/auth/*. */
+/** Better Auth client. Uses the current (web) origin so the session cookie is
+ * same-origin; the web app proxies /api/auth/* to the API (see next.config). */
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
   basePath: "/api/auth",
 });
 
@@ -75,7 +68,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <AuthUserContext.Provider value={user}>{children}</AuthUserContext.Provider>
-  );
+  return <AuthUserContext.Provider value={user}>{children}</AuthUserContext.Provider>;
 }

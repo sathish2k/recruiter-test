@@ -73,7 +73,7 @@ export const AppbarConfiguration = {
         {
           label: "menu.profile",
           icon: "person",
-          routeId: "Recruit.Profile.Route",
+          routeId: "Recruit.SettingsSecurity.Route",
         },
         {
           label: "menu.settings",

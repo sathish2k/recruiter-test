@@ -4,9 +4,7 @@ let client: Mailjet | null = null;
 
 export function isEmailConfigured(): boolean {
   return Boolean(
-    process.env.MAILJET_API_KEY &&
-      process.env.MAILJET_API_SECRET &&
-      process.env.MAILJET_FROM_EMAIL,
+    process.env.MAILJET_API_KEY && process.env.MAILJET_API_SECRET && process.env.MAILJET_FROM_EMAIL,
   );
 }
 

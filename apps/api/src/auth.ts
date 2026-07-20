@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { bearer } from "better-auth/plugins";
 import { db, schema } from "./db";
 import { isEmailConfigured, sendEmail } from "./lib/mailjet";
 
@@ -32,8 +33,13 @@ export const auth = betterAuth({
       role: { type: "string", required: false, defaultValue: "admin", input: true },
       agencyId: { type: "string", required: false, input: true },
       status: { type: "string", required: false, defaultValue: "active", input: false },
+      phone: { type: "string", required: false, input: true },
+      timezone: { type: "string", required: false, input: true },
     },
   },
+  // Accept `Authorization: Bearer <token>` (the SDK httpClient sends the session
+  // token this way) in addition to the session cookie.
+  plugins: [bearer()],
   trustedOrigins: [webOrigin],
 });
 

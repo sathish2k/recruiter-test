@@ -8,6 +8,27 @@
       "when": 1784471703945,
       "tag": "0000_mean_warpath",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784482864653,
+      "tag": "0001_breezy_scorpion",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784510836622,
+      "tag": "0002_mighty_expediter",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784511051027,
+      "tag": "0003_sticky_the_professor",
+      "breakpoints": true
     }
   ]
 }

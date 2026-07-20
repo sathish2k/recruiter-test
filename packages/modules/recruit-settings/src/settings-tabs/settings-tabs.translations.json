@@ -1,0 +1,12 @@
+{
+  "title": "Settings",
+  "subtitle": "Workspace, team, billing & security",
+  "tabs": {
+    "workspace": "Workspace",
+    "members": "Members",
+    "templates": "Email templates",
+    "billing": "Billing",
+    "integrations": "Integrations",
+    "security": "Security"
+  }
+}

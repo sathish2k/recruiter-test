@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 // Better Auth core tables (email + password) plus recruit-specific user fields
 // (role / agencyId / status) exposed to Better Auth via additionalFields.
@@ -12,6 +12,9 @@ export const user = pgTable("user", {
   role: text("role").notNull().default("admin"),
   agencyId: text("agency_id"),
   status: text("status").notNull().default("active"),
+  phone: text("phone"),
+  timezone: text("timezone"),
+  notificationPrefs: jsonb("notification_prefs").$type<Record<string, boolean>>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

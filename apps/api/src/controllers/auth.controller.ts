@@ -1,7 +1,7 @@
 import { status } from "elysia";
 import {
-  registerAccount,
   type RegisterInput,
+  registerAccount,
   requestPasswordReset,
   resetPassword as resetPasswordService,
 } from "../services/auth.service";
