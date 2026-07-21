@@ -2,7 +2,7 @@ import type { AccessRule } from "@recruit/sdk";
 import type { ReactNode } from "react";
 import type { ExportConfig } from "../export";
 import type { FilterConfig } from "../filters";
-import type { JsonSchema } from "../form-renderer";
+import type { JsonSchema } from "../forms";
 import type {
   ActionItem,
   EmptyStateConfig,

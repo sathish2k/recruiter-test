@@ -6,7 +6,9 @@ import InputBase from "@mui/material/InputBase";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { useRef, useState } from "react";
-import { IconRenderer } from "../renderers";
+import { IconRenderer } from "../../renderers";
+import { FieldShell } from "../field/field-shell";
+import type { WidgetProps } from "../types";
 
 type TFunc = (key: string, fallback?: string) => string;
 
@@ -53,13 +55,29 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const inline = (s: string) =>
   s
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/~~([^~]+)~~/g, '<del style="color:#7C7972">$1</del>')
+    .replace(/~~([^~]+)~~/g, `<del style="color:${tokens.muted}">$1</del>`)
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(
       /`([^`]+)`/g,
-      '<code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:12px">$1</code>',
+      `<code style="background:${tokens.fill};padding:1px 6px;border-radius:5px;font-size:12px">$1</code>`,
     )
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#F0B27C">$1</a>');
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2" style="color:${tokens.accentFg}">$1</a>`);
+
+/**
+ * Theme values for the generated preview HTML. Inline styles can't reach `sx`,
+ * but the theme emits CSS custom properties, so the markup references those and
+ * re-themes with everything else — no values threaded through, no literals.
+ */
+const tokens = {
+  muted: "var(--mui-palette-text-disabled)",
+  fill: "var(--mui-palette-surface-hover)",
+  border: "var(--mui-palette-surface-border)",
+  accent: "var(--mui-palette-primary-main)",
+  accentSoft: "var(--mui-palette-surface-primarySoftBg)",
+  accentFg: "var(--mui-palette-surface-primarySoftFg)",
+  text: "var(--mui-palette-surface-textMuted)",
+  success: "var(--mui-palette-success-light)",
+};
 
 export function markdownToHtml(md: string): string {
   const lines = esc(md).split("\n");
@@ -76,7 +94,7 @@ export function markdownToHtml(md: string): string {
   for (const line of lines) {
     if (/^```/.test(line.trim())) {
       if (inCode) {
-        html += `<pre style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:12px 14px;font-size:12px;line-height:1.55;overflow-x:auto;margin:10px 0">${codeBuf.join("\n")}</pre>`;
+        html += `<pre style="background:${tokens.fill};border:1px solid ${tokens.border};border-radius:9px;padding:12px 14px;font-size:12px;line-height:1.55;overflow-x:auto;margin:10px 0">${codeBuf.join("\n")}</pre>`;
         inCode = false;
         codeBuf = [];
       } else {
@@ -91,10 +109,10 @@ export function markdownToHtml(md: string): string {
     }
     if (/^---\s*$/.test(line)) {
       closeList();
-      html += '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:14px 0">';
+      html += `<hr style="border:none;border-top:1px solid ${tokens.border};margin:14px 0">`;
     } else if (/^&gt; /.test(line)) {
       closeList();
-      html += `<blockquote style="margin:8px 0;padding:6px 14px;border-left:3px solid #F26A1B;background:rgba(242,106,27,.07);border-radius:0 8px 8px 0;color:#C9C5BD">${inline(line.slice(5))}</blockquote>`;
+      html += `<blockquote style="margin:8px 0;padding:6px 14px;border-left:3px solid ${tokens.accent};background:${tokens.accentSoft};border-radius:0 8px 8px 0;color:${tokens.text}">${inline(line.slice(5))}</blockquote>`;
     } else if (/^- \[( |x)\] /.test(line)) {
       if (list !== "ul") {
         closeList();
@@ -102,7 +120,7 @@ export function markdownToHtml(md: string): string {
         list = "ul";
       }
       const done = line[3] === "x";
-      html += `<li style="margin:4px 0;display:flex;gap:8px;align-items:baseline"><span style="color:${done ? "#8FD6AC" : "#7C7972"}">${done ? "☑" : "☐"}</span><span${done ? ' style="color:#7C7972;text-decoration:line-through"' : ""}>${inline(line.slice(6))}</span></li>`;
+      html += `<li style="margin:4px 0;display:flex;gap:8px;align-items:baseline"><span style="color:${done ? tokens.success : tokens.muted}">${done ? "☑" : "☐"}</span><span${done ? ` style="color:${tokens.muted};text-decoration:line-through"` : ""}>${inline(line.slice(6))}</span></li>`;
     } else if (/^### /.test(line)) {
       closeList();
       html += `<h3 style="font-size:14px;font-weight:700;margin:14px 0 6px">${inline(line.slice(4))}</h3>`;
@@ -184,7 +202,7 @@ export function MarkdownEditor({
       <Tabs
         value={mode}
         onChange={(_, next) => setMode(next)}
-        sx={{ bgcolor: "#141413", p: "3px" }}
+        sx={{ bgcolor: "surface.inset", p: "3px" }}
       >
         <Tab value="write" label={t("markdown.write", "Write")} sx={{ py: "5px", fontSize: 12 }} />
         <Tab
@@ -196,10 +214,11 @@ export function MarkdownEditor({
       {mode === "write" ? (
         <Box
           sx={{
-            border: "1px solid rgba(255,255,255,.1)",
+            border: "1px solid",
+            borderColor: "surface.border",
             borderRadius: "12px",
             overflow: "hidden",
-            bgcolor: "#141413",
+            bgcolor: "surface.inset",
           }}
         >
           <Box
@@ -208,7 +227,8 @@ export function MarkdownEditor({
               alignItems: "center",
               gap: "2px",
               p: "7px 10px",
-              borderBottom: "1px solid rgba(255,255,255,.07)",
+              borderBottom: "1px solid",
+              borderBottomColor: "surface.border",
               flexWrap: "wrap",
             }}
           >
@@ -220,7 +240,7 @@ export function MarkdownEditor({
                   sx={{
                     width: "1px",
                     height: 18,
-                    bgcolor: "rgba(255,255,255,.1)",
+                    bgcolor: "surface.hover",
                     mx: "5px",
                   }}
                 />
@@ -268,23 +288,44 @@ export function MarkdownEditor({
       ) : (
         <Box
           sx={{
-            border: "1px solid rgba(255,255,255,.1)",
+            border: "1px solid",
+            borderColor: "surface.border",
             borderRadius: "12px",
-            bgcolor: "#141413",
+            bgcolor: "surface.inset",
             p: "16px 18px",
             minHeight: 180,
             fontSize: 13.5,
             lineHeight: 1.6,
-            color: "#C9C5BD",
+            color: "surface.textMuted",
           }}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: input is escaped before rendering.
           dangerouslySetInnerHTML={{
             __html:
               markdownToHtml(value) ||
-              `<p style="color:#7C7972">${esc(t("markdown.empty", "Nothing to preview yet — write some markdown first."))}</p>`,
+              `<p style="color:${tokens.muted}">${esc(t("markdown.empty", "Nothing to preview yet — write some markdown first."))}</p>`,
           }}
         />
       )}
     </Box>
+  );
+}
+
+/** The `markdown` widget. */
+export function MarkdownWidget({ prop, field, fieldState, t }: WidgetProps) {
+  return (
+    <FieldShell
+      label={t(prop.title ?? "")}
+      hideLabel={prop.hideLabel}
+      help={prop.help ? t(prop.help) : undefined}
+      error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
+    >
+      <MarkdownEditor
+        value={String(field.value ?? "")}
+        onChange={field.onChange}
+        placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
+        rows={prop.rows}
+        t={t}
+      />
+    </FieldShell>
   );
 }

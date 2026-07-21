@@ -25,7 +25,7 @@ export function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
         position: "relative",
         cursor: "pointer",
         transition: "background .15s",
-        background: on ? "#4EA874" : "#3A3A37",
+        background: on ? "var(--mui-palette-success-main)" : "var(--mui-palette-surface-neutral)",
       }}
     >
       <Box
@@ -123,13 +123,20 @@ export function CardHeader({
 /** Gradient progress bar used by the security score, seats and AI credits. */
 export function Meter({ percent, color }: { percent: number; color?: string }) {
   return (
-    <Box sx={{ height: 6, borderRadius: 999, background: "rgba(255,255,255,.07)", width: "100%" }}>
+    <Box
+      sx={{
+        height: 6,
+        borderRadius: 999,
+        background: "var(--mui-palette-surface-tint)",
+        width: "100%",
+      }}
+    >
       <Box
         sx={{
           height: "100%",
           borderRadius: 999,
           width: `${Math.min(100, Math.max(0, percent))}%`,
-          background: color ?? "linear-gradient(90deg,#F0894A,#F0C27C)",
+          background: color ?? ((theme) => theme.gradients.meter),
           transition: "width .25s",
         }}
       />

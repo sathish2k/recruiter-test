@@ -1,7 +1,7 @@
 "use client";
 
-import type { FormRendererProps, FormValues } from "../form-renderer";
-import { FormRenderer } from "../form-renderer";
+import type { FormRendererProps, FormValues } from "../forms";
+import { FormRenderer } from "../forms";
 import { Modal, type ModalProps } from "./modal";
 
 export interface FormModalProps

@@ -144,8 +144,8 @@ export function AppbarComponent({ id, configuration, currentRoute }: AppbarCompo
                   onClick={(e) => (menu.length ? setAvatarMenu(e.currentTarget) : go())}
                   title={user?.name ?? undefined}
                   sx={{
-                    bgcolor: "#5B4A3A",
-                    color: "#FFD9BC",
+                    bgcolor: "var(--mui-palette-surface-primarySoftBg)",
+                    color: "var(--mui-palette-surface-primarySoftFg)",
                     cursor: "pointer",
                   }}
                 >

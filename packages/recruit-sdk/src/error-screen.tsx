@@ -196,7 +196,8 @@ function ActionButton({ action, primary }: { action: ErrorScreenAction; primary?
     textDecoration: "none",
     ...(primary
       ? {
-          background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+          background:
+            "linear-gradient(135deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))",
           color: "#fff",
           border: "none",
           boxShadow: "0 14px 34px rgba(228,86,15,.28)",

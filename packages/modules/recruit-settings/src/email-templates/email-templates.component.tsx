@@ -1,5 +1,9 @@
 "use client";
 
+// Deliberate non-theme colours: the block below renders a preview of the actual
+// email, which lands in a mail client on a white background regardless of what
+// scheme the app is in. Theming it would misrepresent what recipients see.
+
 import AddRounded from "@mui/icons-material/AddRounded";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -212,13 +216,17 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
                     cursor: "pointer",
                     borderRadius: "11px",
                     p: "10px 11px",
-                    background: isSelected ? "rgba(242,106,27,0.1)" : "transparent",
+                    background: isSelected
+                      ? "var(--mui-palette-surface-primarySoftBg)"
+                      : "transparent",
                     border: isSelected
                       ? "1px solid rgba(242,106,27,0.35)"
                       : "1px solid transparent",
                     transition: "background .15s, border-color .15s",
                     "&:hover": {
-                      background: isSelected ? "rgba(242,106,27,0.1)" : "rgba(255,255,255,0.04)",
+                      background: isSelected
+                        ? "var(--mui-palette-surface-primarySoftBg)"
+                        : "rgba(255,255,255,0.04)",
                     },
                   }}
                 >
@@ -424,7 +432,7 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
                   color: "#1A1A1A",
                 }}
               >
-                <Box sx={{ height: 5, background: "#F26A1B" }} />
+                <Box sx={{ height: 5, background: "var(--mui-palette-primary-main)" }} />
                 <Box sx={{ p: "22px 26px" }}>
                   <Typography
                     sx={{
@@ -464,7 +472,7 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
                   <Box
                     sx={{
                       display: "inline-block",
-                      background: "#F26A1B",
+                      background: "var(--mui-palette-primary-main)",
                       color: "#FFFFFF",
                       fontSize: 13,
                       fontWeight: 600,

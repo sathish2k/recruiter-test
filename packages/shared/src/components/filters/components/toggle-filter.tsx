@@ -22,7 +22,7 @@ export function ToggleFilterComponent({
         px: "12px",
         py: "5px",
         borderRadius: "999px",
-        border: "1px solid rgba(255,255,255,.1)",
+        border: "1px solid var(--mui-palette-surface-border)",
         bgcolor: "background.paper",
         fontSize: 13,
         color: value ? "text.primary" : "text.secondary",

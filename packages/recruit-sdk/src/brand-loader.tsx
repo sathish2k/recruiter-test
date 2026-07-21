@@ -2,6 +2,10 @@
 
 import Box from "@mui/material/Box";
 
+// `#F59E0B` below is the brand mark's own accent — it belongs to the logo, not
+// the theme, so it stays fixed in both modes. Everything structural (ring,
+// backdrop, the other two orbits) reads theme CSS variables.
+//
 // Loading state from the Claude Design source ("AIRecruiter - Loader"): the
 // brand mark sits inside three counter-rotating orbits, with the runway stroke
 // drawing itself and a comet running off the end. Lives in the SDK rather than
@@ -100,7 +104,7 @@ export function BrandLoader({ size = 140, label }: BrandLoaderProps) {
             position: "absolute",
             inset: `${10 * scale}px`,
             borderRadius: "999px",
-            border: "1px solid rgba(255,255,255,.07)",
+            border: "1px solid var(--mui-palette-surface-tint)",
           }}
         />
         <Box
@@ -118,8 +122,19 @@ export function BrandLoader({ size = 140, label }: BrandLoaderProps) {
         />
 
         <Orbit inset={0} size={5 * scale} color="#F59E0B" duration={6} />
-        <Orbit inset={16 * scale} size={4 * scale} color="#FF8A3C" duration={9} reverse />
-        <Orbit inset={27 * scale} size={3 * scale} color="#9BB8D9" duration={13} />
+        <Orbit
+          inset={16 * scale}
+          size={4 * scale}
+          color="var(--mui-palette-primary-light)"
+          duration={9}
+          reverse
+        />
+        <Orbit
+          inset={27 * scale}
+          size={3 * scale}
+          color="var(--mui-palette-info-light)"
+          duration={13}
+        />
 
         <Box sx={{ position: "relative", width: mark, height: mark }}>
           {/* Halo pulsing out from behind the mark. */}
@@ -209,10 +224,10 @@ export function BrandLoaderScreen({ size, label }: BrandLoaderProps) {
         justifyContent: "center",
         overflow: "hidden",
         color: "text.primary",
-        background: (theme) =>
-          theme.palette.mode === "dark"
-            ? "radial-gradient(620px 420px at 50% 38%, rgba(242,106,27,.09), transparent 65%), radial-gradient(900px 600px at 50% 110%, rgba(245,158,11,.05), transparent 60%), #0F0F0E"
-            : "radial-gradient(620px 420px at 50% 38%, rgba(242,106,27,.07), transparent 65%), radial-gradient(900px 600px at 50% 110%, rgba(245,158,11,.04), transparent 60%)",
+        // Brand glow over the themed page colour — same in both schemes, since
+        // the base beneath it is a token.
+        background:
+          "radial-gradient(620px 420px at 50% 38%, rgba(242,106,27,.08), transparent 65%), radial-gradient(900px 600px at 50% 110%, rgba(245,158,11,.05), transparent 60%), var(--mui-palette-background-default)",
       }}
     >
       <Box sx={{ p: "40px" }}>

@@ -2,11 +2,11 @@ import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
 const accentSx = {
   fontWeight: 600,
-  color: "#F0B27C",
+  color: "surface.primarySoftFg",
   textDecoration: "none",
-  "&:hover": { color: "#FF8A3C" },
+  "&:hover": { color: "primary.light" },
 };
-const mutedSx = { color: "#9A968E", textDecoration: "none" };
+const mutedSx = { color: "text.secondary", textDecoration: "none" };
 
 const schema: JsonSchema = {
   type: "object",

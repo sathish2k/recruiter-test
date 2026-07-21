@@ -34,8 +34,10 @@ export interface FunnelRendererConfig {
   insight?: { name: string; icon?: string };
 }
 
-const ORANGE = "linear-gradient(90deg,#FF8A3C,#C24509)";
-const GREEN = "linear-gradient(90deg,#4EA874,#2E7D52)";
+// The orange bar is the theme's shared gradient; green is funnel-specific and
+// built from palette variables so it tracks the scheme too.
+const GREEN =
+  "linear-gradient(90deg,var(--mui-palette-success-main),var(--mui-palette-surface-successFg))";
 
 export function FunnelRenderer({
   id,
@@ -84,7 +86,7 @@ export function FunnelRenderer({
               sx={{
                 height: 9,
                 borderRadius: "999px",
-                background: "rgba(255,255,255,.06)",
+                background: "var(--mui-palette-surface-hover)",
                 overflow: "hidden",
               }}
             >
@@ -93,7 +95,7 @@ export function FunnelRenderer({
                   width: `${stage.pct}%`,
                   height: "100%",
                   borderRadius: "999px",
-                  background: stage.tone === "success" ? GREEN : ORANGE,
+                  background: (theme) => (stage.tone === "success" ? GREEN : theme.gradients.bar),
                 }}
               />
             </Box>

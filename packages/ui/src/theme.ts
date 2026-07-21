@@ -2,6 +2,75 @@
 
 import { createTheme, type Theme } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    /** Mode-aware surface tokens, reachable from `sx` as `surface.*`. */
+    surface: Surfaces;
+  }
+  interface PaletteOptions {
+    surface?: Surfaces;
+  }
+  interface Theme {
+    /** Shared form metrics, so widgets don't hardcode spacing/radii. */
+    form: FormTokens;
+    /** Brand gradients — one definition per look, referenced everywhere. */
+    gradients: GradientTokens;
+  }
+  interface ThemeOptions {
+    form?: FormTokens;
+    gradients?: GradientTokens;
+  }
+}
+
+/** Metrics the form widgets share. Values come from the design; they're not on
+ * an 8px grid, which is why they live here rather than in `theme.spacing`. */
+export interface FormTokens {
+  /** Label → control, and control → helper. */
+  fieldGap: string;
+  /** Between inline items: chips, day toggles, button pairs. */
+  inlineGap: string;
+  /** Between fields in a stack. */
+  rowGap: string;
+  controlRadius: string;
+  controlPadX: string;
+  controlPadY: string;
+  pillRadius: string;
+  badgeRadius: string;
+  badgePadX: string;
+  badgePadY: string;
+}
+
+export interface GradientTokens {
+  /** Primary CTA fill. */
+  primary: string;
+  /** Progress/score bars. */
+  bar: string;
+  /** Softer meter fill (usage, seats). */
+  meter: string;
+  /** Tinted panel behind the current-plan card. */
+  planCard: string;
+}
+
+const gradientTokens: GradientTokens = {
+  primary: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+  bar: "linear-gradient(90deg,#FF8A3C,#C24509)",
+  meter: "linear-gradient(90deg,#F0894A,#F0C27C)",
+  planCard: "linear-gradient(135deg,rgba(240,137,74,.22),rgba(240,194,124,.07))",
+};
+
+const formTokens: FormTokens = {
+  fieldGap: "7px",
+  inlineGap: "8px",
+  rowGap: "16px",
+  controlRadius: "11px",
+  controlPadX: "14px",
+  controlPadY: "11px",
+  pillRadius: "999px",
+  badgeRadius: "5px",
+  badgePadX: "5px",
+  badgePadY: "2px",
+};
+
 declare module "@mui/material/Chip" {
   interface ChipPropsVariantOverrides {
     soft: true;
@@ -82,6 +151,40 @@ interface Surfaces {
   neutral: string;
   headBg: string;
   menuShadow: string;
+  /** Subtle fill for inline chips/badges sitting on a control. */
+  tint: string;
+  /** Soft-primary trio: selected day toggles, quick-picks, accent chips. */
+  primarySoftBg: string;
+  primarySoftBorder: string;
+  primarySoftFg: string;
+  /** Alert/severity foregrounds — readable against each mode's background. */
+  infoFg: string;
+  successFg: string;
+  warningFg: string;
+  errorFg: string;
+  /** Brighter orange for inline highlights (match scores, check ticks). */
+  accentBright: string;
+  /** Outline of an unchecked checkbox/radio — must read on either background. */
+  controlOutline: string;
+  /** Lighter than `hover`, for rows that only need a hint of separation. */
+  hoverSubtle: string;
+  /** Track behind a progress/score bar. */
+  track: string;
+  /** Ring shown while a control has focus. */
+  focusRing: string;
+  /** Soft warning tone (Enterprise badges, "action needed" banners). */
+  warningSoftBg: string;
+  warningSoftBorder: string;
+  /** Soft success tone (toasts, healthy states). */
+  successSoftBg: string;
+  successSoftBorder: string;
+  /** Soft info tone. */
+  infoSoftBg: string;
+  infoSoftBorder: string;
+  /** Scrim behind a modal. */
+  backdrop: string;
+  /** Translucent fill for sticky bars that overlay scrolling content. */
+  scrim: string;
 }
 
 function surfaces(mode: ThemeMode): Surfaces {
@@ -102,6 +205,27 @@ function surfaces(mode: ThemeMode): Surfaces {
       neutral: "#E4E0D8",
       headBg: "rgba(0,0,0,0.04)",
       menuShadow: "0 18px 50px rgba(0,0,0,.18)",
+      tint: "rgba(0,0,0,0.06)",
+      primarySoftBg: "rgba(242,106,27,0.12)",
+      primarySoftBorder: "rgba(242,106,27,0.30)",
+      primarySoftFg: "#C2521A",
+      infoFg: "#3C5E8C",
+      successFg: "#2C7A50",
+      warningFg: "#8A6415",
+      errorFg: "#A03A3A",
+      accentBright: "#C24509",
+      controlOutline: "rgba(0,0,0,0.28)",
+      hoverSubtle: "rgba(0,0,0,0.035)",
+      track: "rgba(0,0,0,0.10)",
+      focusRing: "rgba(242,106,27,0.5)",
+      warningSoftBg: "rgba(214,155,60,0.16)",
+      warningSoftBorder: "rgba(214,155,60,0.40)",
+      successSoftBg: "rgba(78,168,116,0.12)",
+      successSoftBorder: "rgba(78,168,116,0.40)",
+      infoSoftBg: "rgba(90,130,180,0.12)",
+      infoSoftBorder: "rgba(90,130,180,0.30)",
+      backdrop: "rgba(0,0,0,0.35)",
+      scrim: "rgba(255,255,255,0.94)",
     };
   }
   return {
@@ -120,36 +244,116 @@ function surfaces(mode: ThemeMode): Surfaces {
     neutral: "#2A2A28",
     headBg: "rgba(255,255,255,0.04)",
     menuShadow: "0 18px 50px rgba(0,0,0,.6)",
+    tint: "rgba(255,255,255,0.07)",
+    primarySoftBg: "rgba(242,106,27,0.14)",
+    primarySoftBorder: "rgba(242,106,27,0.35)",
+    primarySoftFg: "#F0B27C",
+    infoFg: "#9BB8D9",
+    successFg: "#8FD6AC",
+    warningFg: "#E8D4A6",
+    errorFg: "#E89A9A",
+    accentBright: "#FF9D57",
+    controlOutline: "rgba(255,255,255,0.3)",
+    hoverSubtle: "rgba(255,255,255,0.05)",
+    track: "rgba(255,255,255,0.18)",
+    focusRing: "rgba(242,106,27,0.5)",
+    warningSoftBg: "rgba(214,155,60,0.14)",
+    warningSoftBorder: "rgba(214,155,60,0.35)",
+    successSoftBg: "rgba(78,168,116,0.12)",
+    successSoftBorder: "rgba(78,168,116,0.40)",
+    infoSoftBg: "rgba(122,162,247,0.10)",
+    infoSoftBorder: "rgba(122,162,247,0.24)",
+    backdrop: "rgba(0,0,0,0.6)",
+    scrim: "rgba(19,19,19,0.94)",
   };
 }
 
-export function createAppTheme(mode: ThemeMode = "dark"): Theme {
+/**
+ * CSS-variable references for the surface tokens. Component styleOverrides use
+ * these instead of literal colours so a single theme serves both schemes — the
+ * browser resolves the var per `data-theme`, no React re-render involved.
+ */
+const v: Surfaces = {
+  bgDefault: "var(--mui-palette-surface-bgDefault)",
+  paper: "var(--mui-palette-surface-paper)",
+  elevated: "var(--mui-palette-surface-elevated)",
+  inset: "var(--mui-palette-surface-inset)",
+  hover: "var(--mui-palette-surface-hover)",
+  divider: "var(--mui-palette-surface-divider)",
+  border: "var(--mui-palette-surface-border)",
+  borderStrong: "var(--mui-palette-surface-borderStrong)",
+  textPrimary: "var(--mui-palette-surface-textPrimary)",
+  textSecondary: "var(--mui-palette-surface-textSecondary)",
+  textDisabled: "var(--mui-palette-surface-textDisabled)",
+  textMuted: "var(--mui-palette-surface-textMuted)",
+  neutral: "var(--mui-palette-surface-neutral)",
+  headBg: "var(--mui-palette-surface-headBg)",
+  menuShadow: "var(--mui-palette-surface-menuShadow)",
+  tint: "var(--mui-palette-surface-tint)",
+  primarySoftBg: "var(--mui-palette-surface-primarySoftBg)",
+  primarySoftBorder: "var(--mui-palette-surface-primarySoftBorder)",
+  primarySoftFg: "var(--mui-palette-surface-primarySoftFg)",
+  infoFg: "var(--mui-palette-surface-infoFg)",
+  successFg: "var(--mui-palette-surface-successFg)",
+  warningFg: "var(--mui-palette-surface-warningFg)",
+  errorFg: "var(--mui-palette-surface-errorFg)",
+  accentBright: "var(--mui-palette-surface-accentBright)",
+  controlOutline: "var(--mui-palette-surface-controlOutline)",
+  hoverSubtle: "var(--mui-palette-surface-hoverSubtle)",
+  track: "var(--mui-palette-surface-track)",
+  focusRing: "var(--mui-palette-surface-focusRing)",
+  warningSoftBg: "var(--mui-palette-surface-warningSoftBg)",
+  warningSoftBorder: "var(--mui-palette-surface-warningSoftBorder)",
+  successSoftBg: "var(--mui-palette-surface-successSoftBg)",
+  successSoftBorder: "var(--mui-palette-surface-successSoftBorder)",
+  infoSoftBg: "var(--mui-palette-surface-infoSoftBg)",
+  infoSoftBorder: "var(--mui-palette-surface-infoSoftBorder)",
+  backdrop: "var(--mui-palette-surface-backdrop)",
+  scrim: "var(--mui-palette-surface-scrim)",
+};
+
+/** Real values per scheme — MUI needs literals here to emit the variables. */
+function paletteFor(mode: ThemeMode) {
   const c = surfaces(mode);
-  return createTheme({
-    palette: {
-      mode,
-      primary: {
-        main: "#F26A1B",
-        light: "#FF8A3C",
-        dark: "#E4560F",
-        contrastText: "#FFFFFF",
-      },
-      secondary: {
-        main: mode === "light" ? "#23211D" : "#F5F3F0",
-        contrastText: mode === "light" ? "#FFFFFF" : "#1a1a1a",
-      },
-      success: { main: "#4EA874", light: "#8FD6AC" },
-      warning: { main: "#D69B3C", light: "#F0C27C" },
-      error: { main: "#C85050", light: "#E89A9A" },
-      info: { main: "#5A82B4", light: "#9BB8D9" },
-      background: { default: c.bgDefault, paper: c.paper },
-      text: {
-        primary: c.textPrimary,
-        secondary: c.textSecondary,
-        disabled: c.textDisabled,
-      },
-      divider: c.divider,
+  return {
+    primary: {
+      main: "#F26A1B",
+      light: "#FF8A3C",
+      dark: "#E4560F",
+      contrastText: "#FFFFFF",
     },
+    secondary: {
+      main: mode === "light" ? "#23211D" : "#F5F3F0",
+      contrastText: mode === "light" ? "#FFFFFF" : "#1a1a1a",
+    },
+    success: { main: "#4EA874", light: "#8FD6AC" },
+    warning: { main: "#D69B3C", light: "#F0C27C" },
+    error: { main: "#C85050", light: "#E89A9A" },
+    info: { main: "#5A82B4", light: "#9BB8D9" },
+    background: { default: c.bgDefault, paper: c.paper },
+    text: {
+      primary: c.textPrimary,
+      secondary: c.textSecondary,
+      disabled: c.textDisabled,
+    },
+    divider: c.divider,
+    surface: c,
+  };
+}
+
+export function createAppTheme(): Theme {
+  return createTheme({
+    // One theme, two schemes. Every palette token becomes a CSS custom property
+    // scoped by `data-theme`, so switching modes is an attribute flip on <html>
+    // — no theme object swap, and no flash before hydration.
+    cssVariables: { colorSchemeSelector: "data-theme" },
+    defaultColorScheme: "dark",
+    colorSchemes: {
+      light: { palette: paletteFor("light") },
+      dark: { palette: paletteFor("dark") },
+    },
+    form: formTokens,
+    gradients: gradientTokens,
     shape: { borderRadius: 12 },
     typography: {
       fontFamily: "var(--font-instrument), 'Instrument Sans', system-ui, sans-serif",
@@ -157,8 +361,8 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
       h5: { fontSize: 17, fontWeight: 600 },
       subtitle1: { fontSize: 14.5, fontWeight: 600 },
       body1: { fontSize: 13.5 },
-      body2: { fontSize: 12.5, color: c.textSecondary },
-      overline: { fontSize: 11, letterSpacing: "0.12em", color: c.textDisabled },
+      body2: { fontSize: 12.5, color: v.textSecondary },
+      overline: { fontSize: 11, letterSpacing: "0.12em", color: v.textDisabled },
       button: { textTransform: "none", fontWeight: 600 },
     },
     components: {
@@ -177,18 +381,18 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "contained", color: "primary" },
             style: {
-              background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+              background: gradientTokens.primary,
               "&:hover": { filter: "brightness(1.08)" },
             },
           },
           {
             props: { variant: "contained", color: "secondary" },
             style: {
-              background: mode === "light" ? "#23211D" : "#F5F3F0",
-              color: mode === "light" ? "#FFFFFF" : "#1a1a1a",
+              background: "var(--mui-palette-secondary-main)",
+              color: "var(--mui-palette-secondary-contrastText)",
               fontWeight: 700,
               "&:hover": {
-                background: mode === "light" ? "#23211D" : "#F5F3F0",
+                background: "var(--mui-palette-secondary-main)",
                 filter: "brightness(.92)",
               },
             },
@@ -196,11 +400,11 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "outlined" },
             style: {
-              borderColor: c.borderStrong,
-              color: c.textPrimary,
+              borderColor: v.borderStrong,
+              color: v.textPrimary,
               "&:hover": {
-                borderColor: c.textDisabled,
-                background: c.hover,
+                borderColor: v.textDisabled,
+                background: v.hover,
               },
             },
           },
@@ -211,9 +415,9 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           root: {
             width: 30,
             height: 30,
-            border: `1px solid ${c.border}`,
-            color: c.textMuted,
-            "&:hover": { background: c.hover, color: c.textPrimary },
+            border: `1px solid ${v.border}`,
+            color: v.textMuted,
+            "&:hover": { background: v.hover, color: v.textPrimary },
             "& svg": { fontSize: 16 },
           },
         },
@@ -247,10 +451,10 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
       MuiMenu: {
         styleOverrides: {
           paper: {
-            background: c.elevated,
-            border: `1px solid ${c.border}`,
+            background: v.elevated,
+            border: `1px solid ${v.border}`,
             borderRadius: 12,
-            boxShadow: c.menuShadow,
+            boxShadow: v.menuShadow,
           },
           list: { padding: 6 },
         },
@@ -260,10 +464,10 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           root: {
             borderRadius: 8,
             fontSize: 13,
-            color: c.textMuted,
+            color: v.textMuted,
             padding: "9px 11px",
             gap: 10,
-            "&:hover": { background: c.hover, color: c.textPrimary },
+            "&:hover": { background: v.hover, color: v.textPrimary },
           },
         },
       },
@@ -277,7 +481,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
         styleOverrides: {
           root: {
             backgroundImage: "none",
-            border: `1px solid ${c.divider}`,
+            border: `1px solid ${v.divider}`,
             borderRadius: 14,
           },
         },
@@ -285,10 +489,10 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "dropdown" },
             style: {
-              background: c.elevated,
-              border: `1px solid ${c.border}`,
+              background: v.elevated,
+              border: `1px solid ${v.border}`,
               borderRadius: 12,
-              boxShadow: c.menuShadow,
+              boxShadow: v.menuShadow,
               padding: 6,
               zIndex: 30,
             },
@@ -308,15 +512,15 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "base" },
             style: {
-              background: c.paper,
-              border: `1px solid ${c.divider}`,
+              background: v.paper,
+              border: `1px solid ${v.divider}`,
             },
           },
           {
             props: { variant: "interactive" },
             style: {
-              background: c.paper,
-              border: `1px solid ${c.divider}`,
+              background: v.paper,
+              border: `1px solid ${v.divider}`,
               cursor: "pointer",
               transition: "border-color .15s, transform .15s",
               "&:hover": {
@@ -328,22 +532,22 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "accent" },
             style: {
-              background: `linear-gradient(180deg,rgba(242,106,27,.14),${c.paper} 60%),${c.paper}`,
-              border: `1px solid ${c.border}`,
+              background: `linear-gradient(180deg,rgba(242,106,27,.14),${v.paper} 60%),${v.paper}`,
+              border: `1px solid ${v.border}`,
             },
           },
           {
             props: { variant: "feature" },
             style: {
-              background: `radial-gradient(120% 140% at 85% 0%,rgba(242,106,27,.4),${c.paper} 65%),${c.paper}`,
-              border: `1px solid ${c.border}`,
+              background: `radial-gradient(120% 140% at 85% 0%,rgba(242,106,27,.4),${v.paper} 65%),${v.paper}`,
+              border: `1px solid ${v.border}`,
             },
           },
           {
             props: { variant: "ghost" },
             style: {
               background: "transparent",
-              border: `1.5px dashed ${c.borderStrong}`,
+              border: `1.5px dashed ${v.borderStrong}`,
               cursor: "pointer",
               textAlign: "center",
               transition: "border-color .15s, background .15s",
@@ -356,8 +560,8 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "inset" },
             style: {
-              background: c.inset,
-              border: `1px solid ${c.divider}`,
+              background: v.inset,
+              border: `1px solid ${v.divider}`,
               borderRadius: 11,
               padding: "11px 13px",
             },
@@ -365,7 +569,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           {
             props: { variant: "highlight" },
             style: {
-              background: c.paper,
+              background: v.paper,
               border: "1px solid rgba(242,106,27,0.35)",
             },
           },
@@ -373,14 +577,14 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
       },
       MuiOutlinedInput: {
         styleOverrides: {
-          root: { borderRadius: 12, background: c.inset, fontSize: 13.5 },
+          root: { borderRadius: 12, background: v.inset, fontSize: 13.5 },
           input: { paddingBlock: 13 },
-          notchedOutline: { borderColor: c.border },
+          notchedOutline: { borderColor: v.border },
         },
       },
       MuiDialog: {
         styleOverrides: {
-          paper: { borderRadius: 20, border: `1px solid ${c.border}` },
+          paper: { borderRadius: 20, border: `1px solid ${v.border}` },
         },
       },
       MuiAlert: {
@@ -399,7 +603,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             style: {
               background: "rgba(90,130,180,.1)",
               borderColor: "rgba(90,130,180,.3)",
-              color: mode === "light" ? "#3C5E8C" : "#9BB8D9",
+              color: v.infoFg,
             },
           },
           {
@@ -407,7 +611,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             style: {
               background: "rgba(78,168,116,.1)",
               borderColor: "rgba(78,168,116,.3)",
-              color: mode === "light" ? "#2C7A50" : "#8FD6AC",
+              color: v.successFg,
             },
           },
           {
@@ -415,7 +619,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             style: {
               background: "rgba(214,155,60,.08)",
               borderColor: "rgba(214,155,60,.25)",
-              color: mode === "light" ? "#8A6415" : "#E8D4A6",
+              color: v.warningFg,
             },
           },
           {
@@ -423,7 +627,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             style: {
               background: "rgba(200,80,80,.1)",
               borderColor: "rgba(200,80,80,.3)",
-              color: mode === "light" ? "#A03A3A" : "#E89A9A",
+              color: v.errorFg,
             },
           },
         ],
@@ -433,8 +637,8 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
           root: {
             minHeight: "auto",
             width: "fit-content",
-            background: c.paper,
-            border: `1px solid ${c.divider}`,
+            background: v.paper,
+            border: `1px solid ${v.divider}`,
             borderRadius: 999,
             padding: 4,
           },
@@ -450,11 +654,11 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             padding: "7px 14px",
             fontSize: 12.5,
             fontWeight: 400,
-            color: c.textSecondary,
+            color: v.textSecondary,
             "&.Mui-selected": {
-              color: c.textPrimary,
+              color: v.textPrimary,
               fontWeight: 600,
-              background: c.hover,
+              background: v.hover,
             },
           },
         },
@@ -471,28 +675,28 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             },
           },
           thumb: { width: 18, height: 18, boxShadow: "none", color: "#fff" },
-          track: { borderRadius: 999, backgroundColor: c.neutral, opacity: 1 },
+          track: { borderRadius: 999, backgroundColor: v.neutral, opacity: 1 },
         },
       },
       MuiCheckbox: {
         styleOverrides: {
           root: {
-            color: c.textDisabled,
+            color: v.textDisabled,
             "&.Mui-checked": { color: "#FF9D57" },
           },
         },
       },
       MuiStepConnector: {
-        styleOverrides: { line: { borderColor: c.border } },
+        styleOverrides: { line: { borderColor: v.border } },
       },
       MuiStepIcon: {
         styleOverrides: {
           root: {
-            color: c.border,
+            color: v.border,
             "&.Mui-active": { color: "#F26A1B" },
             "&.Mui-completed": { color: "#4EA874" },
           },
-          text: { fill: c.textPrimary, fontSize: 11 },
+          text: { fill: v.textPrimary, fontSize: 11 },
         },
       },
       MuiPaginationItem: {
@@ -504,27 +708,27 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             margin: "0 3px",
             fontSize: 12.5,
             fontWeight: 600,
-            color: c.textSecondary,
+            color: v.textSecondary,
             borderRadius: 999,
-            "&:hover": { background: c.hover },
+            "&:hover": { background: v.hover },
             "&.Mui-selected": {
-              background: c.hover,
-              color: c.textPrimary,
+              background: v.hover,
+              color: v.textPrimary,
               borderColor: "transparent",
             },
           },
-          page: { border: `1px solid ${c.divider}` },
+          page: { border: `1px solid ${v.divider}` },
           previousNext: {
-            border: `1px solid ${c.border}`,
-            color: c.textPrimary,
+            border: `1px solid ${v.border}`,
+            color: v.textPrimary,
           },
         },
       },
       MuiTableContainer: {
         styleOverrides: {
           root: {
-            background: c.paper,
-            border: `1px solid ${c.divider}`,
+            background: v.paper,
+            border: `1px solid ${v.divider}`,
             borderRadius: 16,
             padding: "18px 20px",
           },
@@ -532,7 +736,7 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
       },
       MuiTableRow: {
         styleOverrides: {
-          root: { "&:hover": { background: c.hover } },
+          root: { "&:hover": { background: v.hover } },
           head: { "&:hover": { background: "transparent" } },
         },
       },
@@ -542,13 +746,13 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
             borderBottom: "none",
             padding: "13px 14px",
             fontSize: 13,
-            color: c.textPrimary,
+            color: v.textPrimary,
           },
           head: {
-            color: c.textSecondary,
+            color: v.textSecondary,
             fontSize: 12,
             fontWeight: 400,
-            background: c.headBg,
+            background: v.headBg,
             padding: "10px 14px",
             "&:first-of-type": {
               borderTopLeftRadius: 10,
@@ -559,12 +763,12 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
               borderBottomRightRadius: 10,
             },
           },
-          body: { borderBottom: `1px solid ${c.divider}` },
+          body: { borderBottom: `1px solid ${v.divider}` },
         },
       },
       MuiTableSortLabel: {
         styleOverrides: {
-          root: { "&.Mui-active": { color: c.textPrimary } },
+          root: { "&.Mui-active": { color: v.textPrimary } },
           icon: { fontSize: 14, color: "#FF9D57 !important" },
         },
       },
@@ -573,4 +777,4 @@ export function createAppTheme(mode: ThemeMode = "dark"): Theme {
 }
 
 // Default dark theme (back-compat for direct `theme` imports).
-export const theme = createAppTheme("dark");
+export const theme = createAppTheme();

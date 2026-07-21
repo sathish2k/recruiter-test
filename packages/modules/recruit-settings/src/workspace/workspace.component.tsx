@@ -1,34 +1,22 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
-import { type FormValues, FormWithSectionsRenderer, Toast, useToast } from "@recruit/shared";
+import {
+  type FormValues,
+  FormWithSectionsRenderer,
+  IconRenderer,
+  Toast,
+  type UploadValue,
+  useToast,
+} from "@recruit/shared";
 import type { WorkspaceConfiguration } from "./workspace.configuration";
 
 type WorkspaceConfig = typeof WorkspaceConfiguration;
 
 type Organization = Record<string, unknown> & { id: string; name: string };
-
-const DEFAULTS: FormValues = {
-  timezone: "IST (GMT+5:30)",
-  language: "English (India)",
-  currency: "₹ INR — Indian Rupee",
-  noticePeriod: "30 days",
-  defaultOwner: "Round-robin (auto)",
-  jobVisibility: "Everyone",
-  firstDayOfWeek: "Monday",
-  dateFormat: "DD MMM YYYY",
-  timeFormat: "12-hour (2:30 PM)",
-  businessHours: "9:30 AM – 6:30 PM",
-  workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-  duplicateDetection: true,
-  whiteLabel: true,
-  accentColor: "#E4560F",
-  candidatePrefix: "CAND-",
-  jobPrefix: "JOB-",
-  clientPrefix: "CLI-",
-  invoicePrefix: "INV-",
-};
 
 export function SettingsWorkspaceComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
@@ -37,27 +25,25 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
   const { toast, show, clear } = useToast();
 
   const save = async (values: FormValues) => {
-    await mutation.update?.(values);
+    // The logo field carries `{ url, file }`; only a freshly-picked file needs
+    // uploading, and it never belongs in the organization payload.
+    const { logo, ...rest } = values as FormValues & { logo?: UploadValue };
+    if (logo?.file) await mutation.uploadLogo?.(logo.file);
+    await mutation.update?.(rest);
     await mutate();
     show(t("toast.saved"), t("toast.savedSub"));
   };
 
   if (!organization || !config.profileForm) return null;
 
-  // Seed unset settings with the design's defaults so the form is never blank.
-  const defaultValues: FormValues = { ...DEFAULTS };
+  // Every value comes from the API, which merges the org row over
+  // WORKSPACE_DEFAULTS — the form invents nothing.
+  const defaultValues: FormValues = {};
+  defaultValues.logo = { url: (organization.logoUrl as string) ?? "" } as FormValues[string];
   for (const [key, value] of Object.entries(organization)) {
+    if (key === "logo" || key === "logoUrl") continue;
     if (value !== null && value !== undefined && value !== "") {
       defaultValues[key] = value as FormValues[string];
-    }
-  }
-  // A stored value that isn't one of the field's options would render an empty
-  // select — fall back to the default in that case.
-  for (const [key, property] of Object.entries(config.profileForm.properties ?? {})) {
-    const options = property?.enum;
-    const value = defaultValues[key];
-    if (Array.isArray(options) && typeof value === "string" && !options.includes(value)) {
-      defaultValues[key] = (DEFAULTS[key] ?? options[0]) as FormValues[string];
     }
   }
 
@@ -71,9 +57,56 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
         sections={config.sections}
         defaultValues={defaultValues}
         onSubmit={save}
-        submitLabel="save"
-        cancelLabel="cancel"
-        submitIcon="save"
+        actionsPlacement="footer"
+        // The design only surfaces the actions once something has changed, in a
+        // bar that sticks to the bottom of the viewport while you scroll.
+        actions={({ isDirty, isSubmitting, submit, reset }) =>
+          isDirty ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                position: "sticky",
+                bottom: 0,
+                zIndex: 20,
+                mt: "-4px",
+                py: "12px",
+                px: "2px",
+                borderTop: "1px solid",
+                borderColor: "divider",
+                backdropFilter: "blur(10px)",
+                bgcolor: "var(--mui-palette-surface-scrim)",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  mr: "auto",
+                  color: "warning.light",
+                }}
+              >
+                <Box
+                  sx={{ width: 6, height: 6, borderRadius: "999px", bgcolor: "warning.light" }}
+                />
+                <Typography sx={{ fontSize: 12 }}>{t("unsaved")}</Typography>
+              </Box>
+              <Button variant="outlined" onClick={reset} sx={{ fontWeight: 400 }}>
+                {t("cancel")}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={submit}
+                loading={isSubmitting}
+                startIcon={<IconRenderer name="save" size={16} />}
+              >
+                {t("save")}
+              </Button>
+            </Box>
+          ) : null
+        }
       />
       <Toast toast={toast} onClose={clear} />
     </Box>

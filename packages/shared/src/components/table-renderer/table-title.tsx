@@ -32,9 +32,9 @@ export function TableTitle({
             sx={{
               width: 34,
               height: 34,
-              bgcolor: "rgba(242,106,27,.12)",
-              border: "1px solid rgba(242,106,27,.28)",
-              color: "#F0B27C",
+              bgcolor: "var(--mui-palette-surface-primarySoftBg)",
+              border: "1px solid var(--mui-palette-surface-primarySoftBorder)",
+              color: "surface.primarySoftFg",
             }}
           >
             <IconRenderer name={config.icon} size={18} />

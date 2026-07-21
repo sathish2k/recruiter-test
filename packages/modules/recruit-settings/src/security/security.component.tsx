@@ -246,7 +246,9 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
                 fontSize: 30,
                 fontWeight: 800,
                 lineHeight: 1.15,
-                color: twoFactorOn ? "#8FD6AC" : "#F0C27C",
+                color: twoFactorOn
+                  ? "var(--mui-palette-success-light)"
+                  : "var(--mui-palette-warning-light)",
               }}
             >
               {data.score}%
@@ -254,7 +256,7 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
             <Box sx={{ mt: "10px", maxWidth: 420 }}>
               <Meter
                 percent={data.score}
-                color={twoFactorOn ? "#8FD6AC" : "linear-gradient(90deg,#F0894A,#F0C27C)"}
+                color={twoFactorOn ? "var(--mui-palette-success-light)" : undefined}
               />
             </Box>
             <Box sx={{ display: "flex", gap: "16px", flexWrap: "wrap", mt: "14px" }}>
@@ -263,7 +265,11 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
                   <IconRenderer
                     name={check.ok ? "check-circle" : "warning"}
                     size={15}
-                    sx={{ color: check.ok ? "#8FD6AC" : "#F0C27C" }}
+                    sx={{
+                      color: check.ok
+                        ? "var(--mui-palette-success-light)"
+                        : "var(--mui-palette-warning-light)",
+                    }}
                   />
                   <Typography sx={{ fontSize: 11.5, color: "text.secondary" }}>
                     {t(check.label)}
@@ -425,7 +431,7 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
               sx={{
                 cursor: "pointer",
                 ...(resultFilter === option
-                  ? { bgcolor: "rgba(240,137,74,.16)", color: "primary.main" }
+                  ? { bgcolor: "var(--mui-palette-surface-primarySoftBg)", color: "primary.main" }
                   : {}),
               }}
             />
@@ -556,13 +562,13 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
             fontSize: 12.5,
             p: "12px 14px",
             borderRadius: "10px",
-            bgcolor: "rgba(255,255,255,.05)",
+            bgcolor: "var(--mui-palette-surface-hoverSubtle)",
             wordBreak: "break-all",
           }}
         >
           {secret}
         </Box>
-        <Typography sx={{ fontSize: 11.5, color: "#F0C27C", mt: "10px" }}>
+        <Typography sx={{ fontSize: 11.5, color: "warning.light", mt: "10px" }}>
           {t("tokenCreated.warning")}
         </Typography>
         <Box sx={{ display: "flex", gap: "10px", justifyContent: "flex-end", mt: "18px" }}>
@@ -590,7 +596,7 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
                 fontSize: 13,
                 p: "9px 12px",
                 borderRadius: "8px",
-                bgcolor: "rgba(255,255,255,.05)",
+                bgcolor: "var(--mui-palette-surface-hoverSubtle)",
                 textAlign: "center",
               }}
             >

@@ -5,7 +5,23 @@ description: How to build config-driven forms with FormRenderer / FormModal / us
 
 # FormRenderer
 
-Source: `packages/shared/src/components/form-renderer/` (ajv + react-hook-form)
+Source: `packages/shared/src/components/forms/` (ajv + react-hook-form). One
+folder per widget — `text/`, `password/`, `select/` (searchable + API-backed),
+`phone/`, `upload/`, `days/`, `chips/`, `segmented/`, `toggle/`, `markdown/` —
+plus `form-renderer/`, `form-with-section-renderer/` and `field/` (the
+dispatcher + `FieldShell`).
+
+**Adding a widget**: write a component taking `WidgetProps`
+(`{ name, prop, field, fieldState, t }`), render through `FieldShell` so label
+and error styling match, add one line to `WIDGETS` in `field/field.tsx`, and
+add the name to the `Widget` union in `types.ts`. Nothing else changes.
+
+**Layout**: `FormRenderer` takes `stackContainer` / `gridContainer` exactly like
+a page Configuration does; with a grid, each field places itself via
+`grid: { size, offset }` in its schema property. Default is a plain stack.
+
+**Text**: every label, placeholder, help line, error and widget string resolves
+through `t(key, fallback)` — schemas hold keys, never literals.
 and `packages/shared/src/components/modal/` (`Modal`, `FormModal`, `useModal`).
 Real schemas: `recruit-auth/src/sign-up/sign-up.configuration.ts` (validation,
 formats, strength meter), `recruit-client/src/clients/clients.configuration.ts`

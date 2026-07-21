@@ -1,10 +1,13 @@
 import type { AccessRule } from "@recruit/sdk";
 
 export interface SettingsTabItem {
+  /** Translation key for the pill label. */
   label: string;
+  /** Route this pill navigates to; also matched against currentRoute. */
   routeId: string;
-  icon: string;
+  /** Optional chip beside the label (translation key), e.g. `Enterprise`. */
   badge?: string;
+  /** Stripped by the engine when the user can't access it. */
   access?: AccessRule;
 }
 
@@ -18,30 +21,26 @@ export const SettingsTabsConfiguration: SettingsTabsConfiguration = {
   title: "title",
   subtitle: "subtitle",
   tabs: [
-    { label: "tabs.workspace", routeId: "Recruit.Settings.Route", icon: "workspace" },
-    { label: "tabs.members", routeId: "Recruit.SettingsMembers.Route", icon: "members" },
+    { label: "tabs.workspace", routeId: "Recruit.Settings.Route" },
+    { label: "tabs.members", routeId: "Recruit.SettingsMembers.Route" },
     {
       label: "tabs.roles",
       routeId: "Recruit.SettingsRoles.Route",
-      icon: "roles",
       access: { resource: "settings" },
     },
     {
       label: "tabs.templates",
       routeId: "Recruit.EmailTemplates.Route",
-      icon: "templates",
     },
     {
       label: "tabs.integrations",
       routeId: "Recruit.SettingsIntegrations.Route",
-      icon: "integrations",
     },
-    { label: "tabs.billing", routeId: "Recruit.SettingsBilling.Route", icon: "billing" },
-    { label: "tabs.security", routeId: "Recruit.SettingsSecurity.Route", icon: "security" },
+    { label: "tabs.billing", routeId: "Recruit.SettingsBilling.Route" },
+    { label: "tabs.security", routeId: "Recruit.SettingsSecurity.Route" },
     {
       label: "tabs.auditLog",
       routeId: "Recruit.SettingsAuditLog.Route",
-      icon: "auditLog",
       badge: "badges.enterprise",
     },
   ],

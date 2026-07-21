@@ -5,8 +5,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { useState } from "react";
-import { FormRenderer } from "../form-renderer";
-import type { FormValues, JsonSchema } from "../form-renderer/types";
+import { FormRenderer } from "../forms";
+import type { FormValues, JsonSchema } from "../forms/types";
 import { IconRenderer } from "../renderers/icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
@@ -74,10 +74,10 @@ export function SignIn({
                     height: 16,
                     borderRadius: "5px",
                     border: remember
-                      ? "1px solid rgba(242,106,27,.8)"
-                      : "1px solid rgba(255,255,255,.25)",
+                      ? "1px solid var(--mui-palette-primary-main)"
+                      : "1px solid var(--mui-palette-surface-controlOutline)",
                     background: remember
-                      ? "linear-gradient(135deg,#FF8A3C,#E4560F)"
+                      ? "linear-gradient(135deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))"
                       : "transparent",
                     display: "flex",
                     alignItems: "center",
@@ -88,14 +88,16 @@ export function SignIn({
                 >
                   {remember ? <IconRenderer name="check" size={12} /> : null}
                 </Box>
-                <Typography sx={{ fontSize: 12.5, color: "#9A968E" }}>{t("rememberMe")}</Typography>
+                <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+                  {t("rememberMe")}
+                </Typography>
               </Box>
               {forgot ? <LinkRenderer config={forgot} /> : null}
             </Box>
           }
         />
       ) : null}
-      <Typography sx={{ mt: "22px", fontSize: 13, color: "#9A968E", textAlign: "center" }}>
+      <Typography sx={{ mt: "22px", fontSize: 13, color: "text.secondary", textAlign: "center" }}>
         {t("footerText")} {signUp ? <LinkRenderer config={signUp} /> : null}
       </Typography>
     </AuthCard>

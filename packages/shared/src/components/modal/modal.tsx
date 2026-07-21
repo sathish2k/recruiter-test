@@ -32,7 +32,7 @@ export function Modal({
       onClose={onClose}
       slotProps={{
         backdrop: {
-          sx: { background: "rgba(0,0,0,.6)", backdropFilter: "blur(4px)" },
+          sx: { background: "var(--mui-palette-surface-backdrop)", backdropFilter: "blur(4px)" },
         },
         paper: { sx: { width, maxWidth: "100%", m: 2, p: "26px 28px" } },
       }}

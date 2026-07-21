@@ -11,9 +11,9 @@ export interface ScoreBarRendererConfig {
 }
 
 function bandColor(score: number, threshold: number): string {
-  if (score >= threshold) return "#8FD6AC";
-  if (score >= 60) return "#F0C27C";
-  return "#9A968E";
+  if (score >= threshold) return "var(--mui-palette-success-light)";
+  if (score >= 60) return "var(--mui-palette-warning-light)";
+  return "var(--mui-palette-text-secondary)";
 }
 
 export function ScoreBarRenderer({
@@ -44,7 +44,7 @@ export function ScoreBarRenderer({
           flex: 1,
           height: 6,
           borderRadius: "999px",
-          background: "rgba(255,255,255,.08)",
+          background: "var(--mui-palette-divider)",
           overflow: "hidden",
         }}
       >
@@ -53,7 +53,7 @@ export function ScoreBarRenderer({
             width: `${clamped}%`,
             height: "100%",
             borderRadius: "999px",
-            background: "linear-gradient(90deg,#FF8A3C,#C24509)",
+            background: (theme) => theme.gradients.bar,
           }}
         />
       </Box>

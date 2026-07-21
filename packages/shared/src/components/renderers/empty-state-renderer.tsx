@@ -40,24 +40,24 @@ type TFunc = (key: string, vars?: string | Record<string, unknown>) => string;
 
 const TONES: Record<EmptyStateTone, { bg: string; border: string; icon: string }> = {
   primary: {
-    bg: "rgba(242,106,27,.1)",
-    border: "rgba(242,106,27,.24)",
-    icon: "#F0B27C",
+    bg: "var(--mui-palette-surface-primarySoftBg)",
+    border: "var(--mui-palette-surface-primarySoftBorder)",
+    icon: "var(--mui-palette-surface-primarySoftFg)",
   },
   neutral: {
-    bg: "rgba(255,255,255,.04)",
-    border: "rgba(255,255,255,.07)",
-    icon: "#8A6A4E",
+    bg: "var(--mui-palette-surface-headBg)",
+    border: "var(--mui-palette-surface-tint)",
+    icon: "var(--mui-palette-text-disabled)",
   },
   blue: {
-    bg: "rgba(122,162,247,.1)",
-    border: "rgba(122,162,247,.24)",
-    icon: "#9DB8F0",
+    bg: "var(--mui-palette-surface-infoSoftBg)",
+    border: "var(--mui-palette-surface-infoSoftBorder)",
+    icon: "var(--mui-palette-info-light)",
   },
   green: {
-    bg: "rgba(78,168,116,.12)",
-    border: "rgba(78,168,116,.26)",
-    icon: "#8FD6AC",
+    bg: "var(--mui-palette-surface-successSoftBg)",
+    border: "var(--mui-palette-surface-successSoftBorder)",
+    icon: "var(--mui-palette-success-light)",
   },
 };
 
@@ -107,7 +107,7 @@ export function EmptyStateRenderer({
         sx={{
           fontSize: compact ? 14 : 16,
           fontWeight: 700,
-          color: "#ECEAE7",
+          color: "text.primary",
           mt: compact ? 0 : "4px",
         }}
       >

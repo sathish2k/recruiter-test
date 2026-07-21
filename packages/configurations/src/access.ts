@@ -10,5 +10,4 @@ export type Resource =
   | "audit"
   | "settings";
 
-
 export const ROLE_PERMISSIONS = DEFAULT_ROLE_PERMISSIONS;

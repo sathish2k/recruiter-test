@@ -86,7 +86,11 @@ export function RoleRenderer({
           >
             {t(option.label)}
             {option.value === current ? (
-              <IconRenderer name="check" size={14} color="#FF9D57" />
+              <IconRenderer
+                name="check"
+                size={14}
+                color="var(--mui-palette-surface-accentBright)"
+              />
             ) : null}
           </MenuItem>
         ))}

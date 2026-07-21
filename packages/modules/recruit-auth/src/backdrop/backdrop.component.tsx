@@ -1,5 +1,8 @@
 "use client";
 
+// Deliberate non-theme colours: this is the auth hero surface from the design.
+// It is a fixed dark canvas in both schemes by intent — the sign-in card sits on
+// it and carries the themed chrome.
 import Box from "@mui/material/Box";
 import { BrandLogo, BrandWordmark } from "@recruit/shared";
 
@@ -81,7 +84,7 @@ export function AuthBackdropComponent() {
           display: "flex",
           alignItems: "center",
           gap: 1.25,
-          color: "#ECEAE7",
+          color: "text.primary",
         }}
       >
         <BrandLogo size={34} />

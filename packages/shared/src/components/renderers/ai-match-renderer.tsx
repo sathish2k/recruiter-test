@@ -20,8 +20,8 @@ export function AiMatchRenderer({
   data?: Record<string, unknown>;
 }) {
   const color = config.colorPath
-    ? String(delve(data, config.colorPath) ?? "#FF9D57")
-    : (config.color ?? "#FF9D57");
+    ? String(delve(data, config.colorPath) ?? "var(--mui-palette-surface-accentBright)")
+    : (config.color ?? "var(--mui-palette-surface-accentBright)");
   return (
     <Box
       sx={{

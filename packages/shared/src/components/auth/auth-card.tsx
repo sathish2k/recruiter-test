@@ -41,7 +41,7 @@ export function AuthCard({
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          boxShadow: "0 30px 80px rgba(0,0,0,.5)",
+          boxShadow: "var(--mui-palette-surface-menuShadow)",
         }}
       >
         <Avatar
@@ -50,10 +50,11 @@ export function AuthCard({
             width: 56,
             height: 56,
             borderRadius: "16px",
-            background: "linear-gradient(180deg,#2A2A28,#1C1C1B)",
-            border: "1px solid rgba(255,255,255,.12)",
-            color: "#FF9D57",
-            boxShadow: "0 10px 24px rgba(0,0,0,.4)",
+            background:
+              "linear-gradient(180deg,var(--mui-palette-surface-neutral),var(--mui-palette-background-paper))",
+            border: "1px solid var(--mui-palette-surface-border)",
+            color: "surface.accentBright",
+            boxShadow: "var(--mui-palette-surface-menuShadow)",
             mb: "20px",
           }}
         >
@@ -74,7 +75,7 @@ export function AuthCard({
           sx={{
             fontSize: 13.5,
             lineHeight: 1.5,
-            color: "#9A968E",
+            color: "text.secondary",
             textAlign: "center",
             maxWidth: 320,
             mb: "26px",

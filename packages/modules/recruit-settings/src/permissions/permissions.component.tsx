@@ -261,7 +261,13 @@ export function PermissionsComponent({ id }: { id: string }) {
               }}
             >
               {t(group.label)}
-              {active ? <IconRenderer name="check" size={14} color="#FF9D57" /> : null}
+              {active ? (
+                <IconRenderer
+                  name="check"
+                  size={14}
+                  color="var(--mui-palette-surface-accentBright)"
+                />
+              ) : null}
             </MenuItem>
           );
         })}

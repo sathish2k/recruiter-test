@@ -37,7 +37,7 @@ export function MoreFilters({
               minWidth: 18,
               height: 18,
               borderRadius: "999px",
-              background: "#F26A1B",
+              background: "var(--mui-palette-primary-main)",
               color: "#fff",
               fontSize: 11,
               fontWeight: 700,

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
+import { resolveCurrency, resolveLanguage, resolveTimezone } from "../lib/reference-data";
 import { contact } from "../models/contact.model";
 import {
   type OrganizationRole,
@@ -86,10 +87,60 @@ export async function provisionSignup(input: ProvisionInput) {
 /** Columns that live on the table; everything else goes into `settings`. */
 const ORG_COLUMNS = ["name", "website", "timezone", "placementFee", "whiteLabel"] as const;
 
-/** Flatten `settings` into the record so the workspace form gets one flat object. */
+/**
+ * Defaults for an organization that hasn't configured its workspace yet. Kept
+ * here rather than in the form so every consumer — API, exports, emails — sees
+ * the same values, and so the client never invents data the DB doesn't have.
+ */
+export const WORKSPACE_DEFAULTS: Record<string, unknown> = {
+  timezone: "Asia/Kolkata",
+  language: "en",
+  currency: "INR",
+  noticePeriod: "30 days",
+  defaultOwner: "Round-robin (auto)",
+  jobVisibility: "Everyone",
+  firstDayOfWeek: "Monday",
+  dateFormat: "DD MMM YYYY",
+  timeFormat: "12-hour (2:30 PM)",
+  businessHours: "9:30 AM – 6:30 PM",
+  workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  duplicateDetection: true,
+  whiteLabel: true,
+  accentColor: "#E4560F",
+  candidatePrefix: "CAND-",
+  jobPrefix: "JOB-",
+  clientPrefix: "CLI-",
+  invoicePrefix: "INV-",
+};
+
+/** Flatten `settings` into the record so the workspace form gets one flat
+ * object, with defaults filling anything the org hasn't set. */
 function flattenOrganization(row: typeof organization.$inferSelect) {
   const { settings, ...rest } = row;
-  return { ...rest, ...(settings ?? {}) };
+  const merged: Record<string, unknown> = {
+    ...WORKSPACE_DEFAULTS,
+    ...rest,
+    ...(settings ?? {}),
+  };
+  // Normalise anything whose stored form may predate the current option lists —
+  // early rows held display strings ("IST (GMT+5:30)", "English (India)") — so
+  // each picker gets a value it can actually select.
+  if (typeof merged.timezone === "string") {
+    merged.timezone = resolveTimezone(merged.timezone, WORKSPACE_DEFAULTS.timezone as string);
+  }
+  if (typeof merged.currency === "string") {
+    merged.currency = resolveCurrency(merged.currency, WORKSPACE_DEFAULTS.currency as string);
+  }
+  if (typeof merged.language === "string") {
+    merged.language = resolveLanguage(merged.language, WORKSPACE_DEFAULTS.language as string);
+  }
+  // A column that exists but is null/empty still wants its default.
+  for (const [key, fallback] of Object.entries(WORKSPACE_DEFAULTS)) {
+    if (merged[key] === null || merged[key] === undefined || merged[key] === "") {
+      merged[key] = fallback;
+    }
+  }
+  return merged;
 }
 
 export async function getOrganization(id: string) {

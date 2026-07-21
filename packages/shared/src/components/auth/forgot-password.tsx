@@ -6,8 +6,8 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { type ReactNode, useState } from "react";
-import { FormRenderer } from "../form-renderer";
-import type { FormValues, JsonSchema } from "../form-renderer/types";
+import { FormRenderer } from "../forms";
+import type { FormValues, JsonSchema } from "../forms/types";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
@@ -62,8 +62,8 @@ export function ForgotPassword({
             sx={{
               fontSize: 13,
               fontWeight: 600,
-              color: "#F0B27C",
-              "&:hover": { color: "#FF8A3C" },
+              color: "surface.primarySoftFg",
+              "&:hover": { color: "primary.light" },
             }}
           >
             {t("sent.resend")}
@@ -80,7 +80,7 @@ export function ForgotPassword({
           }}
         />
       ) : null}
-      <Typography sx={{ mt: "20px", fontSize: 13, color: "#9A968E", textAlign: "center" }}>
+      <Typography sx={{ mt: "20px", fontSize: 13, color: "text.secondary", textAlign: "center" }}>
         {t("footerText")} {back ? <LinkRenderer config={back} /> : null}
       </Typography>
     </AuthCard>

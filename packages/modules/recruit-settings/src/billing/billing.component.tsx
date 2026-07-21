@@ -72,7 +72,7 @@ function Tick({ on }: { on: boolean }) {
     <IconRenderer
       name={on ? "check-circle" : "close"}
       size={16}
-      sx={{ color: on ? "#8FD6AC" : "text.disabled" }}
+      sx={{ color: on ? "var(--mui-palette-success-light)" : "text.disabled" }}
     />
   );
 }
@@ -148,7 +148,7 @@ export function SettingsBillingComponent({ id }: { id: string }) {
           sx={{
             p: "20px 22px",
             borderRadius: "16px",
-            background: "linear-gradient(135deg,rgba(240,137,74,.22),rgba(240,194,124,.07))",
+            background: (theme) => theme.gradients.planCard,
           }}
         >
           <Typography

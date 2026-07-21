@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider options={{ key: "mui" }}>
-      <ThemeModeProvider defaultMode="dark">
+      <ThemeModeProvider>
         <LocaleProvider defaultLanguage="en">
           <PortalRouterProvider routes={routes}>
             <DatasourceProvider modules={AllModules}>

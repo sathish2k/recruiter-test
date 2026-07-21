@@ -28,7 +28,7 @@ export function TableFooterRenderer({
         pt: "14px",
         px: "14px",
         fontSize: 12.5,
-        color: "#7C7972",
+        color: "text.disabled",
       }}
     >
       <Box>

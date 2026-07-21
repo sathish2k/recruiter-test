@@ -13,9 +13,9 @@ import type { GraphFilterConfig, GraphRow } from "./graph-renderer.types";
 const selectSx = {
   minWidth: 130,
   fontSize: 12.5,
-  color: "#C9C5BD",
+  color: "surface.textMuted",
   ".MuiOutlinedInput-notchedOutline": {
-    borderColor: "rgba(255,255,255,.14)",
+    borderColor: "var(--mui-palette-surface-border)",
   },
   ".MuiSelect-select": { p: "7px 12px" },
 };
@@ -67,7 +67,7 @@ export function GraphFilterRenderer({
           onChange={(e) => setFilter(filter.key, e.target.value)}
           sx={selectSx}
           MenuProps={{
-            slotProps: { paper: { sx: { background: "#1F1F1E" } } },
+            slotProps: { paper: { sx: { background: "var(--mui-palette-surface-elevated)" } } },
           }}
         >
           <MenuItem value="" sx={{ fontSize: 12.5 }}>
@@ -89,7 +89,7 @@ export function GraphFilterRenderer({
               cursor: current === 1 ? "default" : "pointer",
               opacity: current === 1 ? 0.35 : 1,
               transform: "rotate(180deg)",
-              color: "#C9C5BD",
+              color: "surface.textMuted",
             }}
           >
             <IconRenderer name="arrow-forward" size={17} />
@@ -97,7 +97,7 @@ export function GraphFilterRenderer({
           <Box
             sx={{
               fontSize: 12,
-              color: "#7C7972",
+              color: "text.disabled",
               minWidth: 34,
               textAlign: "center",
             }}
@@ -110,7 +110,7 @@ export function GraphFilterRenderer({
               display: "flex",
               cursor: current === totalPages ? "default" : "pointer",
               opacity: current === totalPages ? 0.35 : 1,
-              color: "#C9C5BD",
+              color: "surface.textMuted",
             }}
           >
             <IconRenderer name="arrow-forward" size={17} />

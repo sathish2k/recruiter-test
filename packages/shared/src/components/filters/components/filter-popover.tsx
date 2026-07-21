@@ -28,9 +28,15 @@ export function FilterPopover({
         sx={{
           fontSize: 12.5,
           fontWeight: 600,
-          background: active ? "rgba(242,106,27,.12)" : "#1C1C1B",
-          borderColor: active ? "rgba(242,106,27,.5)" : undefined,
-          color: active ? "#F0B27C" : summary ? "text.primary" : "text.secondary",
+          background: active
+            ? "var(--mui-palette-surface-primarySoftBg)"
+            : "var(--mui-palette-background-paper)",
+          borderColor: active ? "var(--mui-palette-surface-focusRing)" : undefined,
+          color: active
+            ? "var(--mui-palette-surface-primarySoftFg)"
+            : summary
+              ? "text.primary"
+              : "text.secondary",
         }}
       >
         {summary ?? label ?? ""}
@@ -60,16 +66,16 @@ export const optionRowSx = (active: boolean) => ({
   fontSize: 13,
   cursor: "pointer",
   color: active ? "text.primary" : "text.secondary",
-  "&:hover": { background: "rgba(255,255,255,.05)" },
+  "&:hover": { background: "var(--mui-palette-surface-hoverSubtle)" },
 });
 
 export const DARK_INPUT_STYLE: React.CSSProperties = {
-  background: "#141413",
-  border: "1px solid rgba(255,255,255,.1)",
+  background: "var(--mui-palette-surface-inset)",
+  border: "1px solid var(--mui-palette-surface-border)",
   borderRadius: "8px",
   padding: "8px 10px",
   fontSize: "13px",
-  color: "#ECEAE7",
+  color: "text.primary",
   fontFamily: "inherit",
   outline: "none",
   colorScheme: "dark",

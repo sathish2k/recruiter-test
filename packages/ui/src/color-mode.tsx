@@ -1,11 +1,9 @@
 "use client";
 
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider } from "@mui/material/styles";
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
-import { createAppTheme, type ThemeMode } from "./theme";
-
-const STORAGE_KEY = "recruit-theme";
+import { ThemeProvider, useColorScheme } from "@mui/material/styles";
+import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { type ThemeMode, theme } from "./theme";
 
 interface ColorModeContextValue {
   mode: ThemeMode;
@@ -23,45 +21,41 @@ export function useColorMode(): ColorModeContextValue {
   return ctx;
 }
 
-// Wraps MUI's ThemeProvider and swaps the whole theme object on mode change.
-// Persists to localStorage and mirrors the mode onto <html data-theme>.
-export function ThemeModeProvider({
-  children,
-  defaultMode = "dark",
-}: {
-  children: ReactNode;
-  defaultMode?: ThemeMode;
-}) {
-  const [mode, setMode] = useState<ThemeMode>(defaultMode);
-
-  // Hydrate from storage after mount (avoids SSR/client mismatch).
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark") setMode(stored);
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, mode);
-    document.documentElement.setAttribute("data-theme", mode);
-  }, [mode]);
+/**
+ * Adapts MUI's `useColorScheme` to the `useColorMode` shape the app already
+ * consumes. MUI owns persistence and the `data-theme` attribute now, so there's
+ * no localStorage handling or theme-object swapping here.
+ */
+function ColorModeBridge({ children }: { children: ReactNode }) {
+  const { mode, systemMode, setMode } = useColorScheme();
+  // `mode` is undefined until MUI has read storage; "system" resolves via systemMode.
+  const resolved: ThemeMode = (mode === "system" ? systemMode : mode) ?? "dark";
 
   const value = useMemo<ColorModeContextValue>(
     () => ({
-      mode,
-      setMode,
-      toggle: () => setMode((m) => (m === "dark" ? "light" : "dark")),
+      mode: resolved,
+      setMode: (next: ThemeMode) => setMode(next),
+      toggle: () => setMode(resolved === "dark" ? "light" : "dark"),
     }),
-    [mode],
+    [resolved, setMode],
   );
 
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+  return <ColorModeContext.Provider value={value}>{children}</ColorModeContext.Provider>;
+}
 
+/**
+ * One theme carrying both colour schemes. Switching modes flips the
+ * `data-theme` attribute on <html>; the browser re-resolves the CSS variables,
+ * so nothing re-renders and there's no flash before hydration — see
+ * `InitColorSchemeScript` in the web app's layout.
+ */
+export function ThemeModeProvider({ children }: { children: ReactNode }) {
   return (
-    <ColorModeContext.Provider value={value}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    // `modeStorageKey` keeps the key the previous implementation used, so an
+    // existing stored preference survives the switch to MUI-managed persistence.
+    <ThemeProvider theme={theme} defaultMode="dark" modeStorageKey="recruit-theme">
+      <CssBaseline />
+      <ColorModeBridge>{children}</ColorModeBridge>
+    </ThemeProvider>
   );
 }

@@ -35,7 +35,7 @@ export function RadioFilterComponent({
                   width: 14,
                   height: 14,
                   borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,.3)",
+                  border: "1px solid var(--mui-palette-surface-controlOutline)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -48,7 +48,7 @@ export function RadioFilterComponent({
                       width: 7,
                       height: 7,
                       borderRadius: "999px",
-                      background: "#F26A1B",
+                      background: "var(--mui-palette-primary-main)",
                     }}
                   />
                 ) : null}

@@ -1,21 +1,23 @@
+// Deliberate non-theme colours: the chart series palette needs hues that stay
+// distinguishable from each other, which a two-scheme token set can't provide.
 import type { ApexOptions } from "apexcharts";
 import delve from "dlv";
 import type { ApexChartType } from "./chart";
 import type { GraphRendererConfig, GraphRow, TFuncLike } from "./graph-renderer.types";
 
 export const DEFAULT_PALETTE = [
-  "#FF8A3C",
-  "#4EA874",
-  "#9BB8D9",
-  "#F0C27C",
+  "var(--mui-palette-primary-light)",
+  "var(--mui-palette-success-main)",
+  "var(--mui-palette-info-light)",
+  "var(--mui-palette-warning-light)",
   "#C99BE0",
-  "#E89A9A",
+  "var(--mui-palette-error-light)",
   "#7FC8C0",
-  "#E4560F",
+  "var(--mui-palette-primary-dark)",
 ];
 
-const AXIS_COLOR = "#7C7972";
-const GRID_COLOR = "rgba(255,255,255,.06)";
+const AXIS_COLOR = "var(--mui-palette-text-disabled)";
+const GRID_COLOR = "var(--mui-palette-surface-hover)";
 
 function formatValue(value: number, type?: GraphRendererConfig["valueType"]): string {
   if (type === "currency") return `$${value.toLocaleString()}`;

@@ -44,7 +44,6 @@
     "duplicateDetection": "Candidate duplicate detection",
     "duplicateDetectionHelp": "Flag candidates matching on email, phone, LinkedIn or resume hash",
     "workingDays": "Working days",
-    "workingDaysHelp": "Used for interview scheduling and SLA calculations",
     "businessHours": "Business hours",
     "businessHoursPlaceholder": "9:30 AM – 6:30 PM",
     "firstDayOfWeek": "First day of week",
@@ -61,10 +60,19 @@
     "whiteLabel": "White-label reports",
     "whiteLabelHelp": "Show your logo instead of “Powered by HirePilotX”",
     "accentColor": "Accent color",
-    "accentColorPlaceholder": "#E4560F"
+    "accentColorPlaceholder": "#E4560F",
+    "logo": "Agency logo",
+    "logoUpload": "Upload logo",
+    "logoHelp": "PNG or SVG · max 2 MB · recommended 512×512, square"
   },
   "toast": {
     "saved": "Workspace updated",
     "savedSub": "Your changes have been applied"
+  },
+  "unsaved": "You have unsaved changes",
+  "presets": {
+    "weekdays": "Weekdays",
+    "weekends": "Weekends",
+    "everyday": "Every day"
   }
 }

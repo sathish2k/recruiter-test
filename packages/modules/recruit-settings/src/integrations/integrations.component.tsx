@@ -30,8 +30,8 @@ type Tile = IntegrationItem & {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  connected: "#8FD6AC",
-  warning: "#F0C27C",
+  connected: "var(--mui-palette-success-light)",
+  warning: "var(--mui-palette-warning-light)",
   available: "text.disabled",
 };
 
@@ -160,7 +160,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                   alignItems: "center",
                   gap: "12px",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "rgba(255,255,255,.04)" },
+                  "&:hover": { bgcolor: "var(--mui-palette-surface-headBg)" },
                 }}
               >
                 <Box
@@ -171,7 +171,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                     borderRadius: "10px",
                     display: "grid",
                     placeItems: "center",
-                    bgcolor: "rgba(255,255,255,.06)",
+                    bgcolor: "surface.hover",
                     fontSize: 12,
                     fontWeight: 700,
                   }}
@@ -211,7 +211,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                     ...(tile.status === "available"
                       ? { color: "primary.main", border: "1px solid", borderColor: "primary.main" }
                       : {}),
-                    ...(tile.status === "warning" ? { color: "#F0C27C" } : {}),
+                    ...(tile.status === "warning" ? { color: "warning.light" } : {}),
                   }}
                 />
               </Card>
@@ -253,8 +253,8 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                     sx={{
                       p: "10px 12px",
                       borderRadius: "10px",
-                      bgcolor: "rgba(240,194,124,.12)",
-                      color: "#F0C27C",
+                      bgcolor: "var(--mui-palette-surface-warningSoftBg)",
+                      color: "warning.light",
                       fontSize: 12,
                     }}
                   >

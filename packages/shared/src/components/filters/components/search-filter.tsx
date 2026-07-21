@@ -28,11 +28,11 @@ export function SearchField({
           gap: "10px",
           width,
           bgcolor: "background.paper",
-          border: "1px solid rgba(255,255,255,.1)",
+          border: "1px solid var(--mui-palette-surface-border)",
           borderRadius: "999px",
           px: "16px",
           color: "text.disabled",
-          "&:focus-within": { borderColor: "rgba(242,106,27,.5)" },
+          "&:focus-within": { borderColor: "var(--mui-palette-surface-focusRing)" },
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}

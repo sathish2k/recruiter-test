@@ -1,22 +1,5 @@
 import type { FormSection, JsonSchema } from "@recruit/shared";
 
-const TIMEZONES = [
-  "IST (GMT+5:30)",
-  "GMT (GMT+0:00)",
-  "CET (GMT+1:00)",
-  "EST (GMT-5:00)",
-  "PST (GMT-8:00)",
-  "SGT (GMT+8:00)",
-  "AEST (GMT+10:00)",
-];
-const LANGUAGES = ["English (India)", "English (US)", "English (UK)", "Deutsch", "Español"];
-const CURRENCIES = [
-  "₹ INR — Indian Rupee",
-  "$ USD — US Dollar",
-  "£ GBP — British Pound",
-  "€ EUR — Euro",
-  "S$ SGD — Singapore Dollar",
-];
 const NOTICE = ["Immediate", "15 days", "30 days", "60 days", "90 days"];
 const OWNERS = ["Round-robin (auto)", "Account manager", "Creator", "Unassigned"];
 const VISIBILITY = ["Everyone", "Team only", "Private"];
@@ -40,14 +23,45 @@ const select = (key: string, values: string[]) => ({
 
 const profileForm: JsonSchema = {
   type: "object",
+  // Timezone, currency, language and the phone picker all source their options
+  // from GET /reference — the widget fetches and caches, so the screen doesn't.
   properties: {
     // General
+    logo: {
+      // The value is `{ url, file }` — see UploadValue.
+      type: "object",
+      widget: "upload",
+      title: "fields.logo",
+      uploadLabel: "fields.logoUpload",
+      help: "fields.logoHelp",
+      accept: "image/png,image/svg+xml,image/jpeg,image/webp",
+      maxSizeMb: 2,
+      preview: "square",
+    },
     name: text("name", "domain"),
     website: text("website", "link"),
-    phone: text("phone", "call"),
+    phone: {
+      type: "string",
+      widget: "phone",
+      title: "fields.phone",
+      placeholder: "fields.phonePlaceholder",
+      optionSource: { url: "/reference", path: "data.dialCodes" },
+    },
     officeAddress: text("officeAddress", "location"),
-    timezone: select("timezone", TIMEZONES),
-    language: select("language", LANGUAGES),
+    // Options are injected at render from GET /reference — the full IANA list
+    // straight off the runtime's ICU data.
+    timezone: {
+      type: "string" as const,
+      widget: "select" as const,
+      title: "fields.timezone",
+      optionSource: { url: "/reference", path: "data.timezones" },
+    },
+    language: {
+      type: "string" as const,
+      widget: "select" as const,
+      title: "fields.language",
+      optionSource: { url: "/reference", path: "data.languages" },
+    },
     // Email branding
     fromName: text("fromName"),
     fromEmail: { ...text("fromEmail", "mail"), format: "email" },
@@ -55,7 +69,13 @@ const profileForm: JsonSchema = {
     emailSignature: { ...text("emailSignature"), widget: "markdown" },
     // Recruitment defaults
     placementFee: text("placementFee"),
-    currency: select("currency", CURRENCIES),
+    // Options injected at render from GET /reference (ISO 4217 via ICU).
+    currency: {
+      type: "string" as const,
+      widget: "select" as const,
+      title: "fields.currency",
+      optionSource: { url: "/reference", path: "data.currencies" },
+    },
     noticePeriod: select("noticePeriod", NOTICE),
     defaultOwner: select("defaultOwner", OWNERS),
     jobVisibility: select("jobVisibility", VISIBILITY),
@@ -67,9 +87,14 @@ const profileForm: JsonSchema = {
     // Formats & identifiers
     workingDays: {
       type: "array",
+      widget: "days",
       title: "fields.workingDays",
-      help: "fields.workingDaysHelp",
-      enum: DAYS,
+      dayOptions: DAYS.map((d) => ({ value: d, label: d })),
+      dayPresets: [
+        { label: "presets.weekdays", values: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+        { label: "presets.weekends", values: ["Sat", "Sun"] },
+        { label: "presets.everyday", values: DAYS },
+      ],
     },
     businessHours: text("businessHours", "schedule"),
     firstDayOfWeek: select("firstDayOfWeek", WEEK_START),
@@ -97,6 +122,7 @@ const sections: FormSection[] = [
     description: "sections.generalDescription",
     columns: 2,
     fields: [
+      { name: "logo", span: 2 },
       "name",
       "website",
       "phone",

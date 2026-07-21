@@ -155,25 +155,29 @@ export function TableRenderer({
                         width: 54,
                         height: 54,
                         borderRadius: "14px",
-                        border: "1.5px dashed rgba(255,255,255,.16)",
+                        border: "1.5px dashed var(--mui-palette-surface-borderStrong)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <IconRenderer name="search" size={24} color="#7C7972" />
+                      <IconRenderer
+                        name="search"
+                        size={24}
+                        color="var(--mui-palette-text-disabled)"
+                      />
                     </Box>
                     <Box
                       sx={{
                         fontSize: 14.5,
                         fontWeight: 700,
-                        color: "#ECEAE7",
+                        color: "text.primary",
                         mt: "4px",
                       }}
                     >
                       {t(config?.emptyLabel ?? "noData")}
                     </Box>
-                    <Box sx={{ fontSize: 12.5, color: "#9A968E" }}>
+                    <Box sx={{ fontSize: 12.5, color: "text.secondary" }}>
                       {t("emptyHint", "Try adjusting or clearing the filters.")}
                     </Box>
                   </Box>

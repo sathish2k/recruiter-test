@@ -1,30 +1,9 @@
 "use client";
 
-import type { SvgIconComponent } from "@mui/icons-material";
-import AdminPanelSettingsRounded from "@mui/icons-material/AdminPanelSettingsRounded";
-import BusinessRounded from "@mui/icons-material/BusinessRounded";
-import CreditCardRounded from "@mui/icons-material/CreditCardRounded";
-import GroupRounded from "@mui/icons-material/GroupRounded";
-import HistoryRounded from "@mui/icons-material/HistoryRounded";
-import HubRounded from "@mui/icons-material/HubRounded";
-import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
-import ShieldRounded from "@mui/icons-material/ShieldRounded";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
 import type { SettingsTabItem, SettingsTabsConfiguration } from "./settings-tabs.configuration";
-
-const ICONS: Record<string, SvgIconComponent> = {
-  workspace: BusinessRounded,
-  members: GroupRounded,
-  roles: AdminPanelSettingsRounded,
-  templates: MailOutlineRounded,
-  billing: CreditCardRounded,
-  integrations: HubRounded,
-  security: ShieldRounded,
-  auditLog: HistoryRounded,
-};
 
 export function SettingsTabsComponent({
   id,
@@ -52,9 +31,22 @@ export function SettingsTabsComponent({
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", gap: "4px", borderBottom: "1px solid", borderColor: "divider" }}>
+      {/* Pill group per the design: one rounded container, the active tab a
+          lighter fill. No icons, no underline. */}
+      <Box
+        sx={{
+          display: "inline-flex",
+          alignSelf: "flex-start",
+          flexWrap: "wrap",
+          gap: "2px",
+          p: "4px",
+          borderRadius: "999px",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
+      >
         {tabs.map((tab) => {
-          const Icon = ICONS[tab.icon];
           const active = tab.routeId === activeRouteId;
           return (
             <Box
@@ -63,23 +55,36 @@ export function SettingsTabsComponent({
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: "7px",
-                px: "16px",
-                py: "11px",
-                fontSize: 13,
-                fontWeight: 600,
+                gap: "6px",
+                px: "14px",
+                py: "7px",
+                borderRadius: "999px",
+                fontSize: 12.5,
+                fontWeight: active ? 600 : 400,
+                whiteSpace: "nowrap",
                 cursor: "pointer",
-                mb: "-1px",
-                borderBottom: "2px solid",
-                borderColor: active ? "primary.main" : "transparent",
+                bgcolor: active ? "var(--mui-palette-surface-border)" : "transparent",
                 color: active ? "text.primary" : "text.secondary",
                 "&:hover": { color: "text.primary" },
               }}
             >
-              {Icon ? <Icon sx={{ fontSize: 16 }} /> : null}
               {t(tab.label)}
               {tab.badge ? (
-                <Chip variant="soft" size="small" color="warning" label={t(tab.badge)} />
+                <Box
+                  component="span"
+                  sx={{
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    color: "warning.light",
+                    bgcolor: "var(--mui-palette-surface-warningSoftBg)",
+                    border: "1px solid var(--mui-palette-surface-warningSoftBorder)",
+                    borderRadius: "999px",
+                    px: "7px",
+                    py: "2px",
+                  }}
+                >
+                  {t(tab.badge)}
+                </Box>
               ) : null}
             </Box>
           );

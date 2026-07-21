@@ -40,8 +40,8 @@ export function EntityRenderer({
         sx={{
           width: size,
           height: size,
-          bgcolor: read(data, config.bgPath, config.bg) || "#3A4A5B",
-          color: read(data, config.fgPath, config.fg) || "#CFE3F5",
+          bgcolor: read(data, config.bgPath, config.bg) || "var(--mui-palette-surface-neutral)",
+          color: read(data, config.fgPath, config.fg) || "var(--mui-palette-surface-textMuted)",
           fontSize: circle ? 12 : 13,
           fontWeight: circle ? 600 : 700,
         }}

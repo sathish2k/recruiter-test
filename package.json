@@ -47,6 +47,7 @@
     "drizzle-orm": "^0.44.2",
     "elysia": "^1.4.29",
     "i18next": "^26.3.6",
+    "libphonenumber-js": "^1.13.9",
     "next": "^16.2.10",
     "node-mailjet": "^6.0.11",
     "postgres": "^3.4.5",

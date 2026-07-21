@@ -263,8 +263,8 @@ export function Filters({
               flex: "none",
               fontSize: 12.5,
               fontWeight: 600,
-              color: "#F0B27C",
-              "&:hover": { color: "#FF8A3C" },
+              color: "surface.primarySoftFg",
+              "&:hover": { color: "primary.light" },
             }}
           >
             {clearAllLabel}

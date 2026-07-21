@@ -36,14 +36,14 @@ interface AuditEvent {
 
 const SEVERITY_BORDER: Record<string, string> = {
   success: "transparent",
-  warning: "#F0C27C",
-  failure: "#E4756B",
+  warning: "var(--mui-palette-warning-light)",
+  failure: "var(--mui-palette-surface-errorFg)",
 };
 
 const SEVERITY_DOT: Record<string, string> = {
-  success: "#8FD6AC",
-  warning: "#F0C27C",
-  failure: "#E4756B",
+  success: "var(--mui-palette-success-light)",
+  warning: "var(--mui-palette-warning-light)",
+  failure: "var(--mui-palette-surface-errorFg)",
 };
 
 export function SettingsAuditLogComponent({ id }: { id: string }) {
@@ -168,7 +168,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
                 borderLeftColor: SEVERITY_BORDER[row.severity] ?? "transparent",
                 borderTop: "1px solid",
                 borderTopColor: "divider",
-                "&:hover": { bgcolor: "rgba(255,255,255,.02)" },
+                "&:hover": { bgcolor: "var(--mui-palette-surface-hoverSubtle)" },
               }}
             >
               <Box
@@ -179,7 +179,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
                   borderRadius: "9px",
                   display: "grid",
                   placeItems: "center",
-                  bgcolor: "rgba(255,255,255,.05)",
+                  bgcolor: "var(--mui-palette-surface-hoverSubtle)",
                   color: "text.secondary",
                 }}
               >
@@ -324,7 +324,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
                 p: "12px",
                 mt: "6px",
                 borderRadius: "10px",
-                bgcolor: "rgba(255,255,255,.05)",
+                bgcolor: "var(--mui-palette-surface-hoverSubtle)",
                 maxHeight: 220,
                 overflow: "auto",
               }}

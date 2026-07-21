@@ -40,7 +40,9 @@ packages/
     src/client.ts        axios client
     src/types.ts         Route / Configuration / LayoutElement / Module / …
   shared/          Cross-cutting composite components + helpers.
-    src/components/form-renderer/  JSON-schema form (ajv + react-hook-form)
+    src/components/forms/          JSON-schema forms (ajv + react-hook-form):
+                                   form-renderer/ · form-with-section-renderer/
+                                   select/ · phone/ · upload/ · days/ · markdown/
     src/components/auth/           AuthCard, SignIn, SignUp
     src/components/renderers/      LinkRenderer (config-driven links)
     src/utils/                     cn, format (locale-aware Intl)

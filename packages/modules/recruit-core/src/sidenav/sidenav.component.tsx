@@ -140,8 +140,8 @@ export function SidenavComponent({
                     ...(active
                       ? {
                           background:
-                            "linear-gradient(90deg,rgba(242,106,27,.28),rgba(242,106,27,.05))",
-                          borderColor: "rgba(242,106,27,.35)",
+                            "linear-gradient(90deg,var(--mui-palette-surface-primarySoftBorder),var(--mui-palette-surface-primarySoftBg))",
+                          borderColor: "var(--mui-palette-surface-primarySoftBorder)",
                           fontWeight: 600,
                           color: "text.primary",
                         }

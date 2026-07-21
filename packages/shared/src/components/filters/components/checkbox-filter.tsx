@@ -41,13 +41,15 @@ export function CheckboxFilterComponent({
                   width: 16,
                   height: 16,
                   borderRadius: "5px",
-                  border: "1px solid rgba(255,255,255,.3)",
+                  border: "1px solid var(--mui-palette-surface-controlOutline)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flex: "none",
-                  background: checked ? "#F26A1B" : "transparent",
-                  borderColor: checked ? "#F26A1B" : "rgba(255,255,255,.3)",
+                  background: checked ? "var(--mui-palette-primary-main)" : "transparent",
+                  borderColor: checked
+                    ? "var(--mui-palette-primary-main)"
+                    : "var(--mui-palette-surface-controlOutline)",
                 }}
               >
                 {checked ? <CheckRounded sx={{ fontSize: 13, color: "#fff" }} /> : null}

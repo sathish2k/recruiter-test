@@ -1,5 +1,8 @@
 "use client";
 
+// Deliberate non-theme colours: the avatar swatches below are a fixed
+// rotation of hues used to tell clients apart at a glance — they're identity,
+// not chrome, so they don't follow the colour scheme.
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -89,7 +92,7 @@ const DEFAULT_METRICS: ClientMetricConfig[] = [
   },
   {
     label: { name: "hires" },
-    value: { type: "number", path: "hires", sx: { color: "#FF9D57" } },
+    value: { type: "number", path: "hires", sx: { color: "surface.accentBright" } },
   },
 ];
 
@@ -112,7 +115,7 @@ const DEFAULT_PIPELINE: PipelineStatConfig[] = [
     type: "static-translation",
     key: "interviewing",
     value: "interviewing",
-    swatch: "#F26A1B",
+    swatch: "var(--mui-palette-primary-main)",
     sx: { fontSize: 11.5 },
   },
 ];
@@ -173,7 +176,7 @@ export function ClientCard({
         gap: "18px",
         borderRadius: "18px",
         background:
-          "linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 60%),#1C1C1B",
+          "linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 60%),var(--mui-palette-background-paper)",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: "13px" }}>
@@ -193,7 +196,7 @@ export function ClientCard({
         </Avatar>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <TextRenderer config={nameConfig} data={record} />
-          <Typography sx={{ fontSize: 12, color: "#9A968E", mt: "2px" }}>
+          <Typography sx={{ fontSize: 12, color: "text.secondary", mt: "2px" }}>
             {client.industry} · {client.manager}
           </Typography>
         </Box>
@@ -217,13 +220,13 @@ export function ClientCard({
             <Box
               key={metric.label.name}
               sx={{
-                borderRight: last ? "none" : "1px solid rgba(255,255,255,.07)",
+                borderRight: last ? "none" : "1px solid var(--mui-palette-surface-tint)",
                 pl: i === 0 ? 0 : "14px",
                 pr: last ? 0 : "14px",
               }}
             >
               <GenericRenderer config={valueConfig} data={record} />
-              <Typography sx={{ fontSize: 11.5, color: "#7C7972", mt: "2px" }}>
+              <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
                 {t(metric.label.name)}
               </Typography>
             </Box>
@@ -257,7 +260,8 @@ export function ClientCard({
           <Box
             sx={{
               width: `${(client.interviewing / total) * 100}%`,
-              background: "linear-gradient(90deg,#FF8A3C,#E4560F)",
+              background:
+                "linear-gradient(90deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))",
             }}
           />
         </Box>
@@ -268,7 +272,7 @@ export function ClientCard({
             gap: "14px",
             mt: "9px",
             fontSize: 11.5,
-            color: "#9A968E",
+            color: "text.secondary",
             flexWrap: "wrap",
           }}
         >
@@ -300,11 +304,11 @@ export function ClientCard({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          borderTop: "1px solid rgba(255,255,255,.06)",
+          borderTop: "1px solid var(--mui-palette-surface-hover)",
           pt: "14px",
         }}
       >
-        <Typography sx={{ fontSize: 12, color: "#7C7972" }}>{client.activity}</Typography>
+        <Typography sx={{ fontSize: 12, color: "text.disabled" }}>{client.activity}</Typography>
         {actions.length ? (
           <Box
             sx={{
@@ -313,8 +317,8 @@ export function ClientCard({
               gap: "6px",
               fontSize: 12.5,
               fontWeight: 600,
-              color: "#F0B27C",
-              "&:hover": { color: "#FF8A3C" },
+              color: "surface.primarySoftFg",
+              "&:hover": { color: "primary.light" },
             }}
           >
             {actions.map((action, i) => (

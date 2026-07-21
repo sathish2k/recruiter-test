@@ -38,15 +38,15 @@ export function Toast({ toast, onClose }: { toast: ToastState | null; onClose: (
           display: "flex",
           alignItems: "center",
           gap: "11px",
-          bgcolor: "#1F1F1E",
-          border: "1px solid rgba(78,168,116,.4)",
+          bgcolor: "surface.elevated",
+          border: "1px solid var(--mui-palette-surface-successSoftBorder)",
           borderRadius: "13px",
           p: "13px 16px",
-          boxShadow: "0 18px 50px rgba(0,0,0,.6)",
+          boxShadow: "0 18px 50px var(--mui-palette-surface-backdrop)",
           maxWidth: 380,
         }}
       >
-        <IconRenderer name="check-circle" size={18} color="#8FD6AC" />
+        <IconRenderer name="check-circle" size={18} color="var(--mui-palette-success-light)" />
         <Box sx={{ flex: 1 }}>
           <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{toast?.title}</Typography>
           {toast?.sub ? (

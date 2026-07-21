@@ -60,11 +60,11 @@ export interface StatCardRendererConfig {
   link?: LinkRendererConfig;
 }
 
-const DELTA_COLOR = "#F0B27C";
+const DELTA_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 
 const VALUE_SX = { fontSize: 25, fontWeight: 700, letterSpacing: "-.01em" };
 
-const ICON_COLOR = "#F0B27C";
+const ICON_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 const ICON_SIZE = 17;
 
 type T = (key: string, vars?: string | Record<string, unknown>) => string;
@@ -111,7 +111,7 @@ function ProgressStatBody({
         sx={{
           height: 6,
           borderRadius: "999px",
-          background: config.progress?.trackColor ?? "rgba(255,255,255,.18)",
+          background: config.progress?.trackColor ?? "var(--mui-palette-surface-track)",
           overflow: "hidden",
           mt: "10px",
         }}
@@ -121,7 +121,7 @@ function ProgressStatBody({
             width: `${Math.min(pct, 100)}%`,
             height: "100%",
             borderRadius: "999px",
-            background: config.progress?.color ?? "rgba(255,255,255,.9)",
+            background: config.progress?.color ?? "var(--mui-palette-text-primary)",
           }}
         />
       </Box>
@@ -209,9 +209,9 @@ function StatCard({
   const deltaColor = config.delta?.color ?? DELTA_COLOR;
 
   const cardSx = kpiMode
-    ? { color: "#ECEAE7" }
+    ? { color: "text.primary" }
     : {
-        color: "#ECEAE7",
+        color: "text.primary",
         borderRadius: "14px",
         padding: pill ? "18px 20px" : "16px 18px",
       };
@@ -242,7 +242,7 @@ function StatCard({
         <Typography
           sx={{
             fontSize: pill ? 13 : 12.5,
-            color: "#9A968E",
+            color: "text.secondary",
             mb: pill ? "10px" : "8px",
           }}
         >

@@ -5,8 +5,8 @@ import Typography from "@mui/material/Typography";
 import { useConfiguration, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { FormRenderer } from "../form-renderer";
-import type { FormValues, JsonSchema } from "../form-renderer/types";
+import { FormRenderer } from "../forms";
+import type { FormValues, JsonSchema } from "../forms/types";
 import { IconRenderer } from "../renderers/icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
@@ -88,7 +88,7 @@ function ResetPasswordForm({ id, onSubmit }: ResetPasswordProps) {
           sx={{
             mt: "20px",
             fontSize: 13,
-            color: "#9A968E",
+            color: "text.secondary",
             textAlign: "center",
           }}
         >

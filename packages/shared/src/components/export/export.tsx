@@ -41,7 +41,9 @@ export function Export({
         variant="outlined"
         onClick={(e) => setAnchor(e.currentTarget)}
         startIcon={<IconRenderer name="download" size={16} />}
-        endIcon={<IconRenderer name="expand-more" size={15} color="#9A968E" />}
+        endIcon={
+          <IconRenderer name="expand-more" size={15} color="var(--mui-palette-text-secondary)" />
+        }
         sx={{ fontWeight: 400 }}
       >
         {label ? t(label) : t("export")}

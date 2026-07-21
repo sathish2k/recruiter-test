@@ -29,7 +29,6 @@ export interface AppbarConfig {
   actions: AppbarAction[];
 }
 
-
 export interface AppbarComponentProps {
   id: string;
   configuration?: Partial<AppbarConfig>;
