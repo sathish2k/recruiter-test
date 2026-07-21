@@ -6,10 +6,34 @@ description: How to build config-driven forms with FormRenderer / FormModal / us
 # FormRenderer
 
 Source: `packages/shared/src/components/forms/` (ajv + react-hook-form). One
-folder per widget — `text/`, `password/`, `select/` (searchable + API-backed),
-`phone/`, `upload/`, `days/`, `chips/`, `segmented/`, `toggle/`, `markdown/` —
-plus `form-renderer/`, `form-with-section-renderer/` and `field/` (the
+folder per widget:
+
+| widget | value | notes |
+|---|---|---|
+| `text` / `textarea` | string | `format: email` picks the input type |
+| `number` | number | `minimum`/`maximum`/`step`/`unit` |
+| `password` | string | reveal toggle + config-driven strength meter |
+| `select` | string | searchable and/or API-backed via `optionSource` |
+| `multiselect` | string[] | same sourcing, multiple values |
+| `radio` | string | `row` for horizontal |
+| `checkbox-group` | string[] | `columns` to grid it |
+| `switch` / `checkbox` | boolean | single toggle |
+| `segmented` | string | pill tabs over a small `enum` |
+| `chips` | string[] | free-text tags |
+| `date` / `time` / `datetime` | ISO string | native picker, `min`/`max` |
+| `color` | hex string | swatch + hex input |
+| `phone` | string | dial-code picker, `optionSource` for codes |
+| `upload` | `{ url, file }` | preview tile, type/size limits |
+| `days` | string[] | day toggles + presets |
+| `markdown` | string | Write/Preview, split toolbar |
+
+Plus `form-renderer/`, `form-with-section-renderer/` and `field/` (the
 dispatcher + `FieldShell`).
+
+**Inference** when `widget` is omitted: `array`+`enum` → `checkbox-group`,
+`array` → `chips`, `enum` → `select`, `number`/`integer` → `number`,
+`boolean` → `switch`, `format: password` → `password`, `format: date` → `date`,
+else `text`.
 
 **Adding a widget**: write a component taking `WidgetProps`
 (`{ name, prop, field, fieldState, t }`), render through `FieldShell` so label

@@ -63,7 +63,8 @@
     "accentColorPlaceholder": "#E4560F",
     "logo": "Agency logo",
     "logoUpload": "Upload logo",
-    "logoHelp": "PNG or SVG · max 2 MB · recommended 512×512, square"
+    "logoHelp": "PNG or SVG · max 2 MB · recommended 512×512, square",
+    "accentColorHelp": "Used on client reports and career pages"
   },
   "toast": {
     "saved": "Workspace updated",

@@ -17,7 +17,15 @@ export type Widget =
   | "chips"
   | "phone"
   | "upload"
-  | "days";
+  | "days"
+  | "radio"
+  | "checkbox-group"
+  | "multiselect"
+  | "number"
+  | "date"
+  | "time"
+  | "datetime"
+  | "color";
 
 export interface JsonSchemaProperty {
   type: JsonSchemaType;
@@ -56,6 +64,17 @@ export interface JsonSchemaProperty {
   grid?: FieldGrid;
   /** `phone`: country pre-selected when the field is empty. Defaults to `IN`. */
   defaultIso?: string;
+  /** `radio`: lay the options out in a row rather than stacked. */
+  row?: boolean;
+  /** `checkbox-group`: how many columns to grid the options into. */
+  columns?: number;
+  /** `number`: input step. `minimum`/`maximum` bound it. */
+  step?: number;
+  /** `number`: prefix shown inside the field (a translation key), e.g. a currency. */
+  unit?: string;
+  /** `date`/`time`/`datetime`: bounds passed to the native picker. */
+  min?: string;
+  max?: string;
   /** `upload`: accepted mime types, e.g. "image/png,image/svg+xml". */
   accept?: string;
   /** `upload`: rejected above this size, in megabytes. */
@@ -125,13 +144,22 @@ export interface JsonSchema {
   };
 }
 
+/** One rung of the strength meter. Each carries its own rule, label and colour,
+ * so there are no parallel arrays to keep index-aligned. */
+export interface PasswordStrengthLevel {
+  /** Regex (as a string); matching it earns this level. */
+  rule: string;
+  /** Translation key for the label shown at this score. */
+  label: string;
+  /** English shown when the key has no translation. */
+  fallback?: string;
+  /** Palette path (`success.main`) or CSS colour for the filled bars. */
+  color: string;
+}
+
 export interface PasswordStrengthConfig {
-  /** Regex rules (as strings); each password match adds one to the score. */
-  rules?: string[];
-  /** Translation key (or literal) shown for each score level. */
-  labels?: string[];
-  /** Bar color for each score level. */
-  colors?: string[];
+  /** Ordered weakest → strongest. The bar count matches the level count. */
+  levels: PasswordStrengthLevel[];
 }
 
 export type FormValues = Record<string, unknown>;

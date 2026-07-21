@@ -1,70 +1,17 @@
 "use client";
 
-import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import { useState } from "react";
 import { IconRenderer } from "../../renderers";
 import { FieldShell } from "../field/field-shell";
-import type { JsonSchemaProperty, PasswordStrengthConfig, Translate, WidgetProps } from "../types";
+import type { WidgetProps } from "../types";
+import { PasswordStrengthMeter, resolveStrengthConfig } from "./password-strength";
 
-/** Shown when a translation is missing, so the meter is never blank. */
-const STRENGTH_FALLBACKS = ["Weak", "Okay", "Strong"];
-
-const DEFAULT_STRENGTH: Required<PasswordStrengthConfig> = {
-  rules: ["^.{8,}$", "[A-Z]", "[0-9]"],
-  labels: ["form.strength.weak", "form.strength.okay", "form.strength.strong"],
-  colors: ["error.main", "warning.main", "success.main"],
-};
-
-function resolveStrength(
-  strengthMeter: JsonSchemaProperty["strengthMeter"],
-): Required<PasswordStrengthConfig> | null {
-  if (!strengthMeter) return null;
-  return strengthMeter === true ? DEFAULT_STRENGTH : { ...DEFAULT_STRENGTH, ...strengthMeter };
-}
-
-function StrengthMeter({
-  value,
-  config,
-  t,
-}: {
-  value: string;
-  config: Required<PasswordStrengthConfig>;
-  t: Translate;
-}) {
-  const score = value
-    ? config.rules.reduce((n, r) => (new RegExp(r).test(value) ? n + 1 : n), 0)
-    : 0;
-  const color = config.colors[score - 1] ?? config.colors[config.colors.length - 1];
-  const levels = config.rules.map((_, i) => i + 1);
-
-  return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mt: 1 }}>
-      {levels.map((level) => (
-        <Box
-          key={level}
-          sx={{
-            flex: 1,
-            height: 4,
-            borderRadius: 999,
-            bgcolor: score >= level ? color : "surface.neutral",
-          }}
-        />
-      ))}
-      <Typography sx={{ fontSize: 11, color: "text.secondary", ml: 0.75, minWidth: 34 }}>
-        {score > 0 ? t(config.labels[score - 1] ?? "", STRENGTH_FALLBACKS[score - 1]) : ""}
-      </Typography>
-    </Box>
-  );
-}
-
-/** Password input with a reveal toggle and an optional strength meter. */
 export function PasswordWidget({ prop, field, fieldState, t }: WidgetProps) {
   const [reveal, setReveal] = useState(false);
-  const strength = resolveStrength(prop.strengthMeter);
+  const strength = resolveStrengthConfig(prop.strengthMeter);
 
   return (
     <FieldShell
@@ -103,7 +50,7 @@ export function PasswordWidget({ prop, field, fieldState, t }: WidgetProps) {
         }}
       />
       {strength ? (
-        <StrengthMeter value={String(field.value ?? "")} config={strength} t={t} />
+        <PasswordStrengthMeter value={String(field.value ?? "")} config={strength} t={t} />
       ) : null}
     </FieldShell>
   );

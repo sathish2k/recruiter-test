@@ -2,11 +2,17 @@
 
 import type { Control, FieldValues } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import { CheckboxGroupWidget } from "../checkbox-group/checkbox-group";
 import { ChipsWidget } from "../chips/chips";
+import { ColorWidget } from "../color/color";
+import { DateWidget } from "../date/date";
 import { DaysWidget } from "../days/days";
 import { MarkdownWidget } from "../markdown/markdown";
+import { MultiSelectWidget } from "../multiselect/multiselect";
+import { NumberWidget } from "../number/number";
 import { PasswordWidget } from "../password/password";
 import { PhoneWidget } from "../phone/phone";
+import { RadioWidget } from "../radio/radio";
 import { SegmentedWidget } from "../segmented/segmented";
 import { SelectWidget } from "../select/select";
 import { TextWidget } from "../text/text";
@@ -32,12 +38,24 @@ export const WIDGETS: Record<Widget, (props: WidgetProps) => React.ReactNode> = 
   phone: PhoneWidget,
   upload: UploadWidget,
   days: DaysWidget,
+  radio: RadioWidget,
+  "checkbox-group": CheckboxGroupWidget,
+  multiselect: MultiSelectWidget,
+  number: NumberWidget,
+  date: DateWidget,
+  time: DateWidget,
+  datetime: DateWidget,
+  color: ColorWidget,
 };
 
 /** Picks the widget from an explicit `widget`, then from the schema's shape. */
 export function widgetFor(prop: JsonSchemaProperty): Widget {
   if (prop.widget) return prop.widget;
-  if (prop.type === "array") return "chips";
+  // An array constrained to `enum` is a fixed choice list; without one it's
+  // free-text tags.
+  if (prop.type === "array") return prop.enum ? "checkbox-group" : "chips";
+  if (prop.type === "number" || prop.type === "integer") return "number";
+  if (prop.format === "date") return "date";
   if (prop.enum) return "select";
   if (prop.type === "boolean") return "switch";
   if (prop.format === "password") return "password";

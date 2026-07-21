@@ -1,3 +1,6 @@
+export { CheckboxGroupWidget } from "./checkbox-group/checkbox-group";
+export { ColorWidget } from "./color/color";
+export { DateWidget } from "./date/date";
 export type {
   DayOption,
   DayPreset,
@@ -10,10 +13,22 @@ export {
   FormRenderer,
 } from "./form-renderer/form-renderer";
 export { FormWithSectionsRenderer } from "./form-with-section-renderer/form-with-section-renderer";
-export { MarkdownEditor, markdownToHtml } from "./markdown/markdown";
+export { MarkdownEditor } from "./markdown/markdown";
+export { markdownToHtml } from "./markdown/markdown-to-html";
+export { MarkdownToolbar } from "./markdown/markdown-toolbar";
+export { MultiSelectWidget } from "./multiselect/multiselect";
+export { NumberWidget } from "./number/number";
+export {
+  DEFAULT_PASSWORD_STRENGTH,
+  PasswordStrengthMeter,
+  resolveStrengthConfig,
+} from "./password/password-strength";
 export { DIAL_CODES, PhoneField, splitPhone } from "./phone/phone";
+export { RadioWidget } from "./radio/radio";
 export { fetchOptions, invalidateOptions, useRemoteOptions } from "./select/remote-options";
-export { SearchableSelectField } from "./select/select";
+export { SearchableSelectField } from "./select/searchable-select";
+export { SelectWidget } from "./select/select";
+export { SelectField } from "./select/select-field";
 export type {
   DialCode,
   FormActionsState,
@@ -26,6 +41,7 @@ export type {
   JsonSchemaProperty,
   OptionSource,
   PasswordStrengthConfig,
+  PasswordStrengthLevel,
   SelectOption,
   UploadValue,
   Widget,

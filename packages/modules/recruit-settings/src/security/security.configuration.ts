@@ -1,4 +1,4 @@
-import type { JsonSchema, TableRendererConfig } from "@recruit/shared";
+import type { JsonSchema, PasswordStrengthConfig, TableRendererConfig } from "@recruit/shared";
 
 export interface SecurityConfig {
   passwordForm: JsonSchema;
@@ -8,6 +8,17 @@ export interface SecurityConfig {
   /** Checkbox grid in "Security notifications" — keys match the API's prefs. */
   notifications: { key: string; label: string }[];
 }
+
+/** Stricter than the app default: workspace passwords also want a symbol and a
+ * longer minimum, and the meter reflects exactly this policy. */
+const WORKSPACE_PASSWORD_STRENGTH: PasswordStrengthConfig = {
+  levels: [
+    { rule: "^.{10,}$", label: "strength.weak", fallback: "Weak", color: "error.main" },
+    { rule: "[A-Z]", label: "strength.fair", fallback: "Fair", color: "warning.main" },
+    { rule: "[0-9]", label: "strength.good", fallback: "Good", color: "info.main" },
+    { rule: "[^A-Za-z0-9]", label: "strength.strong", fallback: "Strong", color: "success.main" },
+  ],
+};
 
 export const SecurityConfiguration: SecurityConfig = {
   passwordForm: {
@@ -23,8 +34,8 @@ export const SecurityConfiguration: SecurityConfig = {
       newPassword: {
         type: "string",
         format: "password",
-        minLength: 8,
-        strengthMeter: true,
+        minLength: 10,
+        strengthMeter: WORKSPACE_PASSWORD_STRENGTH,
         title: "fields.new",
         placeholder: "fields.newPlaceholder",
         icon: "lock-reset",

@@ -9,8 +9,9 @@
     "twoFactorOn": "Two-factor enabled",
     "twoFactorOff": "Two-factor disabled"
   },
-
-  "auth": { "title": "Authentication" },
+  "auth": {
+    "title": "Authentication"
+  },
   "password": {
     "title": "Password",
     "meta": "Last changed {{changed}} · Strength {{strength}}",
@@ -35,7 +36,6 @@
     "meta": "Okta, Azure AD, Google Workspace",
     "upgrade": "Upgrade"
   },
-
   "sessions": {
     "title": "Active sessions",
     "subtitle": "Devices signed in to this workspace",
@@ -51,7 +51,6 @@
     "mobile": "Mobile",
     "new": "New"
   },
-
   "loginHistory": {
     "title": "Login history",
     "subtitle": "Recent sign-in attempts — separate from active sessions",
@@ -68,7 +67,6 @@
     "failed": "Failed",
     "blocked": "Blocked"
   },
-
   "tokens": {
     "title": "Personal access tokens",
     "badge": "API",
@@ -99,7 +97,6 @@
     "copy": "Copy token",
     "done": "Done"
   },
-
   "notifications": {
     "title": "Security notifications",
     "subtitle": "Email {{email}} when:",
@@ -116,7 +113,6 @@
     "add": "Add",
     "owner": "Owner"
   },
-
   "changePassword": {
     "title": "Change password",
     "description": "You'll stay signed in on this device",
@@ -128,29 +124,25 @@
     "currentPlaceholder": "Enter current password",
     "currentRequired": "Enter your current password",
     "new": "New password",
-    "newPlaceholder": "At least 8 characters",
+    "newPlaceholder": "At least 10 characters",
     "newRequired": "Enter a new password",
     "confirm": "Confirm new password",
     "confirmPlaceholder": "Re-enter new password",
     "confirmRequired": "Re-enter your new password",
     "confirmMismatch": "Passwords don't match"
   },
-
   "recoveryCodes": {
     "title": "Recovery codes",
     "description": "Each code works once — store them somewhere safe.",
     "copy": "Copy codes",
     "done": "Done"
   },
-
   "revokeSession": {
     "title": "Sign out this device?",
     "description": "{{device}} will be signed out immediately and will need to sign in again.",
     "submit": "Sign out"
   },
-
   "cancel": "Cancel",
-
   "toast": {
     "passwordChanged": "Password updated",
     "passwordChangedSub": "Other devices will be asked to sign in again",
@@ -172,5 +164,11 @@
     "recipientAddedSub": "{{email}} will get security alerts",
     "recipientRemoved": "Recipient removed",
     "prefsSaved": "Notification preferences saved"
+  },
+  "strength": {
+    "weak": "Weak",
+    "fair": "Fair",
+    "good": "Good",
+    "strong": "Strong"
   }
 }
