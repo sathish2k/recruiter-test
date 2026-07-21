@@ -134,7 +134,7 @@ export function SettingsBillingComponent({ id }: { id: string }) {
   resets.setMonth(resets.getMonth() + 1, 1);
 
   return (
-    <Box sx={{ maxWidth: 1100, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
       <Box
         sx={{
           display: "grid",

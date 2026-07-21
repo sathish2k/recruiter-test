@@ -231,7 +231,7 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
   const twoFactorOn = data.twoFactor.enabled;
 
   return (
-    <Box sx={{ maxWidth: 1100, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
       {/* Security score */}
       <SectionCard>
         <Box

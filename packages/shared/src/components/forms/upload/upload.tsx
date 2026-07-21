@@ -18,6 +18,8 @@ export interface UploadFieldProps {
   accept?: string;
   maxSizeMb?: number;
   help?: string;
+  /** Second help line, under the first. */
+  helpSecondary?: string;
   preview?: "square" | "circle";
   removeLabel?: string;
   errorLabel?: (reason: "type" | "size") => string;
@@ -36,6 +38,7 @@ export function UploadField({
   accept = "image/png,image/jpeg,image/webp,image/svg+xml",
   maxSizeMb = 2,
   help,
+  helpSecondary,
   preview = "square",
   removeLabel = "Remove",
   errorLabel,
@@ -118,6 +121,11 @@ export function UploadField({
         {help ? (
           <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "7px" }}>{help}</Typography>
         ) : null}
+        {helpSecondary ? (
+          <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "3px" }}>
+            {helpSecondary}
+          </Typography>
+        ) : null}
         {error ? (
           <Typography sx={{ fontSize: 11, color: "error.main", mt: "3px" }}>{error}</Typography>
         ) : null}
@@ -151,6 +159,7 @@ export function UploadWidget({ prop, field, t }: WidgetProps) {
       accept={prop.accept}
       maxSizeMb={prop.maxSizeMb}
       help={prop.help ? t(prop.help) : undefined}
+      helpSecondary={prop.helpSecondary ? t(prop.helpSecondary) : undefined}
       preview={prop.preview}
       removeLabel={t("form.remove", "Remove")}
       errorLabel={(reason) =>

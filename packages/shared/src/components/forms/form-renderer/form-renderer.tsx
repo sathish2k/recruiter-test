@@ -28,8 +28,30 @@ function stripEmptyOptional(schema: JsonSchema, values: FieldValues): FieldValue
   return cleaned;
 }
 
+/**
+ * On a scalar, `enum` constrains the value. On an array or an object it lists
+ * the *choices a widget offers* (see widgetFor, and the pickers that read
+ * `prop.enum`) — but ajv reads a sibling `enum` as a constraint on the whole
+ * value, so those fields would always fail with "must be equal to one of the
+ * allowed values". Move it onto `items` for arrays, and drop it for objects,
+ * where the widget owns the shape.
+ */
+function forValidation(schema: JsonSchema): JsonSchema {
+  const properties: JsonSchema["properties"] = {};
+  for (const [key, prop] of Object.entries(schema.properties)) {
+    if (prop.enum && prop.type === "array") {
+      properties[key] = { ...prop, enum: undefined, items: { ...prop.items, enum: prop.enum } };
+    } else if (prop.enum && prop.type === "object") {
+      properties[key] = { ...prop, enum: undefined };
+    } else {
+      properties[key] = prop;
+    }
+  }
+  return { ...schema, properties };
+}
+
 export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
-  const base = ajvResolver(schema as never, { strict: false });
+  const base = ajvResolver(forValidation(schema) as never, { strict: false });
   return async (rawValues, context, options) => {
     const values = stripEmptyOptional(schema, rawValues);
     const result = await base(values, context, options);
@@ -62,6 +84,7 @@ export function FormRenderer({
   beforeSubmit,
   stackContainer,
   gridContainer,
+  widgets,
 }: FormRendererProps) {
   const { t } = useTranslation(id);
   const resolver = useMemo(() => buildResolver(schema), [schema]);
@@ -80,7 +103,7 @@ export function FormRenderer({
   });
 
   const fields = Object.entries(schema.properties).map(([fieldName, prop]) => (
-    <Field key={fieldName} name={fieldName} prop={prop} control={control} t={t} />
+    <Field key={fieldName} name={fieldName} prop={prop} control={control} t={t} widgets={widgets} />
   ));
 
   return (

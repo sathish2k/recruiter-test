@@ -5,7 +5,8 @@ export type Translate = (key: string, fallback?: string) => string;
 
 export type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "array" | "object";
 
-export type Widget =
+/** Built-in widgets — every one of these ships in the form layer. */
+export type BuiltInWidget =
   | "text"
   | "textarea"
   | "markdown"
@@ -13,6 +14,7 @@ export type Widget =
   | "select"
   | "segmented"
   | "switch"
+  | "switch-row"
   | "checkbox"
   | "chips"
   | "phone"
@@ -27,11 +29,30 @@ export type Widget =
   | "datetime"
   | "color";
 
+/**
+ * A widget name a schema may use: a built-in, or any other string resolved from
+ * the form's `widgets` map — the field-level twin of a table's custom cell
+ * `type`. `(string & {})` keeps autocomplete on the built-ins while still
+ * accepting a custom name.
+ */
+export type Widget = BuiltInWidget | (string & {});
+
+/**
+ * One-off field widgets passed to a form renderer via `widgets`, keyed by a
+ * custom `widget` name; each receives the field context and returns the
+ * control — the mirror of TableRenderer's `cells`. A custom entry wins over a
+ * built-in of the same name, so a screen can also override one locally.
+ *
+ * Called as a plain function (not mounted as a component), so an inline arrow
+ * in the `widgets` literal doesn't remount the field on every render.
+ */
+export type Widgets = Record<string, (props: WidgetProps) => import("react").ReactNode>;
+
 export interface JsonSchemaProperty {
   type: JsonSchemaType;
 
   format?: "email" | "password" | "tel" | "url" | "date";
-  items?: { type: JsonSchemaType };
+  items?: { type?: JsonSchemaType; enum?: Array<string | number> };
   enum?: Array<string | number>;
   minLength?: number;
   maxLength?: number;
@@ -48,6 +69,10 @@ export interface JsonSchemaProperty {
    * the form resolver; failure message comes from `errorMessage.matches`. */
   matchesField?: string;
   icon?: string;
+  /** `switch-row`: soft chip beside the title, e.g. a plan gate. A t-key. */
+  badge?: string;
+  /** `switch-row`: ICON_REGISTRY name rendered inside the badge. */
+  badgeIcon?: string;
   hideLabel?: boolean;
   help?: string;
   rows?: number;
@@ -64,14 +89,18 @@ export interface JsonSchemaProperty {
   grid?: FieldGrid;
   /** `phone`: country pre-selected when the field is empty. Defaults to `IN`. */
   defaultIso?: string;
-  /** `radio`: lay the options out in a row rather than stacked. */
+  /** `radio`/`checkbox-group`: lay the options out in a row rather than stacked. */
   row?: boolean;
-  /** `checkbox-group`: how many columns to grid the options into. */
+  /** `checkbox-group`: how many columns to grid the options into. Ignored when
+   * `row` is set. */
   columns?: number;
   /** `number`: input step. `minimum`/`maximum` bound it. */
   step?: number;
-  /** `number`: prefix shown inside the field (a translation key), e.g. a currency. */
+  /** `number`: unit shown inside the field (a translation key), e.g. a currency
+   * or a percent sign. */
   unit?: string;
+  /** `number`: which end `unit` sits on. Default "start". */
+  unitPosition?: "start" | "end";
   /** `date`/`time`/`datetime`: bounds passed to the native picker. */
   min?: string;
   max?: string;
@@ -81,6 +110,8 @@ export interface JsonSchemaProperty {
   maxSizeMb?: number;
   /** `upload`: label on the button (translation key). */
   uploadLabel?: string;
+  /** `upload`: second, quieter help line under the first. */
+  helpSecondary?: string;
   /** `upload`: shape of the preview tile. */
   preview?: "square" | "circle";
   /** `days`: the toggles, in order. `value` is what gets stored. */
@@ -178,6 +209,8 @@ export interface FormRendererProps extends FormLayoutProps {
   cancelLabel?: string;
   loading?: boolean;
   beforeSubmit?: import("react").ReactNode;
+  /** One-off widgets for `widget` names the form layer doesn't ship (see Widgets). */
+  widgets?: Widgets;
 }
 
 /** A field slot in a section — a schema property key, optionally spanning

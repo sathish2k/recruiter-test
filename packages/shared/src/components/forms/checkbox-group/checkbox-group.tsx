@@ -27,11 +27,17 @@ export function CheckboxGroupWidget({ prop, field, fieldState, t }: WidgetProps)
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
       <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${prop.columns ?? 1}, 1fr)`,
-          gap: "2px",
-        }}
+        sx={
+          // `row` packs the options onto one wrapping line, each only as wide as
+          // its label; `columns` lays them out on an even grid instead.
+          prop.row
+            ? { display: "flex", flexWrap: "wrap", gap: "16px" }
+            : {
+                display: "grid",
+                gridTemplateColumns: `repeat(${prop.columns ?? 1}, 1fr)`,
+                gap: "2px",
+              }
+        }
       >
         {options.map((option, index) => (
           <FormControlLabel
@@ -41,10 +47,16 @@ export function CheckboxGroupWidget({ prop, field, fieldState, t }: WidgetProps)
                 size="small"
                 checked={selected.has(option)}
                 onChange={() => toggle(option)}
+                sx={prop.row ? { p: 0, "& .MuiSvgIcon-root": { fontSize: 17 } } : undefined}
               />
             }
             label={t(prop.enumNames?.[index] ?? String(option))}
-            sx={{ "& .MuiFormControlLabel-label": { fontSize: 13 } }}
+            sx={{
+              ...(prop.row ? { m: 0, gap: "6px" } : {}),
+              "& .MuiFormControlLabel-label": prop.row
+                ? { fontSize: 12, fontWeight: 600 }
+                : { fontSize: 13 },
+            }}
           />
         ))}
       </Box>

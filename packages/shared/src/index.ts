@@ -47,6 +47,7 @@ export {
   type DialCode,
   Field,
   FieldLabel,
+  FieldShell,
   FormContainer,
   FormRenderer,
   type FormRendererProps,
@@ -71,11 +72,15 @@ export {
   SearchableSelectField,
   SelectField,
   type SelectOption,
+  SwitchRowWidget,
   splitPhone,
+  TextWidget,
   UploadField,
   type UploadValue,
   useRemoteOptions,
   type Widget,
+  type WidgetProps,
+  type Widgets,
 } from "./components/forms";
 export {
   type ApexChartType,

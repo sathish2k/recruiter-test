@@ -97,17 +97,20 @@ export const WORKSPACE_DEFAULTS: Record<string, unknown> = {
   language: "en",
   currency: "INR",
   noticePeriod: "30 days",
-  defaultOwner: "Round-robin (auto)",
+  resumePrivacy: "Masked until shortlist",
+  defaultOwner: "",
   jobVisibility: "Everyone",
   firstDayOfWeek: "Monday",
   dateFormat: "DD MMM YYYY",
   timeFormat: "12-hour (2:30 PM)",
-  businessHours: "9:30 AM – 6:30 PM",
+  businessHours: { from: "9:30 AM", to: "6:30 PM" },
+  officeAddress: { street: "", city: "", state: "", postalCode: "", country: "" },
   workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
   duplicateDetection: true,
+  duplicateIdentifiers: ["Email", "Phone"],
   whiteLabel: true,
   accentColor: "#E4560F",
-  candidatePrefix: "CAND-",
+  candidatePrefix: "CAN-",
   jobPrefix: "JOB-",
   clientPrefix: "CLI-",
   invoicePrefix: "INV-",
@@ -133,6 +136,24 @@ function flattenOrganization(row: typeof organization.$inferSelect) {
   }
   if (typeof merged.language === "string") {
     merged.language = resolveLanguage(merged.language, WORKSPACE_DEFAULTS.language as string);
+  }
+  // Business hours used to be one display string ("9:30 AM – 6:30 PM"); the
+  // form now edits the two ends separately.
+  if (typeof merged.businessHours === "string") {
+    const [from, to] = merged.businessHours.split(/\s*[–-]\s*/);
+    merged.businessHours = from && to ? { from, to } : WORKSPACE_DEFAULTS.businessHours;
+  }
+  // The address used to be one free-text line; it's now edited part by part.
+  if (typeof merged.officeAddress === "string") {
+    merged.officeAddress = {
+      ...(WORKSPACE_DEFAULTS.officeAddress as Record<string, string>),
+      street: merged.officeAddress,
+    };
+  }
+  // Early rows kept the fee as a display string ("8.33% of annual CTC").
+  if (typeof merged.placementFee === "string") {
+    const parsed = Number.parseFloat(merged.placementFee);
+    merged.placementFee = Number.isNaN(parsed) ? "" : parsed;
   }
   // A column that exists but is null/empty still wants its default.
   for (const [key, fallback] of Object.entries(WORKSPACE_DEFAULTS)) {

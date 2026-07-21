@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import Popover from "@mui/material/Popover";
+import type { Theme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useMemo, useState } from "react";
 import { IconRenderer } from "../../renderers";
@@ -107,11 +108,16 @@ export function PhoneField({
     onChange(`${nextDial.code} ${nextNumber}`.trim());
 
   const boxSx = {
-    background: "background.default",
+    // `bgcolor`, not `background` — the shorthand doesn't resolve palette paths
+    // in sx, which left both halves of this control transparent.
+    bgcolor: "surface.inset",
     border: "1px solid",
-    borderColor: error ? "error.main" : "divider",
-    borderRadius: "11px",
+    borderColor: error ? "error.main" : "surface.controlBorder",
+    borderRadius: (theme: Theme) => theme.form.controlRadius,
     fontSize: 13.5,
+    // Both halves size off their text's natural line box; the inherited 1.5
+    // would push this control taller than every other one on the form.
+    lineHeight: "normal",
   } as const;
 
   return (
@@ -138,6 +144,9 @@ export function PhoneField({
             fontSize: 11,
             fontWeight: 700,
             letterSpacing: ".04em",
+            // Hugs its text; the inherited 1.5 would make the country chip
+            // taller than the number field beside it.
+            lineHeight: 1,
             color: "text.secondary",
             bgcolor: "surface.tint",
             borderRadius: "5px",
@@ -156,7 +165,16 @@ export function PhoneField({
         onChange={(e) => commit(dial, e.target.value)}
         onBlur={onBlur}
         placeholder={placeholder}
-        sx={{ ...boxSx, flex: 1, minWidth: 0, px: "14px", py: "11px" }}
+        sx={{
+          ...boxSx,
+          flex: 1,
+          minWidth: 0,
+          px: (theme) => theme.form.controlPadX,
+          py: (theme) => theme.form.controlPadY,
+          // The wrapper owns the padding; without this the inner input adds
+          // MUI's own on top, and its 1.4375em sets the height instead.
+          "& .MuiInputBase-input": { p: 0, height: "auto", lineHeight: "normal" },
+        }}
       />
 
       <Popover

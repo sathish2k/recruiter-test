@@ -13,6 +13,7 @@ import {
   useToast,
 } from "@recruit/shared";
 import type { WorkspaceConfiguration } from "./workspace.configuration";
+import { WORKSPACE_WIDGETS } from "./workspace.widgets";
 
 type WorkspaceConfig = typeof WorkspaceConfiguration;
 
@@ -48,7 +49,7 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
   }
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
+    <Box sx={{ maxWidth: 1040 }}>
       <FormWithSectionsRenderer
         // Remount once the record loads so defaultValues seed correctly.
         key={organization.id}
@@ -57,6 +58,7 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
         sections={config.sections}
         defaultValues={defaultValues}
         onSubmit={save}
+        widgets={WORKSPACE_WIDGETS}
         actionsPlacement="footer"
         // The design only surfaces the actions once something has changed, in a
         // bar that sticks to the bottom of the viewport while you scroll.

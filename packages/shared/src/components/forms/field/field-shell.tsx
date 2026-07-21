@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
   if (hide) return null;
   return (
-    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "surface.textMuted" }}>
+    <Typography sx={{ fontSize: 12, fontWeight: 600, color: "surface.textMuted" }}>
       {label}
     </Typography>
   );

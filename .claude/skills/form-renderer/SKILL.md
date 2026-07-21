@@ -92,9 +92,45 @@ Cross-field equality: `matchesField: "<field>"` + `errorMessage.matches` key.
 `icon` is an `ICON_REGISTRY` name rendered via `IconRenderer` as the start adornment.
 All `title`/`placeholder`/`help`/`errorMessage` values are translation keys.
 
+## Custom widgets (one-off escape hatch — mirrors the table's `cells`)
+
+**The `widget` name IS the key**: any `widget` not handled by a built-in is
+resolved from the `widgets` prop and called with the field context — exactly
+how a table cell's `type` resolves from `cells`. A custom entry is checked
+*before* the built-ins, so a screen can also override one locally.
+
+```tsx
+// schema — `brandPicker` is not a built-in widget
+logo: { type: "string", widget: "brandPicker", title: "fields.logo" }
+
+// renderer
+<FormRenderer id={id} schema={schema} onSubmit={save}
+  widgets={{ brandPicker: ({ field, prop, fieldState, t }) => (
+    <FieldShell label={t(prop.title!)} error={fieldState.error?.message && t(fieldState.error.message)}>
+      <MyPicker value={field.value} onChange={field.onChange} />
+    </FieldShell>
+  )}} />
+```
+
+`WidgetProps = { name, prop, field, fieldState, t }` — identical to every
+built-in widget, so a custom one is fully form-bound: validation, dirty state,
+and grid/`span` placement for free. Render through `FieldShell` to keep label +
+error spacing consistent. `Widgets` lives entirely in the form layer (`Field`
+resolves it before falling through to `WIDGETS`), and works the same on
+`FormWithSectionsRenderer` and `FormModal`.
+
+Like `cells`, a widget is **called as a plain function, not mounted as a
+component** — so an inline arrow in the `widgets` literal is safe (as a
+component type its identity would change every render and remount the field,
+dropping input focus). The flip side is the same as the table's: it shares the
+enclosing render's hook order, so don't swap widget keys conditionally.
+
+If the look repeats, promote it to a real `forms/<name>/` folder + a line in
+`WIDGETS` instead of leaving it inline.
+
 ## FormRenderer props
 
-`{ id, schema, defaultValues?, onSubmit, submitLabel?, onCancel?, cancelLabel?, loading?, beforeSubmit? }`
+`{ id, schema, defaultValues?, onSubmit, submitLabel?, onCancel?, cancelLabel?, loading?, beforeSubmit?, widgets? }`
 — `id` resolves every text key via `useTranslation(id)`.
 
 ## FormWithSectionsRenderer (sectioned page forms)

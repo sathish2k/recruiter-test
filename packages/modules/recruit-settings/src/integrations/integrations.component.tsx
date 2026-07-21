@@ -115,7 +115,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
         : t("actions.connect");
 
   return (
-    <Box sx={{ maxWidth: 1100, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
       <SectionCard>
         <CardHeader
           title={t("title")}

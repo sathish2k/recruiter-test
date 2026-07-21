@@ -16,16 +16,15 @@ export function SegmentedWidget({ prop, field, fieldState, t }: WidgetProps) {
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
       <Tabs
+        variant="segmented"
         value={field.value || (options[0] ?? "")}
         onChange={(_, next) => field.onChange(next)}
-        sx={{ width: "100%", "& .MuiTabs-list": { width: "100%" } }}
       >
         {options.map((option, index) => (
           <Tab
             key={String(option)}
             value={option}
             label={t(prop.enumNames?.[index] ?? String(option))}
-            sx={{ flex: 1 }}
           />
         ))}
       </Tabs>

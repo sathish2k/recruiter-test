@@ -35,11 +35,17 @@ export function NumberWidget({ prop, field, fieldState, t }: WidgetProps) {
               <InputAdornment position="start" sx={{ color: "text.disabled" }}>
                 <IconRenderer name={prop.icon} size={18} />
               </InputAdornment>
-            ) : prop.unit ? (
+            ) : prop.unit && prop.unitPosition !== "end" ? (
               <InputAdornment position="start" sx={{ color: "text.disabled" }}>
                 {t(prop.unit)}
               </InputAdornment>
             ) : undefined,
+            endAdornment:
+              prop.unit && prop.unitPosition === "end" ? (
+                <InputAdornment position="end" sx={{ color: "text.disabled" }}>
+                  {t(prop.unit)}
+                </InputAdornment>
+              ) : undefined,
           },
         }}
       />

@@ -1,6 +1,8 @@
 "use client";
 
+import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import { createTheme, type Theme } from "@mui/material/styles";
+import { createElement } from "react";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -74,6 +76,11 @@ const formTokens: FormTokens = {
 declare module "@mui/material/Chip" {
   interface ChipPropsVariantOverrides {
     soft: true;
+  }
+}
+declare module "@mui/material/Tabs" {
+  interface TabsPropsVariantOverrides {
+    segmented: true;
   }
 }
 declare module "@mui/material/Paper" {
@@ -150,6 +157,8 @@ interface Surfaces {
   hover: string;
   divider: string;
   border: string;
+  /** The design's form-control outline — lighter than `border`. */
+  controlBorder: string;
   borderStrong: string;
   textPrimary: string;
   textSecondary: string;
@@ -204,6 +213,7 @@ function surfaces(mode: ThemeMode): Surfaces {
       hover: "rgba(0,0,0,0.05)",
       divider: "rgba(0,0,0,0.09)",
       border: "rgba(0,0,0,0.12)",
+      controlBorder: "rgba(0,0,0,0.1)",
       borderStrong: "rgba(0,0,0,0.16)",
       textPrimary: "#23211D",
       textSecondary: "#6E6960",
@@ -243,6 +253,7 @@ function surfaces(mode: ThemeMode): Surfaces {
     hover: "rgba(255,255,255,0.06)",
     divider: "rgba(255,255,255,0.06)",
     border: "rgba(255,255,255,0.12)",
+    controlBorder: "rgba(255,255,255,0.1)",
     borderStrong: "rgba(255,255,255,0.14)",
     textPrimary: "#ECEAE7",
     textSecondary: "#9A968E",
@@ -288,6 +299,7 @@ const v: Surfaces = {
   hover: "var(--mui-palette-surface-hover)",
   divider: "var(--mui-palette-surface-divider)",
   border: "var(--mui-palette-surface-border)",
+  controlBorder: "var(--mui-palette-surface-controlBorder)",
   borderStrong: "var(--mui-palette-surface-borderStrong)",
   textPrimary: "var(--mui-palette-surface-textPrimary)",
   textSecondary: "var(--mui-palette-surface-textSecondary)",
@@ -584,9 +596,70 @@ export function createAppTheme(): Theme {
       },
       MuiOutlinedInput: {
         styleOverrides: {
-          root: { borderRadius: 12, background: v.inset, fontSize: 13.5 },
-          input: { paddingBlock: 13 },
-          notchedOutline: { borderColor: v.border },
+          root: {
+            borderRadius: formTokens.controlRadius,
+            background: v.inset,
+            fontSize: 13.5,
+          },
+          // Two deviations from MUI's defaults, both to land on the design's
+          // 40.5px control: it pins the input to `height: 1.4375em` (~1px too
+          // tall), and it paints the outline on an absolutely-positioned
+          // fieldset, so — unlike the design's bordered <input> — that 1px edge
+          // adds no layout height. Hence the +1px on each side.
+          input: {
+            paddingBlock: `calc(${formTokens.controlPadY} + 1px)`,
+            lineHeight: "normal",
+            height: "auto",
+          },
+          notchedOutline: { borderColor: v.controlBorder },
+        },
+      },
+      // Both of these re-pad the outlined input for their own affordances, which
+      // makes a select or type-ahead taller than a text field. The design draws
+      // every control at the same height, so they're normalised back onto it.
+      MuiSelect: {
+        // The design's dropdowns end in a thin chevron, not MUI's filled
+        // triangle, sat on the control's own right padding.
+        defaultProps: { IconComponent: ExpandMoreRounded },
+        styleOverrides: {
+          select: { minHeight: "auto" },
+          icon: { fontSize: 17, color: v.textDisabled, right: formTokens.controlPadX },
+        },
+      },
+      MuiAutocomplete: {
+        defaultProps: { popupIcon: createElement(ExpandMoreRounded) },
+        styleOverrides: {
+          inputRoot: {
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingLeft: formTokens.controlPadX,
+            // Nested so it outranks Autocomplete's own `.MuiAutocomplete-input`
+            // padding, which is written at that same depth.
+            "& .MuiAutocomplete-input": {
+              paddingTop: `calc(${formTokens.controlPadY} + 1px)`,
+              paddingBottom: `calc(${formTokens.controlPadY} + 1px)`,
+              paddingLeft: 0,
+            },
+          },
+          endAdornment: { right: formTokens.controlPadX },
+          // The indicators are IconButtons, which this theme gives a bordered
+          // circle; inside a field the design draws a bare glyph.
+          popupIndicator: {
+            border: "none",
+            background: "none",
+            padding: 0,
+            color: v.textDisabled,
+            "& .MuiSvgIcon-root": { fontSize: 17 },
+            "&:hover": { background: "none" },
+          },
+          clearIndicator: {
+            border: "none",
+            background: "none",
+            padding: 0,
+            color: v.textDisabled,
+            "& .MuiSvgIcon-root": { fontSize: 15 },
+            "&:hover": { background: "none" },
+          },
         },
       },
       MuiDialog: {
@@ -651,6 +724,28 @@ export function createAppTheme(): Theme {
           },
           indicator: { display: "none" },
         },
+        variants: [
+          {
+            // The in-form segmented picker: a full-width rounded rect on the
+            // inset surface, not the pill the page-level tab bar uses.
+            props: { variant: "segmented" },
+            style: {
+              width: "100%",
+              background: v.inset,
+              border: `1px solid ${v.controlBorder}`,
+              borderRadius: formTokens.controlRadius,
+              padding: 4,
+              "& .MuiTabs-list": { width: "100%", gap: "4px" },
+              "& .MuiTab-root": {
+                flex: 1,
+                borderRadius: 8,
+                padding: "8px 6px",
+                fontSize: 12,
+                fontWeight: 600,
+              },
+            },
+          },
+        ],
       },
       MuiTab: {
         styleOverrides: {
@@ -672,16 +767,16 @@ export function createAppTheme(): Theme {
       },
       MuiSwitch: {
         styleOverrides: {
-          root: { width: 40, height: 23, padding: 0 },
+          root: { width: 44, height: 26, padding: 0 },
           switchBase: {
-            padding: 2.5,
+            padding: 3,
             "&.Mui-checked": {
-              transform: "translateX(17px)",
+              transform: "translateX(18px)",
               color: "#fff",
               "& + .MuiSwitch-track": { backgroundColor: "#F26A1B", opacity: 1 },
             },
           },
-          thumb: { width: 18, height: 18, boxShadow: "none", color: "#fff" },
+          thumb: { width: 20, height: 20, boxShadow: "none", color: "#fff" },
           track: { borderRadius: 999, backgroundColor: v.neutral, opacity: 1 },
         },
       },

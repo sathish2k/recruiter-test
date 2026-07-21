@@ -30,7 +30,10 @@ export { fetchOptions, invalidateOptions, useRemoteOptions } from "./select/remo
 export { SearchableSelectField } from "./select/searchable-select";
 export { SelectWidget } from "./select/select";
 export { SelectField } from "./select/select-field";
+export { SwitchRowWidget } from "./switch-row/switch-row";
+export { TextWidget } from "./text/text";
 export type {
+  BuiltInWidget,
   DialCode,
   FormActionsState,
   FormRendererProps,
@@ -46,5 +49,7 @@ export type {
   SelectOption,
   UploadValue,
   Widget,
+  WidgetProps,
+  Widgets,
 } from "./types";
 export { UploadField } from "./upload/upload";

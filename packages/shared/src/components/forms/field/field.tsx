@@ -15,9 +15,17 @@ import { PhoneWidget } from "../phone/phone";
 import { RadioWidget } from "../radio/radio";
 import { SegmentedWidget } from "../segmented/segmented";
 import { SelectWidget } from "../select/select";
+import { SwitchRowWidget } from "../switch-row/switch-row";
 import { TextWidget } from "../text/text";
 import { ToggleWidget } from "../toggle/toggle";
-import type { JsonSchemaProperty, Translate, Widget, WidgetProps } from "../types";
+import type {
+  BuiltInWidget,
+  JsonSchemaProperty,
+  Translate,
+  Widget,
+  WidgetProps,
+  Widgets,
+} from "../types";
 import { UploadWidget } from "../upload/upload";
 
 /**
@@ -25,13 +33,14 @@ import { UploadWidget } from "../upload/upload";
  * takes WidgetProps and adding one line here; nothing else in the form layer
  * needs to know about it.
  */
-export const WIDGETS: Record<Widget, (props: WidgetProps) => React.ReactNode> = {
+export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactNode> = {
   text: TextWidget,
   textarea: TextWidget,
   password: PasswordWidget,
   select: SelectWidget,
   segmented: SegmentedWidget,
   switch: ToggleWidget,
+  "switch-row": SwitchRowWidget,
   checkbox: ToggleWidget,
   chips: ChipsWidget,
   markdown: MarkdownWidget,
@@ -67,13 +76,19 @@ export function Field({
   prop,
   control,
   t,
+  widgets,
 }: {
   name: string;
   prop: JsonSchemaProperty;
   control: Control<FieldValues>;
   t: Translate;
+  widgets?: Widgets;
 }) {
-  const Widget = WIDGETS[widgetFor(prop)] ?? TextWidget;
+  // Custom is checked first, so a screen can add a widget the form layer lacks
+  // — or override a built-in — without touching WIDGETS.
+  const key = widgetFor(prop);
+  const custom = widgets?.[key];
+  const Builtin = WIDGETS[key as BuiltInWidget] ?? TextWidget;
   // The title defaults to the field name so a schema without one still labels.
   const resolved: JsonSchemaProperty = { ...prop, title: prop.title ?? name };
 
@@ -81,9 +96,14 @@ export function Field({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState }) => (
-        <Widget name={name} prop={resolved} field={field} fieldState={fieldState} t={t} />
-      )}
+      render={({ field, fieldState }) => {
+        const props: WidgetProps = { name, prop: resolved, field, fieldState, t };
+        // Called, not mounted — an inline arrow in a `widgets` literal is a new
+        // function identity every render, which as a component type would
+        // remount the field (and drop focus) on each keystroke. The fragment
+        // narrows a widget's ReactNode to the ReactElement Controller wants.
+        return <>{custom ? custom(props) : <Builtin {...props} />}</>;
+      }}
     />
   );
 }

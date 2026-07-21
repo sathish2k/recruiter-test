@@ -51,8 +51,11 @@ export function MuiCoreLayout({
       >
         {positioned.top?.map(renderComponent)}
         {positioned.breadcrumb?.map(renderComponent)}
-        <Box component="main" sx={{ flexGrow: 1, p: 3, overflow: "auto" }}>
-          {children}
+        {/* The page padding sits inside the scroller, not on it: a sticky
+            footer resolves `bottom: 0` against the scrollport, so padding here
+            would hold it that far off the bottom of the window. */}
+        <Box component="main" sx={{ flexGrow: 1, overflow: "auto" }}>
+          <Box sx={{ p: "22px 30px 44px" }}>{children}</Box>
         </Box>
         {positioned.bottom?.map(renderComponent)}
       </Box>
