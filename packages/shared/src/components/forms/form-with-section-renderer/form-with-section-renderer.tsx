@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { type FieldValues, useForm } from "react-hook-form";
 import { IconRenderer } from "../../renderers";
 import { Field } from "../field/field";
+import { FormContainer } from "../form-container";
 import { buildResolver, defaultFor } from "../form-renderer/form-renderer";
 import type { FormSectionField, FormValues, FormWithSectionsProps } from "../types";
 
@@ -29,6 +30,7 @@ export function FormWithSectionsRenderer({
   cancelLabel = "cancel",
   loading = false,
   sidePanel,
+  sectionsContainer,
   draftLabel = "saveDraft",
   onSaveDraft,
   actions,
@@ -131,49 +133,61 @@ export function FormWithSectionsRenderer({
           alignItems: "start",
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {sections.map((section, si) => (
-            <Card
-              key={section.title ?? si}
-              variant="base"
-              sx={{
-                p: "22px 24px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-              }}
-            >
-              {section.title ? (
-                <Box>
-                  <Typography sx={{ fontSize: 15, fontWeight: 700 }}>{t(section.title)}</Typography>
-                  {section.description ? (
-                    <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}>
-                      {t(section.description)}
-                    </Typography>
-                  ) : null}
-                </Box>
-              ) : null}
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(${section.columns ?? 2}, 1fr)`,
-                  gap: "14px",
-                }}
+        <FormContainer
+          stackContainer={sectionsContainer?.stackContainer ?? { spacing: 2 }}
+          gridContainer={sectionsContainer?.gridContainer}
+          grids={sections.map((section) => section.grid)}
+        >
+          {sections.map((section, sectionIndex) => {
+            // A section lays its fields out the same way a page lays out
+            // elements. `columns` is shorthand: an even grid where a field's
+            // `span` counts in those columns rather than MUI's 12.
+            const evenColumns = section.columns ?? 2;
+            const useShorthand = !section.gridContainer && !section.stackContainer;
+            const gridContainer = useShorthand
+              ? { spacing: 1.75, columns: evenColumns }
+              : section.gridContainer;
+
+            return (
+              <Card
+                key={section.title ?? sectionIndex}
+                variant="base"
+                sx={{ p: "22px 24px", display: "flex", flexDirection: "column", gap: "16px" }}
               >
-                {section.fields.map((f) => {
-                  const name = fieldName(f);
-                  const prop = schema.properties[name];
-                  if (!prop) return null;
-                  return (
-                    <Box key={name} sx={{ gridColumn: `span ${fieldSpan(f)}` }}>
-                      <Field name={name} prop={prop} control={control} t={t} />
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Card>
-          ))}
-        </Box>
+                {section.title ? (
+                  <Box>
+                    <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
+                      {t(section.title)}
+                    </Typography>
+                    {section.description ? (
+                      <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}>
+                        {t(section.description)}
+                      </Typography>
+                    ) : null}
+                  </Box>
+                ) : null}
+
+                <FormContainer
+                  stackContainer={section.stackContainer}
+                  gridContainer={gridContainer}
+                  grids={section.fields.map((field) => {
+                    const prop = schema.properties[fieldName(field)];
+                    if (prop?.grid) return prop.grid;
+                    // Shorthand span → a size in the section's own column count.
+                    return useShorthand ? { size: fieldSpan(field) } : undefined;
+                  })}
+                >
+                  {section.fields.map((field) => {
+                    const name = fieldName(field);
+                    const prop = schema.properties[name];
+                    if (!prop) return null;
+                    return <Field key={name} name={name} prop={prop} control={control} t={t} />;
+                  })}
+                </FormContainer>
+              </Card>
+            );
+          })}
+        </FormContainer>
         {sidePanel ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>{sidePanel}</Box>
         ) : null}

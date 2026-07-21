@@ -133,8 +133,15 @@ const softChip = Object.entries(SOFT).map(([color, t]) => ({
   },
 }));
 
-// Mode-aware surface tokens. Light values mirror the design's own `hpx-light`
-// remapping, so a token flip re-themes every atom below in one place.
+// Mode-aware surface tokens: flipping them re-themes every atom below in one
+// place.
+//
+// The dark values come from the Claude Design source. The light ones do NOT —
+// the design wires up an `html.hpx-light` class but never styles it (no CSS for
+// that selector, no custom properties, no prefers-color-scheme), so toggling
+// the theme there only swaps the button icon. The light palette below is ours,
+// derived to keep the dark contrast relationships. Replace it wholesale if the
+// design ever ships a real light mode.
 interface Surfaces {
   bgDefault: string;
   paper: string;

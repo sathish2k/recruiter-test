@@ -40,9 +40,24 @@ else `text`.
 and error styling match, add one line to `WIDGETS` in `field/field.tsx`, and
 add the name to the `Widget` union in `types.ts`. Nothing else changes.
 
-**Layout**: `FormRenderer` takes `stackContainer` / `gridContainer` exactly like
-a page Configuration does; with a grid, each field places itself via
-`grid: { size, offset }` in its schema property. Default is a plain stack.
+**Layout** — same vocabulary as a page Configuration, at three levels:
+
+```ts
+<FormWithSectionsRenderer
+  sectionsContainer={{ gridContainer: { spacing: 2 } }}   // sections side by side
+  sections={[
+    { title: "…", columns: 3, grid: { size: 6 },          // shorthand: even columns
+      fields: ["a", "b", { name: "c", span: 3 }] },        //   `span` counts in them
+    { title: "…", gridContainer: { spacing: 2 },          // engine-style: 12-col,
+      fields: ["d", "e"] },                               //   size on the schema prop
+    { title: "…", stackContainer: { spacing: 1 }, fields: ["f"] },
+  ]}
+/>
+```
+
+`FormRenderer` takes the same `stackContainer` / `gridContainer`. A field places
+itself with `grid: { size, offset }` on its schema property. Default everywhere
+is a plain stack.
 
 **Text**: every label, placeholder, help line, error and widget string resolves
 through `t(key, fallback)` — schemas hold keys, never literals.

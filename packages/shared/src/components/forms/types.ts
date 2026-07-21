@@ -185,13 +185,19 @@ export interface FormRendererProps extends FormLayoutProps {
 export type FormSectionField = string | { name: string; span?: number };
 
 /** A titled group of schema fields rendered as its own card. */
-export interface FormSection {
+export interface FormSection extends FormLayoutProps {
   /** Section heading translation key. */
   title?: string;
   /** Section sub-text translation key. */
   description?: string;
-  /** Grid columns for the section's fields (default 2). */
+  /**
+   * Shorthand for an even `gridContainer`: `columns: 3` lays the fields out in
+   * three equal columns, and a field's `span` counts in those columns. Ignored
+   * when the section sets `gridContainer` or `stackContainer` explicitly.
+   */
   columns?: number;
+  /** Where this section sits when the form lays sections out in a grid. */
+  grid?: FieldGrid;
   fields: FormSectionField[];
 }
 
@@ -211,11 +217,14 @@ export interface FormLayoutProps {
   /** Vertical stack — the default when neither container is set. */
   stackContainer?: { spacing?: number; direction?: "column" | "row" };
   /** Columns; each field places itself with its own `grid`. */
-  gridContainer?: Pick<import("@mui/material/Grid").GridProps, "spacing" | "direction">;
+  gridContainer?: Pick<import("@mui/material/Grid").GridProps, "spacing" | "direction" | "columns">;
 }
 
 export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSubmit"> {
   sections: FormSection[];
+  /** Lays the sections themselves out — stack (default) or a grid, so two
+   * sections can sit side by side. Each section places itself via its `grid`. */
+  sectionsContainer?: FormLayoutProps;
   /** Page heading translation key rendered above the sections. */
   title?: string;
   /** Page sub-heading translation key. */

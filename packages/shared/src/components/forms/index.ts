@@ -8,6 +8,7 @@ export type {
 export { DaysField, DEFAULT_DAY_PRESETS, DEFAULT_DAYS } from "./days/days";
 export { Field, WIDGETS, widgetFor } from "./field/field";
 export { FieldLabel, FieldShell } from "./field/field-shell";
+export { FormContainer } from "./form-container";
 export {
   buildResolver,
   FormRenderer,

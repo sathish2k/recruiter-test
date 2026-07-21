@@ -216,8 +216,9 @@ bunx turbo run build              # build all apps
 bunx biome check --write .        # lint + format
 ```
 
-Verify changes with: `bunx biome check --write packages apps`,
-`bunx turbo run typecheck build --force`, `bun test packages`.
+Verify changes with: `bunx biome check --write packages apps`, `bunx tsc
+--noEmit` (packages), `bunx turbo run typecheck build --force` (apps),
+`bun test apps packages`.
 
 Run the API from `apps/api` (`bun run --watch src/index.ts`, port 3001) so Bun
 loads `apps/api/.env` (JWT_SECRET etc.) — don't override env vars on the CLI.
@@ -255,13 +256,29 @@ pixel-by-pixel (via the theme's variants, never inline chrome).
 
 ## Gotchas
 
-- `apps/docs` sets `typescript.ignoreBuildErrors: true` in `next.config.ts` —
-  Next 16's in-build type check crashes on TS 7 for that app. Types are still
-  gated by `bunx turbo run typecheck` (`tsc --noEmit`).
+- **TypeScript 7 + Next 16.** Next's in-build type check requires
+  `typescript/lib/typescript.js`, which the TS 7 native port doesn't ship (it
+  has only `lib/tsc.js`). Next therefore decides TypeScript is missing and tries
+  to `pnpm add -D typescript`, which fails the build *and* litters
+  `apps/*/pnpm-lock.yaml` + `apps/*/node_modules`. Two things keep this fixed,
+  both required: the `@typescript/native-preview` devDependency (Next detects it
+  and skips the install entirely) and `typescript.ignoreBuildErrors: true` in
+  every Next app's config. Never re-add per-app `pnpm-lock.yaml`.
+- Types are gated by `tsc --noEmit`, not by the build. **Both** invocations are
+  needed: `bunx turbo run typecheck` covers `apps/`, and `bunx tsc --noEmit` at
+  the repo root covers `packages/` — the per-app tsconfigs `include` only their
+  own directory, so a broken export in `packages/shared` passes turbo alone.
 - Packages are raw `.ts` source (not built) resolved via tsconfig `paths`;
   Next needs `experimental.externalDir: true` to compile them.
 - The editor's TS server uses the root `tsconfig.json` for files under
   `packages/`, so that config `include`s `packages/**` — don't empty it.
+- **Dev and build write to different directories** (`distDir`): `next dev` uses
+  `.next-dev`, `next build` uses `.next`. They shared one directory before, so
+  building while a dev server ran overwrote the chunks it was serving and the
+  browser threw `ChunkLoadError` until the dev server was restarted. Consequence:
+  `next-env.d.ts` is generated per-mode (its `routes.d.ts` reference follows
+  `distDir`), so it is gitignored rather than committed — Next regenerates it on
+  the next dev/build.
 - `react-apexcharts` renders a blank canvas under React 19 + Turbopack. The
   shared `Chart` (`packages/shared/src/components/graph-renderer/chart.tsx`)
   drives the core `apexcharts` lib imperatively instead (dynamic import,

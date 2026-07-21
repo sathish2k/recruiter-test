@@ -3,13 +3,13 @@
 import { ajvResolver } from "@hookform/resolvers/ajv";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import { useTranslation } from "@recruit/sdk";
 import { useMemo } from "react";
 import { type FieldValues, type Resolver, useForm } from "react-hook-form";
 import { Field } from "../field/field";
-import type { FieldGrid, FormRendererProps, JsonSchema, JsonSchemaProperty } from "../types";
+import { FormContainer } from "../form-container";
+import type { FormRendererProps, JsonSchema, JsonSchemaProperty } from "../types";
 
 export function defaultFor(prop: JsonSchemaProperty): unknown {
   if (prop.widget === "upload") return { url: prop.default ?? "" };
@@ -48,45 +48,6 @@ export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
       ? { values: {}, errors }
       : { values: result.values ?? values, errors: {} };
   };
-}
-
-/**
- * Lays fields out the way the engine lays out a page: `stackContainer` for a
- * vertical rhythm, `gridContainer` for columns with per-field `grid.size`.
- * Neither set means a plain stack, which is what most forms want.
- */
-function FormContainer({
-  stackContainer,
-  gridContainer,
-  grids,
-  children,
-}: {
-  stackContainer?: FormRendererProps["stackContainer"];
-  gridContainer?: FormRendererProps["gridContainer"];
-  grids: (FieldGrid | undefined)[];
-  children: React.ReactNode[];
-}) {
-  if (gridContainer) {
-    return (
-      <Grid container spacing={gridContainer.spacing ?? 2} direction={gridContainer.direction}>
-        {children.map((child, index) => (
-          <Grid
-            // biome-ignore lint/suspicious/noArrayIndexKey: positional, mirrors `grids`.
-            key={index}
-            size={grids[index]?.size ?? 12}
-            offset={grids[index]?.offset}
-          >
-            {child}
-          </Grid>
-        ))}
-      </Grid>
-    );
-  }
-  return (
-    <Stack spacing={stackContainer?.spacing ?? 1.5} direction={stackContainer?.direction}>
-      {children}
-    </Stack>
-  );
 }
 
 export function FormRenderer({
