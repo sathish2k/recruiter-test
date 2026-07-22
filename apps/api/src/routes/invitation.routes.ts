@@ -9,8 +9,9 @@ export default new Elysia({ name: "invitation.routes" })
   })
   .post("/invitations", (ctx) => invitationController.postInvitation(ctx), {
     isAuth: true,
+    // The invite modal sends one email per line, so a send is always a list.
     body: t.Object({
-      email: t.String({ format: "email" }),
+      emails: t.Array(t.String({ format: "email" }), { minItems: 1 }),
       role: t.Optional(t.String()),
       clientAccess: t.Optional(t.String()),
     }),

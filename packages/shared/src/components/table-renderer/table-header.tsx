@@ -37,7 +37,11 @@ export function TableHeaderRenderer({
           )}
         </TableCell>
       ))}
-      {hasActions ? <TableCell align="right">{t(actionsLabelKey)}</TableCell> : null}
+      {/* Omitting `actionsLabel` leaves the trailing header blank, as the
+          designs do — the kebab column needs no caption. */}
+      {hasActions ? (
+        <TableCell align="right">{actionsLabelKey ? t(actionsLabelKey) : null}</TableCell>
+      ) : null}
     </TableRow>
   );
 }

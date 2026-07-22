@@ -45,9 +45,11 @@ function widthEstimate(filter: FilterConfig): number {
     case "segmented":
       return 40 + filter.options.length * 78;
     case "toggle":
-      return 120;
+      return 132;
     default:
-      return 170;
+      // Matches the trigger's own min/max window, so the overflow split
+      // doesn't under-count and leave a filter clipped.
+      return 176;
   }
 }
 
@@ -249,7 +251,14 @@ export function Filters({
             filters={hidden}
             label={moreLabel}
             activeCount={hidden.filter((f) => isSet(filters[f.key])).length}
-            renderControl={(filter) => control(filter, filters, setFilter)}
+            values={filters}
+            renderControl={(filter, draft, set) => control(filter, draft, set)}
+            onApply={(draft) => {
+              for (const filter of hidden) setFilter(filter.key, draft[filter.key]);
+            }}
+            onReset={() => {
+              for (const filter of hidden) clearFilter(filter.key);
+            }}
           />
         ) : null}
         {showClearAll && hasActiveFilters ? (

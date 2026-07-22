@@ -3,6 +3,7 @@
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
+import type { ReactNode } from "react";
 import { IconRenderer, LinkRenderer } from "../renderers";
 import type { TableHeaderConfig, TFunc } from "./table-renderer.types";
 
@@ -10,10 +11,17 @@ export function TableTitle({
   config,
   meta,
   t,
+  extra,
+  action,
 }: {
   config: TableHeaderConfig;
   meta?: Record<string, unknown>;
   t: TFunc;
+  /** Rendered under the title — e.g. a usage meter. */
+  extra?: ReactNode;
+  /** Right-hand slot. Overrides `config.action` when given, so a screen can
+   * put a primary button where the config would place a link chip. */
+  action?: ReactNode;
 }) {
   return (
     <Box
@@ -49,24 +57,26 @@ export function TableTitle({
               {t(config.subtitle, meta ?? {})}
             </Box>
           ) : null}
+          {extra}
         </Box>
       </Box>
-      {config.action ? (
-        <LinkRenderer config={config.action}>
-          <Chip
-            variant="soft"
-            color="primary"
-            clickable
-            label={
-              <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                {config.action.label ? t(config.action.label.name) : ""}
-                {config.actionIcon ? <IconRenderer name={config.actionIcon} size={15} /> : null}
-              </Box>
-            }
-            sx={{ px: "4px", py: "16px" }}
-          />
-        </LinkRenderer>
-      ) : null}
+      {action ??
+        (config.action ? (
+          <LinkRenderer config={config.action}>
+            <Chip
+              variant="soft"
+              color="primary"
+              clickable
+              label={
+                <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  {config.action.label ? t(config.action.label.name) : ""}
+                  {config.actionIcon ? <IconRenderer name={config.actionIcon} size={15} /> : null}
+                </Box>
+              }
+              sx={{ px: "4px", py: "16px" }}
+            />
+          </LinkRenderer>
+        ) : null)}
     </Box>
   );
 }

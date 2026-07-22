@@ -64,47 +64,60 @@ function OwnerPicker({ prop, field, fieldState, t }: WidgetProps) {
       help={prop.help ? t(prop.help) : undefined}
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
-      <Autocomplete<SelectOption>
-        options={options}
-        loading={loading}
-        value={selected}
-        onInputChange={(_, next) => setSearch(next)}
-        onChange={(_, next) => field.onChange(next?.value ?? "")}
-        onBlur={field.onBlur}
-        getOptionLabel={(option) => option.label}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        noOptionsText={t("fields.defaultOwnerEmpty")}
-        renderOption={(optionProps, option) => {
-          const { key, ...rest } = optionProps as typeof optionProps & { key: string };
-          return (
-            <Box
-              component="li"
-              key={key}
-              {...rest}
-              sx={{ display: "flex", alignItems: "center", gap: "10px" }}
-            >
-              <OwnerAvatar row={option.raw} size={24} />
-              <Box component="span" sx={{ flex: 1 }}>
-                {option.label}
-              </Box>
-            </Box>
-          );
-        }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            hiddenLabel
-            placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
-            error={!!fieldState.error}
-            slotProps={{
-              input: {
-                ...params.slotProps?.input,
-                startAdornment: selected ? <OwnerAvatar row={selected.raw} size={26} /> : undefined,
-              },
+      <Box sx={{ position: "relative" }}>
+        {selected ? (
+          <Box
+            sx={{
+              position: "absolute",
+              left: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 1,
+              pointerEvents: "none",
             }}
-          />
-        )}
-      />
+          >
+            <OwnerAvatar row={selected.raw} size={26} />
+          </Box>
+        ) : null}
+        <Autocomplete<SelectOption>
+          options={options}
+          loading={loading}
+          value={selected}
+          onInputChange={(_, next) => setSearch(next)}
+          onChange={(_, next) => field.onChange(next?.value ?? "")}
+          onBlur={field.onBlur}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          noOptionsText={t("fields.defaultOwnerEmpty")}
+          renderOption={(optionProps, option) => {
+            const { key, ...rest } = optionProps as typeof optionProps & { key: string };
+            return (
+              <Box
+                component="li"
+                key={key}
+                {...rest}
+                sx={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <OwnerAvatar row={option.raw} size={24} />
+                <Box component="span" sx={{ flex: 1 }}>
+                  {option.label}
+                </Box>
+              </Box>
+            );
+          }}
+          // Never touch the input slot — Autocomplete wires its ref through it,
+          // and replacing it leaves the control unable to find its own input.
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              hiddenLabel
+              placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
+              error={!!fieldState.error}
+            />
+          )}
+          sx={selected ? { "& .MuiAutocomplete-inputRoot": { pl: "44px" } } : undefined}
+        />
+      </Box>
     </FieldShell>
   );
 }
@@ -118,13 +131,8 @@ interface Address {
   country?: string;
 }
 
-/** The parts under Street, in the design's column proportions. */
-const ADDRESS_PARTS: { key: keyof Address; fr: string }[] = [
-  { key: "city", fr: "1.2fr" },
-  { key: "state", fr: "1fr" },
-  { key: "postalCode", fr: "0.8fr" },
-  { key: "country", fr: "1fr" },
-];
+/** Street spans two tracks; the rest wrap as the card narrows. */
+const ADDRESS_PARTS: (keyof Address)[] = ["city", "state", "postalCode", "country"];
 
 /**
  * Office address as one field: Street over a tighter four-column row, all under
@@ -142,22 +150,24 @@ function AddressGroup({ prop, field, fieldState, t }: WidgetProps) {
       help={prop.help ? t(prop.help) : undefined}
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
-      <TextField
-        fullWidth
-        hiddenLabel
-        value={value.street ?? ""}
-        onChange={(event) => set("street")(event.target.value)}
-        onBlur={field.onBlur}
-        placeholder={t("fields.addressStreetPlaceholder")}
-      />
+      {/* One auto-fitting grid holding Street and its four parts — Street just
+          claims two tracks. Columns re-flow rather than sitting on fixed frs. */}
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: ADDRESS_PARTS.map((p) => p.fr).join(" "),
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
           gap: "10px",
         }}
       >
-        {ADDRESS_PARTS.map(({ key }) => (
+        <TextField
+          hiddenLabel
+          value={value.street ?? ""}
+          onChange={(event) => set("street")(event.target.value)}
+          onBlur={field.onBlur}
+          placeholder={t("fields.addressStreetPlaceholder")}
+          sx={{ gridColumn: "span 2", minWidth: 0 }}
+        />
+        {ADDRESS_PARTS.map((key) => (
           <TextField
             key={key}
             hiddenLabel
@@ -165,6 +175,7 @@ function AddressGroup({ prop, field, fieldState, t }: WidgetProps) {
             onChange={(event) => set(key)(event.target.value)}
             onBlur={field.onBlur}
             placeholder={t(`fields.address${key[0].toUpperCase()}${key.slice(1)}Placeholder`)}
+            sx={{ minWidth: 0 }}
           />
         ))}
       </Box>
@@ -192,25 +203,17 @@ function HoursRangeWidget({ prop, field, fieldState, t }: WidgetProps) {
       help={prop.help ? t(prop.help) : undefined}
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
+      {/* FROM / TO now sit inside each control as a leading caption rather
+          than above it. */}
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
         {(["from", "to"] as const).map((part) => (
-          <Box key={part} sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-            <Typography
-              sx={{
-                fontSize: 10.5,
-                letterSpacing: ".06em",
-                fontWeight: 600,
-                color: "text.disabled",
-              }}
-            >
-              {t(`fields.businessHours${part === "from" ? "From" : "To"}`)}
-            </Typography>
-            <SearchableSelectField
-              value={value[part] ?? ""}
-              onChange={set(part) as (next: never) => void}
-              options={options}
-            />
-          </Box>
+          <SearchableSelectField
+            key={part}
+            value={value[part] ?? ""}
+            onChange={set(part) as (next: never) => void}
+            options={options}
+            prefix={t(`fields.businessHours${part === "from" ? "From" : "To"}`)}
+          />
         ))}
       </Box>
     </FieldShell>

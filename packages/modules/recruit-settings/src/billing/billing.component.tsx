@@ -70,9 +70,9 @@ interface BillingData {
 function Tick({ on }: { on: boolean }) {
   return (
     <IconRenderer
-      name={on ? "check-circle" : "close"}
+      name={on ? "check-circle" : "cancel"}
       size={16}
-      sx={{ color: on ? "var(--mui-palette-success-light)" : "text.disabled" }}
+      sx={{ color: on ? "var(--mui-palette-success-main)" : "rgba(255,255,255,.25)" }}
     />
   );
 }
@@ -134,7 +134,7 @@ export function SettingsBillingComponent({ id }: { id: string }) {
   resets.setMonth(resets.getMonth() + 1, 1);
 
   return (
-    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <Box
         sx={{
           display: "grid",

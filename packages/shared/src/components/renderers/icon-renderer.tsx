@@ -12,6 +12,7 @@ import BarChartRounded from "@mui/icons-material/BarChartRounded";
 import BoltRounded from "@mui/icons-material/BoltRounded";
 import CalendarMonthRounded from "@mui/icons-material/CalendarMonthRounded";
 import CallRounded from "@mui/icons-material/CallRounded";
+import CancelRounded from "@mui/icons-material/CancelRounded";
 import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import ChecklistRounded from "@mui/icons-material/ChecklistRounded";
@@ -44,6 +45,7 @@ import FormatItalicRounded from "@mui/icons-material/FormatItalicRounded";
 import FormatListBulletedRounded from "@mui/icons-material/FormatListBulletedRounded";
 import FormatListNumberedRounded from "@mui/icons-material/FormatListNumberedRounded";
 import FormatQuoteRounded from "@mui/icons-material/FormatQuoteRounded";
+import GroupAddRounded from "@mui/icons-material/GroupAddRounded";
 import GroupRounded from "@mui/icons-material/GroupRounded";
 import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
@@ -155,6 +157,10 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   domain: DomainRounded,
   close: CloseRounded,
   check: CheckRounded,
+  cancel: CancelRounded,
+  "fact-check": FactCheckOutlined,
+  "group-add": GroupAddRounded,
+  "upload-file": UploadFileRounded,
   "check-circle": CheckCircleRounded,
   search: SearchRounded,
   "expand-more": ExpandMoreRounded,

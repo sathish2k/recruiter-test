@@ -91,7 +91,8 @@ export interface TableRendererConfig {
 /** A toolbar call-to-action button (e.g. "Add"). */
 export interface TableCta {
   label: ColumnLabel;
-  icon?: "add" | "download" | "upload";
+  /** ICON_REGISTRY name; the toolbar sizes it consistently. */
+  icon?: string;
   /** Navigate to this route id on click. */
   routeId?: string;
   /** Emit this action key to the component's onCta handler on click. */

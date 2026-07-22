@@ -7,9 +7,10 @@ const roles: RoleOption[] = [
   { value: "client", label: "roles.client", color: "default" },
 ];
 
-const statusColors: Record<string, "success" | "warning"> = {
+const statusColors: Record<string, "success" | "warning" | "error"> = {
   active: "success",
   invited: "warning",
+  suspended: "error",
 };
 
 /** The component config IS the table config, so the feature renders in one
@@ -17,9 +18,11 @@ const statusColors: Record<string, "success" | "warning"> = {
  * the "x of y seats used" line. */
 export const MembersConfiguration: TableFilterExportConfig & { seatLimit: number } = {
   seatLimit: 5,
+  header: { title: "title" },
   columns: [
     {
       label: { name: "columns.member" },
+      width: "27%",
       sort: { key: "member" },
       value: {
         type: "entity",
@@ -29,10 +32,12 @@ export const MembersConfiguration: TableFilterExportConfig & { seatLimit: number
         textPath: "initials",
         title: "displayName",
         subtitle: "email",
+        suffixPath: "isCurrentUser",
       },
     },
     {
       label: { name: "columns.role" },
+      width: "14.2%",
       sort: { key: "role" },
       value: {
         type: "role",
@@ -41,27 +46,44 @@ export const MembersConfiguration: TableFilterExportConfig & { seatLimit: number
         action: "changeRole",
         changeLabel: "actions.changeRole",
         options: roles,
+        lockedPath: "isOwner",
+        lockedValues: ["admin"],
+        lockedHint: "roleLockedHint",
       },
     },
     {
+      label: { name: "columns.clientAccess" },
+      width: "20.3%",
+      value: { type: "clientAccess" },
+    },
+    {
       label: { name: "columns.status" },
+      width: "11.5%",
       sort: { key: "status" },
       value: {
         type: "status",
         path: "status",
         variant: "soft",
-        labels: { active: "status.active", invited: "status.invited" },
+        // The design's member status always carries a leading dot.
+        dot: true,
+        labels: {
+          active: "status.active",
+          invited: "status.invited",
+          suspended: "status.suspended",
+        },
         colors: statusColors,
       },
     },
     {
+      label: { name: "columns.mfa" },
+      width: "12.2%",
+      value: { type: "mfa" },
+    },
+    {
       label: { name: "columns.lastActive" },
+      width: "10.8%",
       sort: { key: "lastActive" },
-      value: {
-        type: "string",
-        path: "lastActive",
-        sx: { color: "text.secondary", fontSize: 12.5 },
-      },
+      value: { type: "lastActive" },
     },
   ],
   filters: [
@@ -77,30 +99,54 @@ export const MembersConfiguration: TableFilterExportConfig & { seatLimit: number
         { value: "client", label: "roles.client" },
       ],
     },
+    {
+      type: "select",
+      key: "status",
+      label: { name: "filters.status" },
+      options: [
+        { value: "active", label: "status.active" },
+        { value: "invited", label: "status.invited" },
+        { value: "suspended", label: "status.suspended" },
+      ],
+    },
   ],
-  export: {
-    types: [
-      { label: "exportTypes.csv", value: "csv", icon: "csv" },
-      { label: "exportTypes.xlsx", value: "xlsx", icon: "excel" },
-    ],
-  },
-  ctas: [{ label: { name: "actions.invite" }, icon: "add", action: "add" }],
+  // The owner can't be re-invited, suspended or removed, and their profile is
+  // reached from their own account rather than this table.
   actions: [
-    { type: "resendInvite", icon: "mail", label: { name: "actions.resendInvite" } },
-    { type: "deactivate", icon: "person-off", label: { name: "actions.deactivate" } },
+    {
+      type: "viewProfile",
+      icon: "person",
+      label: { name: "actions.viewProfile" },
+      hideWhen: "isOwner",
+    },
+    { type: "resetPassword", icon: "lock-reset", label: { name: "actions.resetPassword" } },
+    {
+      type: "resendInvite",
+      icon: "mail",
+      label: { name: "actions.resendInvite" },
+      hideWhen: "isOwner",
+    },
+    {
+      type: "suspend",
+      icon: "person-off",
+      label: { name: "actions.suspend" },
+      hideWhen: "isOwner",
+    },
+    { type: "remove", icon: "delete", label: { name: "actions.remove" }, hideWhen: "isOwner" },
   ],
-  actionsLabel: { name: "columns.actions" },
   emptyLabel: "empty",
-  pagination: { pageSize: 10 },
+  // The design's invite modal: a multi-email textarea over a two-column
+  // role / client-access row.
   addForm: {
     type: "object",
     properties: {
-      email: {
+      emails: {
         type: "string",
-        format: "email",
-        title: "inviteForm.email",
-        placeholder: "inviteForm.emailPlaceholder",
-        icon: "mail",
+        widget: "textarea",
+        rows: 3,
+        title: "inviteForm.emails",
+        placeholder: "inviteForm.emailsPlaceholder",
+        grid: { size: 12 },
       },
       role: {
         type: "string",
@@ -108,12 +154,21 @@ export const MembersConfiguration: TableFilterExportConfig & { seatLimit: number
         title: "inviteForm.role",
         enum: ["admin", "lead", "employee", "client"],
         default: "employee",
+        grid: { size: 6 },
+      },
+      clientAccess: {
+        type: "string",
+        widget: "select",
+        title: "inviteForm.clientAccess",
+        enum: ["all", "unassigned"],
+        default: "all",
+        grid: { size: 6 },
       },
     },
-    required: ["email", "role"],
+    required: ["emails", "role"],
     errorMessage: {
       required: {
-        email: "inviteForm.errors.email",
+        emails: "inviteForm.errors.emails",
         role: "inviteForm.errors.role",
       },
     },

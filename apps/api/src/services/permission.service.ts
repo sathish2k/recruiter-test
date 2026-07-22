@@ -1,6 +1,7 @@
 import { DEFAULT_ROLE_PERMISSIONS } from "@recruit/types";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "../db";
+import { user } from "../models/auth.model";
 import { rolePermission } from "../models/role-permission.model";
 
 const ROLES = Object.keys(DEFAULT_ROLE_PERMISSIONS);
@@ -49,6 +50,22 @@ export async function listPermissions(agencyId: string) {
       permissions: mapToList(row?.permissions ?? DEFAULT_ROLE_PERMISSIONS[role] ?? {}),
     };
   });
+}
+
+/** Who currently holds each role — the role cards' count and name list. */
+export async function roleHolders(agencyId: string) {
+  const rows = await db
+    .select({ role: user.role, name: user.name })
+    .from(user)
+    .where(and(eq(user.agencyId, agencyId), ne(user.status, "inactive")));
+  const holders: Record<string, { count: number; names: string[] }> = {};
+  for (const row of rows) {
+    const entry = holders[row.role] ?? { count: 0, names: [] };
+    entry.count += 1;
+    entry.names.push(row.name);
+    holders[row.role] = entry;
+  }
+  return holders;
 }
 
 export async function updateRolePermissions(

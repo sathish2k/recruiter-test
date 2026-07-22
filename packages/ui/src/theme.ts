@@ -55,9 +55,9 @@ export interface GradientTokens {
 
 const gradientTokens: GradientTokens = {
   primary: "linear-gradient(135deg,#FF8A3C,#E4560F)",
-  bar: "linear-gradient(90deg,#FF8A3C,#C24509)",
-  meter: "linear-gradient(90deg,#F0894A,#F0C27C)",
-  planCard: "linear-gradient(135deg,rgba(240,137,74,.22),rgba(240,194,124,.07))",
+  bar: "linear-gradient(90deg,#FF8A3C,#E4560F)",
+  meter: "linear-gradient(90deg,#FF8A3C,#E4560F)",
+  planCard: "linear-gradient(150deg,rgba(242,106,27,.28),rgba(28,28,27,.7)),#1C1C1B",
 };
 
 const formTokens: FormTokens = {
@@ -432,8 +432,8 @@ export function createAppTheme(): Theme {
       MuiIconButton: {
         styleOverrides: {
           root: {
-            width: 30,
-            height: 30,
+            width: 29,
+            height: 29,
             border: `1px solid ${v.border}`,
             color: v.textMuted,
             "&:hover": { background: v.hover, color: v.textPrimary },
@@ -524,7 +524,7 @@ export function createAppTheme(): Theme {
           root: {
             boxShadow: "none",
             borderRadius: 16,
-            padding: "18px 20px",
+            padding: "20px 22px",
           },
         },
         variants: [
@@ -804,8 +804,8 @@ export function createAppTheme(): Theme {
       MuiPaginationItem: {
         styleOverrides: {
           root: {
-            width: 30,
-            height: 30,
+            width: 29,
+            height: 29,
             minWidth: 30,
             margin: "0 3px",
             fontSize: 12.5,
@@ -832,7 +832,7 @@ export function createAppTheme(): Theme {
             background: v.paper,
             border: `1px solid ${v.divider}`,
             borderRadius: 16,
-            padding: "18px 20px",
+            padding: "20px 22px",
           },
         },
       },
@@ -865,7 +865,8 @@ export function createAppTheme(): Theme {
               borderBottomRightRadius: 10,
             },
           },
-          body: { borderBottom: `1px solid ${v.divider}` },
+          // The designs draw the row rule a shade lighter than `divider`.
+          body: { borderBottom: "1px solid rgba(255,255,255,0.05)" },
         },
       },
       MuiTableSortLabel: {

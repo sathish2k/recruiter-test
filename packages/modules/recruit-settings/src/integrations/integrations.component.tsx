@@ -30,9 +30,23 @@ type Tile = IntegrationItem & {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  connected: "var(--mui-palette-success-light)",
+  connected: "var(--mui-palette-success-main)",
   warning: "var(--mui-palette-warning-light)",
   available: "text.disabled",
+};
+
+/** The blurb under the name shifts colour with the connection's health. */
+const SUBTEXT_COLOR: Record<string, string> = {
+  connected: "text.secondary",
+  warning: "warning.light",
+  available: "text.disabled",
+};
+
+/** Outline + label colour for the trailing action pill, per state. */
+const ACTION_COLOR: Record<string, { fg: string; border: string }> = {
+  connected: { fg: "surface.textMuted", border: "rgba(255,255,255,.14)" },
+  warning: { fg: "warning.light", border: "rgba(214,155,60,.45)" },
+  available: { fg: "surface.primarySoftFg", border: "rgba(242,106,27,.4)" },
 };
 
 export function SettingsIntegrationsComponent({ id }: { id: string }) {
@@ -68,7 +82,8 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
   );
 
   const total = groups.reduce((sum, group) => sum + group.tiles.length, 0);
-  const connected = byProvider.size;
+  // Rows can come back as `available`; only live links count.
+  const connected = [...byProvider.values()].filter((c) => c.status !== "available").length;
 
   const connect = async (tile: Tile) => {
     await mutation.connect?.({
@@ -115,24 +130,44 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
         : t("actions.connect");
 
   return (
-    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <SectionCard>
         <CardHeader
           title={t("title")}
           subtitle={t("subtitle", { connected, available: total - connected })}
+          action={
+            <Box
+              component="a"
+              href="#"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                flex: "none",
+                fontSize: 12.5,
+                fontWeight: 600,
+                textDecoration: "none",
+                color: "surface.primarySoftFg",
+                "&:hover": { color: "primary.light" },
+              }}
+            >
+              {t("browse")}
+              <IconRenderer name="arrow-forward" size={15} />
+            </Box>
+          }
         />
       </SectionCard>
 
       {groups.map((group) => (
         <SectionCard key={group.key}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "14px" }}>
-            <IconRenderer name={group.icon} size={16} sx={{ color: "text.disabled" }} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "12px" }}>
+            <IconRenderer name={group.icon} size={15} sx={{ color: "text.disabled" }} />
             <Typography
               sx={{
                 fontSize: 11,
                 fontWeight: 700,
-                letterSpacing: ".07em",
-                color: "text.secondary",
+                letterSpacing: ".1em",
+                color: "text.disabled",
               }}
             >
               {t(group.label)}
@@ -155,12 +190,16 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                 variant="inset"
                 onClick={() => setSelected(tile)}
                 sx={{
-                  p: "13px 14px",
+                  p: "12px 13px",
                   display: "flex",
                   alignItems: "center",
-                  gap: "12px",
+                  gap: "11px",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "var(--mui-palette-surface-headBg)" },
+                  borderRadius: "12px",
+                  // A stale connection carries an amber edge at rest; hovering
+                  // any tile warms the border rather than filling the card.
+                  ...(tile.status === "warning" ? { borderColor: "rgba(214,155,60,.35)" } : {}),
+                  "&:hover": { borderColor: "rgba(242,106,27,.35)" },
                 }}
               >
                 <Box
@@ -168,19 +207,35 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                     width: 34,
                     height: 34,
                     flex: "none",
-                    borderRadius: "10px",
+                    borderRadius: "9px",
                     display: "grid",
                     placeItems: "center",
-                    bgcolor: "surface.hover",
+                    // The provider's own brand colours — see IntegrationItem.
+                    bgcolor: tile.bg,
+                    color: tile.fg,
+                    border: "1px solid",
+                    borderColor: tile.border,
                     fontSize: 12,
-                    fontWeight: 700,
+                    fontWeight: 800,
                   }}
                 >
                   {tile.mark}
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{tile.name}</Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                    <Typography
+                      sx={{
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        // Truncates rather than running under the action pill
+                        // when the column is narrower than the design's shell.
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {tile.name}
+                    </Typography>
                     {tile.status !== "available" ? (
                       <IconRenderer
                         name={tile.status === "connected" ? "check-circle" : "warning"}
@@ -191,9 +246,8 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                   </Box>
                   <Typography
                     sx={{
-                      fontSize: 11.5,
-                      color: "text.secondary",
-                      mt: "2px",
+                      fontSize: 11,
+                      color: SUBTEXT_COLOR[tile.status],
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -202,18 +256,24 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                     {subtext(tile)}
                   </Typography>
                 </Box>
-                <Chip
-                  variant="soft"
-                  size="small"
-                  label={actionLabel(tile.status)}
+                {/* A bare bordered pill, not a filled chip — the design's
+                    action carries only an outline in its state colour. */}
+                <Box
                   sx={{
                     flex: "none",
-                    ...(tile.status === "available"
-                      ? { color: "primary.main", border: "1px solid", borderColor: "primary.main" }
-                      : {}),
-                    ...(tile.status === "warning" ? { color: "warning.light" } : {}),
+                    px: "12px",
+                    py: "6px",
+                    borderRadius: "999px",
+                    border: "1px solid",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    color: ACTION_COLOR[tile.status].fg,
+                    borderColor: ACTION_COLOR[tile.status].border,
                   }}
-                />
+                >
+                  {actionLabel(tile.status)}
+                </Box>
               </Card>
             ))}
           </Box>

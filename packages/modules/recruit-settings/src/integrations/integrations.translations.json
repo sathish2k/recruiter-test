@@ -1,7 +1,7 @@
 {
   "title": "Integrations",
   "subtitle": "{{connected}} connected · {{available}} available across sourcing, email, calendars, AI & more",
-  "browse": "Browse integrations →",
+  "browse": "Browse integrations",
   "badges": { "enterprise": "Enterprise" },
   "groups": {
     "sourcing": "CANDIDATE SOURCING",

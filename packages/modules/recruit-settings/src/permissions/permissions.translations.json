@@ -1,12 +1,12 @@
 {
-  "title": "Role permissions",
-  "note": "Editable · saved to your agency · admin only",
+  "title": "What each role can do",
+  "note": "Member-level overrides & per-client access are managed in Team & Permissions",
   "permission": "Permission",
   "editHint": "Click a cell to edit",
   "roles": {
-    "admin": "Admin",
+    "admin": "Owner",
     "lead": "Profile Lead",
-    "employee": "Employee",
+    "employee": "Recruiter",
     "client": "Client"
   },
   "resources": {
@@ -15,7 +15,15 @@
     "jobs": "Manage roles / jobs",
     "candidates": "Upload & manage candidates",
     "interviews": "Call candidates & schedule interviews",
-    "settings": "Invite & manage team members"
+    "settings": "Invite & manage team members",
+    "linkedinInvites": "Send LinkedIn invites & share JD",
+    "manageCvs": "Upload & manage received CVs",
+    "aiScreening": "Run AI screening on CVs",
+    "submitToClient": "Review CVs & submit to client",
+    "scheduleInterviews": "Call candidates & schedule interviews",
+    "exportCandidates": "Export candidates",
+    "deleteCandidates": "Delete candidates",
+    "automation": "Configure automation & integrations"
   },
   "actions": {
     "create": "Create",
@@ -24,11 +32,29 @@
     "delete": "Delete"
   },
   "buttons": {
-    "reset": "Reset",
+    "reset": "Reset to defaults",
     "save": "Save changes"
   },
   "toast": {
     "savedTitle": "Permissions updated",
     "savedRole": "{{role}} permissions saved"
-  }
+  },
+  "groups": {
+    "recruiting": "RECRUITING",
+    "jobsClients": "JOBS & CLIENTS",
+    "workspace": "WORKSPACE"
+  },
+  "cards": {
+    "member": "{{count}} member",
+    "members": "{{count}} members",
+    "nobody": "No one yet",
+    "lockedNote": "Cannot be edited or deleted",
+    "desc": {
+      "admin": "Full workspace control — clients, contracts, billing, members & settings.",
+      "lead": "Runs requirements end-to-end: reviews CVs, submits to clients, schedules interviews.",
+      "employee": "Sources candidates — LinkedIn invites, JD sharing, CV uploads & AI screening."
+    }
+  },
+  "manageMembers": "Manage members",
+  "footerNote": "Owner permissions are locked · click a Profile Lead or Recruiter cell to toggle. View / Edit / Approve levels & custom roles (Sourcer, Finance, QA…) arrive with Enterprise."
 }

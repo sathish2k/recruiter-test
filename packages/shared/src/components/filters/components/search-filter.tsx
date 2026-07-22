@@ -25,10 +25,10 @@ export function SearchField({
         {
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          gap: "9px",
           width,
-          bgcolor: "background.paper",
-          border: "1px solid var(--mui-palette-surface-border)",
+          bgcolor: "surface.inset",
+          border: "1px solid var(--mui-palette-surface-controlBorder)",
           borderRadius: "999px",
           px: "16px",
           color: "text.disabled",
@@ -37,12 +37,22 @@ export function SearchField({
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
     >
-      <SearchRounded sx={{ fontSize: 18 }} />
+      <SearchRounded sx={{ fontSize: 17 }} />
       <InputBase
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        sx={{ flex: 1, fontSize: 13, color: "text.primary", py: "9px" }}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          fontSize: 13,
+          color: "text.primary",
+          // The padding belongs to the inner input, not the InputBase root —
+          // stacking both (plus MUI's line-height) made this 50px tall where
+          // every other control is 40.5.
+          lineHeight: "normal",
+          "& .MuiInputBase-input": { p: "11px 0", height: "auto", lineHeight: "normal" },
+        }}
       />
     </Box>
   );

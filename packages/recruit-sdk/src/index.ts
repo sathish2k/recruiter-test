@@ -24,9 +24,11 @@ export { MuiAuthLayout, MuiCoreLayout } from "./layout-renderer";
 export {
   type PortalRouter,
   PortalRouterProvider,
+  useIsNavigating,
   usePortalRouter,
   useRouteParams,
 } from "./navigation";
+export { NavigationProgress } from "./navigation-progress";
 export { NotFound } from "./not-found";
 export * from "./providers";
 export type {

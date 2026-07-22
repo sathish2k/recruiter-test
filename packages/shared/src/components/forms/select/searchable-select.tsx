@@ -24,6 +24,8 @@ export interface SearchableSelectFieldProps {
   disabled?: boolean;
   noOptionsText?: string;
   loadingText?: string;
+  /** Small caption rendered inside the control, before the value. */
+  prefix?: string;
 }
 
 /**
@@ -44,6 +46,7 @@ export function SearchableSelectField({
   disabled,
   noOptionsText = "No match",
   loadingText = "Loading…",
+  prefix,
 }: SearchableSelectFieldProps) {
   const [search, setSearch] = useState("");
   const remote = useRemoteOptions(source, search);
@@ -57,7 +60,7 @@ export function SearchableSelectField({
     return options.find((option) => option.value === value) ?? null;
   }, [options, value, multiple]);
 
-  return (
+  const control = (
     <Autocomplete
       options={options}
       multiple={multiple}
@@ -99,6 +102,33 @@ export function SearchableSelectField({
         // Autocomplete wires through it. Loading shows via `loadingText`.
         <TextField {...params} placeholder={placeholder} error={error} helperText={helperText} />
       )}
+      // With a caption, reserve room for it rather than adorning the input.
+      sx={prefix ? { "& .MuiAutocomplete-inputRoot": { pl: "52px" } } : undefined}
     />
+  );
+
+  if (!prefix) return control;
+
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Box
+        component="span"
+        sx={{
+          position: "absolute",
+          left: "14px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 1,
+          pointerEvents: "none",
+          fontSize: 10.5,
+          fontWeight: 600,
+          letterSpacing: ".06em",
+          color: "text.disabled",
+        }}
+      >
+        {prefix}
+      </Box>
+      {control}
+    </Box>
   );
 }

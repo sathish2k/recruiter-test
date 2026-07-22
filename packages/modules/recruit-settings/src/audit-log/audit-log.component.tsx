@@ -128,7 +128,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
   };
 
   return (
-    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "16px" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Box sx={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
           <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t("title")}</Typography>

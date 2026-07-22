@@ -101,9 +101,11 @@ export function TeamComponent({ id }: { id: string }) {
   }, [config.inviteForm, t]);
 
   const invite = async (values: FormValues) => {
-    await mutation.create?.(values);
+    // The invite endpoint takes a list; this form collects a single address.
+    const { email, ...rest } = values;
+    await mutation.create?.({ ...rest, emails: [String(email ?? "")] });
     await mutate();
-    show(t("toast.inviteSent"), String(values.email ?? ""));
+    show(t("toast.inviteSent"), String(email ?? ""));
   };
 
   const actionHandler: ActionHandler = {

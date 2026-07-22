@@ -15,9 +15,9 @@
     }
   },
   "roles": {
-    "admin": "Admin",
+    "admin": "Owner",
     "lead": "Profile Lead",
-    "employee": "Employee",
+    "employee": "Recruiter",
     "client": "Client"
   },
   "status": {

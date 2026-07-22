@@ -1,12 +1,23 @@
 import { status } from "elysia";
 import { record as recordAudit } from "../services/audit-log.service";
-import { deactivateUser, inviteUser, listUsers, updateUserRole } from "../services/user.service";
+import {
+  deactivateUser,
+  inviteUser,
+  listUsers,
+  removeUser,
+  setUserSuspended,
+  updateUserRole,
+} from "../services/user.service";
 
 type Auth = { id: string; name?: string | null; agencyId?: string | null; role?: string | null };
 
 export async function getUsers(ctx: { user: Auth; query?: Record<string, string | undefined> }) {
-  const { data, totalCount } = await listUsers(ctx.user.agencyId ?? "", ctx.query ?? {});
-  return { data, meta: { totalCount } };
+  const { data, totalCount, meta } = await listUsers(
+    ctx.user.agencyId ?? "",
+    ctx.query ?? {},
+    ctx.user.id,
+  );
+  return { data, meta: { totalCount, ...meta } };
 }
 
 export async function patchUserRole(ctx: {
@@ -58,4 +69,42 @@ export async function postDeactivate(ctx: { user: Auth; params: { id: string } }
     objects: { Member: updated.displayName },
   });
   return { data: updated };
+}
+
+export async function postSuspend(ctx: {
+  user: Auth;
+  params: { id: string };
+  // Unvalidated on this route — the flag is optional and defaults to suspend.
+  body?: unknown;
+}) {
+  if (ctx.params.id === ctx.user.id) return status(422, "You can't suspend yourself");
+  const suspended = (ctx.body as { suspended?: boolean } | undefined)?.suspended !== false;
+  const updated = await setUserSuspended(ctx.params.id, suspended);
+  if (!updated) return status(404, "User not found");
+  await recordAudit({
+    organizationId: ctx.user.agencyId ?? "",
+    userId: ctx.user.id,
+    actorName: ctx.user.name ?? "Unknown",
+    event: `${ctx.user.name ?? "Someone"} ${suspended ? "suspended" : "restored"} ${updated.displayName}`,
+    category: "permissions",
+    ...(suspended ? { severity: "warning" as const } : {}),
+    objects: { Member: updated.displayName },
+  });
+  return { data: updated };
+}
+
+export async function deleteMember(ctx: { user: Auth; params: { id: string } }) {
+  if (ctx.params.id === ctx.user.id) return status(422, "You can't remove yourself");
+  const removed = await removeUser(ctx.params.id);
+  if (!removed) return status(404, "User not found");
+  await recordAudit({
+    organizationId: ctx.user.agencyId ?? "",
+    userId: ctx.user.id,
+    actorName: ctx.user.name ?? "Unknown",
+    event: `${ctx.user.name ?? "Someone"} removed ${removed.displayName}`,
+    category: "permissions",
+    severity: "warning",
+    objects: { Member: removed.displayName },
+  });
+  return { data: removed };
 }

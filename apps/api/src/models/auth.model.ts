@@ -15,6 +15,8 @@ export const user = pgTable("user", {
   phone: text("phone"),
   timezone: text("timezone"),
   notificationPrefs: jsonb("notification_prefs").$type<Record<string, boolean>>(),
+  /** Client names this member may see; empty/absent means the whole book. */
+  clientAccess: jsonb("client_access").$type<string[]>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

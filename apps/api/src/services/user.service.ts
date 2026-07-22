@@ -2,6 +2,8 @@ import { randomUUID } from "node:crypto";
 import { and, asc, count, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
+import { subscription } from "../models/billing.model";
+import { userSecurity } from "../models/security.model";
 
 const ROLES = ["admin", "lead", "employee", "client"];
 
@@ -32,9 +34,32 @@ function lastActiveLabel(date?: Date | null): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+/** "Jul 20, 2026 · 7:02 PM" — the tooltip format behind the relative label. */
+function absoluteStamp(date: Date): string {
+  const day = date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  return `${day} · ${time}`;
+}
+
 type UserRow = typeof user.$inferSelect;
 
-function mapUser(u: UserRow, index: number) {
+/** Extra per-row state the members table needs but `user` doesn't carry. */
+interface MapUserContext {
+  /** Who's asking — drives the "(you)" marker. */
+  viewerId?: string;
+  /** User ids with two-factor on, from `user_security`. */
+  mfaOn?: Set<string>;
+}
+
+function mapUser(u: UserRow, index: number, ctx: MapUserContext = {}) {
   const palette = AVATAR_PALETTE[index % AVATAR_PALETTE.length] ?? AVATAR_PALETTE[0];
   return {
     id: u.id,
@@ -47,6 +72,13 @@ function mapUser(u: UserRow, index: number) {
     avatarBg: palette.bg,
     avatarFg: palette.fg,
     lastActive: lastActiveLabel(u.updatedAt),
+    /** Absolute timestamp behind the relative label, for the cell's tooltip. */
+    lastActiveFull: u.updatedAt ? absoluteStamp(u.updatedAt) : "—",
+    isCurrentUser: !!ctx.viewerId && u.id === ctx.viewerId,
+    /** The owner's role can't be reassigned from this table. */
+    isOwner: u.role === "admin",
+    mfaEnabled: ctx.mfaOn?.has(u.id) ?? false,
+    clientAccess: u.clientAccess ?? [],
   };
 }
 
@@ -78,7 +110,30 @@ function csv(value?: string): string[] {
     .filter(Boolean);
 }
 
-export async function listUsers(agencyId: string, query: ListUsersQuery = {}) {
+/** Seat meter numbers: the plan's allowance against live members. */
+async function seatUsage(agencyId: string) {
+  const [plan] = await db
+    .select()
+    .from(subscription)
+    .where(eq(subscription.organizationId, agencyId))
+    .limit(1);
+  const seatTotal = plan?.seatTotal ?? 5;
+  const usedRows = await db
+    .select({ total: count() })
+    .from(user)
+    .where(and(eq(user.agencyId, agencyId), ne(user.status, "inactive")));
+  const seatUsed = usedRows[0]?.total ?? 0;
+  return {
+    seatUsed,
+    seatTotal,
+    seatPercent: seatTotal > 0 ? Math.min(100, Math.round((seatUsed / seatTotal) * 100)) : 0,
+    seatFull: seatUsed >= seatTotal,
+  };
+}
+
+export async function listUsers(agencyId: string, query: ListUsersQuery = {}, viewerId?: string) {
+  // `suspended` members stay listed (the design shows and un-suspends them);
+  // only hard-deactivated ones drop out.
   const conditions = [eq(user.agencyId, agencyId), ne(user.status, "inactive")];
 
   if (query.search?.trim()) {
@@ -103,7 +158,22 @@ export async function listUsers(agencyId: string, query: ListUsersQuery = {}) {
   const base = db.select().from(user).where(where).orderBy(order);
   const rows = pageSize > 0 ? await base.limit(pageSize).offset((page - 1) * pageSize) : await base;
 
-  return { data: rows.map(mapUser), totalCount: total };
+  // One round-trip for the whole page's two-factor state.
+  const ids = rows.map((r) => r.id);
+  const mfaRows = ids.length
+    ? await db
+        .select({ userId: userSecurity.userId, on: userSecurity.twoFactorEnabled })
+        .from(userSecurity)
+        .where(inArray(userSecurity.userId, ids))
+    : [];
+  const mfaOn = new Set(mfaRows.filter((r) => r.on).map((r) => r.userId));
+
+  const seats = await seatUsage(agencyId);
+  return {
+    data: rows.map((row, i) => mapUser(row, i, { viewerId, mfaOn })),
+    totalCount: total,
+    meta: seats,
+  };
 }
 
 export async function updateUserRole(id: string, role: string) {
@@ -114,6 +184,23 @@ export async function updateUserRole(id: string, role: string) {
     .where(eq(user.id, id))
     .returning();
   return updated ? { id: updated.id, role: updated.role, displayName: updated.name } : null;
+}
+
+/** Suspend keeps the row (and its seat) but blocks sign-in; the design offers
+ * it as a reversible pair, unlike the one-way deactivate. */
+export async function setUserSuspended(id: string, suspended: boolean) {
+  const [updated] = await db
+    .update(user)
+    .set({ status: suspended ? "suspended" : "active", updatedAt: new Date() })
+    .where(eq(user.id, id))
+    .returning();
+  return updated ? { id: updated.id, status: updated.status, displayName: updated.name } : null;
+}
+
+/** Hard-removes a member from the agency. */
+export async function removeUser(id: string) {
+  const [removed] = await db.delete(user).where(eq(user.id, id)).returning();
+  return removed ? { id: removed.id, displayName: removed.name } : null;
 }
 
 export async function deactivateUser(id: string) {

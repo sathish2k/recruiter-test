@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import type { ReactNode } from "react";
+import { NavigationProgress } from "../navigation-progress";
 import type { ComponentDefinition, Configuration, LayoutElement, Route } from "../types";
 
 export function MuiCoreLayout({
@@ -40,6 +41,7 @@ export function MuiCoreLayout({
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
+      <NavigationProgress />
       {positioned.left?.map(renderComponent)}
       <Box
         sx={{
@@ -51,11 +53,8 @@ export function MuiCoreLayout({
       >
         {positioned.top?.map(renderComponent)}
         {positioned.breadcrumb?.map(renderComponent)}
-        {/* The page padding sits inside the scroller, not on it: a sticky
-            footer resolves `bottom: 0` against the scrollport, so padding here
-            would hold it that far off the bottom of the window. */}
-        <Box component="main" sx={{ flexGrow: 1, overflow: "auto" }}>
-          <Box sx={{ p: "22px 30px 44px" }}>{children}</Box>
+        <Box component="main" sx={{ flexGrow: 1, p: 3, overflow: "auto" }}>
+          {children}
         </Box>
         {positioned.bottom?.map(renderComponent)}
       </Box>

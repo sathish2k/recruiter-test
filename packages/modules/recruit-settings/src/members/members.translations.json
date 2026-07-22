@@ -1,27 +1,31 @@
 {
   "title": "Members",
   "seats": "{{used}} of {{total}} seats used",
-  "empty": "No members yet",
+  "empty": "No members match your search or filters",
   "columns": {
     "member": "Member",
     "role": "Role",
     "status": "Status",
     "lastActive": "Last active",
-    "actions": "Actions"
+    "actions": "Actions",
+    "clientAccess": "Client access",
+    "mfa": "MFA"
   },
   "roles": {
-    "admin": "Admin",
-    "lead": "Profile lead",
-    "employee": "Employee",
+    "admin": "Owner",
+    "lead": "Profile Lead",
+    "employee": "Recruiter",
     "client": "Client"
   },
   "status": {
     "active": "Active",
-    "invited": "Invited"
+    "invited": "Invited",
+    "suspended": "Suspended"
   },
   "filters": {
-    "search": "Search members",
-    "role": "Role"
+    "search": "Search members…",
+    "role": "Role",
+    "status": "Status"
   },
   "export": "Export",
   "exportAs": "Export as",
@@ -30,28 +34,55 @@
     "xlsx": "Excel"
   },
   "actions": {
-    "invite": "Invite member",
+    "invite": "Invite people",
     "changeRole": "Change role",
     "resendInvite": "Resend invite",
-    "deactivate": "Deactivate"
+    "deactivate": "Deactivate",
+    "viewProfile": "View profile",
+    "resetPassword": "Reset password",
+    "suspend": "Suspend",
+    "remove": "Remove…"
   },
   "inviteForm": {
-    "title": "Invite a member",
-    "description": "They'll get access once they set a password.",
-    "submit": "Send invite",
-    "email": "Work email",
-    "emailPlaceholder": "name@company.com",
+    "title": "Invite members",
+    "description": "One email per line — everyone joins with the role & access you pick.",
+    "submit": "Send invites",
+    "emails": "Emails",
+    "emailsPlaceholder": "john@agency.com\nalice@agency.com\nbob@agency.com",
     "role": "Role",
+    "clientAccess": "Client access",
+    "clientAccessOptions": {
+      "all": "All clients",
+      "unassigned": "Unassigned"
+    },
     "errors": {
-      "email": "Enter a valid work email",
+      "emails": "Enter at least one email address",
       "role": "Pick a role"
     }
   },
   "cancel": "Cancel",
   "toast": {
     "invited": "Invite sent",
-    "invitedSub": "{{email}} can now join your workspace",
+    "invitedPlural": "Invites sent",
+    "invitedSub": "{{count}} × {{role}} · {{access}}",
+    "invitedSkipped": "{{skipped}} already invited or a member",
     "roleChanged": "Role updated",
-    "deactivated": "Member deactivated"
-  }
+    "deactivated": "Member deactivated",
+    "suspended": "Member suspended",
+    "restored": "Member restored",
+    "removed": "Member removed",
+    "profileSoon": "Profile view coming soon",
+    "resetSent": "Password reset email sent",
+    "accessSoon": "Client access editing is coming soon"
+  },
+  "access": {
+    "all": "All clients",
+    "more": "+{{count}} more",
+    "manage": "Manage client access"
+  },
+  "mfa": {
+    "on": "Enabled",
+    "off": "Not enabled"
+  },
+  "roleLockedHint": "Ownership transfer is a separate flow — contact support"
 }

@@ -62,12 +62,16 @@ export function ActionsMenu({
 
   const labelOf = (a: ActionItem) => (a.label ? t(a.label.name) : a.text) ?? a.type ?? "";
 
-  if (!actions.length) return null;
+  // A row can opt out of individual actions — e.g. the owner, who can't be
+  // suspended, removed or re-invited.
+  const visible = actions.filter((a) => !a.hideWhen || !delve(data, a.hideWhen));
+
+  if (!visible.length) return null;
 
   return (
     <>
       <IconButton onClick={open} aria-label="actions">
-        <IconRenderer name="more-vert" size={17} />
+        <IconRenderer name="more" size={15} />
       </IconButton>
       <Menu
         anchorEl={anchor}
@@ -77,7 +81,7 @@ export function ActionsMenu({
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        {actions.map((a, i) => (
+        {visible.map((a, i) => (
           <MenuItem key={a.type ?? a.routeId ?? a.href ?? i} onClick={handle(a)}>
             {a.icon ? (
               <ListItemIcon sx={{ minWidth: "0 !important" }}>

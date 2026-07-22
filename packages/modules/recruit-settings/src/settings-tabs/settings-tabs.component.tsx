@@ -63,9 +63,10 @@ export function SettingsTabsComponent({
                 fontWeight: active ? 600 : 400,
                 whiteSpace: "nowrap",
                 cursor: "pointer",
-                bgcolor: active ? "var(--mui-palette-surface-border)" : "transparent",
-                color: active ? "text.primary" : "text.secondary",
-                "&:hover": { color: "text.primary" },
+                // The selected tab is a filled gradient pill, not a grey wash.
+                background: active ? (theme) => theme.gradients.primary : "transparent",
+                color: active ? "#fff" : "text.secondary",
+                "&:hover": { color: active ? "#fff" : "text.primary" },
               }}
             >
               {t(tab.label)}

@@ -4,19 +4,18 @@
 // email, which lands in a mail client on a white background regardless of what
 // scheme the app is in. Theming it would misrepresent what recipients see.
 
-import AddRounded from "@mui/icons-material/AddRounded";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import InputBase from "@mui/material/InputBase";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import { IconRenderer, Toast, useToast } from "@recruit/shared";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { EmailTemplatesConfiguration } from "./email-templates.configuration";
 
 interface EmailTemplate {
@@ -46,6 +45,14 @@ function fill(text: string, sample: Record<string, string>): string {
   return text.replace(/\{(\w+)\}/g, (match, key: string) => sample[key] ?? match);
 }
 
+/** The design's fixed filing order; anything else lands in CUSTOM. */
+const TEMPLATE_CATEGORIES: { label: string; icon: string; keys: string[] }[] = [
+  { label: "categories.authentication", icon: "lock", keys: ["invite", "forgot"] },
+  { label: "categories.recruitment", icon: "group", keys: ["jd", "interview"] },
+  { label: "categories.clients", icon: "domain", keys: ["submission"] },
+  { label: "categories.offers", icon: "description", keys: ["offer"] },
+];
+
 export function EmailTemplatesComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<EmailTemplatesConfiguration>(id);
@@ -57,6 +64,30 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [focused, setFocused] = useState<FocusedField>("body");
+  const [query, setQuery] = useState("");
+
+  // The design files templates under fixed categories, with anything unmatched
+  // falling into CUSTOM, and filters name + blurb as you type.
+  const grouped = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    const matches = (tpl: EmailTemplate) =>
+      !term ||
+      tpl.name.toLowerCase().includes(term) ||
+      (tpl.description ?? "").toLowerCase().includes(term);
+
+    const claimed = new Set<string>();
+    const groups: { label: string; icon: string; items: EmailTemplate[] }[] = [];
+
+    for (const category of TEMPLATE_CATEGORIES) {
+      const items = templates.filter((tpl) => category.keys.includes(tpl.key) && matches(tpl));
+      for (const tpl of items) claimed.add(tpl.id);
+      if (items.length) groups.push({ label: category.label, icon: category.icon, items });
+    }
+
+    const rest = templates.filter((tpl) => !claimed.has(tpl.id) && matches(tpl));
+    if (rest.length) groups.push({ label: "categories.custom", icon: "edit", items: rest });
+    return groups;
+  }, [templates, query]);
 
   const subjectRef = useRef<HTMLInputElement | null>(null);
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
@@ -177,98 +208,148 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
           alignItems: "start",
         }}
       >
-        <Card sx={{ p: "16px 16px" }}>
+        <Card sx={{ p: "12px" }}>
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              mb: "12px",
+              p: "8px 10px 10px",
             }}
           >
-            <Typography variant="overline">{t("templatesLabel")}</Typography>
+            <Typography sx={{ fontSize: 11, letterSpacing: ".08em", color: "text.disabled" }}>
+              {t("templatesLabel")}
+            </Typography>
             <Button
               variant="contained"
-              size="small"
-              startIcon={<AddRounded sx={{ fontSize: 15 }} />}
               onClick={createNew}
+              sx={{ px: "12px", py: "5px", fontSize: 11, fontWeight: 700, minWidth: 0 }}
             >
               {t("newTemplate")}
             </Button>
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            {templates.map((tpl) => {
-              const isSelected = tpl.id === selected?.id;
-              const on = isSelected && draft ? draft.enabled : tpl.enabled;
-              return (
-                <Box
-                  key={tpl.id}
-                  component="button"
-                  type="button"
-                  onClick={() => setSelectedId(tpl.id)}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "11px",
-                    width: "100%",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    borderRadius: "11px",
-                    p: "10px 11px",
-                    background: isSelected
-                      ? "var(--mui-palette-surface-primarySoftBg)"
-                      : "transparent",
-                    border: isSelected
-                      ? "1px solid rgba(242,106,27,0.35)"
-                      : "1px solid transparent",
-                    transition: "background .15s, border-color .15s",
-                    "&:hover": {
-                      background: isSelected
-                        ? "var(--mui-palette-surface-primarySoftBg)"
-                        : "rgba(255,255,255,0.04)",
-                    },
-                  }}
-                >
-                  <Avatar
-                    variant="rounded"
+          {/* Filters the list in place — the design searches name and blurb. */}
+          <Box
+            component="label"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              bgcolor: "surface.inset",
+              border: "1px solid var(--mui-palette-surface-controlBorder)",
+              borderRadius: "9px",
+              p: "8px 10px",
+              m: "0 2px 4px",
+            }}
+          >
+            <IconRenderer name="search" size={16} sx={{ color: "text.disabled" }} />
+            <InputBase
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t("searchTemplates")}
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                fontSize: 12.5,
+                color: "text.primary",
+                "& .MuiInputBase-input": { p: 0, height: "auto", lineHeight: "normal" },
+              }}
+            />
+          </Box>
+
+          {grouped.length === 0 ? (
+            <Typography
+              sx={{ p: "16px 10px", textAlign: "center", fontSize: 12, color: "text.disabled" }}
+            >
+              {t("noTemplates")}
+            </Typography>
+          ) : null}
+
+          {grouped.map((group) => (
+            <Box key={group.label}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: 10,
+                  letterSpacing: ".1em",
+                  fontWeight: 700,
+                  color: "text.disabled",
+                  p: "12px 10px 5px",
+                }}
+              >
+                <IconRenderer name={group.icon} size={13} />
+                {t(group.label)}
+              </Box>
+              {group.items.map((tpl) => {
+                const isSelected = tpl.id === selected?.id;
+                const on = isSelected && draft ? draft.enabled : tpl.enabled;
+                return (
+                  <Box
+                    key={tpl.id}
+                    component="button"
+                    type="button"
+                    onClick={() => setSelectedId(tpl.id)}
                     sx={{
-                      width: 34,
-                      height: 34,
-                      bgcolor: "rgba(255,255,255,0.05)",
-                      color: "text.secondary",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "11px",
+                      width: "100%",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      borderRadius: "11px",
+                      p: "11px 12px",
+                      mb: "4px",
+                      background: isSelected ? "rgba(242,106,27,.12)" : "transparent",
+                      border: isSelected
+                        ? "1px solid rgba(242,106,27,.35)"
+                        : "1px solid transparent",
+                      "&:hover": {
+                        background: isSelected
+                          ? "rgba(242,106,27,.12)"
+                          : "var(--mui-palette-surface-hoverSubtle)",
+                      },
                     }}
                   >
-                    <IconRenderer name={tpl.icon} size={17} />
-                  </Avatar>
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography
+                    <Box
                       sx={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "text.primary",
+                        width: 32,
+                        height: 32,
+                        flex: "none",
+                        borderRadius: "9px",
+                        display: "grid",
+                        placeItems: "center",
+                        bgcolor: "rgba(242,106,27,.1)",
+                        border: "1px solid rgba(242,106,27,.25)",
+                        color: "surface.accentBright",
                       }}
-                      noWrap
                     >
-                      {tpl.name}
-                    </Typography>
-                    <Typography sx={{ fontSize: 11.5, color: "text.disabled" }} noWrap>
-                      {tpl.description}
-                    </Typography>
+                      <IconRenderer name={tpl.icon} size={15} />
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600 }} noWrap>
+                        {tpl.name}
+                      </Typography>
+                      <Typography sx={{ fontSize: 11, color: "text.disabled" }} noWrap>
+                        {tpl.description}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: "999px",
+                        flex: "none",
+                        bgcolor: on ? "success.main" : "surface.track",
+                      }}
+                    />
                   </Box>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                      bgcolor: on ? "success.main" : "text.disabled",
-                    }}
-                  />
-                </Box>
-              );
-            })}
-          </Box>
+                );
+              })}
+            </Box>
+          ))}
         </Card>
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: "18px" }}>

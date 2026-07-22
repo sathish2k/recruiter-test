@@ -10,6 +10,8 @@ export interface StatusRendererConfig {
   variant?: ChipProps["variant"];
   /** Render a leading dot (in the current text color) before the label. */
   dot?: boolean;
+  /** Overrides the dot colour when it should differ from the label. */
+  dotColor?: string;
   sx?: ChipProps["sx"];
 }
 
@@ -30,10 +32,13 @@ export function StatusRenderer({
             <Box
               component="span"
               sx={{
-                width: 5,
-                height: 5,
+                width: 7,
+                height: 7,
                 borderRadius: "999px",
-                background: "currentColor",
+                flex: "none",
+                // `dotColor` lets a status show a different dot from its text
+                // (the designs use a stronger tone for the dot).
+                background: config.dotColor ?? "currentColor",
               }}
             />
             {label}
@@ -45,7 +50,7 @@ export function StatusRenderer({
       size="small"
       variant={config.variant ?? "soft"}
       color={config.colors?.[key] ?? "default"}
-      sx={config.sx}
+      sx={[{ fontSize: 11.5 }, ...(Array.isArray(config.sx) ? config.sx : [config.sx])]}
     />
   );
 }

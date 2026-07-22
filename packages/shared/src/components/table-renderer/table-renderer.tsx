@@ -11,6 +11,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
+import type { ReactNode } from "react";
 import { type ActionHandler, EmptyStateRenderer, IconRenderer } from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
@@ -33,6 +34,8 @@ export function TableRenderer({
   filters,
   actionHandler,
   cells,
+  headerExtra,
+  headerAction,
   footerData,
   onEmptyAction,
 }: {
@@ -47,6 +50,10 @@ export function TableRenderer({
   /** One-off cell renderers, keyed by a custom cell's `type` (a `type` not
    * handled by a built-in GenericRenderer type). Each receives the row. */
   cells?: Cells;
+  /** Node under the card title (see TableTitle). */
+  headerExtra?: ReactNode;
+  /** Node in the card title's right-hand slot. */
+  headerAction?: ReactNode;
   /** Row the `footer` totals cells render against (default `{}`). */
   footerData?: Row;
 }) {
@@ -105,15 +112,27 @@ export function TableRenderer({
     );
   }
 
+  const hasWidths = (config?.columns ?? []).some((column) => column.width !== undefined);
+
   return (
     <TableContainer>
-      {config?.header ? <TableTitle config={config.header} meta={meta} t={t} /> : null}
-      <Table size="small">
+      {config?.header ? (
+        <TableTitle
+          config={config.header}
+          meta={meta}
+          t={t}
+          extra={headerExtra}
+          action={headerAction}
+        />
+      ) : null}
+      {/* Declared column widths only bind under a fixed layout; tables that
+          don't set any keep the browser's content-driven sizing. */}
+      <Table size="small" sx={hasWidths ? { tableLayout: "fixed" } : undefined}>
         <TableHead>
           <TableHeaderRenderer
             columns={columns}
             hasActions={actions.length > 0}
-            actionsLabelKey={config?.actionsLabel?.name ?? "actions"}
+            actionsLabelKey={config?.actionsLabel?.name ?? ""}
             sort={sort}
             onSort={toggleSort}
             t={t}

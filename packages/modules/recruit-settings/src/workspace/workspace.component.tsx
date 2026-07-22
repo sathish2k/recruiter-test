@@ -49,7 +49,7 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
   }
 
   return (
-    <Box sx={{ maxWidth: 1040 }}>
+    <Box sx={{ maxWidth: 1240 }}>
       <FormWithSectionsRenderer
         // Remount once the record loads so defaultValues seed correctly.
         key={organization.id}

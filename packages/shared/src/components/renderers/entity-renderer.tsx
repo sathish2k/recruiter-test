@@ -19,6 +19,10 @@ export interface EntityRendererConfig {
   title: string;
   /** Data path for the secondary subtitle. */
   subtitle?: string;
+  /** Boolean data path; when truthy, `suffixLabel` follows the title. */
+  suffixPath?: string;
+  /** Defaults to "(you)". */
+  suffixLabel?: string;
 }
 
 const read = (data: Record<string, unknown>, path?: string, literal?: string) =>
@@ -49,9 +53,36 @@ export function EntityRenderer({
         {read(data, config.textPath, config.text)}
       </Avatar>
       <Box sx={{ minWidth: 0 }}>
-        <Box sx={{ fontWeight: 600 }}>{read(data, config.title)}</Box>
+        <Box
+          sx={{
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {read(data, config.title)}
+          {config.suffixPath && data?.[config.suffixPath] ? (
+            <Box
+              component="span"
+              sx={{ fontSize: 11.5, fontWeight: 400, color: "text.disabled", ml: "5px" }}
+            >
+              {config.suffixLabel ?? "(you)"}
+            </Box>
+          ) : null}
+        </Box>
         {config.subtitle ? (
-          <Box sx={{ fontSize: 11.5, color: "text.disabled" }}>{read(data, config.subtitle)}</Box>
+          <Box
+            sx={{
+              fontSize: 11.5,
+              color: "text.disabled",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {read(data, config.subtitle)}
+          </Box>
         ) : null}
       </Box>
     </Box>

@@ -1,9 +1,9 @@
 import { status } from "elysia";
 import { record as recordAudit } from "../services/audit-log.service";
 import {
-  type CreateInvitationInput,
+  type CreateInvitationsInput,
   cancelInvitation,
-  createInvitation,
+  createInvitations,
   listInvitations,
   resendInvitation,
 } from "../services/invitation.service";
@@ -15,18 +15,27 @@ export async function getInvitations(ctx: { user: Auth }) {
   return { data, meta: { totalCount } };
 }
 
-export async function postInvitation(ctx: { user: Auth; body: CreateInvitationInput }) {
-  const created = await createInvitation(ctx.user.agencyId ?? "", ctx.user.id, ctx.body);
-  if (!created) return status(422, "Could not create invitation");
-  await recordAudit({
-    organizationId: ctx.user.agencyId ?? "",
-    userId: ctx.user.id,
-    actorName: ctx.user.name ?? "Unknown",
-    event: `Invited ${created.email} as ${created.role}`,
-    category: "permissions",
-    objects: { Invitee: created.email },
-  });
-  return status(201, { data: created });
+export async function postInvitation(ctx: { user: Auth; body: CreateInvitationsInput }) {
+  const { created, skipped } = await createInvitations(
+    ctx.user.agencyId ?? "",
+    ctx.user.id,
+    ctx.body,
+  );
+  if (!created.length) {
+    return status(422, skipped.length ? "Already invited" : "Could not create invitation");
+  }
+  // One entry per invitee — the audit log lists people, not batches.
+  for (const invite of created) {
+    await recordAudit({
+      organizationId: ctx.user.agencyId ?? "",
+      userId: ctx.user.id,
+      actorName: ctx.user.name ?? "Unknown",
+      event: `Invited ${invite.email} as ${invite.role}`,
+      category: "permissions",
+      objects: { Invitee: invite.email },
+    });
+  }
+  return status(201, { data: created, meta: { skipped } });
 }
 
 export async function postResend(ctx: { user: Auth; params: { id: string } }) {

@@ -28,6 +28,18 @@ export function FilterPopover({
         sx={{
           fontSize: 12.5,
           fontWeight: 600,
+          // A floor and a ceiling: short labels still read as a control, and a
+          // long selection summary truncates instead of pushing the row wide.
+          minWidth: 132,
+          maxWidth: 220,
+          justifyContent: "space-between",
+          flex: "none",
+          "& .MuiButton-endIcon": { flex: "none", ml: "6px" },
+          // Only the label shrinks — `&` here would undo minWidth above.
+          "& > span:first-of-type": { minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" },
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
           background: active
             ? "var(--mui-palette-surface-primarySoftBg)"
             : "var(--mui-palette-background-paper)",

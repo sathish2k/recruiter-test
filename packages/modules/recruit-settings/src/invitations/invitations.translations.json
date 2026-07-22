@@ -4,7 +4,9 @@
   "empty": "No pending invitations",
   "export": "Export",
   "exportAs": "Export as",
-  "exportTypes": { "csv": "CSV" },
+  "exportTypes": {
+    "csv": "CSV"
+  },
   "columns": {
     "email": "Email",
     "role": "Role",
@@ -12,11 +14,13 @@
     "expires": "Expires",
     "actions": "Actions"
   },
-  "filters": { "search": "Search invitations" },
+  "filters": {
+    "search": "Search invitations"
+  },
   "roles": {
-    "admin": "Admin",
-    "lead": "Profile lead",
-    "employee": "Employee",
+    "admin": "Owner",
+    "lead": "Profile Lead",
+    "employee": "Recruiter",
     "client": "Client"
   },
   "actions": {

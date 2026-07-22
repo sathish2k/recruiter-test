@@ -20,6 +20,8 @@ export type ActionItem = {
   icon?: string;
   /** Access rule verified + stripped by the engine before render. */
   access?: AccessRule;
+  /** Boolean data path; the action is hidden on rows where it's truthy. */
+  hideWhen?: string;
 } & Partial<LinkRendererConfig>;
 
 export interface ActionsRendererConfig {

@@ -279,6 +279,16 @@ pixel-by-pixel (via the theme's variants, never inline chrome).
   `next-env.d.ts` is generated per-mode (its `routes.d.ts` reference follows
   `distDir`), so it is gitignored rather than committed — Next regenerates it on
   the next dev/build.
+- **Never override the input slot inside an Autocomplete's `renderInput`.**
+  MUI threads the input ref through `params`; passing `slotProps={{ input }}`
+  (or `InputProps`) to that `TextField` drops it, so every dropdown renders
+  empty and logs `MUI: Unable to find the input element`. This has regressed
+  three times. Put adornments in an absolutely-positioned overlay next to the
+  control and reserve space with `& .MuiAutocomplete-inputRoot { pl }` instead.
+  `bun run check:autocomplete` fails the build if it comes back.
+- Unknown `IconRenderer` names render **nothing** — `ICON_REGISTRY[name]`
+  misses and the component returns `null`, so a typo is a silently blank cell,
+  not an error. Check the name exists in `icon-renderer.tsx` before using it.
 - `react-apexcharts` renders a blank canvas under React 19 + Turbopack. The
   shared `Chart` (`packages/shared/src/components/graph-renderer/chart.tsx`)
   drives the core `apexcharts` lib imperatively instead (dynamic import,

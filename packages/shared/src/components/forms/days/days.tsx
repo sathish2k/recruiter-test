@@ -58,7 +58,15 @@ export function DaysField({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: (theme) => theme.form.inlineGap }}>
+      {/* An even track per day rather than fixed-width chips, so the row
+          fills its field and stays aligned as the card resizes. */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${options.length}, 1fr)`,
+          gap: "6px",
+        }}
+      >
         {options.map((option) => {
           const on = selected.has(option.value);
           return (
@@ -68,9 +76,8 @@ export function DaysField({
               role="checkbox"
               aria-checked={on}
               sx={{
-                width: 44,
                 textAlign: "center",
-                py: "9px",
+                py: "12px",
                 borderRadius: "9px",
                 border: "1px solid",
                 fontSize: 12,

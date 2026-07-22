@@ -60,7 +60,7 @@ export function SettingsInvitationsComponent({ id }: { id: string }) {
   };
 
   return (
-    <Box sx={{ maxWidth: 1040, display: "flex", flexDirection: "column", gap: "12px" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <Box>
         <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t("title")}</Typography>
         <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>

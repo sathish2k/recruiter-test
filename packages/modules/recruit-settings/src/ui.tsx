@@ -98,9 +98,9 @@ export function CardHeader({
     <Box
       sx={{
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "space-between",
-        gap: 2,
+        gap: "14px",
         mb: subtitle ? "14px" : "10px",
       }}
     >
@@ -110,7 +110,7 @@ export function CardHeader({
           {badge}
         </Box>
         {subtitle ? (
-          <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
+          <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}>
             {subtitle}
           </Typography>
         ) : null}
@@ -125,10 +125,12 @@ export function Meter({ percent, color }: { percent: number; color?: string }) {
   return (
     <Box
       sx={{
-        height: 6,
+        height: 8,
         borderRadius: 999,
-        background: "var(--mui-palette-surface-tint)",
+        // The design's track is the inset surface, not a translucent white.
+        background: "var(--mui-palette-surface-inset)",
         width: "100%",
+        overflow: "hidden",
       }}
     >
       <Box

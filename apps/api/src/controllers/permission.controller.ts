@@ -1,11 +1,16 @@
 import { status } from "elysia";
-import { listPermissions, updateRolePermissions } from "../services/permission.service";
+import {
+  listPermissions,
+  roleHolders,
+  updateRolePermissions,
+} from "../services/permission.service";
 
 type Auth = { agencyId?: string | null };
 
 export async function getPermissions(ctx: { user: Auth }) {
-  const data = await listPermissions(ctx.user.agencyId ?? "");
-  return { data };
+  const agencyId = ctx.user.agencyId ?? "";
+  const [data, holders] = await Promise.all([listPermissions(agencyId), roleHolders(agencyId)]);
+  return { data, meta: { holders } };
 }
 
 export async function putRolePermissions(ctx: {

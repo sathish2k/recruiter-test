@@ -92,7 +92,7 @@ export const BillingConfiguration: BillingConfig = {
             pending: "statuses.pending",
             refunded: "statuses.refunded",
           },
-          colors: { paid: "success", pending: "warning", refunded: "default" },
+          colors: { paid: "success", pending: "warning", refunded: "info" },
         },
       },
     ],

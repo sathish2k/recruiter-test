@@ -1,5 +1,6 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import Chip, { type ChipProps } from "@mui/material/Chip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -28,6 +29,12 @@ export interface RoleRendererConfig {
   /** Menu heading translation key. */
   changeLabel?: string;
   options: RoleOption[];
+  /** Boolean data path; truthy rows render a locked, non-clickable chip. */
+  lockedPath?: string;
+  /** Role values that can never be assigned from this menu. */
+  lockedValues?: string[];
+  /** Tooltip shown on a locked chip. */
+  lockedHint?: string;
 }
 
 export function RoleRenderer({
@@ -43,6 +50,10 @@ export function RoleRenderer({
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const current = String(delve(data, config.path) ?? "");
   const active = config.options.find((o) => o.value === current);
+  // The owner's role isn't reassignable from this table — the chip reads as a
+  // locked badge, and the owner never appears as a choice for anyone else.
+  const locked = !!config.lockedPath && !!delve(data, config.lockedPath);
+  const options = config.options.filter((o) => !config.lockedValues?.includes(o.value));
 
   const open = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -61,10 +72,30 @@ export function RoleRenderer({
         variant="soft"
         size="small"
         color={active?.color ?? "default"}
-        label={t(active?.label ?? current)}
-        onClick={open}
-        onDelete={open}
-        deleteIcon={<IconRenderer name="unfold-more" size={13} />}
+        label={
+          locked ? (
+            // MUI's `icon` slot always precedes the label; the design puts the
+            // lock after the text, so it lives inside the label instead.
+            <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              {t(active?.label ?? current)}
+              <IconRenderer name="lock" size={12} />
+            </Box>
+          ) : (
+            t(active?.label ?? current)
+          )
+        }
+        title={locked ? t(config.lockedHint ?? "") : undefined}
+        onClick={locked ? undefined : open}
+        onDelete={locked ? undefined : open}
+        deleteIcon={locked ? undefined : <IconRenderer name="unfold-more" size={13} />}
+        sx={{
+          height: "auto",
+          py: "5px",
+          px: "12px",
+          "& .MuiChip-label": { px: 0 },
+          "& .MuiChip-deleteIcon": { m: 0, ml: "6px" },
+          ...(locked ? { cursor: "default" } : {}),
+        }}
       />
       <Menu
         anchorEl={anchor}
@@ -77,7 +108,7 @@ export function RoleRenderer({
             {t(config.changeLabel)}
           </Typography>
         ) : null}
-        {config.options.map((option) => (
+        {options.map((option) => (
           <MenuItem
             key={option.value}
             selected={option.value === current}

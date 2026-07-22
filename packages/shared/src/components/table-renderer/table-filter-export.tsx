@@ -3,11 +3,12 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { useConfiguration, useFetch, usePortalRouter, useTranslation } from "@recruit/sdk";
+import type { ReactNode } from "react";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
 import { type ActionHandler, IconRenderer } from "../renderers";
 import { TableRenderer } from "./table-renderer";
-import type { TableCta, TableFilterExportConfig } from "./table-renderer.types";
+import type { Cells, TableCta, TableFilterExportConfig } from "./table-renderer.types";
 
 type Row = Record<string, unknown>;
 
@@ -16,11 +17,18 @@ export function TableFilterExportRenderer({
   config: configProp,
   onCta,
   actionHandler,
+  cells,
+  headerExtra,
+  headerAction,
 }: {
   id: string;
   config?: TableFilterExportConfig;
   onCta?: (action: string) => void;
   actionHandler?: ActionHandler;
+  /** One-off cell renderers, forwarded to the table (see Cells). */
+  cells?: Cells;
+  headerExtra?: ReactNode;
+  headerAction?: ReactNode;
 }) {
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<TableFilterExportConfig>(id);
@@ -106,6 +114,9 @@ export function TableFilterExportRenderer({
         config={config}
         filters={filters}
         actionHandler={actionHandler}
+        cells={cells}
+        headerExtra={headerExtra}
+        headerAction={headerAction}
         onEmptyAction={onCta}
       />
     </Box>

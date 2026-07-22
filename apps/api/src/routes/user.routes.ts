@@ -16,6 +16,8 @@ export default new Elysia({ name: "user.routes" })
     isAuth: true,
     body: t.Object({ role: t.String({ minLength: 1 }) }),
   })
+  .post("/users/:id/suspend", (ctx) => userController.postSuspend(ctx), { isAuth: true })
+  .delete("/users/:id", (ctx) => userController.deleteMember(ctx), { isAuth: true })
   .post("/users/:id/deactivate", (ctx) => userController.postDeactivate(ctx), {
     isAuth: true,
   });

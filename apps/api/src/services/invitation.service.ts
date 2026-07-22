@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "../db";
+import { user } from "../models/auth.model";
 import { invitation } from "../models/invitation.model";
 
 const INVITE_TTL_DAYS = 14;
@@ -47,31 +48,55 @@ export async function listInvitations(organizationId: string) {
   return { data, totalCount: data.length };
 }
 
-export interface CreateInvitationInput {
-  email: string;
+export interface CreateInvitationsInput {
+  emails: string[];
   role?: string;
   clientAccess?: string;
 }
 
-export async function createInvitation(
+/**
+ * Bulk invite — the design's modal takes one email per line, so a send is
+ * always a list. Addresses that are already members or already hold a pending
+ * invite are reported as `skipped` rather than failing the whole batch.
+ */
+export async function createInvitations(
   organizationId: string,
   invitedBy: string,
-  input: CreateInvitationInput,
+  input: CreateInvitationsInput,
 ) {
+  const emails = [...new Set(input.emails.map((email) => email.trim().toLowerCase()))].filter(
+    Boolean,
+  );
+  if (!emails.length) return { created: [], skipped: [] };
+
+  const [pending, members] = await Promise.all([
+    db
+      .select({ email: invitation.email })
+      .from(invitation)
+      .where(and(eq(invitation.organizationId, organizationId), eq(invitation.status, "pending"))),
+    db.select({ email: user.email }).from(user).where(eq(user.agencyId, organizationId)),
+  ]);
+  const taken = new Set([...pending, ...members].map((row) => row.email.toLowerCase()));
+  const fresh = emails.filter((email) => !taken.has(email));
+  const skipped = emails.filter((email) => taken.has(email));
+  if (!fresh.length) return { created: [], skipped };
+
   const expiresAt = new Date(Date.now() + INVITE_TTL_DAYS * 86_400_000);
-  const [created] = await db
+  const rows = await db
     .insert(invitation)
-    .values({
-      id: randomUUID(),
-      organizationId,
-      email: input.email,
-      role: input.role ?? "employee",
-      clientAccess: input.clientAccess ?? null,
-      invitedBy,
-      expiresAt,
-    })
+    .values(
+      fresh.map((email) => ({
+        id: randomUUID(),
+        organizationId,
+        email,
+        role: input.role ?? "employee",
+        clientAccess: input.clientAccess ?? null,
+        invitedBy,
+        expiresAt,
+      })),
+    )
     .returning();
-  return created ? mapInvitation(created) : null;
+  return { created: rows.map(mapInvitation), skipped };
 }
 
 export async function cancelInvitation(organizationId: string, id: string) {

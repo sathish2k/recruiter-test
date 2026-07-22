@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useMemo, useTransition } from "react";
 import { findRouteBySlug } from "./engine/router";
 import type { Route } from "./types";
 
@@ -17,6 +17,8 @@ export interface PortalRouter {
 }
 
 const PortalRouterContext = createContext<PortalRouter | undefined>(undefined);
+/** True while a route transition is in flight — drives the progress bar. */
+const NavigatingContext = createContext(false);
 const RoutesContext = createContext<Route[]>([]);
 
 function buildPath(routes: Route[], routeId: string, params?: Record<string, string>): string {
@@ -43,15 +45,20 @@ export function PortalRouterProvider({
   children: ReactNode;
 }) {
   const router = useRouter();
+  // Route pushes run inside a transition so the UI can show progress while
+  // the next route's server components resolve, instead of freezing or
+  // blanking the page.
+  const [isNavigating, startTransition] = useTransition();
 
   const value = useMemo<PortalRouter>(() => {
+    const navigate = (fn: () => void) => startTransition(fn);
     const getPathFromRouteId = (routeId: string, params?: Record<string, string>) =>
       buildPath(routes, routeId, params);
     return {
-      push: (id, params) => router.push(getPathFromRouteId(id, params)),
-      replace: (id, params) => router.replace(getPathFromRouteId(id, params)),
-      pushPath: (path) => router.push(path),
-      replacePath: (path) => router.replace(path),
+      push: (id, params) => navigate(() => router.push(getPathFromRouteId(id, params))),
+      replace: (id, params) => navigate(() => router.replace(getPathFromRouteId(id, params))),
+      pushPath: (path) => navigate(() => router.push(path)),
+      replacePath: (path) => navigate(() => router.replace(path)),
       back: () => router.back(),
       forward: () => router.forward(),
       refresh: () => router.refresh(),
@@ -61,9 +68,16 @@ export function PortalRouterProvider({
 
   return (
     <PortalRouterContext.Provider value={value}>
-      <RoutesContext.Provider value={routes}>{children}</RoutesContext.Provider>
+      <NavigatingContext.Provider value={isNavigating}>
+        <RoutesContext.Provider value={routes}>{children}</RoutesContext.Provider>
+      </NavigatingContext.Provider>
     </PortalRouterContext.Provider>
   );
+}
+
+/** Whether a route change is currently resolving. */
+export function useIsNavigating(): boolean {
+  return useContext(NavigatingContext);
 }
 
 export function usePortalRouter(): PortalRouter {
