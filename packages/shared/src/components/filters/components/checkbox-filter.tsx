@@ -3,6 +3,7 @@
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import Box from "@mui/material/Box";
 import type { CheckboxFilter, SelectFilter } from "../types";
+import { useFilterOptions } from "../use-filter-options";
 import { FilterPopover, optionRowSx } from "./filter-popover";
 
 export function CheckboxFilterComponent({
@@ -16,9 +17,10 @@ export function CheckboxFilterComponent({
   onChange: (value: string[]) => void;
   active?: boolean;
 }) {
+  const options = useFilterOptions(config);
   const values = Array.isArray(value) ? value : [];
   const first = values.length
-    ? (config.options.find((o) => o.value === values[0])?.label ?? values[0])
+    ? (options.find((o) => o.value === values[0])?.label ?? values[0])
     : undefined;
   const summary = first
     ? `${[config.label?.name, first].filter(Boolean).join(": ")}${
@@ -32,7 +34,7 @@ export function CheckboxFilterComponent({
   return (
     <FilterPopover label={config.label?.name} summary={summary} active={active}>
       {() =>
-        config.options.map((option) => {
+        options.map((option) => {
           const checked = values.includes(option.value);
           return (
             <Box key={option.value} onClick={() => toggle(option.value)} sx={optionRowSx(checked)}>

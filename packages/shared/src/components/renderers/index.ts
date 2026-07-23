@@ -66,4 +66,9 @@ export {
   type StaticTranslationRendererConfig,
 } from "./static-translation-renderer";
 export { StatusRenderer, type StatusRendererConfig } from "./status-renderer";
+export {
+  type TabNavConfiguration,
+  type TabNavItem,
+  TabNavRenderer,
+} from "./tab-nav-renderer/tab-nav-renderer";
 export { TextRenderer, type TextRendererConfig } from "./text-renderer";

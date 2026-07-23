@@ -5,11 +5,36 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import { useTranslation } from "@recruit/sdk";
+import { isPossiblePhoneNumber } from "libphonenumber-js/max";
 import { useMemo } from "react";
 import { type FieldValues, type Resolver, useForm } from "react-hook-form";
 import { Field } from "../field/field";
 import { FormContainer } from "../form-container";
 import type { FormRendererProps, JsonSchema, JsonSchemaProperty } from "../types";
+
+/** Error key/message for a phone field, from its schema `errorMessage`. */
+function phoneErrorMessage(prop: JsonSchemaProperty): string {
+  const em = prop.errorMessage;
+  if (typeof em === "string") return em;
+  if (em && typeof em === "object") {
+    return em.phone ?? em.pattern ?? em.format ?? "Enter a valid phone number";
+  }
+  return "Enter a valid phone number";
+}
+
+/**
+ * Per-country phone validation: the stored value is `+<code> <national>`, so the
+ * national part (after the first space) tells us whether a number was entered at
+ * all, and `isPossiblePhoneNumber` enforces that country's expected length
+ * dynamically. Empty (code-only) values pass — `required` handles those.
+ */
+function phoneProblem(value: unknown): boolean {
+  if (typeof value !== "string" || !value.trim()) return false;
+  const spaceIndex = value.indexOf(" ");
+  const national = spaceIndex >= 0 ? value.slice(spaceIndex + 1) : "";
+  if (national.replace(/\D/g, "").length === 0) return false;
+  return !isPossiblePhoneNumber(value);
+}
 
 export function defaultFor(prop: JsonSchemaProperty): unknown {
   if (prop.widget === "upload") return { url: prop.default ?? "" };
@@ -19,11 +44,16 @@ export function defaultFor(prop: JsonSchemaProperty): unknown {
   return "";
 }
 
-function stripEmptyOptional(schema: JsonSchema, values: FieldValues): FieldValues {
-  const required = new Set(schema.required ?? []);
+/**
+ * Drop empty-string fields before ajv runs. ajv `required` only checks that a
+ * key is *present*, so an empty required field (`""`) would otherwise pass —
+ * removing it makes `required` fail (and lets optional empties skip
+ * format/pattern checks). Booleans/arrays aren't `""`, so they're untouched.
+ */
+function stripEmptyOptional(_schema: JsonSchema, values: FieldValues): FieldValues {
   const cleaned: FieldValues = { ...values };
   for (const key of Object.keys(cleaned)) {
-    if (cleaned[key] === "" && !required.has(key)) delete cleaned[key];
+    if (cleaned[key] === "") delete cleaned[key];
   }
   return cleaned;
 }
@@ -57,13 +87,15 @@ export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
     const result = await base(values, context, options);
     const errors = { ...result.errors };
     for (const [key, prop] of Object.entries(schema.properties)) {
-      if (!prop.matchesField || errors[key]) continue;
-      if (values[key] && values[key] !== values[prop.matchesField]) {
+      if (errors[key]) continue;
+      if (prop.matchesField && values[key] && values[key] !== values[prop.matchesField]) {
         errors[key] = {
           type: "matches",
           message:
             typeof prop.errorMessage === "object" ? prop.errorMessage.matches : prop.errorMessage,
         };
+      } else if (prop.widget === "phone" && phoneProblem(values[key])) {
+        errors[key] = { type: "phone", message: phoneErrorMessage(prop) };
       }
     }
     return Object.keys(errors).length
@@ -102,8 +134,16 @@ export function FormRenderer({
     mode: "onTouched",
   });
 
+  const requiredFields = new Set(schema.required ?? []);
   const fields = Object.entries(schema.properties).map(([fieldName, prop]) => (
-    <Field key={fieldName} name={fieldName} prop={prop} control={control} t={t} widgets={widgets} />
+    <Field
+      key={fieldName}
+      name={fieldName}
+      prop={requiredFields.has(fieldName) ? { ...prop, required: true } : prop}
+      control={control}
+      t={t}
+      widgets={widgets}
+    />
   ));
 
   return (

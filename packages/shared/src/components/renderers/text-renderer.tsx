@@ -1,5 +1,7 @@
+import Box from "@mui/material/Box";
 import Typography, { type TypographyProps } from "@mui/material/Typography";
 import delve from "dlv";
+import { CopyButton } from "./copy-button";
 
 export interface TextRendererConfig {
   type: "string" | "text";
@@ -11,6 +13,10 @@ export interface TextRendererConfig {
   color?: TypographyProps["color"];
   sx?: TypographyProps["sx"];
   placeholder?: string;
+  /** Adds a copy-to-clipboard icon after the value (emails, phones, IDs). */
+  copyable?: boolean;
+  /** Toast title shown after copying (already-resolved literal). */
+  copiedLabel?: string;
 }
 
 function transform(value: string, kind?: TextRendererConfig["transform"]): string {
@@ -29,11 +35,24 @@ export function TextRenderer({
 }) {
   const raw = delve(data, config.path);
   const value = raw == null || raw === "" ? (config.placeholder ?? "") : String(raw);
-  return (
+  const text = (
     <Typography component="span" variant={config.variant} color={config.color} sx={config.sx}>
       {config.prefix ?? ""}
       {transform(value, config.transform)}
       {config.suffix ?? ""}
     </Typography>
   );
+
+  if (config.copyable && value) {
+    return (
+      <Box
+        component="span"
+        sx={{ display: "inline-flex", alignItems: "center", gap: "7px", minWidth: 0 }}
+      >
+        {text}
+        <CopyButton value={value} copiedLabel={config.copiedLabel} />
+      </Box>
+    );
+  }
+  return text;
 }

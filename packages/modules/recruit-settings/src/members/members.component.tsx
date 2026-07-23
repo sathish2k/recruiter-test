@@ -10,7 +10,6 @@ import {
   IconRenderer,
   type TableFilterExportConfig,
   TableFilterExportRenderer,
-  Toast,
   useFilters,
   useModal,
   useToast,
@@ -34,7 +33,7 @@ export function SettingsMembersComponent({ id }: { id: string }) {
   const config = useConfiguration<MembersConfig>(id);
   const { filters } = useFilters();
   const inviteModal = useModal();
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
   const { meta, mutation } = useFetch<Member[]>(id, { filters });
   // Inviting writes to the sibling pending-invitations element (page config id).
   const refresh = useRefresh(id, "settings-invitations");
@@ -227,8 +226,6 @@ export function SettingsMembersComponent({ id }: { id: string }) {
           onSubmit={invite}
         />
       ) : null}
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

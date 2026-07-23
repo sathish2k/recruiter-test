@@ -1,124 +1,59 @@
 "use client";
 
-// Deliberate non-theme colours: the avatar swatches below are a fixed
-// rotation of hues used to tell clients apart at a glance — they're identity,
-// not chrome, so they don't follow the colour scheme.
-import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+// The 46px logo swatch below uses a fixed rotation of hues to tell clients
+// apart at a glance — that's identity, not chrome, so it doesn't follow the
+// colour scheme. Everything else reads from the theme's surface tokens.
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
-import { useTranslation } from "@recruit/sdk";
-import {
-  GenericRenderer,
-  type GenericRendererConfig,
-  LinkRenderer,
-  type LinkRendererConfig,
-  StaticTranslationRenderer,
-  type StaticTranslationRendererConfig,
-  StatusRenderer,
-  type StatusRendererConfig,
-  TextRenderer,
-  type TextRendererConfig,
-} from "../renderers";
+import { type MouseEvent, useState } from "react";
+import { IconRenderer } from "../renderers";
 
 export interface ClientCardData {
   id: string;
   name: string;
-  industry: string;
-  manager: string;
-  status: string;
-  openRoles: number;
-  hires: number;
-  sourced: number;
-  screened: number;
-  interviewing: number;
-  pipeline: number;
-  activity: string;
+  industry?: string;
+  status?: string;
+  health?: string;
+  openRoles?: number;
+  candidates?: number;
+  placements?: number;
+  accountLeadName?: string;
+  /** Optional narrative flourishes — rendered only when present. */
+  activity?: string;
+  insightTitle?: string;
+  insightBody?: string;
+  eventText?: string;
+  eventWhen?: string;
 }
 
-/** A metric cell: big number (value renderer) over a translated label. */
-export interface ClientMetricConfig {
-  label: { name: string };
-  value: GenericRendererConfig;
+/** Every visible string, already translated by the owning module. */
+export interface ClientCardLabels {
+  requirements: string;
+  candidates: string;
+  placements: string;
+  status: Record<string, string>;
+  health: Record<string, string>;
+  open: string;
+  addRole: string;
+  contacts: string;
+  more: string;
+  edit: string;
+  delete: string;
 }
 
-/** Static-translation config (id injected by ClientCard) plus a swatch color. */
-type PipelineStatConfig = Omit<StaticTranslationRendererConfig, "id"> & {
-  swatch?: string;
-};
-
-export interface ClientCardConfig {
-  /** String-renderer config for the client name. */
-  name?: TextRendererConfig;
-  /** Status-renderer config for the status chip. */
-  status?: StatusRendererConfig;
-  /** Metric row (open roles, in pipeline, hires). */
-  metrics?: ClientMetricConfig[];
-  /** Static-translation configs for the pipeline breakdown (sourced, …). */
-  pipeline?: PipelineStatConfig[];
-  /** Link-renderer configs for the card's footer actions. */
-  actions?: LinkRendererConfig[];
+export interface ClientCardHandlers {
+  onOpen?: (client: ClientCardData) => void;
+  onAddRole?: (client: ClientCardData) => void;
+  onContacts?: (client: ClientCardData) => void;
+  onEdit?: (client: ClientCardData) => void;
+  onDelete?: (client: ClientCardData) => void;
 }
-
-const DEFAULT_NAME: TextRendererConfig = {
-  type: "string",
-  path: "name",
-  sx: { fontSize: 15.5, fontWeight: 700 },
-};
-
-const DEFAULT_STATUS: StatusRendererConfig = {
-  type: "status",
-  path: "status",
-  labels: { hiring: "status.hiring", paused: "status.paused" },
-  colors: { hiring: "success", paused: "default" },
-  dot: true,
-  sx: {
-    fontSize: 11.5,
-    fontWeight: 600,
-    height: 24,
-    "& .MuiChip-label": { px: "11px" },
-  },
-};
-
-const DEFAULT_METRICS: ClientMetricConfig[] = [
-  {
-    label: { name: "openRoles" },
-    value: { type: "number", path: "openRoles" },
-  },
-  {
-    label: { name: "inPipeline" },
-    value: { type: "number", path: "pipeline" },
-  },
-  {
-    label: { name: "hires" },
-    value: { type: "number", path: "hires", sx: { color: "surface.accentBright" } },
-  },
-];
-
-const DEFAULT_PIPELINE: PipelineStatConfig[] = [
-  {
-    type: "static-translation",
-    key: "sourced",
-    value: "sourced",
-    swatch: "#3A3A38",
-    sx: { fontSize: 11.5 },
-  },
-  {
-    type: "static-translation",
-    key: "screened",
-    value: "screened",
-    swatch: "#B9805A",
-    sx: { fontSize: 11.5 },
-  },
-  {
-    type: "static-translation",
-    key: "interviewing",
-    value: "interviewing",
-    swatch: "var(--mui-palette-primary-main)",
-    sx: { fontSize: 11.5 },
-  },
-];
 
 const LOGO_PALETTE = [
   { bg: "#3A4A5B", fg: "#CFE3F5" },
@@ -127,210 +62,366 @@ const LOGO_PALETTE = [
   { bg: "#5B3A3A", fg: "#F5CFCF" },
   { bg: "#5B4A3A", fg: "#FFD9BC" },
   { bg: "#4A5B3A", fg: "#E0F5CF" },
-];
+] as const;
 
-const METRIC_VALUE_SX = {
-  fontSize: 21,
-  fontWeight: 700,
-  letterSpacing: "-.01em",
+// Health tone → themed foreground token (dot + label share it).
+const HEALTH_FG: Record<string, string> = {
+  healthy: "surface.successFg",
+  attention: "surface.warningFg",
+  at_risk: "surface.accentBright",
+  dormant: "surface.textSecondary",
 };
 
-export function ClientCard({
-  id,
-  client,
-  index = 0,
-  config,
-}: {
-  id: string;
-  client: ClientCardData;
-  index?: number;
-  config?: ClientCardConfig;
-}) {
-  const { t } = useTranslation(id);
-  const logo = LOGO_PALETTE[index % LOGO_PALETTE.length];
-  const total = client.sourced + client.screened + client.interviewing || 1;
-  const record = client as unknown as Record<string, unknown>;
+function hue(name: string) {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return LOGO_PALETTE[hash % LOGO_PALETTE.length] ?? LOGO_PALETTE[0];
+}
 
-  const nameConfig = config?.name ?? DEFAULT_NAME;
-  const statusSource = config?.status ?? DEFAULT_STATUS;
-  const statusConfig: StatusRendererConfig = {
-    ...statusSource,
-    labels: Object.fromEntries(
-      Object.entries(statusSource.labels ?? {}).map(([k, v]) => [k, t(v)]),
-    ),
-  };
-  const metrics = config?.metrics ?? DEFAULT_METRICS;
-  const pipeline = (config?.pipeline ?? DEFAULT_PIPELINE).map((p) => ({
-    ...p,
-    id,
-  }));
-  const actions = (config?.actions ?? []).map((action) => ({ ...action, id }));
+function initials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
+const ACTION_BTN = {
+  width: 28,
+  height: 28,
+  border: "1px solid",
+  borderColor: "surface.border",
+  color: "text.secondary",
+  "&:hover": { bgcolor: "surface.hover", color: "text.primary" },
+} as const;
+
+function Metric({ value, label, accent }: { value: number; label: string; accent?: boolean }) {
+  return (
+    <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Typography
+        sx={{
+          fontSize: 17,
+          fontWeight: 700,
+          letterSpacing: "-.01em",
+          color: accent ? "surface.accentBright" : "text.primary",
+        }}
+      >
+        {value ?? 0}
+      </Typography>
+      <Typography sx={{ fontSize: 10.5, color: "text.disabled", mt: "1px" }}>{label}</Typography>
+    </Box>
+  );
+}
+
+export function ClientCardSkeleton() {
   return (
     <Card
       variant="interactive"
       sx={{
-        p: "22px",
+        p: "20px 18px 16px",
+        borderRadius: "18px",
+        minHeight: 270,
         display: "flex",
         flexDirection: "column",
-        gap: "18px",
-        borderRadius: "18px",
-        background:
-          "linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0) 60%),var(--mui-palette-background-paper)",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: "13px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Skeleton variant="circular" width={46} height={46} />
+        <Skeleton variant="rounded" width={72} height={22} sx={{ borderRadius: "999px" }} />
+      </Box>
+      <Skeleton variant="text" width="55%" height={22} sx={{ mt: "15px" }} />
+      <Skeleton variant="text" width="40%" height={16} sx={{ mt: "7px" }} />
+      <Box sx={{ display: "flex", gap: "12px", mt: "16px" }}>
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} variant="rounded" width="30%" height={38} />
+        ))}
+      </Box>
+      <Skeleton variant="text" width="70%" height={16} sx={{ mt: "18px" }} />
+      <Box sx={{ flex: 1 }} />
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "6px", mt: "15px", pt: "12px" }}>
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} variant="circular" width={28} height={28} />
+        ))}
+      </Box>
+    </Card>
+  );
+}
+
+export function ClientCard({
+  client,
+  labels,
+  onOpen,
+  onAddRole,
+  onContacts,
+  onEdit,
+  onDelete,
+}: {
+  client: ClientCardData;
+  labels: ClientCardLabels;
+} & ClientCardHandlers) {
+  const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
+  const logo = hue(client.name);
+  const status = client.status ?? "paused";
+  const health = client.health ?? "healthy";
+  const healthFg = HEALTH_FG[health] ?? "surface.textSecondary";
+  const isHiring = status === "hiring";
+
+  const openMenu = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setMenuEl(e.currentTarget);
+  };
+  const closeMenu = (e?: MouseEvent<HTMLElement>) => {
+    e?.stopPropagation();
+    setMenuEl(null);
+  };
+  const run = (handler?: (c: ClientCardData) => void) => (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    closeMenu();
+    handler?.(client);
+  };
+
+  return (
+    <Card
+      variant="interactive"
+      onClick={() => onOpen?.(client)}
+      sx={{
+        p: "20px 18px 16px",
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: "18px",
+        minHeight: 270,
+        cursor: "pointer",
+        transition: "transform .15s, border-color .15s",
+        "&:hover": { transform: "translateY(-2px)", borderColor: "surface.borderStrong" },
+      }}
+    >
+      {/* Logo + health */}
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Avatar
-          variant="rounded"
           sx={{
             width: 46,
             height: 46,
-            borderRadius: "13px",
             bgcolor: logo.bg,
             color: logo.fg,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: 700,
           }}
         >
-          {client.name.charAt(0).toUpperCase()}
+          {initials(client.name)}
         </Avatar>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <TextRenderer config={nameConfig} data={record} />
-          <Typography sx={{ fontSize: 12, color: "text.secondary", mt: "2px" }}>
-            {client.industry} · {client.manager}
-          </Typography>
-        </Box>
-        <StatusRenderer config={statusConfig} data={record} />
-      </Box>
-
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${metrics.length}, 1fr)`,
-        }}
-      >
-        {metrics.map((metric, i) => {
-          const overrideSx = (metric.value as { sx?: Record<string, unknown> })?.sx;
-          const valueConfig = {
-            ...metric.value,
-            sx: { ...METRIC_VALUE_SX, ...(overrideSx ?? {}) },
-          } as GenericRendererConfig;
-          const last = i === metrics.length - 1;
-          return (
-            <Box
-              key={metric.label.name}
-              sx={{
-                borderRight: last ? "none" : "1px solid var(--mui-palette-surface-tint)",
-                pl: i === 0 ? 0 : "14px",
-                pr: last ? 0 : "14px",
-              }}
-            >
-              <GenericRenderer config={valueConfig} data={record} />
-              <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
-                {t(metric.label.name)}
-              </Typography>
-            </Box>
-          );
-        })}
-      </Box>
-
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            gap: "3px",
-            height: 8,
-            borderRadius: "999px",
-            overflow: "hidden",
-            background: "#242422",
-          }}
-        >
-          <Box
-            sx={{
-              width: `${(client.sourced / total) * 100}%`,
-              background: "#3A3A38",
-            }}
-          />
-          <Box
-            sx={{
-              width: `${(client.screened / total) * 100}%`,
-              background: "#B9805A",
-            }}
-          />
-          <Box
-            sx={{
-              width: `${(client.interviewing / total) * 100}%`,
-              background:
-                "linear-gradient(90deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))",
-            }}
-          />
-        </Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: "14px",
-            mt: "9px",
-            fontSize: 11.5,
-            color: "text.secondary",
-            flexWrap: "wrap",
+            gap: "6px",
+            fontSize: 11,
+            fontWeight: 600,
+            color: healthFg,
+            bgcolor: "surface.scrim",
+            border: "1px solid",
+            borderColor: "surface.border",
+            px: "11px",
+            py: "4px",
+            borderRadius: "999px",
           }}
         >
-          {pipeline.map((stat) => (
-            <Box
-              key={stat.key}
-              component="span"
-              sx={{ display: "flex", alignItems: "center", gap: "6px" }}
-            >
-              {stat.swatch ? (
-                <Box
-                  component="span"
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "2px",
-                    background: stat.swatch,
-                  }}
-                />
-              ) : null}
-              <StaticTranslationRenderer config={stat} data={record} />
-            </Box>
-          ))}
+          <Box sx={{ width: 5, height: 5, borderRadius: "999px", bgcolor: healthFg }} />
+          {labels.health[health] ?? health}
         </Box>
       </Box>
 
+      {/* Name + status */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "15px" }}>
+        <Typography
+          sx={{
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: "-.01em",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {client.name}
+        </Typography>
+        <Box
+          sx={{
+            flex: "none",
+            fontSize: 10,
+            fontWeight: 700,
+            px: "8px",
+            py: "2px",
+            borderRadius: "999px",
+            border: "1px solid",
+            color: isHiring ? "surface.successFg" : "text.muted",
+            bgcolor: isHiring ? "surface.successSoftBg" : "surface.tint",
+            borderColor: isHiring ? "surface.successSoftBorder" : "surface.borderStrong",
+          }}
+        >
+          {labels.status[status] ?? status}
+        </Box>
+      </Box>
+
+      {/* Activity line (optional) */}
+      {client.activity ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            mt: "7px",
+            fontSize: 12,
+            fontWeight: 600,
+            color: healthFg,
+          }}
+        >
+          <Box
+            sx={{ width: 6, height: 6, borderRadius: "99px", bgcolor: healthFg, flex: "none" }}
+          />
+          {client.activity}
+        </Box>
+      ) : null}
+
+      {/* Metrics */}
+      <Box sx={{ display: "flex", mt: "16px", gap: "12px" }}>
+        <Metric value={client.openRoles ?? 0} label={labels.requirements} />
+        <Box sx={{ borderLeft: "1px solid", borderColor: "surface.divider", pl: "12px", flex: 1 }}>
+          <Metric value={client.candidates ?? 0} label={labels.candidates} />
+        </Box>
+        <Box sx={{ borderLeft: "1px solid", borderColor: "surface.divider", pl: "12px", flex: 1 }}>
+          <Metric value={client.placements ?? 0} label={labels.placements} accent />
+        </Box>
+      </Box>
+
+      {/* AI insight (optional) */}
+      {client.insightTitle ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "9px",
+            mt: "14px",
+            pt: "13px",
+            borderTop: "1px solid",
+            borderColor: "surface.divider",
+          }}
+        >
+          <Box sx={{ color: "surface.successFg", flex: "none", mt: "1px" }}>
+            <IconRenderer name="sparkle" size={14} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontSize: 12, fontWeight: 600 }}>{client.insightTitle}</Typography>
+            {client.insightBody ? (
+              <Typography sx={{ fontSize: 11, color: "text.secondary", mt: "1px" }}>
+                {client.insightBody}
+              </Typography>
+            ) : null}
+          </Box>
+        </Box>
+      ) : null}
+
+      {/* Account lead */}
+      {client.accountLeadName ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "14px" }}>
+          <Avatar
+            sx={{
+              width: 22,
+              height: 22,
+              fontSize: 8.5,
+              fontWeight: 700,
+              bgcolor: hue(client.accountLeadName).bg,
+              color: hue(client.accountLeadName).fg,
+            }}
+          >
+            {initials(client.accountLeadName)}
+          </Avatar>
+          <Typography sx={{ fontSize: 12, color: "text.muted" }}>
+            {client.accountLeadName}
+          </Typography>
+        </Box>
+      ) : null}
+
+      <Box sx={{ flex: 1 }} />
+
+      {/* Footer: event + actions */}
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-end",
           justifyContent: "space-between",
-          borderTop: "1px solid var(--mui-palette-surface-hover)",
-          pt: "14px",
+          gap: "8px",
+          mt: "15px",
+          pt: "12px",
+          borderTop: "1px solid",
+          borderColor: "surface.divider",
         }}
       >
-        <Typography sx={{ fontSize: 12, color: "text.disabled" }}>{client.activity}</Typography>
-        {actions.length ? (
-          <Box
+        <Box sx={{ minWidth: 0 }}>
+          {client.eventText ? (
+            <Typography
+              sx={{
+                fontSize: 12,
+                color: "text.muted",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {client.eventText}
+            </Typography>
+          ) : null}
+          {client.eventWhen ? (
+            <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "2px" }}>
+              {client.eventWhen}
+            </Typography>
+          ) : null}
+        </Box>
+        <Box sx={{ display: "flex", gap: "6px", flex: "none" }}>
+          <IconButton title={labels.open} onClick={run(onOpen)} sx={ACTION_BTN}>
+            <IconRenderer name="open-in-new" size={14} />
+          </IconButton>
+          <IconButton
+            title={labels.addRole}
+            onClick={run(onAddRole)}
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: "surface.primarySoftFg",
-              "&:hover": { color: "primary.light" },
+              width: 28,
+              height: 28,
+              border: "1px solid",
+              borderColor: "surface.primarySoftBorder",
+              bgcolor: "surface.primarySoftBg",
+              color: "surface.accentBright",
+              "&:hover": { bgcolor: "surface.primarySoftBorder", color: "surface.accentBright" },
             }}
           >
-            {actions.map((action, i) => (
-              <LinkRenderer
-                key={action.routeId ?? action.href ?? i}
-                config={{ color: "inherit", underline: "none", ...action }}
-                data={record}
-              />
-            ))}
-            <ArrowForwardRounded sx={{ fontSize: 14 }} />
-          </Box>
-        ) : null}
+            <IconRenderer name="add" size={14} />
+          </IconButton>
+          <IconButton title={labels.contacts} onClick={run(onContacts)} sx={ACTION_BTN}>
+            <IconRenderer name="contacts" size={14} />
+          </IconButton>
+          <IconButton title={labels.more} onClick={openMenu} sx={ACTION_BTN}>
+            <IconRenderer name="more" size={14} />
+          </IconButton>
+          <Menu
+            anchorEl={menuEl}
+            open={Boolean(menuEl)}
+            onClose={() => closeMenu()}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <MenuItem onClick={run(onEdit)} sx={{ fontSize: 12.5, gap: "9px" }}>
+              <IconRenderer name="edit" size={14} />
+              {labels.edit}
+            </MenuItem>
+            <MenuItem
+              onClick={run(onDelete)}
+              sx={{ fontSize: 12.5, gap: "9px", color: "surface.errorFg" }}
+            >
+              <IconRenderer name="delete" size={14} />
+              {labels.delete}
+            </MenuItem>
+          </Menu>
+        </Box>
       </Box>
     </Card>
   );

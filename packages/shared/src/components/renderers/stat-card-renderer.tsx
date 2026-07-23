@@ -8,7 +8,7 @@ import Typography, { type TypographyProps } from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 import { useState } from "react";
-import { Toast } from "../toast/toast";
+import { useToast } from "../toast/toast";
 import { GenericRenderer, type GenericRendererConfig } from "./generic-renderer";
 import { IconRenderer } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
@@ -141,30 +141,24 @@ function StatAction({
   t: T;
   onLog: () => void;
 }) {
-  const [toast, setToast] = useState<{ title: string; sub?: string } | null>(null);
+  const { show } = useToast();
   const action = config.action;
   if (!action) return null;
   return (
-    <>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => {
-          onLog();
-          if (action.toast) {
-            setToast({
-              title: t(action.toast.title),
-              sub: t(action.toast.sub),
-            });
-          }
-        }}
-        startIcon={action.icon ? <IconRenderer name={action.icon} size={15} /> : undefined}
-        sx={{ fontSize: 12, mt: "14px" }}
-      >
-        {t(action.label.name)}
-      </Button>
-      <Toast toast={toast} onClose={() => setToast(null)} />
-    </>
+    <Button
+      variant="contained"
+      color="secondary"
+      onClick={() => {
+        onLog();
+        if (action.toast) {
+          show(t(action.toast.title), t(action.toast.sub));
+        }
+      }}
+      startIcon={action.icon ? <IconRenderer name={action.icon} size={15} /> : undefined}
+      sx={{ fontSize: 12, mt: "14px" }}
+    >
+      {t(action.label.name)}
+    </Button>
   );
 }
 

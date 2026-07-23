@@ -41,7 +41,7 @@ export function TableFilterExportRenderer({
 
   const filterOptions: FilterConfig[] = (config?.filters ?? []).map((f) => {
     const label = f.label ? { name: t(f.label.name) } : undefined;
-    if ("options" in f) {
+    if ("options" in f && f.options) {
       return {
         ...f,
         label,

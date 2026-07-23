@@ -2,6 +2,7 @@
 
 import Box from "@mui/material/Box";
 import type { DropdownFilter } from "../types";
+import { useFilterOptions } from "../use-filter-options";
 import { FilterPopover, optionRowSx } from "./filter-popover";
 
 export function DropdownFilterComponent({
@@ -15,11 +16,12 @@ export function DropdownFilterComponent({
   onChange: (value: string) => void;
   active?: boolean;
 }) {
-  const selected = config.options.find((o) => o.value === value);
+  const options = useFilterOptions(config);
+  const selected = options.find((o) => o.value === value);
   return (
     <FilterPopover label={config.label?.name} summary={selected?.label} active={active}>
       {(close) =>
-        config.options.map((option) => (
+        options.map((option) => (
           <Box
             key={option.value}
             onClick={() => {

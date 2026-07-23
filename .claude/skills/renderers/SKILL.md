@@ -19,7 +19,7 @@ skill); no inline chrome, no comments in `.tsx`.
 |---|---|---|
 | `string`/`text` | text at `path` | `sx` |
 | `static-translation` | fixed t-key | `value`, `swatch` |
-| `number` / `currency` / `date` | locale-aware (useFormatters) | `path` |
+| `number` / `currency` / `date` | locale-aware (useFormatters) | `path`, date `options` |
 | `boolean` / `status` | yes-no / status dot | `path` |
 | `entity` | tile/avatar + title + subtitle | `shape`, `bgPath/fgPath/textPath`, `title`, `subtitle` |
 | `ai-match` | sparkle + value | `path`, `suffix`, `color`/`colorPath` |
@@ -37,6 +37,19 @@ genuinely one-off cell = a **custom table cell**: give the column
 `value: { type: "myKey" }` and pass `<TableRenderer cells={{ myKey: (row) => … }} />`.
 Custom cells are a TableRenderer concern (resolved in TableCellRenderer, not
 GenericRenderer) — see the table-renderer skill.
+
+**Date/number formatting** goes through `useFormatters()` (`@recruit/shared`),
+which is locale-aware AND honors the user's **locale preferences** — language,
+timezone, date pattern, 12/24h — held in `useLocale` (`@recruit/sdk`). That store
+is **seeded server-side on boot**: the root layout (`apps/web/src/locale.ts`
+`getBootLocale`) fetches the user's effective prefs (override, else workspace
+default) and passes them to `LocaleProvider` as `initialPreferences`, so the
+first paint is correct on any device. It's localStorage-backed too (key
+`recruit-locale`; falls back to it only when the server gave nothing). The
+account **Profile** (timezone) and **Language & formats** tabs update it live via
+`useLocale` setters. A **bare** `formatDate(value)` uses the user's date pattern +
+timezone; explicit Intl `options` win (a rendered time still picks up
+`hour12`/`timeZone`). So `date` cells with no `options` reformat automatically.
 
 ## IconRenderer — the ONLY icon source
 
@@ -57,6 +70,35 @@ Route ids resolve via `usePortalRouter` → SPA `next/link`. Two modes:
   `{ filters: { type: "static", value: JSON.stringify({ status: ["Active"] }) } }`
   → `?filters=<json>` which the target's `useFilters` reads. Sort via
   `sortKey`/`sortDir` params, which `useSort` reads.
+
+## TabNavRenderer — the shared area tab bar
+
+Config-driven pill tab bar + optional titled header, behind every "tabs across
+the top of a settings-style area" screen (workspace settings, my-account, …).
+**Don't hand-write a per-area tab component** — bind one `ComponentDefinition`
+per area with `value: TabNavRenderer` and its own `.Configuration` +
+`.Translation`; the engine injects `configuration`/`currentRoute` and strips any
+tab the user can't access. Config:
+`{ title?, subtitle?, subtitleLink?: { text, routeId }, tabs: [{ label, routeId, badge?, access? }] }`
+(all text = translation keys). Active tab = the one whose `routeId` matches
+`currentRoute`; clicking `router.push`es. See
+`recruit-settings/src/settings-tabs/` and `recruit-profile/src/profile-tabs/`
+(both are just a config + translations + a bootstrap pointing at `TabNavRenderer`).
+
+## ListSection — the one settings/account list
+
+`<ListSection title? subtitle? icon? badge? headerAction? footer? divided? items />`
+— a `Card` with an optional header and a configurable row list. **One component
+for every "card of rows" screen** (notification toggles, format pickers,
+connected-calendar rows, session lists): don't re-roll bespoke rows. Each
+`items[]` entry (`ListSectionItem`) declares its own shape:
+`{ key, icon?, title, description?, chips?, action?, control? }` — `icon` =
+leading tile, `action` = right-hand control (Switch/Button/segmented),
+`control` = full-width control beneath the row. The module supplies live
+controls as nodes and builds `items` from its config/state. Pass
+`isLoading` (+ `skeletonRows`) to render a skeleton while the fetch is pending
+instead of the rows. Reference:
+`recruit-profile/src/{notifications,language,appearance,calendar}`.
 
 ## StatCardRenderer
 

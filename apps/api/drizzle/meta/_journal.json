@@ -71,6 +71,76 @@
       "when": 1784650747891,
       "tag": "0009_bent_nightmare",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784701439983,
+      "tag": "0010_peaceful_havok",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1784711565045,
+      "tag": "0011_chemical_fenris",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1784719849617,
+      "tag": "0012_minor_virginia_dare",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1784726018933,
+      "tag": "0013_steep_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1784735111464,
+      "tag": "0014_clumsy_lightspeed",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1784735569288,
+      "tag": "0015_closed_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1784741002886,
+      "tag": "0016_tired_centennial",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1784741622457,
+      "tag": "0017_premium_iron_monger",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1784742159531,
+      "tag": "0018_rich_boom_boom",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1784772724393,
+      "tag": "0019_long_paibok",
+      "breakpoints": true
     }
   ]
 }

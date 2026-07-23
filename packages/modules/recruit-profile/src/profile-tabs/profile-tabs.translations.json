@@ -1,0 +1,13 @@
+{
+  "title": "My account",
+  "subtitle": "Your personal preferences and security. Workspace administration lives in",
+  "subtitleLink": "Workspace Settings.",
+  "tabs": {
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "security": "Security",
+    "calendar": "Calendar",
+    "appearance": "Appearance",
+    "language": "Language"
+  }
+}

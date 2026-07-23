@@ -3,12 +3,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useRefresh, useTranslation } from "@recruit/sdk";
-import {
-  type TableFilterExportConfig,
-  TableFilterExportRenderer,
-  Toast,
-  useToast,
-} from "@recruit/shared";
+import { type TableFilterExportConfig, TableFilterExportRenderer, useToast } from "@recruit/shared";
 import { useMemo } from "react";
 
 interface Invitation {
@@ -21,7 +16,7 @@ export function SettingsInvitationsComponent({ id }: { id: string }) {
   const config = useConfiguration<TableFilterExportConfig>(id);
   const { data, mutation } = useFetch<Invitation[]>(id);
   const refresh = useRefresh(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
 
   // Status-cell labels are translation keys — resolve them before rendering.
   const tableConfig = useMemo<TableFilterExportConfig>(
@@ -75,7 +70,6 @@ export function SettingsInvitationsComponent({ id }: { id: string }) {
           cancel: (row) => cancel(row as unknown as Invitation),
         }}
       />
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

@@ -1,6 +1,7 @@
 export {
   ClientCard,
-  type ClientCardConfig,
   type ClientCardData,
-  type ClientMetricConfig,
+  type ClientCardHandlers,
+  type ClientCardLabels,
+  ClientCardSkeleton,
 } from "./client-card";

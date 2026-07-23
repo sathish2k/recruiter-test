@@ -13,7 +13,6 @@ import {
   IconRenderer,
   Modal,
   TableRenderer,
-  Toast,
   useModal,
   useToast,
 } from "@recruit/shared";
@@ -81,7 +80,7 @@ export function SettingsBillingComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<BillingConfig>(id);
   const { data, mutation, mutate } = useFetch<BillingData>(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
   const paymentModal = useModal();
   const [comparing, setComparing] = useState(false);
 
@@ -479,8 +478,6 @@ export function SettingsBillingComponent({ id }: { id: string }) {
         cancelLabel="cancel"
         onSubmit={savePayment}
       />
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

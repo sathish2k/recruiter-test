@@ -14,7 +14,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
-import { IconRenderer, Toast, useToast } from "@recruit/shared";
+import { IconRenderer, useToast } from "@recruit/shared";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { EmailTemplatesConfiguration } from "./email-templates.configuration";
 
@@ -60,7 +60,7 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
   const { data, mutation, mutate } = useFetch<EmailTemplate[]>(id);
   const templates = data ?? [];
 
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [focused, setFocused] = useState<FocusedField>("body");
@@ -581,8 +581,6 @@ export function EmailTemplatesComponent({ id }: { id: string }) {
           ) : null}
         </Box>
       </Box>
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

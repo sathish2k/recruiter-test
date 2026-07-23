@@ -2,6 +2,8 @@
 
 import type { Control, FieldValues } from "react-hook-form";
 import { Controller } from "react-hook-form";
+import { AttachmentsWidget } from "../attachments/attachments";
+import { CalloutWidget } from "../callout/callout";
 import { CheckboxGroupWidget } from "../checkbox-group/checkbox-group";
 import { ChipsWidget } from "../chips/chips";
 import { ColorWidget } from "../color/color";
@@ -27,6 +29,7 @@ import type {
   Widgets,
 } from "../types";
 import { UploadWidget } from "../upload/upload";
+import { FieldRequiredContext } from "./field-shell";
 
 /**
  * Widget name → component. Adding a field type means writing a component that
@@ -46,6 +49,8 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   markdown: MarkdownWidget,
   phone: PhoneWidget,
   upload: UploadWidget,
+  attachments: AttachmentsWidget,
+  callout: CalloutWidget,
   days: DaysWidget,
   radio: RadioWidget,
   "checkbox-group": CheckboxGroupWidget,
@@ -102,7 +107,11 @@ export function Field({
         // function identity every render, which as a component type would
         // remount the field (and drop focus) on each keystroke. The fragment
         // narrows a widget's ReactNode to the ReactElement Controller wants.
-        return <>{custom ? custom(props) : <Builtin {...props} />}</>;
+        return (
+          <FieldRequiredContext.Provider value={Boolean(resolved.required)}>
+            {custom ? custom(props) : <Builtin {...props} />}
+          </FieldRequiredContext.Provider>
+        );
       }}
     />
   );

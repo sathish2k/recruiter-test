@@ -1,0 +1,11 @@
+{
+  "title": "Connected calendars",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "connected": "Connected · {{account}}",
+  "notConnected": "Not connected",
+  "toast": {
+    "connected": "{{name}} connected",
+    "disconnected": "{{name}} disconnected"
+  }
+}

@@ -2,13 +2,23 @@
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import type { ReactNode } from "react";
+import { createContext, type ReactNode, useContext } from "react";
+
+/** Set by `Field` from the schema's `required` list so any label — whichever
+ * widget renders it — shows the asterisk without every widget threading a flag. */
+export const FieldRequiredContext = createContext(false);
 
 export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
+  const required = useContext(FieldRequiredContext);
   if (hide) return null;
   return (
     <Typography sx={{ fontSize: 12, fontWeight: 600, color: "surface.textMuted" }}>
       {label}
+      {required ? (
+        <Box component="span" sx={{ color: "error.main", ml: "3px" }}>
+          *
+        </Box>
+      ) : null}
     </Typography>
   );
 }

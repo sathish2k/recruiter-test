@@ -5,11 +5,61 @@ import InputBase from "@mui/material/InputBase";
 import Popover from "@mui/material/Popover";
 import type { Theme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+// The /max metadata is required — the default "min" build can't format most
+// countries or check their lengths.
+import examples from "libphonenumber-js/examples.mobile.json";
+import { AsYouType, type CountryCode, getExampleNumber } from "libphonenumber-js/max";
 import { useMemo, useState } from "react";
 import { IconRenderer } from "../../renderers";
 import { FieldShell } from "../field/field-shell";
 import { useRemoteOptions } from "../select/remote-options";
 import type { DialCode, OptionSource, WidgetProps } from "../types";
+
+/** Per-country example: how long its national number is (used to cap input) and
+ * a formatted sample (used as the placeholder). Cached across renders. */
+const metaCache = new Map<string, { maxLen: number; placeholder: string }>();
+function countryMeta(iso?: string): { maxLen: number; placeholder: string } | undefined {
+  if (!iso) return undefined;
+  const cached = metaCache.get(iso);
+  if (cached) return cached;
+  try {
+    const sample = getExampleNumber(
+      iso as CountryCode,
+      examples as Parameters<typeof getExampleNumber>[1],
+    );
+    if (!sample) return undefined;
+    const meta = { maxLen: sample.nationalNumber.length, placeholder: sample.formatNational() };
+    metaCache.set(iso, meta);
+    return meta;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Formats the national number the way the selected country writes it — e.g.
+ * `98450 12340` (IN), `07400 123456` (GB) — and caps it to that country's own
+ * length, so `+91` accepts only 10 digits. Caps against the *parsed* national
+ * length so a trunk prefix a user types (GB's leading 0) isn't miscounted. */
+function formatNational(raw: string, iso: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (!digits) return "";
+  const max = countryMeta(iso)?.maxLen;
+  const run = (value: string) => {
+    const asYouType = new AsYouType(iso as CountryCode);
+    const text = asYouType.input(value);
+    return { text, nationalLen: asYouType.getNumber()?.nationalNumber.length ?? value.length };
+  };
+  try {
+    let out = run(digits);
+    while (max && digits.length > 1 && out.nationalLen > max) {
+      digits = digits.slice(0, -1);
+      out = run(digits);
+    }
+    return out.text;
+  } catch {
+    return digits;
+  }
+}
 
 /** Dial codes from the design's CODES table. Override per-field with
  * `dialCodes` when a form needs a different set. */
@@ -107,6 +157,9 @@ export function PhoneField({
   const commit = (nextDial: DialCode, nextNumber: string) =>
     onChange(`${nextDial.code} ${nextNumber}`.trim());
 
+  // Placeholder mirrors the selected country's own format.
+  const countryPlaceholder = countryMeta(dial?.iso ?? defaultIso)?.placeholder;
+
   const boxSx = {
     // `bgcolor`, not `background` — the shorthand doesn't resolve palette paths
     // in sx, which left both halves of this control transparent.
@@ -162,9 +215,9 @@ export function PhoneField({
 
       <InputBase
         value={number}
-        onChange={(e) => commit(dial, e.target.value)}
+        onChange={(e) => commit(dial, formatNational(e.target.value, dial?.iso ?? defaultIso))}
         onBlur={onBlur}
-        placeholder={placeholder}
+        placeholder={countryPlaceholder ?? placeholder}
         sx={{
           ...boxSx,
           flex: 1,
@@ -213,7 +266,8 @@ export function PhoneField({
             <Box
               key={`${c.iso}-${c.code}`}
               onClick={() => {
-                commit(c, number);
+                // Re-format the existing digits the new country's way.
+                commit(c, formatNational(number, c.iso));
                 setAnchor(null);
                 setQuery("");
               }}

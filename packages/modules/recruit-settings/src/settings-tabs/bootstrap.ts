@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { SettingsTabsComponent } from "./settings-tabs.component";
+import { TabNavRenderer } from "@recruit/shared";
 import { SettingsTabsConfiguration } from "./settings-tabs.configuration";
 import fallbackTranslation from "./settings-tabs.translations.json";
 
@@ -18,7 +18,7 @@ const TRANSLATION: ComponentDependency = {
 export const SETTINGS_TABS_COMPONENT: ComponentDefinition = {
   id: "Recruit.SettingsTabs.Component",
   type: "COMPONENT",
-  value: SettingsTabsComponent,
+  value: TabNavRenderer,
   default: {
     configuration: CONFIGURATION,
     translation: TRANSLATION,

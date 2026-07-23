@@ -1,0 +1,20 @@
+{
+  "groups": {
+    "candidates": "Candidate activity",
+    "interviews": "Interviews & mentions",
+    "product": "Product"
+  },
+  "items": {
+    "newApplicants": "New applicants apply to your jobs",
+    "weeklyDigest": "Weekly Monday pipeline digest",
+    "interviewReminders": "Reminders before scheduled interviews",
+    "mentions": "A teammate @mentions you",
+    "productUpdates": "News about features and improvements"
+  },
+  "autosave": "Notification changes save automatically",
+  "toast": {
+    "on": "Notification turned on",
+    "off": "Notification turned off",
+    "error": "Couldn't update — please try again"
+  }
+}

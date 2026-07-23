@@ -10,6 +10,12 @@
   "titles": {
     "dashboard": "Dashboard",
     "clients": "Clients",
+    "clientNew": "Add client",
+    "clientEdit": "Edit client",
+    "clientDetail": "Client",
+    "contacts": "Contacts",
+    "contactNew": "New contact",
+    "contactEdit": "Edit contact",
     "jobs": "Jobs",
     "candidates": "Candidates",
     "pipeline": "Pipeline",

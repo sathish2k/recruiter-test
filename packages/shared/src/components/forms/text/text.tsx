@@ -31,6 +31,7 @@ export function TextWidget({ prop, field, fieldState, t }: WidgetProps) {
         type={multiline ? undefined : type}
         multiline={multiline}
         minRows={prop.rows}
+        disabled={prop.readOnly}
         placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
         error={!!fieldState.error}
         slotProps={{

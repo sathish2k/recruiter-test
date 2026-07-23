@@ -18,7 +18,10 @@ export async function putMyProfile(ctx: {
     name?: string;
     phone?: string;
     timezone?: string;
+    signature?: string;
+    image?: string;
     notificationPrefs?: Record<string, boolean>;
+    preferences?: Record<string, string>;
   };
 }) {
   const updated = await updateProfile(ctx.user.id, ctx.body);

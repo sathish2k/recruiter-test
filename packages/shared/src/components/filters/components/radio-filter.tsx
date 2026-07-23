@@ -2,6 +2,7 @@
 
 import Box from "@mui/material/Box";
 import type { RadioFilter } from "../types";
+import { useFilterOptions } from "../use-filter-options";
 import { FilterPopover, optionRowSx } from "./filter-popover";
 
 export function RadioFilterComponent({
@@ -15,11 +16,12 @@ export function RadioFilterComponent({
   onChange: (value: string) => void;
   active?: boolean;
 }) {
-  const selected = config.options.find((o) => o.value === value);
+  const options = useFilterOptions(config);
+  const selected = options.find((o) => o.value === value);
   return (
     <FilterPopover label={config.label?.name} summary={selected?.label} active={activeProp}>
       {(close) =>
-        config.options.map((option) => {
+        options.map((option) => {
           const active = option.value === value;
           return (
             <Box

@@ -19,6 +19,8 @@ export type BuiltInWidget =
   | "chips"
   | "phone"
   | "upload"
+  | "attachments"
+  | "callout"
   | "days"
   | "radio"
   | "checkbox-group"
@@ -64,11 +66,17 @@ export interface JsonSchemaProperty {
   title?: string;
   enumNames?: string[];
   placeholder?: string;
+  /** Set by the renderer from the schema's `required` list — drives the label
+   * asterisk. Not authored per-field; declare requirements in `schema.required`. */
+  required?: boolean;
   widget?: Widget;
   /** Field name this value must equal (e.g. confirm-password). Validated by
    * the form resolver; failure message comes from `errorMessage.matches`. */
   matchesField?: string;
   icon?: string;
+  /** `callout`: `"card"` (default, bordered tip) or `"banner"` (filled accent
+   * strip — icon + help text, no title). */
+  variant?: "card" | "banner";
   /** `switch-row`: soft chip beside the title, e.g. a plan gate. A t-key. */
   badge?: string;
   /** `switch-row`: ICON_REGISTRY name rendered inside the badge. */
@@ -76,6 +84,10 @@ export interface JsonSchemaProperty {
   hideLabel?: boolean;
   help?: string;
   rows?: number;
+  /** Renders the field non-editable (e.g. a sign-in email). Honored by `text`;
+   * the value is still seeded and read, so strip it in `onSubmit` if the API
+   * rejects it. */
+  readOnly?: boolean;
   strengthMeter?: boolean | PasswordStrengthConfig;
 
   /** `phone`: dial codes offered by the country picker. Defaults to DIAL_CODES. */
@@ -85,6 +97,9 @@ export interface JsonSchemaProperty {
   optionSource?: OptionSource;
   /** Renders a `select` as a type-ahead. Implied when `optionSource` is set. */
   searchable?: boolean;
+  /** `select`: show a coloured initials avatar beside each option and the chosen
+   * value (a person/contact picker). */
+  avatar?: boolean;
   /** Placement when the form uses `gridContainer`. */
   grid?: FieldGrid;
   /** `phone`: country pre-selected when the field is empty. Defaults to `IN`. */
@@ -128,6 +143,17 @@ export interface UploadValue {
   url: string;
   /** Set only when the user picked a file this session. */
   file?: File | null;
+}
+
+/** One item in an `attachments` field. Existing files carry `url`; a file
+ * picked this session carries `file` (the caller uploads it, then swaps in the
+ * returned `url`). */
+export interface Attachment {
+  name: string;
+  size?: number;
+  type?: string;
+  url?: string;
+  file?: File;
 }
 
 export interface SelectOption {
@@ -214,8 +240,10 @@ export interface FormRendererProps extends FormLayoutProps {
 }
 
 /** A field slot in a section — a schema property key, optionally spanning
- * multiple grid columns. */
-export type FormSectionField = string | { name: string; span?: number };
+ * multiple grid columns (`span`) or placed with its own responsive `grid`. A
+ * `name` that isn't a schema property renders as an empty spacer cell, so a
+ * half-width field can sit beside a gap (e.g. secondary email). */
+export type FormSectionField = string | { name: string; span?: number; grid?: FieldGrid };
 
 /** A titled group of schema fields rendered as its own card. */
 export interface FormSection extends FormLayoutProps {
@@ -223,15 +251,32 @@ export interface FormSection extends FormLayoutProps {
   title?: string;
   /** Section sub-text translation key. */
   description?: string;
+  /** Skip the section card chrome and render the fields bare — for a single
+   * display widget (e.g. a callout) that draws its own container. */
+  bare?: boolean;
+  /** Draw the card with the accent (orange) border instead of the neutral one —
+   * for a highlighted section like a fee agreement. */
+  accent?: boolean;
+  /** ICON_REGISTRY name shown (accent-coloured) before the section title. */
+  icon?: string;
   /**
    * Shorthand for an even `gridContainer`: `columns: 3` lays the fields out in
    * three equal columns, and a field's `span` counts in those columns. Ignored
    * when the section sets `gridContainer` or `stackContainer` explicitly.
    */
   columns?: number;
-  /** Where this section sits when the form lays sections out in a grid. */
+  /** Where this section sits when the form lays sections out in a grid — a
+   * responsive `size` (e.g. `{ xs: 12, md: 8 }`) is how a two-column form is
+   * expressed and how it collapses to one column on small screens. */
   grid?: FieldGrid;
-  fields: FormSectionField[];
+  /** A layout **group**: instead of its own card, this entry stacks the child
+   * sections vertically and takes its `grid` slot in the parent grid. Two groups
+   * sized `md: 8` / `md: 4` give the "form column + side panel" layout, fully
+   * from config (no bespoke aside/sidePanel plumbing). Mutually exclusive with
+   * `fields`. */
+  sections?: FormSection[];
+  /** The schema fields in this section (omit for a `sections` group). */
+  fields?: FormSectionField[];
 }
 
 /** Passed to a custom `actions` renderer so callers can drive the form's
@@ -264,6 +309,9 @@ export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSu
   description?: string;
   /** Icon name for the submit button. */
   submitIcon?: string;
+  /** Translation key shown on the submit button for ~2s after a successful save
+   * (with a check + pop). Defaults to `submitLabel` (no distinct saved state). */
+  savedLabel?: string;
   /** Rendered in a 340px column beside the sections (design side panel). */
   sidePanel?: import("react").ReactNode;
   /** Translation key for the save-draft button (rendered when onSaveDraft is set). */
@@ -274,6 +322,9 @@ export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSu
   actions?: (state: FormActionsState) => import("react").ReactNode;
   /** Where the button cluster sits. Defaults to the header, above the sections. */
   actionsPlacement?: "header" | "footer";
+  /** Renders a skeleton mirroring the section/field layout instead of the form —
+   * pass while the record is still loading. */
+  isLoading?: boolean;
 }
 
 /** Every widget takes exactly this. Adding a widget means writing a component

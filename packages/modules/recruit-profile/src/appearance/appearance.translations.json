@@ -1,0 +1,23 @@
+{
+  "title": "Appearance",
+  "theme": {
+    "title": "Theme",
+    "description": "Dark or light — applies instantly, synced with the top-bar toggle.",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "accent": {
+    "title": "UI accent color",
+    "description": "Only your interface — client report colors live in Workspace settings."
+  },
+  "prefs": {
+    "compact": {
+      "label": "Compact density",
+      "description": "Tighter spacing across tables and lists."
+    },
+    "sidebar": {
+      "label": "Keep sidebar collapsed",
+      "description": "Start every session with the navigation minimized."
+    }
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import FlightTakeoffRounded from "@mui/icons-material/FlightTakeoffRounded";
+import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
@@ -25,9 +26,15 @@ interface SignInConfig {
 export function SignIn({
   id,
   onSubmit,
+  error,
+  onClearError,
 }: {
   id: string;
   onSubmit: (values: SignInValues) => void | Promise<void>;
+  /** Shown as an error alert above the form, e.g. bad credentials. */
+  error?: string;
+  /** Called when the user edits a field while an error is shown — dismiss it. */
+  onClearError?: () => void;
 }) {
   const { schema, links } = useConfiguration<SignInConfig>(id);
   const { t } = useTranslation(id);
@@ -43,59 +50,70 @@ export function SignIn({
       title={t("title")}
       subtitle={t("subtitle")}
     >
+      {error ? (
+        <Alert severity="error" sx={{ mb: "16px" }}>
+          {error}
+        </Alert>
+      ) : null}
       {schema ? (
-        <FormRenderer
-          id={id}
-          schema={schema}
-          onSubmit={(v: FormValues) =>
-            onSubmit({ ...(v as unknown as SignInValues), rememberMe: remember })
-          }
-          beforeSubmit={
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+        <Box
+          onInput={() => {
+            if (error) onClearError?.();
+          }}
+        >
+          <FormRenderer
+            id={id}
+            schema={schema}
+            onSubmit={(v: FormValues) =>
+              onSubmit({ ...(v as unknown as SignInValues), rememberMe: remember })
+            }
+            beforeSubmit={
               <Box
-                onClick={() => setRemember((r) => !r)}
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  cursor: "pointer",
-                  userSelect: "none",
+                  justifyContent: "space-between",
                 }}
               >
                 <Box
+                  onClick={() => setRemember((r) => !r)}
                   sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "5px",
-                    border: remember
-                      ? "1px solid var(--mui-palette-primary-main)"
-                      : "1px solid var(--mui-palette-surface-controlOutline)",
-                    background: remember
-                      ? "linear-gradient(135deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))"
-                      : "transparent",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    color: "#fff",
-                    transition: "background .15s",
+                    gap: "8px",
+                    cursor: "pointer",
+                    userSelect: "none",
                   }}
                 >
-                  {remember ? <IconRenderer name="check" size={12} /> : null}
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: "5px",
+                      border: remember
+                        ? "1px solid var(--mui-palette-primary-main)"
+                        : "1px solid var(--mui-palette-surface-controlOutline)",
+                      background: remember
+                        ? "linear-gradient(135deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))"
+                        : "transparent",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      transition: "background .15s",
+                    }}
+                  >
+                    {remember ? <IconRenderer name="check" size={12} /> : null}
+                  </Box>
+                  <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+                    {t("rememberMe")}
+                  </Typography>
                 </Box>
-                <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
-                  {t("rememberMe")}
-                </Typography>
+                {forgot ? <LinkRenderer config={forgot} /> : null}
               </Box>
-              {forgot ? <LinkRenderer config={forgot} /> : null}
-            </Box>
-          }
-        />
+            }
+          />
+        </Box>
       ) : null}
       <Typography sx={{ mt: "22px", fontSize: 13, color: "text.secondary", textAlign: "center" }}>
         {t("footerText")} {signUp ? <LinkRenderer config={signUp} /> : null}

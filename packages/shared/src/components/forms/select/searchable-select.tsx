@@ -1,9 +1,12 @@
 "use client";
 
 import Autocomplete from "@mui/material/Autocomplete";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { useMemo, useState } from "react";
+import { avatarSwatch, initialsOf } from "../../../utils/avatar";
+import { IconRenderer } from "../../renderers";
 import type { OptionSource, SelectOption } from "../types";
 import { useRemoteOptions } from "./remote-options";
 
@@ -26,6 +29,8 @@ export interface SearchableSelectFieldProps {
   loadingText?: string;
   /** Small caption rendered inside the control, before the value. */
   prefix?: string;
+  /** Render a coloured initials avatar beside each option and the chosen value. */
+  avatar?: boolean;
 }
 
 /**
@@ -47,6 +52,7 @@ export function SearchableSelectField({
   noOptionsText = "No match",
   loadingText = "Loading…",
   prefix,
+  avatar,
 }: SearchableSelectFieldProps) {
   const [search, setSearch] = useState("");
   const remote = useRemoteOptions(source, search);
@@ -59,6 +65,10 @@ export function SearchableSelectField({
     }
     return options.find((option) => option.value === value) ?? null;
   }, [options, value, multiple]);
+
+  // A person picker draws the chosen contact's avatar inside the control.
+  const single = !multiple && selected && !Array.isArray(selected) ? selected : null;
+  const showAvatar = Boolean(avatar && single);
 
   const control = (
     <Autocomplete
@@ -91,9 +101,52 @@ export function SearchableSelectField({
       onBlur={onBlur}
       renderOption={(props, option) => {
         const { key, ...rest } = props as { key?: string } & Record<string, unknown>;
+        const swatch = avatar ? avatarSwatch(option.label) : null;
+        const isSelected = multiple
+          ? Array.isArray(value) && value.includes(option.value)
+          : option.value === value;
         return (
-          <Box component="li" key={option.value} {...rest} sx={{ fontSize: 13 }}>
-            {option.label}
+          <Box
+            component="li"
+            key={option.value}
+            {...rest}
+            sx={{
+              fontSize: 13,
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "9px 11px",
+              borderRadius: "9px",
+              color: "surface.textSecondary",
+              // Match the plain Select menu's hover/selected treatment.
+              "&.Mui-focused": { bgcolor: "surface.hover", color: "text.primary" },
+              '&[aria-selected="true"]': { bgcolor: "surface.hover", color: "text.primary" },
+              '&[aria-selected="true"].Mui-focused': { bgcolor: "surface.hover" },
+            }}
+          >
+            {swatch ? (
+              <Avatar
+                sx={{
+                  width: 24,
+                  height: 24,
+                  fontSize: 9,
+                  fontWeight: 600,
+                  bgcolor: swatch.bg,
+                  color: swatch.fg,
+                  flex: "none",
+                }}
+              >
+                {initialsOf(option.label)}
+              </Avatar>
+            ) : null}
+            <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
+              {option.label}
+            </Box>
+            {isSelected ? (
+              <Box sx={{ color: "surface.accentBright", display: "flex", flex: "none" }}>
+                <IconRenderer name="check" size={15} />
+              </Box>
+            ) : null}
           </Box>
         );
       }}
@@ -102,32 +155,60 @@ export function SearchableSelectField({
         // Autocomplete wires through it. Loading shows via `loadingText`.
         <TextField {...params} placeholder={placeholder} error={error} helperText={helperText} />
       )}
-      // With a caption, reserve room for it rather than adorning the input.
-      sx={prefix ? { "& .MuiAutocomplete-inputRoot": { pl: "52px" } } : undefined}
+      // With a caption/avatar, reserve room for it rather than adorning the input.
+      sx={
+        prefix
+          ? { "& .MuiAutocomplete-inputRoot": { pl: "52px" } }
+          : showAvatar
+            ? { "& .MuiAutocomplete-inputRoot": { pl: "44px" } }
+            : undefined
+      }
     />
   );
 
-  if (!prefix) return control;
+  if (!prefix && !showAvatar) return control;
 
   return (
     <Box sx={{ position: "relative" }}>
-      <Box
-        component="span"
-        sx={{
-          position: "absolute",
-          left: "14px",
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1,
-          pointerEvents: "none",
-          fontSize: 10.5,
-          fontWeight: 600,
-          letterSpacing: ".06em",
-          color: "text.disabled",
-        }}
-      >
-        {prefix}
-      </Box>
+      {prefix ? (
+        <Box
+          component="span"
+          sx={{
+            position: "absolute",
+            left: "14px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1,
+            pointerEvents: "none",
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: ".06em",
+            color: "text.disabled",
+          }}
+        >
+          {prefix}
+        </Box>
+      ) : null}
+      {showAvatar && single ? (
+        <Avatar
+          sx={{
+            position: "absolute",
+            left: "10px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1,
+            pointerEvents: "none",
+            width: 26,
+            height: 26,
+            fontSize: 9.5,
+            fontWeight: 600,
+            bgcolor: avatarSwatch(single.label).bg,
+            color: avatarSwatch(single.label).fg,
+          }}
+        >
+          {initialsOf(single.label)}
+        </Avatar>
+      ) : null}
       {control}
     </Box>
   );

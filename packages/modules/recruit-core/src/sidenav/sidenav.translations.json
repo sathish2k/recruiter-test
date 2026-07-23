@@ -10,6 +10,7 @@
   "items": {
     "dashboard": "Dashboard",
     "clients": "Clients",
+    "contacts": "Contacts",
     "jobs": "Jobs",
     "candidates": "Candidates",
     "pipeline": "Pipeline",

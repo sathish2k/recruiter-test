@@ -2,6 +2,7 @@ import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import type { Metadata } from "next";
 import { Instrument_Sans, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
+import { getBootLocale } from "../locale";
 import { Providers } from "./providers";
 
 const instrument = Instrument_Sans({
@@ -24,10 +25,13 @@ export const metadata: Metadata = {
   description: "Applicant tracking system",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // Server-fetched once per request so the locale store boots with the right
+  // language/timezone/formats — correct from the first paint on any device.
+  const bootLocale = await getBootLocale();
   return (
     <html
-      lang="en"
+      lang={bootLocale.language ?? "en"}
       className={`${instrument.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
@@ -39,7 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           defaultMode="dark"
           modeStorageKey="recruit-theme"
         />
-        <Providers>{children}</Providers>
+        <Providers initialLocale={bootLocale}>{children}</Providers>
       </body>
     </html>
   );

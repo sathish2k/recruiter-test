@@ -25,6 +25,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   lead: {
     dashboard: READ,
     clients: ["read", "edit", "update"],
+    contacts: ALL,
     jobs: ALL,
     candidates: ["read", "create", "edit", "update"],
     interviews: ALL,
@@ -33,6 +34,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, RolePermissions> = {
   },
   employee: {
     dashboard: READ,
+    contacts: ["read", "create", "edit"],
     jobs: READ,
     candidates: ["read", "create", "edit"],
     interviews: ["read", "create"],

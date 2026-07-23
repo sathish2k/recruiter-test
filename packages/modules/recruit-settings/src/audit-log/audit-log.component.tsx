@@ -12,7 +12,6 @@ import {
   Filters,
   IconRenderer,
   Modal,
-  Toast,
   useFilters,
   useToast,
 } from "@recruit/shared";
@@ -50,7 +49,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<AuditLogConfig>(id);
   const { filters, setFilter } = useFilters();
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<AuditEvent | null>(null);
 
@@ -80,7 +79,7 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
     () =>
       [config.filters[0] as FilterConfig, userFilter, ...config.filters.slice(1)].map((filter) => {
         const label = filter.label ? { name: t(filter.label.name) } : undefined;
-        if ("options" in filter) {
+        if ("options" in filter && filter.options) {
           return {
             ...filter,
             label,
@@ -354,8 +353,6 @@ export function SettingsAuditLogComponent({ id }: { id: string }) {
           </Box>
         ) : null}
       </Modal>
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

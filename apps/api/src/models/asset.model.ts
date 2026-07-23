@@ -21,6 +21,7 @@ export type AssetEntityType =
   | "member"
   | "candidate"
   | "client"
+  | "contact"
   | "job"
   | "report"
   | "template"

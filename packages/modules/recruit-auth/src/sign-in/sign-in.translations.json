@@ -6,6 +6,9 @@
   "rememberMe": "Remember me",
   "footerText": "New to HirePilotX?",
   "footerLink": "Start a free trial",
+  "errors": {
+    "invalid": "Incorrect email or password. Please try again."
+  },
   "email": {
     "label": "Email",
     "placeholder": "Email",

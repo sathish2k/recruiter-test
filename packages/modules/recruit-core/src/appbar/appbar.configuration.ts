@@ -5,6 +5,12 @@ export const AppbarConfiguration: AppbarConfig = {
   titles: {
     "Recruit.Root": "titles.dashboard",
     "Recruit.Clients.Route": "titles.clients",
+    "Recruit.ClientNew.Route": "titles.clientNew",
+    "Recruit.ClientEdit.Route": "titles.clientEdit",
+    "Recruit.ClientDetail.Route": "titles.clientDetail",
+    "Recruit.Contacts.Route": "titles.contacts",
+    "Recruit.ContactNew.Route": "titles.contactNew",
+    "Recruit.ContactEdit.Route": "titles.contactEdit",
     "Recruit.Jobs.Route": "titles.jobs",
     "Recruit.Candidates.Route": "titles.candidates",
     "Recruit.Pipeline.Route": "titles.pipeline",
@@ -43,7 +49,7 @@ export const AppbarConfiguration: AppbarConfig = {
         {
           label: "menu.profile",
           icon: "person",
-          routeId: "Recruit.SettingsSecurity.Route",
+          routeId: "Recruit.Profile.Route",
         },
         {
           label: "menu.settings",

@@ -12,7 +12,6 @@ import {
   Modal,
   TableRenderer,
   type TableRendererConfig,
-  Toast,
   useModal,
   useToast,
 } from "@recruit/shared";
@@ -43,7 +42,7 @@ export function TeamComponent({ id }: { id: string }) {
 
   const inviteModal = useModal();
   const deactivateModal = useModal<Member>();
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
 
   const roles = config.roles ?? [];
   const roleLabelOf = (value: string) => roles.find((r) => r.value === value)?.label ?? value;
@@ -204,8 +203,6 @@ export function TeamComponent({ id }: { id: string }) {
           </Box>
         }
       />
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

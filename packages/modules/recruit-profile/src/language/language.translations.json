@@ -1,0 +1,14 @@
+{
+  "title": "Language & formats",
+  "rows": {
+    "language": "Display language",
+    "dateFormat": "Date format",
+    "timeFormat": "Time format"
+  },
+  "workspaceDefault": "Workspace default: {{value}} — set by your admin",
+  "useDefault": "Use default",
+  "fields": {
+    "placeholder": "Search language…"
+  },
+  "footer": "Overrides apply to your view only — workspace defaults are set by your admin in Workspace settings"
+}

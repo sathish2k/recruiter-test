@@ -1,3 +1,5 @@
+export { AttachmentsWidget, type AttachmentUploader } from "./attachments/attachments";
+export { CalloutWidget } from "./callout/callout";
 export { CheckboxGroupWidget } from "./checkbox-group/checkbox-group";
 export { ColorWidget } from "./color/color";
 export { DateWidget } from "./date/date";
@@ -33,9 +35,11 @@ export { SelectField } from "./select/select-field";
 export { SwitchRowWidget } from "./switch-row/switch-row";
 export { TextWidget } from "./text/text";
 export type {
+  Attachment,
   BuiltInWidget,
   DialCode,
   FormActionsState,
+  FormLayoutProps,
   FormRendererProps,
   FormSection,
   FormSectionField,

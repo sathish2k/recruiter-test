@@ -8,7 +8,6 @@ import {
   type FormValues,
   FormWithSectionsRenderer,
   IconRenderer,
-  Toast,
   type UploadValue,
   useToast,
 } from "@recruit/shared";
@@ -23,7 +22,7 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<WorkspaceConfig>(id);
   const { data: organization, mutation, mutate } = useFetch<Organization>(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
 
   const save = async (values: FormValues) => {
     // The logo field carries `{ url, file }`; only a freshly-picked file needs
@@ -110,7 +109,6 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
           ) : null
         }
       />
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

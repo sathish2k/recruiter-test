@@ -84,11 +84,11 @@ function displayValue(config: FilterConfig, value: unknown): string {
     case "dropdown":
     case "radio":
     case "segmented":
-      return config.options.find((o) => o.value === value)?.label ?? String(value);
+      return (config.options ?? []).find((o) => o.value === value)?.label ?? String(value);
     case "checkbox":
     case "select":
       return Array.isArray(value)
-        ? value.map((v) => config.options.find((o) => o.value === v)?.label ?? v).join(", ")
+        ? value.map((v) => (config.options ?? []).find((o) => o.value === v)?.label ?? v).join(", ")
         : String(value);
     case "toggle":
       return value ? "On" : "Off";

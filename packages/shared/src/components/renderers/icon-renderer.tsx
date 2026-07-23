@@ -3,6 +3,7 @@
 import type { SvgIconComponent } from "@mui/icons-material";
 import AddRounded from "@mui/icons-material/AddRounded";
 import AdminPanelSettingsRounded from "@mui/icons-material/AdminPanelSettingsRounded";
+import ArchiveOutlined from "@mui/icons-material/ArchiveOutlined";
 import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
@@ -17,16 +18,20 @@ import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRound
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import ChecklistRounded from "@mui/icons-material/ChecklistRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import ChevronLeftRounded from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import CodeRounded from "@mui/icons-material/CodeRounded";
+import ContactsRounded from "@mui/icons-material/ContactsRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
 import CorporateFareRounded from "@mui/icons-material/CorporateFareRounded";
 import CreditCardRounded from "@mui/icons-material/CreditCardRounded";
+import DarkModeRounded from "@mui/icons-material/DarkModeRounded";
 import DataObjectRounded from "@mui/icons-material/DataObjectRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import DescriptionRounded from "@mui/icons-material/DescriptionRounded";
 import DesktopWindowsRounded from "@mui/icons-material/DesktopWindowsRounded";
+import DomainAddRounded from "@mui/icons-material/DomainAddRounded";
 import DomainRounded from "@mui/icons-material/DomainRounded";
 import DoneAllRounded from "@mui/icons-material/DoneAllRounded";
 import EditOutlined from "@mui/icons-material/EditOutlined";
@@ -53,9 +58,11 @@ import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import HorizontalRuleRounded from "@mui/icons-material/HorizontalRuleRounded";
 import HourglassTopRounded from "@mui/icons-material/HourglassTopRounded";
 import HubRounded from "@mui/icons-material/HubRounded";
+import InfoRounded from "@mui/icons-material/InfoRounded";
 import InsightsRounded from "@mui/icons-material/InsightsRounded";
 import KeyRounded from "@mui/icons-material/KeyRounded";
 import LaptopMacRounded from "@mui/icons-material/LaptopMacRounded";
+import LightModeRounded from "@mui/icons-material/LightModeRounded";
 import LinkRounded from "@mui/icons-material/LinkRounded";
 import LocationOnRounded from "@mui/icons-material/LocationOnRounded";
 import LockOpenRounded from "@mui/icons-material/LockOpenRounded";
@@ -85,6 +92,7 @@ import QuizRounded from "@mui/icons-material/QuizRounded";
 import ReceiptLongRounded from "@mui/icons-material/ReceiptLongRounded";
 import RemoveRounded from "@mui/icons-material/RemoveRounded";
 import ReplayRounded from "@mui/icons-material/ReplayRounded";
+import RequestQuoteRounded from "@mui/icons-material/RequestQuoteRounded";
 import RocketLaunchRounded from "@mui/icons-material/RocketLaunchRounded";
 import SaveRounded from "@mui/icons-material/SaveRounded";
 import ScheduleRounded from "@mui/icons-material/ScheduleRounded";
@@ -97,12 +105,14 @@ import ShieldRounded from "@mui/icons-material/ShieldRounded";
 import SmartToyRounded from "@mui/icons-material/SmartToyRounded";
 import SourceRounded from "@mui/icons-material/SourceRounded";
 import SpaceDashboardRounded from "@mui/icons-material/SpaceDashboardRounded";
+import StarRounded from "@mui/icons-material/StarRounded";
 import StrikethroughSRounded from "@mui/icons-material/StrikethroughSRounded";
 import SupervisorAccountRounded from "@mui/icons-material/SupervisorAccountRounded";
 import SupportAgentRounded from "@mui/icons-material/SupportAgentRounded";
 import TableViewRounded from "@mui/icons-material/TableViewRounded";
 import TaskAltRounded from "@mui/icons-material/TaskAltRounded";
 import TimerOutlined from "@mui/icons-material/TimerOutlined";
+import TipsAndUpdatesRounded from "@mui/icons-material/TipsAndUpdatesRounded";
 import TuneRounded from "@mui/icons-material/TuneRounded";
 import UnfoldMoreRounded from "@mui/icons-material/UnfoldMoreRounded";
 import UploadFileRounded from "@mui/icons-material/UploadFileRounded";
@@ -155,6 +165,9 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   login: LoginRounded,
   logout: LogoutRounded,
   domain: DomainRounded,
+  "domain-add": DomainAddRounded,
+  "request-quote": RequestQuoteRounded,
+  info: InfoRounded,
   close: CloseRounded,
   check: CheckRounded,
   cancel: CancelRounded,
@@ -184,8 +197,13 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "bar-chart": BarChartRounded,
   rocket: RocketLaunchRounded,
   call: CallRounded,
+  "chevron-left": ChevronLeftRounded,
   "chevron-right": ChevronRightRounded,
   copy: ContentCopyRounded,
+  "content-copy": ContentCopyRounded,
+  contacts: ContactsRounded,
+  star: StarRounded,
+  archive: ArchiveOutlined,
   flag: FlagRounded,
   hourglass: HourglassTopRounded,
   location: LocationOnRounded,
@@ -222,6 +240,7 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   save: SaveRounded,
   send: SendRounded,
   timer: TimerOutlined,
+  tips: TipsAndUpdatesRounded,
   "attach-file": AttachFileRounded,
   attach_file: AttachFileRounded,
   comment: ChatBubbleOutlineRounded,
@@ -245,6 +264,8 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   event_upcoming: EventAvailableRounded,
   event_busy: EventBusyRounded,
   calendar_month: CalendarMonthRounded,
+  "light-mode": LightModeRounded,
+  "dark-mode": DarkModeRounded,
   view_kanban: ViewKanbanRounded,
   bar_chart: BarChartRounded,
   person_add: PersonAddAlt1Rounded,

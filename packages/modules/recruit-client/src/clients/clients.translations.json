@@ -1,0 +1,41 @@
+{
+  "searchPlaceholder": "Search clients…",
+  "addClient": "+ Add Client",
+  "export": "Export",
+  "empty": "No clients yet. Add your first client to start sourcing.",
+  "pageInfo": "{{count}} of {{total}} clients · page {{page}} of {{pages}}",
+  "tabs": {
+    "all": "All",
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
+  "status": {
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
+  "health": {
+    "healthy": "Healthy",
+    "attention": "Attention",
+    "at_risk": "At risk",
+    "dormant": "Dormant"
+  },
+  "card": {
+    "requirements": "Requirements",
+    "candidates": "Candidates",
+    "placements": "Placements",
+    "open": "Open client",
+    "addRole": "Add requirement",
+    "contacts": "View contacts",
+    "more": "More",
+    "edit": "Edit client",
+    "delete": "Delete"
+  },
+  "deleteTitle": "Delete client",
+  "deleteBody": "Remove {{name}} from your workspace? This can't be undone.",
+  "cancel": "Cancel",
+  "confirmDelete": "Delete client",
+  "toast": {
+    "deleted": "{{name}} removed from your workspace",
+    "exportSoon": "Export is coming soon"
+  }
+}

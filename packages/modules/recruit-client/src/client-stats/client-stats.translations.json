@@ -1,0 +1,10 @@
+{
+  "stats": {
+    "activeClients": "Active Clients",
+    "hiring": "{value} hiring",
+    "requirements": "Active Requirements",
+    "requirementsDelta": "across your clients",
+    "placements": "Placements",
+    "placementsDelta": "all time"
+  }
+}

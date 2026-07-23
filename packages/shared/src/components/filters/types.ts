@@ -1,7 +1,15 @@
+import type { OptionSource } from "../forms/types";
+
 export interface FilterOption {
   label: string;
   value: string;
   count?: number;
+}
+
+/** Option-bearing filters can either ship a static `options` list or pull one
+ * from an API endpoint via `optionSource` (same shape the form selects use). */
+export interface RemoteOptions {
+  optionSource?: OptionSource;
 }
 
 interface BaseFilter {
@@ -22,24 +30,24 @@ export interface SegmentedFilter extends BaseFilter {
   options: FilterOption[];
 }
 
-export interface DropdownFilter extends BaseFilter {
+export interface DropdownFilter extends BaseFilter, RemoteOptions {
   type: "dropdown";
-  options: FilterOption[];
+  options?: FilterOption[];
 }
 
-export interface RadioFilter extends BaseFilter {
+export interface RadioFilter extends BaseFilter, RemoteOptions {
   type: "radio";
-  options: FilterOption[];
+  options?: FilterOption[];
 }
 
-export interface CheckboxFilter extends BaseFilter {
+export interface CheckboxFilter extends BaseFilter, RemoteOptions {
   type: "checkbox";
-  options: FilterOption[];
+  options?: FilterOption[];
 }
 
-export interface SelectFilter extends BaseFilter {
+export interface SelectFilter extends BaseFilter, RemoteOptions {
   type: "select";
-  options: FilterOption[];
+  options?: FilterOption[];
 }
 
 export interface ToggleFilter extends BaseFilter {

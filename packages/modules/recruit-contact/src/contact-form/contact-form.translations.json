@@ -1,0 +1,105 @@
+{
+  "back": "Back to Contacts",
+  "newTitle": "New Contact",
+  "newDescription": "A person at one of your clients — shared with everyone on that client's roles.",
+  "editTitle": "Edit contact",
+  "editDescription": "Update this contact's details and relationship.",
+  "sections": {
+    "info": "Contact information",
+    "social": "Social links",
+    "description": "Description",
+    "attachments": "Attachments",
+    "attachmentsHint": "NDAs, org charts or anything tied to this person",
+    "other": "Other info",
+    "otherHint": "Ownership, source and mailing preferences"
+  },
+  "fields": {
+    "salutation": "Salutation",
+    "firstName": "First name",
+    "firstNamePlaceholder": "e.g. Ana",
+    "firstNameMax": "Keep the first name under 100 characters",
+    "firstNameInvalid": "Enter a valid first name",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "e.g. Kelmendi",
+    "lastNameRequired": "Last name is required",
+    "lastNameMax": "Keep the last name under 100 characters",
+    "client": "Client",
+    "clientPlaceholder": "Search clients…",
+    "clientRequired": "Select the client this person works at",
+    "department": "Department",
+    "departmentPlaceholder": "e.g. Engineering",
+    "departmentMax": "Keep the department under 100 characters",
+    "title": "Job title",
+    "titlePlaceholder": "e.g. VP Engineering",
+    "titleMax": "Keep the job title under 150 characters",
+    "email": "Email",
+    "emailPlaceholder": "ana@nortech.io",
+    "emailInvalid": "Enter a valid email address",
+    "emailMax": "Keep the email under 255 characters",
+    "secondaryEmail": "Secondary email",
+    "secondaryEmailPlaceholder": "Optional",
+    "phone": "Work phone",
+    "phonePlaceholder": "98450 12345",
+    "phoneInvalid": "Enter a valid phone number for the selected country",
+    "mobile": "Mobile",
+    "mobilePlaceholder": "98450 12345",
+    "linkedin": "LinkedIn",
+    "linkedinPlaceholder": "linkedin.com/in/ana-kelmendi",
+    "twitter": "X (formerly Twitter)",
+    "twitterPlaceholder": "handle",
+    "notes": "Description",
+    "notesPlaceholder": "Context for the team — decision style, preferences, history…",
+    "notesMax": "Keep the description under 5000 characters",
+    "attachments": "Attachments",
+    "others": "Others",
+    "attachmentsBrowse": "Browse or drop a file",
+    "owner": "Contact owner",
+    "ownerPlaceholder": "Search team…",
+    "source": "Source",
+    "isPrimary": "Primary contact for this client",
+    "emailOptOut": "Email opt-out"
+  },
+  "source": {
+    "added_by_user": "Added by user",
+    "referral": "Referral",
+    "linkedin": "LinkedIn",
+    "inbound": "Inbound",
+    "event": "Event",
+    "cold_outreach": "Cold outreach",
+    "import": "Import",
+    "api": "API",
+    "other": "Other"
+  },
+  "errors": {
+    "contactMethod": "Add at least one way to reach this person — email, work phone or mobile.",
+    "secondaryEqualsPrimary": "Secondary email can't be the same as the primary email."
+  },
+  "salutation": {
+    "none": "None",
+    "mr": "Mr",
+    "ms": "Ms",
+    "mrs": "Mrs",
+    "dr": "Dr",
+    "mx": "Mx"
+  },
+  "tips": {
+    "title": "Primary contact",
+    "body": "The primary contact receives candidate submissions, weekly reports and invoice notifications. Other contacts can still be selected during submissions and interview coordination."
+  },
+  "duplicate": {
+    "title": "Possible duplicate contact",
+    "body": "A contact under this client already matches by email, mobile or name. Open the existing one, or create this anyway.",
+    "open": "Open existing",
+    "createAnyway": "Create anyway"
+  },
+  "actions": {
+    "create": "Save contact",
+    "save": "Save changes",
+    "saveAnother": "Save & add another",
+    "cancel": "Cancel"
+  },
+  "toast": {
+    "created": "Contact added",
+    "updated": "Contact updated"
+  }
+}

@@ -11,14 +11,14 @@ import {
   FormRenderer,
   type FormValues,
   IconRenderer,
+  ListSection,
   Modal,
   TableRenderer,
-  Toast,
   useModal,
   useToast,
 } from "@recruit/shared";
 import { useMemo, useState } from "react";
-import { CardHeader, ListRow, Meter, SectionCard } from "../ui";
+import { CardHeader, Meter, SectionCard } from "../ui";
 import type { SecurityConfig } from "./security.configuration";
 
 interface Session {
@@ -93,7 +93,7 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<SecurityConfig>(id);
   const { data, mutation, mutate } = useFetch<SecurityData>(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
 
   const passwordModal = useModal();
   const tokenModal = useModal();
@@ -291,24 +291,26 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
       </SectionCard>
 
       {/* Authentication */}
-      <SectionCard>
-        <CardHeader title={t("auth.title")} />
-        <ListRow
-          title={t("password.title")}
-          meta={t("password.meta", {
-            changed: data.password.changed,
-            strength: data.password.strength,
-          })}
-          action={
-            <Button variant="outlined" onClick={() => passwordModal.open()}>
-              {t("password.change")}
-            </Button>
-          }
-        />
-        <ListRow
-          title={t("twoFactor.title")}
-          meta={
-            twoFactorOn
+      <ListSection
+        title={t("auth.title")}
+        items={[
+          {
+            key: "password",
+            title: t("password.title"),
+            description: t("password.meta", {
+              changed: data.password.changed,
+              strength: data.password.strength,
+            }),
+            action: (
+              <Button variant="outlined" onClick={() => passwordModal.open()}>
+                {t("password.change")}
+              </Button>
+            ),
+          },
+          {
+            key: "twoFactor",
+            title: t("twoFactor.title"),
+            description: twoFactorOn
               ? [
                   t("twoFactor.recoveryAvailable"),
                   data.twoFactor.verified
@@ -320,102 +322,91 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
                 ]
                   .filter(Boolean)
                   .join(" · ")
-              : t("twoFactor.apps")
-          }
-          chips={
-            <Chip
-              variant="soft"
-              size="small"
-              color={twoFactorOn ? "success" : "warning"}
-              label={twoFactorOn ? t("twoFactor.enabled") : t("twoFactor.disabled")}
-            />
-          }
-          action={
-            <Box sx={{ display: "flex", gap: "8px", flex: "none" }}>
-              {twoFactorOn ? (
-                <>
-                  <Button variant="outlined" onClick={() => setCodes(data.twoFactor.recoveryCodes)}>
-                    {t("twoFactor.viewCodes")}
-                  </Button>
-                  <Button variant="outlined" onClick={regenerate}>
-                    {t("twoFactor.regenerate")}
-                  </Button>
-                </>
-              ) : null}
-              <Button variant={twoFactorOn ? "outlined" : "contained"} onClick={toggleTwoFactor}>
-                {twoFactorOn ? t("twoFactor.disable") : t("twoFactor.enable")}
-              </Button>
-            </Box>
-          }
-        />
-        <ListRow
-          title={t("sso.title")}
-          meta={t("sso.meta")}
-          chips={<Chip variant="soft" size="small" color="warning" label={t("sso.badge")} />}
-          action={<Button variant="outlined">{t("sso.upgrade")}</Button>}
-        />
-      </SectionCard>
-
-      {/* Active sessions */}
-      <SectionCard>
-        <CardHeader
-          title={t("sessions.title")}
-          subtitle={t("sessions.subtitle")}
-          action={
-            <Link href="/audit-log" sx={{ fontSize: 12 }}>
-              {t("sessions.viewLog")}
-            </Link>
-          }
-        />
-        {data.sessions.map((session) => (
-          <ListRow
-            key={session.id}
-            icon={<IconRenderer name={session.icon} size={19} />}
-            title={session.device}
-            meta={session.meta}
-            chips={session.chips.map((chip) => (
+              : t("twoFactor.apps"),
+            chips: (
               <Chip
-                key={chip}
                 variant="soft"
                 size="small"
-                color={CHIP_COLORS[chip] ?? "default"}
-                label={t(`chips.${chip}`)}
+                color={twoFactorOn ? "success" : "warning"}
+                label={twoFactorOn ? t("twoFactor.enabled") : t("twoFactor.disabled")}
               />
-            ))}
-            action={
-              session.isCurrent ? null : (
-                <Button color="error" onClick={() => setPendingRevoke(session)}>
-                  {t("sessions.revoke")}
+            ),
+            action: (
+              <Box sx={{ display: "flex", gap: "8px", flex: "none" }}>
+                {twoFactorOn ? (
+                  <>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setCodes(data.twoFactor.recoveryCodes)}
+                    >
+                      {t("twoFactor.viewCodes")}
+                    </Button>
+                    <Button variant="outlined" onClick={regenerate}>
+                      {t("twoFactor.regenerate")}
+                    </Button>
+                  </>
+                ) : null}
+                <Button variant={twoFactorOn ? "outlined" : "contained"} onClick={toggleTwoFactor}>
+                  {twoFactorOn ? t("twoFactor.disable") : t("twoFactor.enable")}
                 </Button>
-              )
-            }
-          />
-        ))}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            pt: "14px",
-            mt: "4px",
-            borderTop: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
-            {t("sessions.signOutHint")}
-          </Typography>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={signOutAll}
-            startIcon={<IconRenderer name="logout" size={16} />}
+              </Box>
+            ),
+          },
+          {
+            key: "sso",
+            title: t("sso.title"),
+            description: t("sso.meta"),
+            chips: <Chip variant="soft" size="small" color="warning" label={t("sso.badge")} />,
+            action: <Button variant="outlined">{t("sso.upgrade")}</Button>,
+          },
+        ]}
+      />
+
+      {/* Active sessions */}
+      <ListSection
+        title={t("sessions.title")}
+        subtitle={t("sessions.subtitle")}
+        headerAction={
+          <Link href="/audit-log" sx={{ fontSize: 12 }}>
+            {t("sessions.viewLog")}
+          </Link>
+        }
+        items={data.sessions.map((session) => ({
+          key: session.id,
+          icon: <IconRenderer name={session.icon} size={19} />,
+          title: session.device,
+          description: session.meta,
+          chips: session.chips.map((chip) => (
+            <Chip
+              key={chip}
+              variant="soft"
+              size="small"
+              color={CHIP_COLORS[chip] ?? "default"}
+              label={t(`chips.${chip}`)}
+            />
+          )),
+          action: session.isCurrent ? undefined : (
+            <Button color="error" onClick={() => setPendingRevoke(session)}>
+              {t("sessions.revoke")}
+            </Button>
+          ),
+        }))}
+        footer={
+          <Box
+            sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}
           >
-            {t("sessions.signOutAll")}
-          </Button>
-        </Box>
-      </SectionCard>
+            <Box component="span">{t("sessions.signOutHint")}</Box>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={signOutAll}
+              startIcon={<IconRenderer name="logout" size={16} />}
+            >
+              {t("sessions.signOutAll")}
+            </Button>
+          </Box>
+        }
+      />
 
       {/* Login history */}
       <SectionCard>
@@ -441,41 +432,32 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
       </SectionCard>
 
       {/* Personal access tokens */}
-      <SectionCard>
-        <CardHeader
-          title={t("tokens.title")}
-          subtitle={t("tokens.subtitle")}
-          badge={<Chip variant="soft" size="small" label={t("tokens.badge")} />}
-          action={
-            <Button
-              variant="contained"
-              onClick={() => tokenModal.open()}
-              startIcon={<IconRenderer name="add" size={17} />}
-            >
-              {t("tokens.create")}
+      <ListSection
+        title={t("tokens.title")}
+        subtitle={t("tokens.subtitle")}
+        badge={<Chip variant="soft" size="small" label={t("tokens.badge")} />}
+        headerAction={
+          <Button
+            variant="contained"
+            onClick={() => tokenModal.open()}
+            startIcon={<IconRenderer name="add" size={17} />}
+          >
+            {t("tokens.create")}
+          </Button>
+        }
+        items={data.tokens.map((token) => ({
+          key: token.id,
+          icon: <IconRenderer name="key" size={18} />,
+          title: token.name,
+          description: token.meta,
+          action: (
+            <Button color="error" onClick={() => revokeToken(token)}>
+              {t("tokens.revoke")}
             </Button>
-          }
-        />
-        {data.tokens.length === 0 ? (
-          <Typography sx={{ fontSize: 12.5, color: "text.disabled", py: "12px" }}>
-            {t("tokens.empty")}
-          </Typography>
-        ) : (
-          data.tokens.map((token) => (
-            <ListRow
-              key={token.id}
-              icon={<IconRenderer name="key" size={18} />}
-              title={token.name}
-              meta={token.meta}
-              action={
-                <Button color="error" onClick={() => revokeToken(token)}>
-                  {t("tokens.revoke")}
-                </Button>
-              }
-            />
-          ))
-        )}
-      </SectionCard>
+          ),
+        }))}
+        footer={data.tokens.length === 0 ? t("tokens.empty") : undefined}
+      />
 
       {/* Security notifications */}
       <SectionCard>
@@ -634,8 +616,6 @@ export function SettingsSecurityComponent({ id }: { id: string }) {
           </Button>
         </Box>
       </Modal>
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

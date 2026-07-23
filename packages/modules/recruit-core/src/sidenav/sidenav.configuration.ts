@@ -31,6 +31,12 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Clients.Route",
       },
       {
+        label: "items.contacts",
+        access: { resource: "contacts" },
+        icon: "contacts",
+        routeId: "Recruit.Contacts.Route",
+      },
+      {
         label: "items.jobs",
         access: { resource: "jobs" },
         icon: "work",

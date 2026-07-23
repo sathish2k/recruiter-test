@@ -6,7 +6,7 @@ import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useSession, useTranslation } from "@recruit/sdk";
-import { IconRenderer, Modal, Toast, useToast } from "@recruit/shared";
+import { IconRenderer, Modal, useToast } from "@recruit/shared";
 import { useMemo, useState } from "react";
 import { CardHeader, SectionCard } from "../ui";
 import type { IntegrationItem, IntegrationsConfig } from "./integrations.configuration";
@@ -53,7 +53,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<IntegrationsConfig>(id);
   const { data, mutation, mutate } = useFetch<Connection[]>(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
   const session = useSession();
   const [selected, setSelected] = useState<Tile | null>(null);
 
@@ -365,8 +365,6 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
           </Box>
         ) : null}
       </Modal>
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }

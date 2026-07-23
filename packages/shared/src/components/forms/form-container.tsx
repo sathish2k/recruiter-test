@@ -6,6 +6,24 @@ import type { ReactNode } from "react";
 import type { FieldGrid, FormLayoutProps } from "./types";
 
 /**
+ * A `size` of 0 at a breakpoint gives MUI a negative (clamped-to-0) width, but
+ * the item stays in the flex flow and still eats a gap. Turn those breakpoints
+ * into `display: none` so a spacer (`size: { xs: 0, md: 6 }`) truly leaves the
+ * layout on small screens instead of leaving a blank line.
+ */
+function hiddenSx(grid?: FieldGrid) {
+  const size = grid?.size;
+  if (typeof size !== "object") return undefined;
+  const display: Record<string, "none" | "block"> = {};
+  let anyHidden = false;
+  for (const [breakpoint, value] of Object.entries(size)) {
+    display[breakpoint] = value === 0 ? "none" : "block";
+    if (value === 0) anyHidden = true;
+  }
+  return anyHidden ? { display } : undefined;
+}
+
+/**
  * Lays fields out the way the engine lays out a page: `stackContainer` for a
  * vertical rhythm, `gridContainer` for columns with per-field `grid.size`.
  * Neither set means a plain stack, which is what most forms want.
@@ -36,6 +54,7 @@ export function FormContainer({
             // Default to a full row, in whatever column count the container uses.
             size={grids[index]?.size ?? gridContainer.columns ?? 12}
             offset={grids[index]?.offset}
+            sx={hiddenSx(grids[index])}
           >
             {child}
           </Grid>

@@ -14,7 +14,11 @@ export const user = pgTable("user", {
   status: text("status").notNull().default("active"),
   phone: text("phone"),
   timezone: text("timezone"),
+  signature: text("signature"),
   notificationPrefs: jsonb("notification_prefs").$type<Record<string, boolean>>(),
+  /** Per-user overrides of workspace formats (language/date/time). Absent key =
+   * inherit the workspace default. */
+  preferences: jsonb("preferences").$type<Record<string, string>>(),
   /** Client names this member may see; empty/absent means the whole book. */
   clientAccess: jsonb("client_access").$type<string[]>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

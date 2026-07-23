@@ -15,7 +15,7 @@ import type { ReactNode } from "react";
 import { type ActionHandler, EmptyStateRenderer, IconRenderer } from "../renderers";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
-import type { Cells, Row, TableRendererConfig } from "./table-renderer.types";
+import type { Cells, Row, TableColumnConfig, TableRendererConfig } from "./table-renderer.types";
 import { TableRowRenderer } from "./table-row";
 import { TableTitle } from "./table-title";
 import { TableTotalsRenderer } from "./table-totals";
@@ -61,7 +61,19 @@ export function TableRenderer({
   const configFromId = useConfiguration<TableRendererConfig>(id);
   const config = configProp ?? configFromId;
 
-  const columns = config?.columns ?? [];
+  // Cell configs are handed to GenericRenderer verbatim (no translation
+  // context down there), so resolve their translation-key props here where `t`
+  // lives — currently `copiedLabel` on copyable text cells.
+  const columns: TableColumnConfig[] = (config?.columns ?? []).map((column) => {
+    const value = column.value as { copiedLabel?: string };
+    if (value && typeof value === "object" && value.copiedLabel) {
+      return {
+        ...column,
+        value: { ...column.value, copiedLabel: t(value.copiedLabel) },
+      } as TableColumnConfig;
+    }
+    return column;
+  });
   const actions = config?.actions ?? [];
   const pageSize = config?.pagination?.pageSize;
   const colSpan = columns.length + (actions.length ? 1 : 0);

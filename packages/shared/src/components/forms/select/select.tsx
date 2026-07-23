@@ -31,6 +31,7 @@ export function SelectWidget({ prop, field, fieldState, t }: WidgetProps) {
           onBlur={field.onBlur}
           source={prop.optionSource}
           options={options}
+          avatar={prop.avatar}
           placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
           error={!!fieldState.error}
           noOptionsText={t("form.noOptions", "No match")}

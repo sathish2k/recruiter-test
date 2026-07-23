@@ -629,6 +629,16 @@ export function createAppTheme(): Theme {
       MuiAutocomplete: {
         defaultProps: { popupIcon: createElement(ExpandMoreRounded) },
         styleOverrides: {
+          // The type-ahead popover, matched to the plain Select menu (and the
+          // design's dropdowns): elevated surface, soft border, rounded, padded.
+          paper: {
+            backgroundImage: "none",
+            background: v.elevated,
+            border: `1px solid ${v.border}`,
+            borderRadius: 13,
+            boxShadow: v.menuShadow,
+          },
+          listbox: { padding: 6, maxHeight: 230 },
           inputRoot: {
             paddingTop: 0,
             paddingBottom: 0,

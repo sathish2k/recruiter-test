@@ -1,0 +1,92 @@
+{
+  "back": "Back to Clients",
+  "newTitle": "New Client",
+  "newDescription": "Add the company, billing details and the contract — roles come next.",
+  "editTitle": "Edit client",
+  "editDescription": "Update this client's details, address and fee agreement.",
+  "sections": {
+    "info": "Client information",
+    "address": "Address",
+    "attachments": "Attachments",
+    "attachmentsHint": "MSA/contract, org charts or anything tied to this client",
+    "ownership": "Ownership",
+    "ownershipHint": "Who owns this account and where it came from",
+    "fee": "Fee agreement",
+    "feeHint": "Defaults for every role and invoice under this client"
+  },
+  "fields": {
+    "name": "Company name",
+    "namePlaceholder": "e.g. Acme Corp",
+    "nameRequired": "Company name is required",
+    "nameMax": "Keep the company name under 150 characters",
+    "parentCompany": "Parent company",
+    "parentCompanyPlaceholder": "None",
+    "primaryContact": "Primary contact",
+    "primaryContactPlaceholder": "Search contacts…",
+    "industry": "Industry",
+    "industryPlaceholder": "Search industries…",
+    "website": "Website",
+    "websitePlaceholder": "e.g. acme.com",
+    "phone": "Main office phone",
+    "phonePlaceholder": "98450 12345",
+    "phoneInvalid": "Enter a valid phone number for the selected country",
+    "accountLead": "Account manager",
+    "accountLeadPlaceholder": "Search team…",
+    "source": "Source",
+    "contract": "Client contract (MSA)",
+    "others": "Others",
+    "attachmentsBrowse": "Browse or drop a file",
+    "feeBasis": "Fee basis",
+    "feeLabelPct": "Fee % of annual CTC",
+    "feeLabelFlat": "Flat fee per placement (₹)",
+    "feePhPct": "e.g. 8.33",
+    "feePhFlat": "e.g. 1,50,000",
+    "paymentTerms": "Payment terms",
+    "paymentTermsPlaceholder": "Select terms",
+    "billingEmail": "Billing email",
+    "billingEmailPlaceholder": "finance@acme.com",
+    "emailInvalid": "Enter a valid email address",
+    "emailMax": "Keep the email under 255 characters",
+    "taxId": "GSTIN / VAT",
+    "taxIdPlaceholder": "29ABCDE1234F1Z5",
+    "feeInfo": "Invoices go to the billing email — used by Finance to compute placement fees and invoice amounts.",
+    "notes": "Internal notes",
+    "notesPlaceholder": "Hiring process, interview rounds, salary negotiation, preferred candidate profile — things recruiters should know…",
+    "notesMax": "Keep the notes under 5000 characters"
+  },
+  "source": {
+    "added_by_user": "Added by user",
+    "referral": "Referral",
+    "inbound": "Inbound enquiry",
+    "outbound": "Outbound",
+    "event": "Marketing event"
+  },
+  "paymentTermsOptions": {
+    "net15": "Net 15",
+    "net30": "Net 30",
+    "net45": "Net 45",
+    "net60": "Net 60"
+  },
+  "address": {
+    "title": "Address",
+    "sameAsBilling": "Shipping same as billing",
+    "billing": "BILLING",
+    "shipping": "SHIPPING",
+    "street": "Street",
+    "city": "City",
+    "state": "Province / State",
+    "postalCode": "Postal code",
+    "country": "Country"
+  },
+  "feeBasis": { "percent": "% of CTC", "flat": "Flat fee" },
+  "actions": {
+    "create": "Save client",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "saveAnother": "Save & add another"
+  },
+  "toast": {
+    "created": "Client created",
+    "updated": "Client updated"
+  }
+}

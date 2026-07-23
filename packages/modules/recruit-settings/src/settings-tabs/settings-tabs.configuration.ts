@@ -1,23 +1,6 @@
-import type { AccessRule } from "@recruit/sdk";
+import type { TabNavConfiguration } from "@recruit/shared";
 
-export interface SettingsTabItem {
-  /** Translation key for the pill label. */
-  label: string;
-  /** Route this pill navigates to; also matched against currentRoute. */
-  routeId: string;
-  /** Optional chip beside the label (translation key), e.g. `Enterprise`. */
-  badge?: string;
-  /** Stripped by the engine when the user can't access it. */
-  access?: AccessRule;
-}
-
-export interface SettingsTabsConfiguration {
-  title: string;
-  subtitle: string;
-  tabs: SettingsTabItem[];
-}
-
-export const SettingsTabsConfiguration: SettingsTabsConfiguration = {
+export const SettingsTabsConfiguration: TabNavConfiguration = {
   title: "title",
   subtitle: "subtitle",
   tabs: [

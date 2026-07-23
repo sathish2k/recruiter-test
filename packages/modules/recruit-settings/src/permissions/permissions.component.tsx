@@ -8,7 +8,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { type AccessAction, useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
-import { IconRenderer, Toast, useToast } from "@recruit/shared";
+import { IconRenderer, useToast } from "@recruit/shared";
 import { useEffect, useMemo, useState } from "react";
 import type { PermissionsConfig } from "./permissions.configuration";
 import { RoleCards, type RoleHolders } from "./role-cards";
@@ -60,7 +60,7 @@ export function PermissionsComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<PermissionsConfig>(id);
   const { data, meta, isLoading, mutation, mutate } = useFetch<RolePermissions[]>(id);
-  const { toast, show, clear } = useToast();
+  const { show } = useToast();
 
   const columns = config.columns ?? [];
   const resources = config.resources ?? [];
@@ -360,8 +360,6 @@ export function PermissionsComponent({ id }: { id: string }) {
           </Box>
         </Box>
       </Box>
-
-      <Toast toast={toast} onClose={clear} />
     </Box>
   );
 }
