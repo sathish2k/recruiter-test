@@ -7,6 +7,10 @@
     "settings": "Settings",
     "logout": "Log out"
   },
+  "back": {
+    "candidates": "Back to candidates",
+    "jobs": "Back to jobs"
+  },
   "titles": {
     "dashboard": "Dashboard",
     "clients": "Clients",

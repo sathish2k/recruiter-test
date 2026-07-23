@@ -12,6 +12,7 @@ const attachmentList = t.Array(
 );
 
 const candidateBody = t.Object({
+  salutation: t.Optional(t.String({ maxLength: 10 })),
   firstName: t.Optional(t.String({ maxLength: 100 })),
   lastName: t.Optional(t.String({ maxLength: 100 })),
   email: t.Optional(t.String({ maxLength: 255 })),
@@ -41,31 +42,43 @@ const candidateBody = t.Object({
   education: t.Optional(
     t.Array(
       t.Object({
-        degree: t.Optional(t.String()),
         institution: t.Optional(t.String()),
-        fieldOfStudy: t.Optional(t.String()),
-        year: t.Optional(t.String()),
+        major: t.Optional(t.String()),
+        degree: t.Optional(t.String()),
+        fromMonth: t.Optional(t.String()),
+        fromYear: t.Optional(t.String()),
+        toMonth: t.Optional(t.String()),
+        toYear: t.Optional(t.String()),
+        currentlyPursuing: t.Optional(t.Boolean()),
       }),
     ),
   ),
   experience: t.Optional(
     t.Array(
       t.Object({
-        company: t.Optional(t.String()),
         jobTitle: t.Optional(t.String()),
-        from: t.Optional(t.String()),
-        to: t.Optional(t.String()),
+        company: t.Optional(t.String()),
+        summary: t.Optional(t.String()),
+        fromMonth: t.Optional(t.String()),
+        fromYear: t.Optional(t.String()),
+        toMonth: t.Optional(t.String()),
+        toYear: t.Optional(t.String()),
         current: t.Optional(t.Boolean()),
       }),
     ),
   ),
   resume: t.Optional(attachmentList),
+  formattedResume: t.Optional(attachmentList),
+  coverLetter: t.Optional(attachmentList),
+  offer: t.Optional(attachmentList),
+  contracts: t.Optional(attachmentList),
   attachments: t.Optional(attachmentList),
   jobId: t.Optional(t.String()),
   startingStage: t.Optional(t.String({ maxLength: 40 })),
   status: t.Optional(t.String()),
   ownerId: t.Optional(t.String()),
   source: t.Optional(t.String({ maxLength: 40 })),
+  emailOptOut: t.Optional(t.Boolean()),
 });
 
 export default new Elysia({ name: "candidate.routes" })

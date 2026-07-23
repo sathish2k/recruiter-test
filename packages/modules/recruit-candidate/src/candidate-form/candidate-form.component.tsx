@@ -1,7 +1,5 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import {
   useConfiguration,
   useFetch,
@@ -15,7 +13,7 @@ import {
   type AttachmentUploader,
   type FormValues,
   FormWithSectionsRenderer,
-  IconRenderer,
+  ResumeAutofillWidget,
   useToast,
 } from "@recruit/shared";
 import { useMemo } from "react";
@@ -44,6 +42,7 @@ interface Experience {
 
 interface Candidate {
   id: string;
+  salutation: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -65,18 +64,19 @@ interface Candidate {
   education: Education[];
   experience: Experience[];
   resume: Attachment[];
+  formattedResume: Attachment[];
+  coverLetter: Attachment[];
+  offer: Attachment[];
+  contracts: Attachment[];
   attachments: Attachment[];
   jobId: string;
   startingStage: string;
   status: string;
   ownerId: string;
   source: string;
+  emailOptOut: boolean;
 }
 
-const QUALIFICATIONS = ["high_school", "diploma", "bachelors", "masters", "phd"];
-const STAGES = ["sourced", "screening", "submitted", "interview", "offer"];
-const STATUS = ["active", "placed", "on_hold", "rejected"];
-const SOURCES = ["added_by_user", "referral", "inbound", "outbound", "event"];
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 
 export function CandidateFormComponent({ id }: { id: string }) {
@@ -99,27 +99,12 @@ export function CandidateFormComponent({ id }: { id: string }) {
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
+      resumeAutofill: (props: Parameters<typeof ResumeAutofillWidget>[0]) => (
+        <ResumeAutofillWidget {...props} uploader={uploader} />
+      ),
     }),
     [uploader],
   );
-
-  const schema = useMemo(() => {
-    if (!config.schema) return config.schema;
-    const p = config.schema.properties;
-    return {
-      ...config.schema,
-      properties: {
-        ...p,
-        highestQualification: {
-          ...p.highestQualification,
-          enumNames: QUALIFICATIONS.map((q) => t(`qualification.${q}`)),
-        },
-        startingStage: { ...p.startingStage, enumNames: STAGES.map((s) => t(`stage.${s}`)) },
-        status: { ...p.status, enumNames: STATUS.map((s) => t(`status.${s}`)) },
-        source: { ...p.source, enumNames: SOURCES.map((s) => t(`source.${s}`)) },
-      },
-    };
-  }, [config.schema, t]);
 
   if (!config.schema) return null;
   const loading = isEdit && (isLoading || !data);
@@ -138,7 +123,13 @@ export function CandidateFormComponent({ id }: { id: string }) {
       postalCode,
       country,
       resume: rawResume,
-      attachments: rawAttachments,
+      formattedResume: rawFormatted,
+      coverLetter: rawCover,
+      offer: rawOffer,
+      contracts: rawContracts,
+      others: rawOthers,
+      // Display-only parse dropzone — not persisted (it seeds `resume`).
+      autofillCv: _autofillCv,
       ...rest
     } = values;
     const payload = {
@@ -151,7 +142,12 @@ export function CandidateFormComponent({ id }: { id: string }) {
         country: str(country),
       },
       resume: cleanFiles(rawResume),
-      attachments: cleanFiles(rawAttachments),
+      formattedResume: cleanFiles(rawFormatted),
+      coverLetter: cleanFiles(rawCover),
+      offer: cleanFiles(rawOffer),
+      contracts: cleanFiles(rawContracts),
+      // The "Others" slot maps to the backend `attachments` column.
+      attachments: cleanFiles(rawOthers),
     };
 
     if (isEdit) {
@@ -168,6 +164,7 @@ export function CandidateFormComponent({ id }: { id: string }) {
   const defaultValues: FormValues =
     isEdit && data
       ? {
+          salutation: data.salutation,
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
@@ -193,53 +190,39 @@ export function CandidateFormComponent({ id }: { id: string }) {
           education: data.education ?? [],
           experience: data.experience ?? [],
           resume: data.resume ?? [],
-          attachments: data.attachments ?? [],
+          formattedResume: data.formattedResume ?? [],
+          coverLetter: data.coverLetter ?? [],
+          offer: data.offer ?? [],
+          contracts: data.contracts ?? [],
+          others: data.attachments ?? [],
           jobId: data.jobId,
           startingStage: data.startingStage,
           status: data.status,
           ownerId: data.ownerId,
           source: data.source,
+          emailOptOut: data.emailOptOut,
         }
-      : { status: "active" };
+      : { status: "new" };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <Link
-        component="button"
-        type="button"
-        onClick={() => router.push(config.listRouteId)}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: "text.secondary",
-          alignSelf: "flex-start",
-        }}
-      >
-        <IconRenderer name="arrow-back" size={15} />
-        {t("back")}
-      </Link>
-      <FormWithSectionsRenderer
-        key={candidateId ?? "new"}
-        id={id}
-        title={isEdit ? "editTitle" : "newTitle"}
-        description={isEdit ? "editDescription" : "newDescription"}
-        schema={schema}
-        sections={config.sections}
-        sectionsContainer={config.sectionsContainer}
-        defaultValues={defaultValues}
-        onSubmit={save}
-        isLoading={loading}
-        actionsPlacement="header"
-        widgets={widgets}
-        submitLabel={isEdit ? "actions.save" : "actions.create"}
-        submitIcon={isEdit ? "check" : "person-add"}
-        cancelLabel="actions.cancel"
-        onCancel={() => router.push(config.listRouteId)}
-        addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
-      />
-    </Box>
+    <FormWithSectionsRenderer
+      key={candidateId ?? "new"}
+      id={id}
+      title={isEdit ? "editTitle" : "newTitle"}
+      description={isEdit ? "editDescription" : "newDescription"}
+      schema={config.schema}
+      sections={config.sections}
+      sectionsContainer={config.sectionsContainer}
+      defaultValues={defaultValues}
+      onSubmit={save}
+      isLoading={loading}
+      actionsPlacement="header"
+      widgets={widgets}
+      submitLabel={isEdit ? "actions.save" : "actions.create"}
+      submitIcon={isEdit ? "check" : "person-add"}
+      cancelLabel="actions.cancel"
+      onCancel={() => router.push(config.listRouteId)}
+      addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
+    />
   );
 }

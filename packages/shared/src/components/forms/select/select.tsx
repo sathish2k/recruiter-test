@@ -12,10 +12,15 @@ import { SelectField } from "./select-field";
  */
 export function SelectWidget({ prop, field, fieldState, t, disabled }: WidgetProps) {
   const error = fieldState.error?.message ? t(fieldState.error.message) : undefined;
-  const options: SelectOption[] = (prop.enum ?? []).map((option, index) => ({
-    value: String(option),
-    label: t(prop.enumNames?.[index] ?? String(option)),
-  }));
+  const options: SelectOption[] = (prop.enum ?? []).map((option, index) => {
+    const raw = String(option);
+    const label = prop.enumNames?.[index]
+      ? t(prop.enumNames[index])
+      : prop.enumL10n
+        ? t(`${prop.enumL10n}.${raw || "none"}`)
+        : t(raw);
+    return { value: raw, label };
+  });
 
   return (
     <FieldShell

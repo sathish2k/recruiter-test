@@ -155,6 +155,34 @@
       "when": 1784801249350,
       "tag": "0021_rare_squadron_supreme",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1784802949187,
+      "tag": "0022_supreme_the_captain",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1784803471802,
+      "tag": "0023_mysterious_smiling_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1784813329237,
+      "tag": "0024_certain_aqueduct",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1784814078015,
+      "tag": "0025_glamorous_invaders",
+      "breakpoints": true
     }
   ]
 }

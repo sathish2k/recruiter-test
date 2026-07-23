@@ -212,7 +212,7 @@ export function FormWithSectionsRenderer({
       // `sticky` pins this column to the top while the rest of the form scrolls
       // (the design's side panel).
       return (
-        <Box key={key} sx={section.sticky ? { position: "sticky", top: "16px" } : undefined}>
+        <Box key={key} sx={section.sticky ? { position: "sticky", top: "22px" } : undefined}>
           <FormContainer
             stackContainer={section.stackContainer ?? { spacing: 2 }}
             gridContainer={section.gridContainer}
@@ -274,13 +274,20 @@ export function FormWithSectionsRenderer({
         key={key}
         variant="base"
         sx={{
-          p: "20px 22px",
+          p: section.iconBadge ? "18px" : "20px 22px",
           display: "flex",
           flexDirection: "column",
           gap: "16px",
-          // `filled` = solid neutral-tinted panel; default `text` keeps the
-          // bordered card. `accent` (orange border) composes with either.
-          ...(section.variant === "filled" ? { bgcolor: "surface.inset" } : {}),
+          // `iconBadge` (AI card) → diagonal orange-gradient fill; `filled` →
+          // neutral fill; default keeps the plain card. `accent` = orange border.
+          ...(section.iconBadge
+            ? {
+                background:
+                  "linear-gradient(120deg,rgba(242,106,27,.18),rgba(28,28,27,0) 55%),#1C1C1B",
+              }
+            : section.variant === "filled"
+              ? { bgcolor: "surface.inset" }
+              : {}),
           ...(section.accent
             ? { border: "1px solid", borderColor: "surface.primarySoftBorder" }
             : section.variant === "filled"
@@ -289,21 +296,52 @@ export function FormWithSectionsRenderer({
         }}
       >
         {section.title ? (
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "9px" }}>
-              {section.icon ? (
-                <Box sx={{ color: "surface.accentBright", flex: "none", display: "flex" }}>
-                  <IconRenderer name={section.icon} size={17} />
-                </Box>
-              ) : null}
-              <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t(section.title)}</Typography>
+          section.iconBadge && section.icon ? (
+            // Filled orange square badge + title/subtitle beside it (AI cards).
+            <Box sx={{ display: "flex", gap: "11px", alignItems: "flex-start" }}>
+              <Box
+                sx={{
+                  flex: "none",
+                  width: 34,
+                  height: 34,
+                  borderRadius: "10px",
+                  background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconRenderer name={section.icon} size={18} />
+              </Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t(section.title)}</Typography>
+                {section.description ? (
+                  <Typography
+                    sx={{ fontSize: 11.5, color: "#D9B79A", mt: "2px", lineHeight: 1.45 }}
+                  >
+                    {t(section.description)}
+                  </Typography>
+                ) : null}
+              </Box>
             </Box>
-            {section.description ? (
-              <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}>
-                {t(section.description)}
-              </Typography>
-            ) : null}
-          </Box>
+          ) : (
+            <Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: "9px" }}>
+                {section.icon ? (
+                  <Box sx={{ color: "surface.accentBright", flex: "none", display: "flex" }}>
+                    <IconRenderer name={section.icon} size={17} />
+                  </Box>
+                ) : null}
+                <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t(section.title)}</Typography>
+              </Box>
+              {section.description ? (
+                <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}>
+                  {t(section.description)}
+                </Typography>
+              ) : null}
+            </Box>
+          )
         ) : null}
         {body}
       </Card>

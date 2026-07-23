@@ -16,8 +16,10 @@ import { PasswordWidget } from "../password/password";
 import { PhoneWidget } from "../phone/phone";
 import { RadioWidget } from "../radio/radio";
 import { RepeaterWidget } from "../repeater/repeater";
+import { ResumeAutofillWidget } from "../resume-autofill/resume-autofill";
 import { SegmentedWidget } from "../segmented/segmented";
 import { SelectWidget } from "../select/select";
+import { SliderWidget } from "../slider/slider";
 import { SwitchRowWidget } from "../switch-row/switch-row";
 import { TextWidget } from "../text/text";
 import { ToggleWidget } from "../toggle/toggle";
@@ -53,11 +55,13 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   attachments: AttachmentsWidget,
   callout: CalloutWidget,
   repeater: RepeaterWidget,
+  resumeAutofill: ResumeAutofillWidget,
   days: DaysWidget,
   radio: RadioWidget,
   "checkbox-group": CheckboxGroupWidget,
   multiselect: MultiSelectWidget,
   number: NumberWidget,
+  slider: SliderWidget,
   date: DateWidget,
   time: DateWidget,
   datetime: DateWidget,

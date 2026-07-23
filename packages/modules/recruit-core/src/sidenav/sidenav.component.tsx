@@ -23,6 +23,10 @@ export function SidenavComponent({
   const { t } = useTranslation(id);
   const [collapsed, setCollapsed] = useState(false);
   const groups = (configuration?.groups ?? []).filter((group) => group.items.length > 0);
+  // Full path of the current route (child paths are built from their parent's),
+  // so a nav item is active on its own route and on any descendant (e.g. the
+  // "Jobs" item stays active on the New/Edit Job child routes).
+  const currentPath = currentRoute ? router.getPathFromRouteId(currentRoute.id) : "";
 
   return (
     <Box
@@ -121,7 +125,12 @@ export function SidenavComponent({
             }}
           >
             {group.items.map((item) => {
-              const active = item.routeId === currentRoute?.id;
+              const itemPath = router.getPathFromRouteId(item.routeId);
+              // Exact match, or the current route is a descendant of this item.
+              // Guard `length > 1` so the root ("/") isn't active everywhere.
+              const active =
+                item.routeId === currentRoute?.id ||
+                (itemPath.length > 1 && currentPath.startsWith(`${itemPath}/`));
               return (
                 <Box
                   key={item.routeId}

@@ -12,7 +12,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useAuthUser, useLogout, usePortalRouter, useTranslation } from "@recruit/sdk";
-import { IconRenderer } from "@recruit/shared";
+import { IconRenderer, LinkRenderer } from "@recruit/shared";
 import { useColorMode } from "@recruit/ui";
 import { useState } from "react";
 import type { AppbarComponentProps, AppbarMenuItem } from "./appbar.types";
@@ -36,6 +36,7 @@ export function AppbarComponent({ id, configuration, currentRoute }: AppbarCompo
   const [langMenu, setLangMenu] = useState<HTMLElement | null>(null);
   const { mode: themeMode, toggle: toggleTheme } = useColorMode();
   const titleKey = configuration?.titles?.[currentRoute?.id ?? ""];
+  const backLink = configuration?.back?.[currentRoute?.id ?? ""];
   const actions = configuration?.actions ?? [];
 
   const runMenuItem = (item: AppbarMenuItem) => {
@@ -56,7 +57,28 @@ export function AppbarComponent({ id, configuration, currentRoute }: AppbarCompo
         borderColor: "divider",
       }}
     >
-      <Typography sx={{ fontSize: 17, fontWeight: 600 }}>{titleKey ? t(titleKey) : ""}</Typography>
+      {backLink ? (
+        <LinkRenderer config={{ id, ...backLink }}>
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: 13.5,
+              fontWeight: 600,
+              color: "text.secondary",
+              "&:hover": { color: "text.primary" },
+            }}
+          >
+            <IconRenderer name="arrow-back" size={16} />
+            {backLink.label ? t(backLink.label.name) : null}
+          </Box>
+        </LinkRenderer>
+      ) : (
+        <Typography sx={{ fontSize: 17, fontWeight: 600 }}>
+          {titleKey ? t(titleKey) : ""}
+        </Typography>
+      )}
       <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
         {actions.map((action) => {
           const go = () => action.routeId && router.push(action.routeId);

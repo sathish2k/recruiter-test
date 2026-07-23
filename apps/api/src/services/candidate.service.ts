@@ -23,6 +23,7 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
   return {
     id: row.id,
     name: fullName(row.firstName, row.lastName),
+    salutation: row.salutation ?? "",
     firstName: row.firstName,
     lastName: row.lastName ?? "",
     email: row.email ?? "",
@@ -44,6 +45,10 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     education: row.education ?? [],
     experience: row.experience ?? [],
     resume: row.resume ?? [],
+    formattedResume: row.formattedResume ?? [],
+    coverLetter: row.coverLetter ?? [],
+    offer: row.offer ?? [],
+    contracts: row.contracts ?? [],
     attachments: row.attachments ?? [],
     jobId: row.jobId ?? "",
     jobTitle: row.jobTitle ?? "",
@@ -52,6 +57,7 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     ownerId: row.ownerId ?? "",
     ownerName: row.ownerName ?? "",
     source: row.source ?? "",
+    emailOptOut: row.emailOptOut ?? false,
     updatedAt: row.updatedAt.toISOString(),
   };
 }
@@ -128,6 +134,7 @@ export async function getCandidate(organizationId: string, id: string) {
 }
 
 export interface CandidateInput {
+  salutation?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -149,15 +156,21 @@ export interface CandidateInput {
   education?: Education[];
   experience?: Experience[];
   resume?: CandidateAttachment[];
+  formattedResume?: CandidateAttachment[];
+  coverLetter?: CandidateAttachment[];
+  offer?: CandidateAttachment[];
+  contracts?: CandidateAttachment[];
   attachments?: CandidateAttachment[];
   jobId?: string;
   startingStage?: string;
   status?: string;
   ownerId?: string;
   source?: string;
+  emailOptOut?: boolean;
 }
 
 const EDITABLE = [
+  "salutation",
   "firstName",
   "lastName",
   "email",
@@ -179,12 +192,17 @@ const EDITABLE = [
   "education",
   "experience",
   "resume",
+  "formattedResume",
+  "coverLetter",
+  "offer",
+  "contracts",
   "attachments",
   "jobId",
   "startingStage",
   "status",
   "ownerId",
   "source",
+  "emailOptOut",
 ] as const;
 
 function pickEditable(input: CandidateInput): Partial<CandidateRow> {

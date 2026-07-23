@@ -29,6 +29,10 @@ function mapJob(row: JobRow & JobJoins) {
     employmentType: row.employmentType ?? "",
     workExperience: row.workExperience ?? "",
     industry: row.industry ?? "",
+    description: row.description ?? "",
+    requirements: row.requirements ?? "",
+    benefits: row.benefits ?? "",
+    skills: row.skills ?? [],
     openings: row.openings,
     salaryMin: row.salaryMin ?? "",
     salaryMax: row.salaryMax ?? "",
@@ -43,6 +47,10 @@ function mapJob(row: JobRow & JobJoins) {
     attachments: row.attachments ?? [],
     aiScreening: row.aiScreening,
     screeningCriteria: row.screeningCriteria ?? "",
+    matchThreshold: row.matchThreshold,
+    autoAdvance: row.autoAdvance,
+    knockoutCount: row.knockoutCount,
+    dailyDigest: row.dailyDigest,
     sourcerId: row.sourcerId ?? "",
     sourcerName: row.sourcerName ?? "",
     profileLeadId: row.profileLeadId ?? "",
@@ -134,6 +142,10 @@ export interface JobInput {
   employmentType?: string;
   workExperience?: string;
   industry?: string;
+  description?: string;
+  requirements?: string;
+  benefits?: string;
+  skills?: string[];
   openings?: number;
   salaryMin?: string;
   salaryMax?: string;
@@ -146,6 +158,10 @@ export interface JobInput {
   attachments?: JobAttachment[];
   aiScreening?: boolean;
   screeningCriteria?: string;
+  matchThreshold?: number;
+  autoAdvance?: boolean;
+  knockoutCount?: number;
+  dailyDigest?: boolean;
   sourcerId?: string;
   profileLeadId?: string;
   dailyInviteTarget?: number;
@@ -161,6 +177,10 @@ const EDITABLE = [
   "employmentType",
   "workExperience",
   "industry",
+  "description",
+  "requirements",
+  "benefits",
+  "skills",
   "openings",
   "salaryMin",
   "salaryMax",
@@ -173,6 +193,10 @@ const EDITABLE = [
   "attachments",
   "aiScreening",
   "screeningCriteria",
+  "matchThreshold",
+  "autoAdvance",
+  "knockoutCount",
+  "dailyDigest",
   "sourcerId",
   "profileLeadId",
   "dailyInviteTarget",

@@ -25,6 +25,24 @@ export const AppbarConfiguration: AppbarConfig = {
     "Recruit.Notifications.Route": "titles.notifications",
     "Recruit.HelpCenter.Route": "titles.helpCenter",
   },
+  back: {
+    "Recruit.CandidateNew.Route": {
+      routeId: "Recruit.Candidates.Route",
+      label: { name: "back.candidates" },
+    },
+    "Recruit.CandidateEdit.Route": {
+      routeId: "Recruit.Candidates.Route",
+      label: { name: "back.candidates" },
+    },
+    "Recruit.JobNew.Route": {
+      routeId: "Recruit.Jobs.Route",
+      label: { name: "back.jobs" },
+    },
+    "Recruit.JobEdit.Route": {
+      routeId: "Recruit.Jobs.Route",
+      label: { name: "back.jobs" },
+    },
+  },
   actions: [
     { kind: "theme" },
     {

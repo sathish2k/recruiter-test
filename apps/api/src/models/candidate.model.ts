@@ -1,9 +1,9 @@
-import { jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.model";
 import { job } from "./job.model";
 import { organization } from "./organization.model";
 
-export type CandidateStatus = "active" | "placed" | "on_hold" | "rejected";
+export type CandidateStatus = "new" | "active" | "placed" | "on_hold" | "rejected";
 
 export interface CandidateAddress {
   street?: string;
@@ -21,17 +21,24 @@ export interface CandidateAttachment {
 }
 
 export interface Education {
-  degree?: string;
   institution?: string;
-  fieldOfStudy?: string;
-  year?: string;
+  major?: string;
+  degree?: string;
+  fromMonth?: string;
+  fromYear?: string;
+  toMonth?: string;
+  toYear?: string;
+  currentlyPursuing?: boolean;
 }
 
 export interface Experience {
-  company?: string;
   jobTitle?: string;
-  from?: string;
-  to?: string;
+  company?: string;
+  summary?: string;
+  fromMonth?: string;
+  fromYear?: string;
+  toMonth?: string;
+  toYear?: string;
   current?: boolean;
 }
 
@@ -41,6 +48,7 @@ export const candidate = pgTable("candidate", {
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
+  salutation: text("salutation"),
   firstName: text("first_name").notNull(),
   lastName: text("last_name"),
   email: text("email"),
@@ -62,12 +70,17 @@ export const candidate = pgTable("candidate", {
   education: jsonb("education").$type<Education[]>(),
   experience: jsonb("experience").$type<Experience[]>(),
   resume: jsonb("resume").$type<CandidateAttachment[]>(),
+  formattedResume: jsonb("formatted_resume").$type<CandidateAttachment[]>(),
+  coverLetter: jsonb("cover_letter").$type<CandidateAttachment[]>(),
+  offer: jsonb("offer").$type<CandidateAttachment[]>(),
+  contracts: jsonb("contracts").$type<CandidateAttachment[]>(),
   attachments: jsonb("attachments").$type<CandidateAttachment[]>(),
   jobId: text("job_id").references(() => job.id, { onDelete: "set null" }),
   startingStage: text("starting_stage"),
-  status: text("status").$type<CandidateStatus>().notNull().default("active"),
+  status: text("status").$type<CandidateStatus>().notNull().default("new"),
   ownerId: text("owner_id").references(() => user.id, { onDelete: "set null" }),
   source: text("source"),
+  emailOptOut: boolean("email_opt_out").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

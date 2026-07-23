@@ -20,13 +20,15 @@ export function SegmentedWidget({ prop, field, fieldState, t }: WidgetProps) {
         value={field.value || (options[0] ?? "")}
         onChange={(_, next) => field.onChange(next)}
       >
-        {options.map((option, index) => (
-          <Tab
-            key={String(option)}
-            value={option}
-            label={t(prop.enumNames?.[index] ?? String(option))}
-          />
-        ))}
+        {options.map((option, index) => {
+          const raw = String(option);
+          const label = prop.enumNames?.[index]
+            ? t(prop.enumNames[index])
+            : prop.enumL10n
+              ? t(`${prop.enumL10n}.${raw || "none"}`)
+              : t(raw);
+          return <Tab key={raw} value={option} label={label} />;
+        })}
       </Tabs>
     </FieldShell>
   );

@@ -28,10 +28,12 @@ export {
 } from "./password/password-strength";
 export { DIAL_CODES, PhoneField, splitPhone } from "./phone/phone";
 export { RadioWidget } from "./radio/radio";
+export { ResumeAutofillWidget } from "./resume-autofill/resume-autofill";
 export { fetchOptions, invalidateOptions, useRemoteOptions } from "./select/remote-options";
 export { SearchableSelectField } from "./select/searchable-select";
 export { SelectWidget } from "./select/select";
 export { SelectField } from "./select/select-field";
+export { Slider, SliderWidget } from "./slider/slider";
 export { SwitchRowWidget } from "./switch-row/switch-row";
 export { TextWidget } from "./text/text";
 export type {

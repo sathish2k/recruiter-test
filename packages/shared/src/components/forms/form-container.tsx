@@ -46,6 +46,7 @@ export function FormContainer({
         spacing={gridContainer.spacing ?? 2}
         direction={gridContainer.direction}
         columns={gridContainer.columns}
+        sx={gridContainer.alignItems ? { alignItems: gridContainer.alignItems } : undefined}
       >
         {children.map((child, index) => (
           <Grid

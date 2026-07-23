@@ -736,22 +736,32 @@ export function createAppTheme(): Theme {
         },
         variants: [
           {
-            // The in-form segmented picker: a full-width rounded rect on the
-            // inset surface, not the pill the page-level tab bar uses.
+            // The in-form segmented picker: a full pill on the inset surface
+            // with a raised pill for the selected option (matches the design).
             props: { variant: "segmented" },
             style: {
               width: "100%",
               background: v.inset,
               border: `1px solid ${v.controlBorder}`,
-              borderRadius: formTokens.controlRadius,
+              borderRadius: 999,
               padding: 4,
+              "& .MuiTabs-indicator": { display: "none" },
               "& .MuiTabs-list": { width: "100%", gap: "4px" },
               "& .MuiTab-root": {
                 flex: 1,
-                borderRadius: 8,
+                // Override MUI's default 160px tab min-width so equal-flex tabs
+                // share the track and don't overflow/clip when there are many.
+                minWidth: 0,
+                borderRadius: 999,
                 padding: "8px 6px",
-                fontSize: 12,
+                fontSize: 12.5,
                 fontWeight: 600,
+                color: v.textSecondary,
+                "&.Mui-selected": {
+                  color: v.textPrimary,
+                  background: v.elevated,
+                  boxShadow: `0 0 0 1px ${v.controlBorder}, 0 2px 4px rgba(0,0,0,.3)`,
+                },
               },
             },
           },

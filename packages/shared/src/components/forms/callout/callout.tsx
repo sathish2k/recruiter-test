@@ -30,7 +30,7 @@ export function CalloutWidget({ prop, t }: WidgetProps) {
           </Box>
         ) : null}
         {prop.help ? (
-          <Typography sx={{ fontSize: 11.5, lineHeight: 1.5, color: "surface.textSecondary" }}>
+          <Typography sx={{ fontSize: 11.5, lineHeight: 1.5, color: "#E8C4A6" }}>
             {t(prop.help)}
           </Typography>
         ) : null}

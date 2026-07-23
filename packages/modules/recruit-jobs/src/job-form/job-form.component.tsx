@@ -1,7 +1,5 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import {
   useConfiguration,
   useFetch,
@@ -15,10 +13,10 @@ import {
   type AttachmentUploader,
   type FormValues,
   FormWithSectionsRenderer,
-  IconRenderer,
   useToast,
 } from "@recruit/shared";
 import { useMemo } from "react";
+import { AiScreeningWidget } from "./ai-screening.widget";
 import type { JobFormConfiguration } from "./job-form.configuration";
 
 interface JobAddress {
@@ -38,6 +36,10 @@ interface Job {
   employmentType: string;
   workExperience: string;
   industry: string;
+  description: string;
+  requirements: string;
+  benefits: string;
+  skills: string[];
   openings: number;
   salaryMin: string;
   salaryMax: string;
@@ -49,17 +51,16 @@ interface Job {
   jobSummary: Attachment[];
   attachments: Attachment[];
   aiScreening: boolean;
-  screeningCriteria: string;
+  matchThreshold: number;
+  autoAdvance: boolean;
+  knockoutCount: number;
+  dailyDigest: boolean;
   sourcerId: string;
   profileLeadId: string;
   dailyInviteTarget: number;
   publishChannels: string[];
 }
 
-const EMPLOYMENT = ["full_time", "part_time", "contract", "temporary", "internship"];
-const EXPERIENCE = ["lt1", "1_3", "3_5", "5_8", "8plus"];
-const STATUS = ["open", "on_hold", "filled", "closed"];
-const CHANNELS = ["website", "linkedin", "naukri", "indeed"];
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 
 export function JobFormComponent({ id }: { id: string }) {
@@ -82,33 +83,12 @@ export function JobFormComponent({ id }: { id: string }) {
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
+      aiScreening: (props: Parameters<typeof AiScreeningWidget>[0]) => (
+        <AiScreeningWidget {...props} />
+      ),
     }),
     [uploader],
   );
-
-  const schema = useMemo(() => {
-    if (!config.schema) return config.schema;
-    const p = config.schema.properties;
-    return {
-      ...config.schema,
-      properties: {
-        ...p,
-        employmentType: {
-          ...p.employmentType,
-          enumNames: EMPLOYMENT.map((e) => t(`employmentType.${e}`)),
-        },
-        workExperience: {
-          ...p.workExperience,
-          enumNames: EXPERIENCE.map((e) => t(`workExperience.${e}`)),
-        },
-        status: { ...p.status, enumNames: STATUS.map((s) => t(`status.${s}`)) },
-        publishChannels: {
-          ...p.publishChannels,
-          enumNames: CHANNELS.map((c) => t(`channels.${c}`)),
-        },
-      },
-    };
-  }, [config.schema, t]);
 
   if (!config.schema) return null;
   const loading = isEdit && (isLoading || !data);
@@ -165,6 +145,10 @@ export function JobFormComponent({ id }: { id: string }) {
           employmentType: data.employmentType,
           workExperience: data.workExperience,
           industry: data.industry,
+          description: data.description,
+          requirements: data.requirements,
+          benefits: data.benefits,
+          skills: data.skills ?? [],
           openings: data.openings,
           salaryMin: data.salaryMin,
           salaryMax: data.salaryMax,
@@ -179,52 +163,36 @@ export function JobFormComponent({ id }: { id: string }) {
           jobSummary: data.jobSummary ?? [],
           attachments: data.attachments ?? [],
           aiScreening: data.aiScreening,
-          screeningCriteria: data.screeningCriteria,
+          matchThreshold: data.matchThreshold,
+          autoAdvance: data.autoAdvance,
+          knockoutCount: data.knockoutCount,
+          dailyDigest: data.dailyDigest,
           sourcerId: data.sourcerId,
           profileLeadId: data.profileLeadId,
           dailyInviteTarget: data.dailyInviteTarget,
           publishChannels: data.publishChannels ?? [],
         }
-      : { status: "open", openings: 1, aiScreening: false };
+      : { status: "open", openings: 1, aiScreening: true };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <Link
-        component="button"
-        type="button"
-        onClick={() => router.push(config.listRouteId)}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: "text.secondary",
-          alignSelf: "flex-start",
-        }}
-      >
-        <IconRenderer name="arrow-back" size={15} />
-        {t("back")}
-      </Link>
-      <FormWithSectionsRenderer
-        key={jobId ?? "new"}
-        id={id}
-        title={isEdit ? "editTitle" : "newTitle"}
-        description={isEdit ? "editDescription" : "newDescription"}
-        schema={schema}
-        sections={config.sections}
-        sectionsContainer={config.sectionsContainer}
-        defaultValues={defaultValues}
-        onSubmit={save}
-        isLoading={loading}
-        actionsPlacement="header"
-        widgets={widgets}
-        submitLabel={isEdit ? "actions.save" : "actions.create"}
-        submitIcon={isEdit ? "check" : "send"}
-        cancelLabel="actions.cancel"
-        onCancel={() => router.push(config.listRouteId)}
-        addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
-      />
-    </Box>
+    <FormWithSectionsRenderer
+      key={jobId ?? "new"}
+      id={id}
+      title={isEdit ? "editTitle" : "newTitle"}
+      description={isEdit ? "editDescription" : "newDescription"}
+      schema={config.schema}
+      sections={config.sections}
+      sectionsContainer={config.sectionsContainer}
+      defaultValues={defaultValues}
+      onSubmit={save}
+      isLoading={loading}
+      actionsPlacement="header"
+      widgets={widgets}
+      submitLabel={isEdit ? "actions.save" : "actions.create"}
+      submitIcon={isEdit ? "check" : "rocket"}
+      cancelLabel="actions.cancel"
+      onCancel={() => router.push(config.listRouteId)}
+      addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
+    />
   );
 }

@@ -35,6 +35,9 @@ export function SelectField({
       onBlur={onBlur}
       error={error}
       disabled={disabled}
+      // Render the selected item even when the value is "" — otherwise MUI treats
+      // an empty value as "no selection" and hides an explicit "None" option.
+      slotProps={{ select: { displayEmpty: true } }}
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>

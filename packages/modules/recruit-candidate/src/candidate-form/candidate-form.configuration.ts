@@ -7,24 +7,58 @@ export interface CandidateFormConfiguration {
   listRouteId: string;
 }
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const YEARS = Array.from({ length: 66 }, (_, i) => String(2035 - i));
+
+const month = (title: string) => ({
+  type: "string" as const,
+  widget: "select" as const,
+  searchable: true,
+  title,
+  placeholder: "fields.month",
+  enum: MONTHS,
+  grid: { size: { xs: 6, md: 3 } },
+});
+const year = (title: string) => ({
+  type: "string" as const,
+  widget: "select" as const,
+  searchable: true,
+  title,
+  placeholder: "fields.year",
+  enum: YEARS,
+  grid: { size: { xs: 6, md: 3 } },
+});
+
 export const CandidateFormConfiguration: CandidateFormConfiguration = {
   schema: {
     type: "object",
     properties: {
       // ── Basic info ──
+      salutation: {
+        type: "string",
+        widget: "select",
+        // Carries the shared "First name" label; the input below hides its own
+        // and the row is bottom-aligned so the two controls line up.
+        title: "fields.firstName",
+        enum: ["", "mr", "ms", "mrs", "dr", "mx"],
+        enumL10n: "salutation",
+        grid: { size: { xs: 4, md: 2 } },
+      },
       firstName: {
         type: "string",
+        hideLabel: true,
         title: "fields.firstName",
         placeholder: "fields.firstNamePlaceholder",
         maxLength: 100,
         errorMessage: { maxLength: "fields.firstNameMax" },
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 8, md: 4 } },
       },
       lastName: {
         type: "string",
         title: "fields.lastName",
         placeholder: "fields.lastNamePlaceholder",
         maxLength: 100,
+        errorMessage: { maxLength: "fields.lastNameMax" },
         grid: { size: { xs: 12, md: 6 } },
       },
       email: {
@@ -70,7 +104,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         maxLength: 255,
         grid: { size: { xs: 12, md: 6 } },
       },
-      // ── Address (plain fields) ──
+      // ── Address ──
       street: {
         type: "string",
         title: "address.street",
@@ -106,6 +140,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "number",
         widget: "number",
         title: "fields.experienceYears",
+        placeholder: "fields.experienceYearsPlaceholder",
         minimum: 0,
         maximum: 60,
         step: 0.5,
@@ -116,6 +151,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         widget: "select",
         title: "fields.highestQualification",
         enum: ["high_school", "diploma", "bachelors", "masters", "phd"],
+        enumL10n: "qualification",
         grid: { size: { xs: 12, md: 6 } },
       },
       currentJobTitle: {
@@ -136,6 +172,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "number",
         widget: "number",
         title: "fields.currentSalary",
+        placeholder: "fields.currentSalaryPlaceholder",
         unit: "fields.lpa",
         unitPosition: "end",
         minimum: 0,
@@ -145,6 +182,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "number",
         widget: "number",
         title: "fields.expectedSalary",
+        placeholder: "fields.expectedSalaryPlaceholder",
         unit: "fields.lpa",
         unitPosition: "end",
         minimum: 0,
@@ -186,21 +224,38 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "array",
         widget: "repeater",
         title: "sections.education",
-        hideLabel: true,
         addLabel: "fields.addEducation",
         itemSchema: {
-          degree: { type: "string", title: "fields.degree", grid: { size: { xs: 12, md: 6 } } },
           institution: {
             type: "string",
             title: "fields.institution",
+            placeholder: "fields.institution",
             grid: { size: { xs: 12, md: 6 } },
           },
-          fieldOfStudy: {
+          major: {
             type: "string",
-            title: "fields.fieldOfStudy",
+            title: "fields.major",
+            placeholder: "fields.major",
             grid: { size: { xs: 12, md: 6 } },
           },
-          year: { type: "string", title: "fields.year", grid: { size: { xs: 12, md: 6 } } },
+          degree: {
+            type: "string",
+            widget: "textarea",
+            rows: 3,
+            title: "fields.degree",
+            placeholder: "fields.degreePlaceholder",
+            grid: { size: { xs: 12 } },
+          },
+          fromMonth: month("fields.from"),
+          fromYear: year("fields.from"),
+          toMonth: month("fields.to"),
+          toYear: year("fields.to"),
+          currentlyPursuing: {
+            type: "boolean",
+            widget: "checkbox",
+            title: "fields.currentlyPursuing",
+            grid: { size: { xs: 12 } },
+          },
         },
         grid: { size: { xs: 12 } },
       },
@@ -209,23 +264,32 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "array",
         widget: "repeater",
         title: "sections.experience",
-        hideLabel: true,
         addLabel: "fields.addExperience",
         itemSchema: {
-          company: { type: "string", title: "fields.company", grid: { size: { xs: 12, md: 6 } } },
-          jobTitle: { type: "string", title: "fields.jobTitle", grid: { size: { xs: 12, md: 6 } } },
-          from: {
+          jobTitle: {
             type: "string",
-            widget: "date",
-            title: "fields.from",
+            title: "fields.occupation",
+            placeholder: "fields.occupation",
             grid: { size: { xs: 12, md: 6 } },
           },
-          to: {
+          company: {
             type: "string",
-            widget: "date",
-            title: "fields.to",
+            title: "fields.company",
+            placeholder: "fields.company",
             grid: { size: { xs: 12, md: 6 } },
           },
+          summary: {
+            type: "string",
+            widget: "textarea",
+            rows: 3,
+            title: "fields.summary",
+            placeholder: "fields.summaryPlaceholder",
+            grid: { size: { xs: 12 } },
+          },
+          fromMonth: month("fields.from"),
+          fromYear: year("fields.from"),
+          toMonth: month("fields.to"),
+          toYear: year("fields.to"),
           current: {
             type: "boolean",
             widget: "checkbox",
@@ -235,17 +299,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         },
         grid: { size: { xs: 12 } },
       },
-      // ── Attachments (others) ──
-      attachments: {
-        type: "array",
-        widget: "attachments",
-        title: "fields.others",
-        uploadLabel: "fields.attachmentsBrowse",
-        accept: "application/pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png",
-        maxSizeMb: 20,
-        grid: { size: { xs: 12, md: 6 } },
-      },
-      // ── Upload resume (side, filled) ──
+      // ── Attachments (6 slots) ──
       resume: {
         type: "array",
         widget: "attachments",
@@ -253,9 +307,60 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         uploadLabel: "fields.attachmentsBrowse",
         accept: "application/pdf,.doc,.docx",
         maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      formattedResume: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.formattedResume",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      coverLetter: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.coverLetter",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      offer: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.offer",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      contracts: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.contracts",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      others: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.others",
+        uploadLabel: "fields.attachmentsBrowse",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      // ── Autofill from resume (side, accent) ──
+      autofillCv: {
+        type: "array",
+        widget: "resumeAutofill",
+        hideLabel: true,
         grid: { size: { xs: 12 } },
       },
-      // ── Associate to job (side) ──
+      // ── Associate to job (side, accent) ──
       jobId: {
         type: "string",
         widget: "select",
@@ -269,7 +374,16 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         widget: "select",
         title: "fields.startingStage",
         enum: ["sourced", "screening", "submitted", "interview", "offer"],
-        condition: { field: "jobId", notEquals: "" },
+        enumL10n: "stage",
+        default: "sourced",
+        grid: { size: { xs: 12 } },
+      },
+      associateInfo: {
+        type: "string",
+        widget: "callout",
+        variant: "banner",
+        icon: "sparkle",
+        help: "fields.associateInfo",
         grid: { size: { xs: 12 } },
       },
       // ── Other info (side) ──
@@ -277,8 +391,9 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         type: "string",
         widget: "select",
         title: "fields.status",
-        enum: ["active", "placed", "on_hold", "rejected"],
-        default: "active",
+        enum: ["new", "active", "placed", "on_hold", "rejected"],
+        enumL10n: "status",
+        default: "new",
         grid: { size: { xs: 12 } },
       },
       ownerId: {
@@ -295,11 +410,18 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         widget: "select",
         title: "fields.source",
         enum: ["added_by_user", "referral", "inbound", "outbound", "event"],
+        enumL10n: "source",
+        grid: { size: { xs: 12 } },
+      },
+      emailOptOut: {
+        type: "boolean",
+        widget: "checkbox",
+        title: "fields.emailOptOut",
         grid: { size: { xs: 12 } },
       },
     },
-    required: ["firstName"],
-    errorMessage: { required: { firstName: "fields.firstNameRequired" } },
+    required: ["lastName"],
+    errorMessage: { required: { lastName: "fields.lastNameRequired" } },
   },
   sections: [
     {
@@ -307,8 +429,11 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       sections: [
         {
           title: "sections.basicInfo",
-          gridContainer: { columns: 12, spacing: 2 },
+          // Bottom-align so the salutation dropdown (which carries the label)
+          // lines up with the unlabelled first-name input beside it.
+          gridContainer: { columns: 12, spacing: 2, alignItems: "flex-end" },
           fields: [
+            "salutation",
             "firstName",
             "lastName",
             "email",
@@ -343,19 +468,21 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
           fields: ["linkedin", "twitter"],
         },
         {
-          title: "sections.education",
+          // Bare: the repeater renders its own titled card with a top-right CTA.
+          bare: true,
           gridContainer: { columns: 12, spacing: 2 },
           fields: ["education"],
         },
         {
-          title: "sections.experience",
+          bare: true,
           gridContainer: { columns: 12, spacing: 2 },
           fields: ["experience"],
         },
         {
           title: "sections.attachments",
+          description: "sections.attachmentsHint",
           gridContainer: { columns: 12, spacing: 2 },
-          fields: ["attachments"],
+          fields: ["resume", "formattedResume", "coverLetter", "offer", "contracts", "others"],
         },
       ],
     },
@@ -364,21 +491,27 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       sticky: true,
       sections: [
         {
-          title: "sections.uploadResume",
-          variant: "filled",
-          icon: "upload-file",
+          title: "sections.autofill",
+          description: "sections.autofillHint",
+          accent: true,
+          icon: "sparkle",
+          iconBadge: true,
           gridContainer: { columns: 12, spacing: 2 },
-          fields: ["resume"],
+          fields: ["autofillCv"],
         },
         {
           title: "sections.associateJob",
+          description: "sections.associateJobHint",
+          accent: true,
+          icon: "work",
           gridContainer: { columns: 12, spacing: 2 },
-          fields: ["jobId", "startingStage"],
+          fields: ["jobId", "startingStage", "associateInfo"],
         },
         {
           title: "sections.otherInfo",
+          description: "sections.otherInfoHint",
           gridContainer: { columns: 12, spacing: 2 },
-          fields: ["status", "ownerId", "source"],
+          fields: ["status", "ownerId", "source", "emailOptOut"],
         },
       ],
     },

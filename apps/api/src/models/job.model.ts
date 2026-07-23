@@ -35,6 +35,12 @@ export const job = pgTable("job", {
   employmentType: text("employment_type"),
   workExperience: text("work_experience"),
   industry: text("industry"),
+  // Free-form long text (markdown) + must-have skills, per the design's
+  // Description tabs and Must-have skills section.
+  description: text("description"),
+  requirements: text("requirements"),
+  benefits: text("benefits"),
+  skills: jsonb("skills").$type<string[]>(),
   openings: integer("openings").notNull().default(1),
   salaryMin: text("salary_min"),
   salaryMax: text("salary_max"),
@@ -47,6 +53,10 @@ export const job = pgTable("job", {
   attachments: jsonb("attachments").$type<JobAttachment[]>(),
   aiScreening: boolean("ai_screening").notNull().default(false),
   screeningCriteria: text("screening_criteria"),
+  matchThreshold: integer("match_threshold").notNull().default(80),
+  autoAdvance: boolean("auto_advance").notNull().default(true),
+  knockoutCount: integer("knockout_count").notNull().default(4),
+  dailyDigest: boolean("daily_digest").notNull().default(true),
   sourcerId: text("sourcer_id").references(() => user.id, { onDelete: "set null" }),
   profileLeadId: text("profile_lead_id").references(() => user.id, { onDelete: "set null" }),
   dailyInviteTarget: integer("daily_invite_target").notNull().default(0),

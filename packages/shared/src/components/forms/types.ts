@@ -22,11 +22,13 @@ export type BuiltInWidget =
   | "attachments"
   | "callout"
   | "repeater"
+  | "resumeAutofill"
   | "days"
   | "radio"
   | "checkbox-group"
   | "multiselect"
   | "number"
+  | "slider"
   | "date"
   | "time"
   | "datetime"
@@ -83,6 +85,10 @@ export interface JsonSchemaProperty {
 
   title?: string;
   enumNames?: string[];
+  /** Translation namespace for `enum` option labels: each option is shown as
+   * `t("<enumL10n>.<value>")` (an empty value maps to `<enumL10n>.none`). Lets a
+   * select localise its choices from config, with no component-side `enumNames`. */
+  enumL10n?: string;
   placeholder?: string;
   /** Set by the renderer from the schema's `required` list — drives the label
    * asterisk. Not authored per-field; declare requirements in `schema.required`. */
@@ -143,6 +149,10 @@ export interface JsonSchemaProperty {
   unit?: string;
   /** `number`: which end `unit` sits on. Default "start". */
   unitPosition?: "start" | "end";
+  /** `slider`: captions under the track ends (translation keys), e.g.
+   * "50 · broad" / "95 · strict". The value readout uses `unit` as its suffix. */
+  minLabel?: string;
+  maxLabel?: string;
   /** `date`/`time`/`datetime`: bounds passed to the native picker. */
   min?: string;
   max?: string;
@@ -293,6 +303,9 @@ export interface FormSection extends FormLayoutProps {
   accent?: boolean;
   /** ICON_REGISTRY name shown (accent-coloured) before the section title. */
   icon?: string;
+  /** Render `icon` inside a filled orange square badge (the design's AI cards)
+   * rather than as a bare inline glyph. */
+  iconBadge?: boolean;
   /** Card look: `"text"` (default — bordered card) or `"filled"` (solid neutral-
    * tinted panel, no border). Composable with `accent`/`icon`. */
   variant?: "text" | "filled";
@@ -334,8 +347,15 @@ export interface FormActionsState {
 export interface FormLayoutProps {
   /** Vertical stack — the default when neither container is set. */
   stackContainer?: { spacing?: number; direction?: "column" | "row" };
-  /** Columns; each field places itself with its own `grid`. */
-  gridContainer?: Pick<import("@mui/material/Grid").GridProps, "spacing" | "direction" | "columns">;
+  /** Columns; each field places itself with its own `grid`. `alignItems:
+   * "flex-end"` bottom-aligns the controls in a row (e.g. a labelled field
+   * beside an unlabelled one). */
+  gridContainer?: Pick<
+    import("@mui/material/Grid").GridProps,
+    "spacing" | "direction" | "columns"
+  > & {
+    alignItems?: "flex-start" | "center" | "flex-end" | "stretch" | "baseline";
+  };
 }
 
 export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSubmit"> {
