@@ -1,7 +1,6 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import {
   useConfiguration,
@@ -19,10 +18,8 @@ import {
   IconRenderer,
   useToast,
 } from "@recruit/shared";
-import { useMemo, useRef, useState } from "react";
-import { AddressField } from "./address-field.component";
+import { useMemo } from "react";
 import type { ClientFormConfiguration } from "./client-form.configuration";
-import { FeeValueField } from "./fee-value-field.component";
 
 interface ClientAddress {
   street?: string;
@@ -58,6 +55,7 @@ interface Client {
 const FEE_BASIS = ["percent", "flat"];
 const SOURCES = ["added_by_user", "referral", "inbound", "outbound", "event"];
 const PAYMENT_TERMS = ["net15", "net30", "net45", "net60"];
+const str = (v: unknown) => (typeof v === "string" ? v : "");
 
 export function ClientFormComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
@@ -67,10 +65,6 @@ export function ClientFormComponent({ id }: { id: string }) {
   const params = useRouteParams();
   const clientId = params.id;
   const isEdit = Boolean(clientId);
-
-  // "Save & add another" creates then remounts the form empty via this key.
-  const [formKey, setFormKey] = useState(0);
-  const addAnother = useRef(false);
 
   const { data, isLoading, mutation } = useFetch<Client>(id, { filters: { id: clientId } });
 
@@ -85,8 +79,6 @@ export function ClientFormComponent({ id }: { id: string }) {
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
-      address: AddressField,
-      feeValue: FeeValueField,
     }),
     [uploader],
   );
@@ -116,28 +108,54 @@ export function ClientFormComponent({ id }: { id: string }) {
       .filter((item) => item.url)
       .map(({ name, url, size, type }) => ({ name, url, size, type }));
 
-  const save = async (values: FormValues) => {
+  const save = async (values: FormValues, meta?: { addAnother?: boolean }) => {
     const mut = mutation as Record<string, ((body?: unknown) => Promise<unknown>) | undefined>;
     const {
-      address: rawAddress,
       attachments: rawAttachments,
       contract: rawContract,
-      // `feeInfo` is a display-only banner — never persisted.
+      // Display-only / flattened fields — not sent verbatim.
       feeInfo: _feeInfo,
+      sameAsBilling,
+      billingStreet,
+      billingCity,
+      billingState,
+      billingPostal,
+      billingCountry,
+      shipStreet,
+      shipCity,
+      shipState,
+      shipPostal,
+      shipCountry,
+      feePercent,
+      feeFlat,
       ...rest
     } = values;
-    const addr = (rawAddress ?? {}) as {
-      billing?: ClientAddress;
-      shipping?: ClientAddress;
-      sameAsBilling?: boolean;
+
+    const billing = {
+      street: str(billingStreet),
+      city: str(billingCity),
+      state: str(billingState),
+      postalCode: str(billingPostal),
+      country: str(billingCountry),
     };
-    const billing = addr.billing ?? {};
-    const same = addr.sameAsBilling ?? true;
+    const shipping = sameAsBilling
+      ? billing
+      : {
+          street: str(shipStreet),
+          city: str(shipCity),
+          state: str(shipState),
+          postalCode: str(shipPostal),
+          country: str(shipCountry),
+        };
+    // Only the fee input matching the chosen basis is visible — coalesce it.
+    const feeValue = (rest.feeBasis ?? "percent") === "flat" ? str(feeFlat) : str(feePercent);
+
     const payload = {
       ...rest,
+      feeValue,
       address: billing,
-      shippingAddress: same ? billing : (addr.shipping ?? {}),
-      shippingSameAsBilling: same,
+      shippingAddress: shipping,
+      shippingSameAsBilling: Boolean(sameAsBilling),
       contract: cleanFiles(rawContract),
       attachments: cleanFiles(rawAttachments),
     };
@@ -150,9 +168,8 @@ export function ClientFormComponent({ id }: { id: string }) {
     }
     await mut.create?.(payload);
     show(t("toast.created"));
-    // Add-another clears the form (remount) and stays; otherwise go to the list.
-    if (addAnother.current) setFormKey((key) => key + 1);
-    else router.push(config.listRouteId);
+    // Add-another: the renderer already cleared the form — just stay.
+    if (!meta?.addAnother) router.push(config.listRouteId);
   };
 
   const defaultValues: FormValues =
@@ -167,20 +184,27 @@ export function ClientFormComponent({ id }: { id: string }) {
           accountLeadId: data.accountLeadId,
           source: data.source,
           feeBasis: data.feeBasis,
-          feeValue: data.feeValue,
+          feePercent: data.feeBasis === "percent" ? data.feeValue : "",
+          feeFlat: data.feeBasis === "flat" ? data.feeValue : "",
           paymentTerms: data.paymentTerms,
           billingEmail: data.billingEmail,
           taxId: data.taxId,
           notes: data.notes,
           contract: data.contract ?? [],
           attachments: data.attachments ?? [],
-          address: {
-            billing: data.address ?? {},
-            shipping: data.shippingAddress ?? {},
-            sameAsBilling: data.shippingSameAsBilling ?? true,
-          },
+          sameAsBilling: data.shippingSameAsBilling ?? true,
+          billingStreet: data.address?.street ?? "",
+          billingCity: data.address?.city ?? "",
+          billingState: data.address?.state ?? "",
+          billingPostal: data.address?.postalCode ?? "",
+          billingCountry: data.address?.country ?? "",
+          shipStreet: data.shippingAddress?.street ?? "",
+          shipCity: data.shippingAddress?.city ?? "",
+          shipState: data.shippingAddress?.state ?? "",
+          shipPostal: data.shippingAddress?.postalCode ?? "",
+          shipCountry: data.shippingAddress?.country ?? "",
         }
-      : { feeBasis: "percent", paymentTerms: "net30" };
+      : { feeBasis: "percent", paymentTerms: "net30", sameAsBilling: true };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -202,7 +226,7 @@ export function ClientFormComponent({ id }: { id: string }) {
         {t("back")}
       </Link>
       <FormWithSectionsRenderer
-        key={`${clientId ?? "new"}-${formKey}`}
+        key={clientId ?? "new"}
         id={id}
         title={isEdit ? "editTitle" : "newTitle"}
         description={isEdit ? "editDescription" : "newDescription"}
@@ -214,42 +238,11 @@ export function ClientFormComponent({ id }: { id: string }) {
         isLoading={loading}
         actionsPlacement="header"
         widgets={widgets}
-        actions={(state) => (
-          <Box sx={{ display: "flex", gap: "8px", flex: "none" }}>
-            <Button
-              variant="outlined"
-              onClick={() => router.push(config.listRouteId)}
-              disabled={state.isSubmitting}
-              sx={{ fontWeight: 400 }}
-            >
-              {t("actions.cancel")}
-            </Button>
-            {isEdit ? null : (
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  addAnother.current = true;
-                  state.submit();
-                }}
-                disabled={state.isSubmitting}
-                sx={{ fontWeight: 400 }}
-              >
-                {t("actions.saveAnother")}
-              </Button>
-            )}
-            <Button
-              variant="contained"
-              loading={state.isSubmitting}
-              startIcon={<IconRenderer name={isEdit ? "check" : "domain-add"} size={16} />}
-              onClick={() => {
-                addAnother.current = false;
-                state.submit();
-              }}
-            >
-              {t(isEdit ? "actions.save" : "actions.create")}
-            </Button>
-          </Box>
-        )}
+        submitLabel={isEdit ? "actions.save" : "actions.create"}
+        submitIcon={isEdit ? "check" : "domain-add"}
+        cancelLabel="actions.cancel"
+        onCancel={() => router.push(config.listRouteId)}
+        addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
       />
     </Box>
   );

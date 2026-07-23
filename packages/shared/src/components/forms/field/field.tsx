@@ -15,6 +15,7 @@ import { NumberWidget } from "../number/number";
 import { PasswordWidget } from "../password/password";
 import { PhoneWidget } from "../phone/phone";
 import { RadioWidget } from "../radio/radio";
+import { RepeaterWidget } from "../repeater/repeater";
 import { SegmentedWidget } from "../segmented/segmented";
 import { SelectWidget } from "../select/select";
 import { SwitchRowWidget } from "../switch-row/switch-row";
@@ -51,6 +52,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   upload: UploadWidget,
   attachments: AttachmentsWidget,
   callout: CalloutWidget,
+  repeater: RepeaterWidget,
   days: DaysWidget,
   radio: RadioWidget,
   "checkbox-group": CheckboxGroupWidget,
@@ -82,12 +84,15 @@ export function Field({
   control,
   t,
   widgets,
+  disabled,
 }: {
   name: string;
   prop: JsonSchemaProperty;
   control: Control<FieldValues>;
   t: Translate;
   widgets?: Widgets;
+  /** Set by the renderer from `disabledWhen` / a checkbox's `syncFields`. */
+  disabled?: boolean;
 }) {
   // Custom is checked first, so a screen can add a widget the form layer lacks
   // — or override a built-in — without touching WIDGETS.
@@ -102,7 +107,7 @@ export function Field({
       name={name}
       control={control}
       render={({ field, fieldState }) => {
-        const props: WidgetProps = { name, prop: resolved, field, fieldState, t };
+        const props: WidgetProps = { name, prop: resolved, field, fieldState, t, disabled };
         // Called, not mounted — an inline arrow in a `widgets` literal is a new
         // function identity every render, which as a component type would
         // remount the field (and drop focus) on each keystroke. The fragment

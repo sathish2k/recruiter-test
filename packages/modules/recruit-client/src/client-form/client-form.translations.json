@@ -49,6 +49,7 @@
     "emailMax": "Keep the email under 255 characters",
     "taxId": "GSTIN / VAT",
     "taxIdPlaceholder": "29ABCDE1234F1Z5",
+    "sameAsBilling": "Shipping same as billing",
     "feeInfo": "Invoices go to the billing email — used by Finance to compute placement fees and invoice amounts.",
     "notes": "Internal notes",
     "notesPlaceholder": "Hiring process, interview rounds, salary negotiation, preferred candidate profile — things recruiters should know…",
@@ -69,14 +70,16 @@
   },
   "address": {
     "title": "Address",
-    "sameAsBilling": "Shipping same as billing",
-    "billing": "BILLING",
-    "shipping": "SHIPPING",
     "street": "Street",
     "city": "City",
     "state": "Province / State",
     "postalCode": "Postal code",
-    "country": "Country"
+    "country": "Country",
+    "shipStreet": "Shipping street",
+    "shipCity": "Shipping city",
+    "shipState": "Shipping state",
+    "shipPostalCode": "Shipping postal code",
+    "shipCountry": "Shipping country"
   },
   "feeBasis": { "percent": "% of CTC", "flat": "Flat fee" },
   "actions": {

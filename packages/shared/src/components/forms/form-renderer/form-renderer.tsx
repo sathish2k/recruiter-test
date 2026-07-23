@@ -8,7 +8,9 @@ import { useTranslation } from "@recruit/sdk";
 import { isPossiblePhoneNumber } from "libphonenumber-js/max";
 import { useMemo } from "react";
 import { type FieldValues, type Resolver, useForm } from "react-hook-form";
+import { hiddenFields } from "../conditions";
 import { Field } from "../field/field";
+import { useFieldEffects } from "../field/use-field-effects";
 import { FormContainer } from "../form-container";
 import type { FormRendererProps, JsonSchema, JsonSchemaProperty } from "../types";
 
@@ -83,11 +85,16 @@ function forValidation(schema: JsonSchema): JsonSchema {
 export function buildResolver(schema: JsonSchema): Resolver<FieldValues> {
   const base = ajvResolver(forValidation(schema) as never, { strict: false });
   return async (rawValues, context, options) => {
+    // A condition-hidden field must not validate or reach the payload — drop its
+    // value before ajv sees it.
+    const hidden = hiddenFields(schema, rawValues);
     const values = stripEmptyOptional(schema, rawValues);
+    for (const key of hidden) delete values[key];
     const result = await base(values, context, options);
     const errors = { ...result.errors };
+    for (const key of hidden) delete errors[key];
     for (const [key, prop] of Object.entries(schema.properties)) {
-      if (errors[key]) continue;
+      if (errors[key] || hidden.has(key)) continue;
       if (prop.matchesField && values[key] && values[key] !== values[prop.matchesField]) {
         errors[key] = {
           type: "matches",
@@ -128,14 +135,17 @@ export function FormRenderer({
     return values;
   }, [schema, defaultValues]);
 
-  const { control, handleSubmit, formState } = useForm<FieldValues>({
+  const { control, handleSubmit, formState, setValue } = useForm<FieldValues>({
     resolver,
     defaultValues: initial,
     mode: "onTouched",
   });
+  const { hiddenSet, disabledSet } = useFieldEffects(schema, control, setValue);
 
   const requiredFields = new Set(schema.required ?? []);
-  const fields = Object.entries(schema.properties).map(([fieldName, prop]) => (
+  // Drop condition-hidden fields so their grid cell collapses (no gap).
+  const visible = Object.entries(schema.properties).filter(([name]) => !hiddenSet.has(name));
+  const fields = visible.map(([fieldName, prop]) => (
     <Field
       key={fieldName}
       name={fieldName}
@@ -143,15 +153,16 @@ export function FormRenderer({
       control={control}
       t={t}
       widgets={widgets}
+      disabled={disabledSet.has(fieldName)}
     />
   ));
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} noValidate>
       <FormContainer
         stackContainer={stackContainer}
         gridContainer={gridContainer}
-        grids={Object.values(schema.properties).map((prop) => prop.grid)}
+        grids={visible.map(([, prop]) => prop.grid)}
       >
         {fields}
       </FormContainer>

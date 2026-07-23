@@ -10,7 +10,7 @@ import { SelectField } from "./select-field";
  * sources options from the API; otherwise a plain menu, which reads better for
  * a handful of choices.
  */
-export function SelectWidget({ prop, field, fieldState, t }: WidgetProps) {
+export function SelectWidget({ prop, field, fieldState, t, disabled }: WidgetProps) {
   const error = fieldState.error?.message ? t(fieldState.error.message) : undefined;
   const options: SelectOption[] = (prop.enum ?? []).map((option, index) => ({
     value: String(option),
@@ -32,6 +32,7 @@ export function SelectWidget({ prop, field, fieldState, t }: WidgetProps) {
           source={prop.optionSource}
           options={options}
           avatar={prop.avatar}
+          disabled={disabled}
           placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
           error={!!fieldState.error}
           noOptionsText={t("form.noOptions", "No match")}
@@ -43,6 +44,7 @@ export function SelectWidget({ prop, field, fieldState, t }: WidgetProps) {
           onChange={field.onChange}
           onBlur={field.onBlur}
           options={options}
+          disabled={disabled}
           error={!!fieldState.error}
         />
       )}

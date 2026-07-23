@@ -21,6 +21,7 @@ export type BuiltInWidget =
   | "upload"
   | "attachments"
   | "callout"
+  | "repeater"
   | "days"
   | "radio"
   | "checkbox-group"
@@ -49,6 +50,23 @@ export type Widget = BuiltInWidget | (string & {});
  * in the `widgets` literal doesn't remount the field on every render.
  */
 export type Widgets = Record<string, (props: WidgetProps) => import("react").ReactNode>;
+
+/** A predicate over another field's current value — drives `condition`
+ * (show/hide) and `disabledWhen` (enable/disable). Exactly one operator. */
+export interface FieldCondition {
+  /** Field name whose value is tested. */
+  field: string;
+  equals?: string | number | boolean;
+  notEquals?: string | number | boolean;
+  in?: Array<string | number | boolean>;
+}
+
+/** On a checkbox: while checked, live-copy each `from[i]` into `to[i]` and render
+ * the `to` fields disabled (the "shipping same as billing" pattern, from config). */
+export interface SyncFields {
+  from: string[];
+  to: string[];
+}
 
 export interface JsonSchemaProperty {
   type: JsonSchemaType;
@@ -100,6 +118,15 @@ export interface JsonSchemaProperty {
   /** `select`: show a coloured initials avatar beside each option and the chosen
    * value (a person/contact picker). */
   avatar?: boolean;
+  /** Show this field only while the predicate holds; hidden fields are stripped
+   * from the payload and skipped in validation. */
+  condition?: FieldCondition;
+  /** Render this field disabled (greyed, value kept + still submitted) while the
+   * predicate holds. */
+  disabledWhen?: FieldCondition;
+  /** `checkbox`: while checked, copy `from`→`to` (kept in sync) and disable the
+   * `to` fields. Replaces bespoke "same as billing" widgets. */
+  syncFields?: SyncFields;
   /** Placement when the form uses `gridContainer`. */
   grid?: FieldGrid;
   /** `phone`: country pre-selected when the field is empty. Defaults to `IN`. */
@@ -129,6 +156,11 @@ export interface JsonSchemaProperty {
   helpSecondary?: string;
   /** `upload`: shape of the preview tile. */
   preview?: "square" | "circle";
+  /** `repeater`: the fields of one row (a sub-record); stored as an array of
+   * objects. Nested field names are `<name>.<index>.<key>`. */
+  itemSchema?: Record<string, JsonSchemaProperty>;
+  /** `repeater`: translation key for the "add row" button. */
+  addLabel?: string;
   /** `days`: the toggles, in order. `value` is what gets stored. */
   dayOptions?: { value: string; label: string }[];
   /** `days`: quick-pick shortcuts under the toggles. */
@@ -226,7 +258,9 @@ export interface FormRendererProps extends FormLayoutProps {
   id: string;
   schema: JsonSchema;
   defaultValues?: FormValues;
-  onSubmit: (data: FormValues) => void | Promise<void>;
+  /** `meta.addAnother` is true when the user hit "Save & add another" — the
+   * caller persists but skips navigation (the renderer clears the form). */
+  onSubmit: (data: FormValues, meta?: { addAnother?: boolean }) => void | Promise<void>;
   /** Translation key for the submit button (default "submit"). */
   submitLabel?: string;
   /** When set, renders a Cancel button beside Submit (footer row) that calls it. */
@@ -259,6 +293,12 @@ export interface FormSection extends FormLayoutProps {
   accent?: boolean;
   /** ICON_REGISTRY name shown (accent-coloured) before the section title. */
   icon?: string;
+  /** Card look: `"text"` (default — bordered card) or `"filled"` (solid neutral-
+   * tinted panel, no border). Composable with `accent`/`icon`. */
+  variant?: "text" | "filled";
+  /** On a `sections` group: stick the column to the top of the viewport while the
+   * rest of the form scrolls (the design's side panel). */
+  sticky?: boolean;
   /**
    * Shorthand for an even `gridContainer`: `columns: 3` lays the fields out in
    * three equal columns, and a field's `span` counts in those columns. Ignored
@@ -320,8 +360,12 @@ export interface FormWithSectionsProps extends Omit<FormRendererProps, "beforeSu
   onSaveDraft?: (values: FormValues) => void | Promise<void>;
   /** Replaces the built-in Cancel/Save cluster with your own buttons. */
   actions?: (state: FormActionsState) => import("react").ReactNode;
-  /** Where the button cluster sits. Defaults to the header, above the sections. */
-  actionsPlacement?: "header" | "footer";
+  /** When set, the built-in cluster gains a middle "Save & add another" button
+   * (create screens); on that submit the renderer clears the form and stays. */
+  addAnotherLabel?: string;
+  /** Where the button cluster sits. `"sticky"` = a bottom bar shown only while the
+   * form is dirty. Defaults to the header, above the sections. */
+  actionsPlacement?: "header" | "footer" | "sticky";
   /** Renders a skeleton mirroring the section/field layout instead of the form —
    * pass while the record is still loading. */
   isLoading?: boolean;
@@ -335,6 +379,9 @@ export interface WidgetProps {
   field: ControllerRenderProps<FieldValues, string>;
   fieldState: ControllerFieldState;
   t: Translate;
+  /** Set by the renderer from `disabledWhen` / a checkbox's `syncFields`: render
+   * the control disabled, but keep the value in form state so it still submits. */
+  disabled?: boolean;
 }
 
 /** Grid placement for a field, mirroring the engine's LayoutElement. */

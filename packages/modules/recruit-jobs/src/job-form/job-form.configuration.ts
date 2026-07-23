@@ -1,0 +1,317 @@
+import type { FormLayoutProps, FormSection, JsonSchema } from "@recruit/shared";
+
+export interface JobFormConfiguration {
+  schema: JsonSchema;
+  sections: FormSection[];
+  sectionsContainer: FormLayoutProps;
+  listRouteId: string;
+}
+
+export const JobFormConfiguration: JobFormConfiguration = {
+  schema: {
+    type: "object",
+    properties: {
+      // ── Basics ──
+      title: {
+        type: "string",
+        title: "fields.title",
+        placeholder: "fields.titlePlaceholder",
+        maxLength: 150,
+        errorMessage: { maxLength: "fields.titleMax" },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      clientId: {
+        type: "string",
+        widget: "select",
+        title: "fields.client",
+        placeholder: "fields.clientPlaceholder",
+        optionSource: { url: "/clients", path: "data", valueKey: "id", labelKey: "name" },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      clientContactId: {
+        type: "string",
+        widget: "select",
+        avatar: true,
+        title: "fields.clientContact",
+        placeholder: "fields.clientContactPlaceholder",
+        optionSource: { url: "/contacts", path: "data", valueKey: "id", labelKey: "name" },
+        condition: { field: "clientId", notEquals: "" },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      dateOpened: {
+        type: "string",
+        widget: "date",
+        title: "fields.dateOpened",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      targetDate: {
+        type: "string",
+        widget: "date",
+        title: "fields.targetDate",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      employmentType: {
+        type: "string",
+        widget: "select",
+        title: "fields.employmentType",
+        enum: ["full_time", "part_time", "contract", "temporary", "internship"],
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      workExperience: {
+        type: "string",
+        widget: "select",
+        title: "fields.workExperience",
+        enum: ["lt1", "1_3", "3_5", "5_8", "8plus"],
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      industry: {
+        type: "string",
+        widget: "select",
+        searchable: true,
+        title: "fields.industry",
+        placeholder: "fields.industryPlaceholder",
+        optionSource: { url: "/industries", path: "data", valueKey: "name", labelKey: "name" },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      openings: {
+        type: "integer",
+        widget: "number",
+        title: "fields.openings",
+        minimum: 1,
+        default: 1,
+        grid: { size: { xs: 12, md: 4 } },
+      },
+      salaryMin: {
+        type: "number",
+        widget: "number",
+        title: "fields.salaryMin",
+        unit: "fields.usd",
+        unitPosition: "end",
+        minimum: 0,
+        grid: { size: { xs: 12, md: 4 } },
+      },
+      salaryMax: {
+        type: "number",
+        widget: "number",
+        title: "fields.salaryMax",
+        unit: "fields.usd",
+        unitPosition: "end",
+        minimum: 0,
+        grid: { size: { xs: 12, md: 4 } },
+      },
+      status: {
+        type: "string",
+        widget: "select",
+        title: "fields.status",
+        enum: ["open", "on_hold", "filled", "closed"],
+        default: "open",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      // ── Address ──
+      city: {
+        type: "string",
+        title: "address.city",
+        placeholder: "address.city",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      state: {
+        type: "string",
+        title: "address.state",
+        placeholder: "address.state",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      country: {
+        type: "string",
+        title: "address.country",
+        placeholder: "address.country",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      postalCode: {
+        type: "string",
+        title: "address.postalCode",
+        placeholder: "address.postalCode",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      // ── Forecast details ──
+      revenuePerPosition: {
+        type: "number",
+        widget: "number",
+        title: "fields.revenuePerPosition",
+        unit: "fields.usd",
+        unitPosition: "end",
+        minimum: 0,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      expectedRevenue: {
+        type: "number",
+        widget: "number",
+        title: "fields.expectedRevenue",
+        unit: "fields.usd",
+        unitPosition: "end",
+        readOnly: true,
+        help: "fields.expectedRevenueHelp",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      actualRevenue: {
+        type: "number",
+        widget: "number",
+        title: "fields.actualRevenue",
+        unit: "fields.usd",
+        unitPosition: "end",
+        minimum: 0,
+        condition: { field: "status", in: ["filled", "closed"] },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      missedRevenue: {
+        type: "number",
+        widget: "number",
+        title: "fields.missedRevenue",
+        unit: "fields.usd",
+        unitPosition: "end",
+        minimum: 0,
+        condition: { field: "status", equals: "closed" },
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      // ── Attachments ──
+      jobSummary: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.jobSummary",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      attachments: {
+        type: "array",
+        widget: "attachments",
+        title: "fields.others",
+        uploadLabel: "fields.attachmentsBrowse",
+        accept: "application/pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png",
+        maxSizeMb: 20,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      // ── AI Screening ──
+      aiScreening: {
+        type: "boolean",
+        widget: "switch-row",
+        title: "fields.aiScreening",
+        help: "fields.aiScreeningHelp",
+        grid: { size: { xs: 12 } },
+      },
+      screeningCriteria: {
+        type: "string",
+        widget: "textarea",
+        rows: 3,
+        title: "fields.screeningCriteria",
+        placeholder: "fields.screeningCriteriaPlaceholder",
+        condition: { field: "aiScreening", equals: true },
+        grid: { size: { xs: 12 } },
+      },
+      // ── Assigned team (side) ──
+      sourcerId: {
+        type: "string",
+        widget: "select",
+        avatar: true,
+        title: "fields.sourcer",
+        placeholder: "fields.sourcerPlaceholder",
+        optionSource: { url: "/users", path: "data", valueKey: "id", labelKey: "name" },
+        grid: { size: { xs: 12 } },
+      },
+      profileLeadId: {
+        type: "string",
+        widget: "select",
+        avatar: true,
+        title: "fields.profileLead",
+        placeholder: "fields.profileLeadPlaceholder",
+        optionSource: { url: "/users", path: "data", valueKey: "id", labelKey: "name" },
+        grid: { size: { xs: 12 } },
+      },
+      dailyInviteTarget: {
+        type: "integer",
+        widget: "number",
+        title: "fields.dailyInviteTarget",
+        minimum: 0,
+        grid: { size: { xs: 12 } },
+      },
+      // ── Publish to (side) ──
+      publishChannels: {
+        type: "array",
+        widget: "checkbox-group",
+        title: "fields.publishChannels",
+        hideLabel: true,
+        enum: ["website", "linkedin", "naukri", "indeed"],
+        grid: { size: { xs: 12 } },
+      },
+    },
+    required: ["title", "clientId"],
+    errorMessage: {
+      required: { title: "fields.titleRequired", clientId: "fields.clientRequired" },
+    },
+  },
+  sections: [
+    {
+      grid: { size: { xs: 12, md: 8 } },
+      sections: [
+        {
+          title: "sections.basics",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: [
+            "title",
+            "clientId",
+            "clientContactId",
+            "dateOpened",
+            "targetDate",
+            "employmentType",
+            "workExperience",
+            "industry",
+            "openings",
+            "salaryMin",
+            "salaryMax",
+            "status",
+          ],
+        },
+        {
+          title: "sections.address",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["city", "state", "country", "postalCode"],
+        },
+        {
+          title: "sections.forecast",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["revenuePerPosition", "expectedRevenue", "actualRevenue", "missedRevenue"],
+        },
+        {
+          title: "sections.attachments",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["jobSummary", "attachments"],
+        },
+        {
+          title: "sections.aiScreening",
+          accent: true,
+          icon: "auto-awesome",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["aiScreening", "screeningCriteria"],
+        },
+      ],
+    },
+    {
+      grid: { size: { xs: 12, md: 4 } },
+      sticky: true,
+      sections: [
+        {
+          title: "sections.assignedTeam",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["sourcerId", "profileLeadId", "dailyInviteTarget"],
+        },
+        {
+          title: "sections.publishTo",
+          gridContainer: { columns: 12, spacing: 2 },
+          fields: ["publishChannels"],
+        },
+      ],
+    },
+  ],
+  sectionsContainer: { gridContainer: { columns: 12, spacing: 2 } },
+  listRouteId: "Recruit.Jobs.Route",
+};

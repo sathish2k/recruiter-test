@@ -1,0 +1,18 @@
+{
+  "columns": {
+    "title": "Job title",
+    "client": "Client",
+    "status": "Status",
+    "openings": "Openings",
+    "updated": "Updated"
+  },
+  "filters": { "search": "Search jobs…" },
+  "actions": {
+    "new": "New job",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "exportCsv": "Export CSV",
+  "empty": "No jobs yet",
+  "toast": { "deleted": "Job \"{{name}}\" deleted" }
+}

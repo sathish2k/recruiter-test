@@ -1,0 +1,21 @@
+{
+  "columns": {
+    "name": "Candidate",
+    "email": "Email",
+    "job": "Job",
+    "status": "Status",
+    "updated": "Updated"
+  },
+  "filters": { "search": "Search candidates…" },
+  "actions": {
+    "new": "New candidate",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "exportCsv": "Export CSV",
+  "empty": "No candidates yet",
+  "toast": {
+    "copied": "Copied",
+    "deleted": "Candidate \"{{name}}\" deleted"
+  }
+}

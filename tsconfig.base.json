@@ -27,6 +27,8 @@
       "@recruit/module-profile": ["./packages/modules/recruit-profile/src/index.ts"],
       "@recruit/module-contact": ["./packages/modules/recruit-contact/src/index.ts"],
       "@recruit/module-client": ["./packages/modules/recruit-client/src/index.ts"],
+      "@recruit/module-jobs": ["./packages/modules/recruit-jobs/src/index.ts"],
+      "@recruit/module-candidate": ["./packages/modules/recruit-candidate/src/index.ts"],
       "@recruit/configurations": ["./packages/configurations/src/index.ts"]
     }
   }

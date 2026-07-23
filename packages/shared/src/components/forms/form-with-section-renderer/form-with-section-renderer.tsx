@@ -12,6 +12,7 @@ import { useMemo, useRef, useState } from "react";
 import { type FieldValues, FormProvider, useForm } from "react-hook-form";
 import { IconRenderer } from "../../renderers";
 import { Field } from "../field/field";
+import { useFieldEffects } from "../field/use-field-effects";
 import { FormContainer } from "../form-container";
 import { buildResolver, defaultFor } from "../form-renderer/form-renderer";
 import type {
@@ -171,6 +172,7 @@ export function FormWithSectionsRenderer({
   draftLabel = "saveDraft",
   onSaveDraft,
   actions,
+  addAnotherLabel,
   actionsPlacement = "header",
   widgets,
   isLoading = false,
@@ -179,6 +181,8 @@ export function FormWithSectionsRenderer({
   // Transient "Saved" confirmation on the submit button (spinner → check + pop).
   const [justSaved, setJustSaved] = useState(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Set true by "Save & add another" just before submit, read in submitHandler.
+  const addAnotherRef = useRef(false);
   const resolver = useMemo(() => buildResolver(schema), [schema]);
   const initial = useMemo(() => {
     const values: FieldValues = { ...defaultValues };
@@ -196,6 +200,7 @@ export function FormWithSectionsRenderer({
     mode: "onTouched",
   });
   const { control, handleSubmit, getValues, reset, formState } = methods;
+  const { hiddenSet, disabledSet } = useFieldEffects(schema, control, methods.setValue);
 
   // A leaf section renders as one card of fields; a `sections` group lays its
   // children out through the same config-driven FormContainer (grid or stack),
@@ -204,15 +209,18 @@ export function FormWithSectionsRenderer({
   // fixed column styles — and it collapses to one column on small screens.
   const renderEntry = (section: FormSection, key: string | number): ReactNode => {
     if (section.sections) {
+      // `sticky` pins this column to the top while the rest of the form scrolls
+      // (the design's side panel).
       return (
-        <FormContainer
-          key={key}
-          stackContainer={section.stackContainer ?? { spacing: 2 }}
-          gridContainer={section.gridContainer}
-          grids={section.sections.map((child) => child.grid)}
-        >
-          {section.sections.map((child, index) => renderEntry(child, child.title ?? index))}
-        </FormContainer>
+        <Box key={key} sx={section.sticky ? { position: "sticky", top: "16px" } : undefined}>
+          <FormContainer
+            stackContainer={section.stackContainer ?? { spacing: 2 }}
+            gridContainer={section.gridContainer}
+            grids={section.sections.map((child) => child.grid)}
+          >
+            {section.sections.map((child, index) => renderEntry(child, child.title ?? index))}
+          </FormContainer>
+        </Box>
       );
     }
     // A section lays its fields out the same way a page lays out elements.
@@ -223,7 +231,8 @@ export function FormWithSectionsRenderer({
     const gridContainer = useShorthand
       ? { spacing: 2, columns: evenColumns }
       : section.gridContainer;
-    const fields = section.fields ?? [];
+    // Condition-hidden fields drop out so their grid cell collapses (no gap).
+    const fields = (section.fields ?? []).filter((field) => !hiddenSet.has(fieldName(field)));
     const body = fields.length ? (
       <FormContainer
         stackContainer={section.stackContainer}
@@ -249,6 +258,7 @@ export function FormWithSectionsRenderer({
               control={control}
               t={t}
               widgets={widgets}
+              disabled={disabledSet.has(name)}
             />
           );
         })}
@@ -268,9 +278,14 @@ export function FormWithSectionsRenderer({
           display: "flex",
           flexDirection: "column",
           gap: "16px",
+          // `filled` = solid neutral-tinted panel; default `text` keeps the
+          // bordered card. `accent` (orange border) composes with either.
+          ...(section.variant === "filled" ? { bgcolor: "surface.inset" } : {}),
           ...(section.accent
             ? { border: "1px solid", borderColor: "surface.primarySoftBorder" }
-            : {}),
+            : section.variant === "filled"
+              ? { border: "none" }
+              : {}),
         }}
       >
         {section.title ? (
@@ -300,7 +315,14 @@ export function FormWithSectionsRenderer({
   // Reset from getValues(), not the submitted payload — the resolver strips
   // empty optional fields, and resetting to that would re-dirty every one.
   const submitHandler = async (values: FieldValues) => {
-    await onSubmit(values as FormValues);
+    const addAnother = addAnotherRef.current;
+    addAnotherRef.current = false;
+    await onSubmit(values as FormValues, { addAnother });
+    // Add-another clears the form and stays; the caller skips navigation.
+    if (addAnother) {
+      reset(initial);
+      return;
+    }
     reset(getValues());
     if (savedLabel) {
       setJustSaved(true);
@@ -341,6 +363,19 @@ export function FormWithSectionsRenderer({
           {t(draftLabel)}
         </Button>
       ) : null}
+      {addAnotherLabel ? (
+        <Button
+          variant="outlined"
+          disabled={submitting}
+          onClick={() => {
+            addAnotherRef.current = true;
+            void handleSubmit(submitHandler)();
+          }}
+          sx={{ fontWeight: 400 }}
+        >
+          {t(addAnotherLabel)}
+        </Button>
+      ) : null}
       <Button
         type="submit"
         variant="contained"
@@ -374,6 +409,28 @@ export function FormWithSectionsRenderer({
   // custom cluster owns its own layout (e.g. a full-width sticky bar) and is
   // placed full-width after the grid.
   const footerBuiltIn = actionsPlacement === "footer" && !actions;
+  // A bottom bar that appears only once the form is dirty (settings screens).
+  const stickyBar =
+    actionsPlacement === "sticky" && !actions && formState.isDirty ? (
+      <Box
+        sx={{
+          position: "sticky",
+          bottom: "16px",
+          mt: "16px",
+          zIndex: 5,
+          display: "flex",
+          justifyContent: "flex-end",
+          p: "10px 14px",
+          borderRadius: "14px",
+          bgcolor: "surface.elevated",
+          border: "1px solid",
+          borderColor: "surface.border",
+          boxShadow: "0 12px 34px rgba(0,0,0,.4)",
+        }}
+      >
+        {defaultActions}
+      </Box>
+    ) : null;
 
   if (isLoading) {
     return (
@@ -463,6 +520,7 @@ export function FormWithSectionsRenderer({
         )}
 
         {actionsPlacement === "footer" && actions ? cluster : null}
+        {stickyBar}
       </Box>
     </FormProvider>
   );

@@ -1,0 +1,98 @@
+{
+  "back": "Back to jobs",
+  "newTitle": "New Job",
+  "newDescription": "Open a requirement under a client — sourcing and screening come next.",
+  "editTitle": "Edit job",
+  "editDescription": "Update this requirement's details, forecast and team.",
+  "sections": {
+    "basics": "Basics",
+    "address": "Address",
+    "forecast": "Forecast details",
+    "attachments": "Attachments",
+    "aiScreening": "AI Screening",
+    "assignedTeam": "Assigned team",
+    "publishTo": "Publish to"
+  },
+  "fields": {
+    "title": "Job title",
+    "titlePlaceholder": "e.g. Senior Backend Engineer",
+    "titleMax": "Keep the title under 150 characters",
+    "titleRequired": "Job title is required",
+    "client": "Client",
+    "clientPlaceholder": "Select client",
+    "clientRequired": "Client is required",
+    "clientContact": "Client contact",
+    "clientContactPlaceholder": "Search contacts…",
+    "dateOpened": "Date opened",
+    "targetDate": "Target date",
+    "employmentType": "Employment type",
+    "workExperience": "Work experience",
+    "industry": "Industry",
+    "industryPlaceholder": "Search industries…",
+    "openings": "Openings",
+    "salaryMin": "Salary min",
+    "salaryMax": "Salary max",
+    "usd": "USD",
+    "status": "Job opening status",
+    "revenuePerPosition": "Revenue per position",
+    "expectedRevenue": "Expected revenue",
+    "expectedRevenueHelp": "Revenue per position × openings",
+    "actualRevenue": "Actual revenue",
+    "missedRevenue": "Missed revenue",
+    "jobSummary": "Job summary (JD)",
+    "others": "Others",
+    "attachmentsBrowse": "Browse or drop a file",
+    "aiScreening": "Enable AI screening",
+    "aiScreeningHelp": "Auto-screen inbound applicants against the criteria below",
+    "screeningCriteria": "Screening criteria",
+    "screeningCriteriaPlaceholder": "Must-have skills, deal-breakers, seniority…",
+    "sourcer": "Employee (sourcer)",
+    "sourcerPlaceholder": "Search team…",
+    "profileLead": "Profile lead (reviews & submits)",
+    "profileLeadPlaceholder": "Search team…",
+    "dailyInviteTarget": "Daily invite target",
+    "publishChannels": "Publish to"
+  },
+  "employmentType": {
+    "full_time": "Full-time",
+    "part_time": "Part-time",
+    "contract": "Contract",
+    "temporary": "Temporary",
+    "internship": "Internship"
+  },
+  "workExperience": {
+    "lt1": "Less than 1 year",
+    "1_3": "1–3 years",
+    "3_5": "3–5 years",
+    "5_8": "5–8 years",
+    "8plus": "8+ years"
+  },
+  "status": {
+    "open": "Open",
+    "on_hold": "On hold",
+    "filled": "Filled",
+    "closed": "Closed"
+  },
+  "channels": {
+    "website": "Website",
+    "linkedin": "LinkedIn",
+    "naukri": "Naukri",
+    "indeed": "Indeed"
+  },
+  "address": {
+    "city": "City",
+    "state": "Province / State",
+    "country": "Country",
+    "postalCode": "Postal code"
+  },
+  "actions": {
+    "create": "Publish job",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "saveAnother": "Save & add another"
+  },
+  "toast": {
+    "created": "Job created",
+    "updated": "Job updated"
+  }
+}

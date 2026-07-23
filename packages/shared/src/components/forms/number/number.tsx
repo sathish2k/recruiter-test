@@ -8,7 +8,7 @@ import type { WidgetProps } from "../types";
 
 /** Numeric input. Stores a `number` (or "" when cleared), so a schema declaring
  * `type: "number"` validates without the string coercion a text field needs. */
-export function NumberWidget({ prop, field, fieldState, t }: WidgetProps) {
+export function NumberWidget({ prop, field, fieldState, t, disabled }: WidgetProps) {
   return (
     <FieldShell
       label={t(prop.title ?? "")}
@@ -26,6 +26,7 @@ export function NumberWidget({ prop, field, fieldState, t }: WidgetProps) {
         fullWidth
         hiddenLabel
         type="number"
+        disabled={disabled}
         placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
         error={!!fieldState.error}
         slotProps={{
