@@ -10,7 +10,23 @@ import { SelectField } from "./select-field";
  * sources options from the API; otherwise a plain menu, which reads better for
  * a handful of choices.
  */
-export function SelectWidget({ prop, field, fieldState, t, disabled }: WidgetProps) {
+export function SelectWidget({
+  prop,
+  field,
+  fieldState,
+  t,
+  disabled,
+  createOption,
+}: WidgetProps & {
+  /** Accent "create …" row pinned under the options (design behaviour). Passed
+   * by the owning screen via the `widgets` override, since creating a record
+   * is a screen concern, not a form-schema one. */
+  createOption?: {
+    label: (query: string) => string;
+    icon?: string;
+    onCreate: (query: string) => void;
+  };
+}) {
   const error = fieldState.error?.message ? t(fieldState.error.message) : undefined;
   const options: SelectOption[] = (prop.enum ?? []).map((option, index) => {
     const raw = String(option);
@@ -19,7 +35,7 @@ export function SelectWidget({ prop, field, fieldState, t, disabled }: WidgetPro
       : prop.enumL10n
         ? t(`${prop.enumL10n}.${raw || "none"}`)
         : t(raw);
-    return { value: raw, label };
+    return { value: raw, label, dot: prop.optionDots?.[raw] };
   });
 
   return (
@@ -38,8 +54,11 @@ export function SelectWidget({ prop, field, fieldState, t, disabled }: WidgetPro
           options={options}
           avatar={prop.avatar}
           disabled={disabled}
+          icon={prop.icon}
           placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
           error={!!fieldState.error}
+          emptyOption={prop.emptyOption ? { label: t(prop.emptyOption) } : undefined}
+          createOption={createOption}
           noOptionsText={t("form.noOptions", "No match")}
           loadingText={t("form.loading", "Loading…")}
         />

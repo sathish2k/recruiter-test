@@ -123,7 +123,7 @@ export function BarChartRenderer({
                 borderColor: "surface.borderStrong",
                 fontSize: 12.5,
                 cursor: "pointer",
-                "&:hover": { background: "action.hover" },
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               {t(period.label)}
@@ -181,7 +181,7 @@ export function BarChartRenderer({
                   cursor: "pointer",
                   ...(active
                     ? {
-                        background: "surface.primarySoftBg",
+                        bgcolor: "surface.primarySoftBg",
                         borderColor: "surface.primarySoftBorder",
                         color: "surface.primarySoftFg",
                       }
@@ -213,7 +213,7 @@ export function BarChartRenderer({
                 cursor: "pointer",
                 ...(showValues
                   ? {
-                      background: "surface.primarySoftBg",
+                      bgcolor: "surface.primarySoftBg",
                       borderColor: "surface.primarySoftBorder",
                       color: "surface.primarySoftFg",
                     }

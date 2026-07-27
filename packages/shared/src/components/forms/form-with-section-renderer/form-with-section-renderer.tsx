@@ -7,6 +7,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { keyframes } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { useTranslation } from "@recruit/sdk";
+import { denseFormVars } from "@recruit/ui";
 import type { ReactNode } from "react";
 import { useMemo, useRef, useState } from "react";
 import { type FieldValues, FormProvider, useForm } from "react-hook-form";
@@ -207,7 +208,7 @@ export function FormWithSectionsRenderer({
   // taking its own `grid` slot in the parent. So a two-column form is just a
   // container grid + two groups sized `md: 8` / `md: 4` — no bespoke aside or
   // fixed column styles — and it collapses to one column on small screens.
-  const renderEntry = (section: FormSection, key: string | number): ReactNode => {
+  const renderEntry = (section: FormSection, key: string | number, inRail = false): ReactNode => {
     if (section.sections) {
       // `sticky` pins this column to the top while the rest of the form scrolls
       // (the design's side panel).
@@ -218,7 +219,9 @@ export function FormWithSectionsRenderer({
             gridContainer={section.gridContainer}
             grids={section.sections.map((child) => child.grid)}
           >
-            {section.sections.map((child, index) => renderEntry(child, child.title ?? index))}
+            {section.sections.map((child, index) =>
+              renderEntry(child, child.title ?? index, inRail || Boolean(section.sticky)),
+            )}
           </FormContainer>
         </Box>
       );
@@ -274,7 +277,9 @@ export function FormWithSectionsRenderer({
         key={key}
         variant="base"
         sx={{
-          p: section.iconBadge ? "18px" : "20px 22px",
+          p: section.iconBadge ? "18px" : inRail ? "20px" : "22px 24px",
+          // The rail runs the design`s smaller control size.
+          ...(inRail ? denseFormVars : {}),
           display: "flex",
           flexDirection: "column",
           gap: "16px",
@@ -333,7 +338,13 @@ export function FormWithSectionsRenderer({
                     <IconRenderer name={section.icon} size={17} />
                   </Box>
                 ) : null}
-                <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t(section.title)}</Typography>
+                <Typography
+                  sx={
+                    inRail ? { fontSize: 14.5, fontWeight: 600 } : { fontSize: 15, fontWeight: 700 }
+                  }
+                >
+                  {t(section.title)}
+                </Typography>
               </Box>
               {section.description ? (
                 <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}>

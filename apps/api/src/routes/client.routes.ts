@@ -42,6 +42,12 @@ const clientBody = t.Object({
   status: t.Optional(t.String()),
   health: t.Optional(t.String()),
   logo: t.Optional(t.String()),
+  linkedin: t.Optional(t.String({ maxLength: 255 })),
+  careerPage: t.Optional(t.String({ maxLength: 255 })),
+  timezone: t.Optional(t.String({ maxLength: 60 })),
+  companySize: t.Optional(t.String({ maxLength: 40 })),
+  annualHiringVolume: t.Optional(t.String({ maxLength: 40 })),
+  replacementPeriod: t.Optional(t.String({ maxLength: 40 })),
 });
 
 export default new Elysia({ name: "client.routes" })
@@ -51,6 +57,7 @@ export default new Elysia({ name: "client.routes" })
     query: t.Object({
       search: t.Optional(t.String()),
       status: t.Optional(t.String()),
+      health: t.Optional(t.String()),
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
       sortKey: t.Optional(t.String()),

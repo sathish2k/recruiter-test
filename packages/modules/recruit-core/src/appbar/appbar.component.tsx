@@ -121,7 +121,7 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
                     fontWeight: 700,
                     letterSpacing: ".04em",
                     "&:hover": {
-                      background: "action.hover",
+                      bgcolor: "action.hover",
                       color: "text.primary",
                     },
                   }}

@@ -1,13 +1,29 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, count, desc, eq, getTableColumns, ilike, inArray, or, sum } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  gt,
+  gte,
+  ilike,
+  inArray,
+  or,
+  sum,
+} from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
+import { candidate } from "../models/candidate.model";
 import {
   type ClientAddress,
   type ClientAttachment,
+  type ClientHealth,
   type ClientStatus,
   client,
 } from "../models/client.model";
+import { job } from "../models/job.model";
 
 type ClientRow = typeof client.$inferSelect;
 
@@ -37,6 +53,12 @@ function mapClient(row: ClientRow & { accountLeadName?: string | null }) {
     status: row.status,
     health: row.health,
     logo: row.logo ?? "",
+    linkedin: row.linkedin ?? "",
+    careerPage: row.careerPage ?? "",
+    timezone: row.timezone ?? "",
+    companySize: row.companySize ?? "",
+    annualHiringVolume: row.annualHiringVolume ?? "",
+    replacementPeriod: row.replacementPeriod ?? "",
     openRoles: row.openRoles,
     candidates: row.candidates,
     placements: row.placements,
@@ -60,6 +82,7 @@ function split(value?: string) {
 export interface ListClientsParams {
   search?: string;
   status?: string;
+  health?: string;
   page?: number;
   pageSize?: number;
   sortKey?: string;
@@ -76,6 +99,8 @@ export async function listClients(organizationId: string, params: ListClientsPar
   }
   const statuses = split(params.status);
   if (statuses.length) filters.push(inArray(client.status, statuses as ClientStatus[]));
+  const healths = split(params.health);
+  if (healths.length) filters.push(inArray(client.health, healths as ClientHealth[]));
 
   const where = and(...filters);
   const page = Math.max(1, params.page ?? 1);
@@ -83,7 +108,7 @@ export async function listClients(organizationId: string, params: ListClientsPar
   const column = SORT_FIELDS[params.sortKey as keyof typeof SORT_FIELDS] ?? client.createdAt;
   const order = params.sortDir === "asc" ? asc(column) : desc(column);
 
-  const [rows, countRows] = await Promise.all([
+  const [rows, countRows, stageRows] = await Promise.all([
     db
       .select({ ...getTableColumns(client), accountLeadName: user.name })
       .from(client)
@@ -93,14 +118,40 @@ export async function listClients(organizationId: string, params: ListClientsPar
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db.select({ total: count() }).from(client).where(where),
+    // Candidate-flow split per client, for the card's pipeline bar.
+    db
+      .select({ clientId: job.clientId, stage: candidate.startingStage, total: count() })
+      .from(candidate)
+      .innerJoin(job, eq(candidate.jobId, job.id))
+      .where(eq(candidate.organizationId, organizationId))
+      .groupBy(job.clientId, candidate.startingStage),
   ]);
 
-  return { data: rows.map(mapClient), totalCount: countRows[0]?.total ?? 0 };
+  const flow = new Map<string, { sourced: number; screening: number; interviewing: number }>();
+  for (const row of stageRows) {
+    if (!row.clientId) continue;
+    const entry = flow.get(row.clientId) ?? { sourced: 0, screening: 0, interviewing: 0 };
+    if (row.stage === "sourced") entry.sourced += Number(row.total);
+    else if (row.stage === "screening") entry.screening += Number(row.total);
+    else if (row.stage === "interview") entry.interviewing += Number(row.total);
+    flow.set(row.clientId, entry);
+  }
+
+  return {
+    data: rows.map((row) => ({
+      ...mapClient(row),
+      flow: flow.get(row.id) ?? { sourced: 0, screening: 0, interviewing: 0 },
+    })),
+    totalCount: countRows[0]?.total ?? 0,
+  };
 }
+
+const QUARTER_MS = 90 * 24 * 60 * 60 * 1000;
 
 export async function clientStats(organizationId: string) {
   const where = eq(client.organizationId, organizationId);
-  const [byStatusRows, [totals]] = await Promise.all([
+  const quarterAgo = new Date(Date.now() - QUARTER_MS);
+  const [byStatusRows, [totals], [addedRow], [withRolesRow], placedRows] = await Promise.all([
     db
       .select({ status: client.status, total: count() })
       .from(client)
@@ -110,7 +161,28 @@ export async function clientStats(organizationId: string) {
       .select({ openRoles: sum(client.openRoles), placements: sum(client.placements) })
       .from(client)
       .where(where),
+    db
+      .select({ total: count() })
+      .from(client)
+      .where(and(where, gte(client.createdAt, quarterAgo))),
+    db
+      .select({ total: count() })
+      .from(client)
+      .where(and(where, gt(client.openRoles, 0))),
+    // Time to hire: how long a placed candidate took from first record to
+    // placement. `updatedAt` is when they were marked placed.
+    db
+      .select({ createdAt: candidate.createdAt, updatedAt: candidate.updatedAt })
+      .from(candidate)
+      .where(and(eq(candidate.organizationId, organizationId), eq(candidate.status, "placed"))),
   ]);
+
+  const days = placedRows
+    .map((row) => (row.updatedAt.getTime() - row.createdAt.getTime()) / (24 * 60 * 60 * 1000))
+    .filter((value) => value >= 0);
+  const avgTimeToHire = days.length
+    ? Math.round(days.reduce((sum, value) => sum + value, 0) / days.length)
+    : 0;
   const byStatus = Object.fromEntries(byStatusRows.map((r) => [r.status, r.total]));
   const active = byStatusRows.reduce((acc, r) => acc + r.total, 0);
   return {
@@ -119,6 +191,9 @@ export async function clientStats(organizationId: string) {
     paused: byStatus.paused ?? 0,
     openRoles: Number(totals?.openRoles ?? 0),
     placements: Number(totals?.placements ?? 0),
+    addedThisQuarter: Number(addedRow?.total ?? 0),
+    clientsWithRoles: Number(withRolesRow?.total ?? 0),
+    avgTimeToHire,
   };
 }
 
@@ -133,6 +208,12 @@ export async function getClient(organizationId: string, id: string) {
 }
 
 export interface ClientInput {
+  linkedin?: string;
+  careerPage?: string;
+  timezone?: string;
+  companySize?: string;
+  annualHiringVolume?: string;
+  replacementPeriod?: string;
   name?: string;
   parentCompany?: string;
   primaryContactId?: string;
@@ -180,6 +261,12 @@ const EDITABLE = [
   "status",
   "health",
   "logo",
+  "linkedin",
+  "careerPage",
+  "timezone",
+  "companySize",
+  "annualHiringVolume",
+  "replacementPeriod",
 ] as const;
 
 function pickEditable(input: ClientInput): Partial<ClientRow> {

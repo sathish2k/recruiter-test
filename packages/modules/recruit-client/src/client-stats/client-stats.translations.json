@@ -1,9 +1,13 @@
 {
   "stats": {
     "activeClients": "Active Clients",
-    "hiring": "{value} hiring",
+    "hiring": "{value} currently hiring",
+    "addedThisQuarter": "+{{addedThisQuarter}} added this quarter",
     "requirements": "Active Requirements",
-    "requirementsDelta": "across your clients",
+    "requirementsDelta": "Across {value} clients",
+    "avgTimeToHire": "Avg Time to Hire",
+    "days": "{value} days",
+    "avgTimeToHireDelta": "across placed candidates",
     "placements": "Placements",
     "placementsDelta": "all time"
   }

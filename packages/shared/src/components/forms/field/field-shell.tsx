@@ -8,15 +8,26 @@ import { createContext, type ReactNode, useContext } from "react";
  * widget renders it — shows the asterisk without every widget threading a flag. */
 export const FieldRequiredContext = createContext(false);
 
+/** Already-translated "optional" suffix, set by `Field` from the schema. The design
+ * appends it to the label in a dimmer, lighter weight rather than a separate line. */
+export const FieldOptionalContext = createContext<string | null>(null);
+
 export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
   const required = useContext(FieldRequiredContext);
+  const optional = useContext(FieldOptionalContext);
   if (hide) return null;
   return (
-    <Typography sx={{ fontSize: 12, fontWeight: 600, color: "surface.textMuted" }}>
+    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "surface.textMuted" }}>
       {label}
       {required ? (
         <Box component="span" sx={{ color: "error.main", ml: "3px" }}>
           *
+        </Box>
+      ) : null}
+      {optional ? (
+        <Box component="span" sx={{ color: "text.disabled", fontWeight: 400 }}>
+          {" · "}
+          {optional}
         </Box>
       ) : null}
     </Typography>

@@ -22,7 +22,11 @@ export interface UploadFieldProps {
   helpSecondary?: string;
   preview?: "square" | "circle";
   removeLabel?: string;
-  errorLabel?: (reason: "type" | "size") => string;
+  errorLabel?: (reason: "type" | "size" | "upload") => string;
+  /** Uploads the picked file, reporting 0–100. When given, the tile draws the
+   * design`s progress ring and a completion tick; without it the field just holds
+   * the File for the caller to upload on submit. */
+  uploader?: (file: File, onProgress: (percent: number) => void) => Promise<{ url: string }>;
 }
 
 /**
@@ -42,9 +46,20 @@ export function UploadField({
   preview = "square",
   removeLabel = "Remove",
   errorLabel,
+  uploader,
 }: UploadFieldProps) {
   const input = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  // null = idle; 0–100 = uploading; 100 then cleared = just finished.
+  const [percent, setPercent] = useState<number | null>(null);
+  const [done, setDone] = useState(false);
+
+  const remove = () => {
+    setDone(false);
+    setPercent(null);
+    setError(null);
+    onChange("", null);
+  };
 
   const pick = (file?: File | null) => {
     if (!file) return;
@@ -58,68 +73,116 @@ export function UploadField({
       setError(errorLabel?.("size") ?? `Keep it under ${maxSizeMb} MB`);
       return;
     }
-    onChange(URL.createObjectURL(file), file);
+    const objectUrl = URL.createObjectURL(file);
+    if (!uploader) {
+      onChange(objectUrl, file);
+      return;
+    }
+    // Show the local preview immediately, then swap in the stored URL.
+    onChange(objectUrl, file);
+    setDone(false);
+    setPercent(0);
+    uploader(file, setPercent)
+      .then((stored) => {
+        onChange(stored.url || objectUrl, file);
+        setDone(true);
+      })
+      .catch(() => setError(errorLabel?.("upload") ?? "Upload failed"))
+      .finally(() => setPercent(null));
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "flex-start", gap: "16px" }}>
-      <Box
-        onClick={() => input.current?.click()}
-        sx={{
-          width: 64,
-          height: 64,
-          flex: "none",
-          display: "grid",
-          placeItems: "center",
-          overflow: "hidden",
-          cursor: "pointer",
-          borderRadius: preview === "circle" ? "999px" : "14px",
-          border: "1px solid",
-          borderColor: "divider",
-          bgcolor: "background.default",
-        }}
-      >
-        {value ? (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "14px",
+        bgcolor: "surface.inset",
+        border: "1px solid",
+        borderColor: "surface.controlBorder",
+        borderRadius: "13px",
+        p: "12px 14px",
+      }}
+    >
+      <Box sx={{ position: "relative", width: 50, height: 50, flex: "none" }}>
+        {percent !== null ? (
           <Box
-            component="img"
-            src={value}
-            alt=""
-            sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+            sx={{
+              position: "absolute",
+              inset: "-5px",
+              borderRadius: "16px",
+              background: (theme) =>
+                `conic-gradient(${theme.palette.primary.main} ${percent}%, ${theme.palette.surface.border} 0)`,
+            }}
           />
-        ) : (
-          <IconRenderer name="upload_file" size={22} sx={{ color: "text.disabled" }} />
-        )}
+        ) : null}
+        <Box
+          sx={{
+            position: "absolute",
+            inset: "-2px",
+            borderRadius: "14px",
+            bgcolor: "surface.inset",
+          }}
+        />
+        <Box
+          onClick={() => input.current?.click()}
+          sx={{
+            position: "relative",
+            width: 50,
+            height: 50,
+            flex: "none",
+            display: "grid",
+            placeItems: "center",
+            overflow: "hidden",
+            cursor: "pointer",
+            borderRadius: preview === "circle" ? "999px" : "13px",
+            // Empty reads as a drop target (dashed); filled is just the image.
+            border: value ? "none" : "1px dashed",
+            borderColor: "surface.borderStrong",
+            color: "surface.textDisabled",
+          }}
+        >
+          {value ? (
+            <Box
+              component="img"
+              src={value}
+              alt=""
+              sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+            />
+          ) : (
+            <IconRenderer name="upload_file" size={22} />
+          )}
+        </Box>
+        {done && value ? (
+          <Box
+            sx={{
+              position: "absolute",
+              right: -6,
+              bottom: -6,
+              width: 20,
+              height: 20,
+              borderRadius: "999px",
+              bgcolor: "success.main",
+              border: "2.5px solid",
+              borderColor: "surface.inset",
+              display: "grid",
+              placeItems: "center",
+              color: "#fff",
+            }}
+          >
+            <IconRenderer name="check" size={12} />
+          </Box>
+        ) : null}
       </Box>
 
-      <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
         {label ? (
-          <Typography sx={{ fontSize: 12, fontWeight: 600, color: "surface.textMuted", mb: "7px" }}>
+          <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "surface.textMuted" }}>
             {label}
           </Typography>
         ) : null}
-
-        <Box sx={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            onClick={() => input.current?.click()}
-            startIcon={<IconRenderer name="upload" size={14} />}
-            sx={{ fontSize: 12 }}
-          >
-            {buttonLabel}
-          </Button>
-          {value ? (
-            <Button
-              color="error"
-              onClick={() => onChange("", null)}
-              sx={{ fontSize: 12, fontWeight: 400 }}
-            >
-              {removeLabel}
-            </Button>
-          ) : null}
-        </Box>
-
         {help ? (
-          <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "7px" }}>{help}</Typography>
+          <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "3px" }}>{help}</Typography>
         ) : null}
         {helpSecondary ? (
           <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "3px" }}>
@@ -129,29 +192,59 @@ export function UploadField({
         {error ? (
           <Typography sx={{ fontSize: 11, color: "error.main", mt: "3px" }}>{error}</Typography>
         ) : null}
-
-        <Box
-          component="input"
-          ref={input}
-          type="file"
-          accept={accept}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            pick(e.target.files?.[0]);
-            // Allows re-picking the same file after a remove.
-            e.target.value = "";
-          }}
-          sx={{ display: "none" }}
-        />
       </Box>
+
+      {value ? (
+        <Typography
+          onClick={remove}
+          sx={{
+            flex: "none",
+            fontSize: 12,
+            fontWeight: 600,
+            color: "surface.textSecondary",
+            cursor: "pointer",
+          }}
+        >
+          {removeLabel}
+        </Typography>
+      ) : (
+        <Button
+          variant="outlined"
+          onClick={() => input.current?.click()}
+          startIcon={<IconRenderer name="upload" size={14} />}
+          sx={{ flex: "none", fontSize: 12.5 }}
+        >
+          {buttonLabel}
+        </Button>
+      )}
+
+      <Box
+        component="input"
+        ref={input}
+        type="file"
+        accept={accept}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          pick(e.target.files?.[0]);
+          // Allows re-picking the same file after a remove.
+          e.target.value = "";
+        }}
+        sx={{ display: "none" }}
+      />
     </Box>
   );
 }
 
 /** The `upload` widget. Value is `{ url, file }` — see UploadValue. */
-export function UploadWidget({ prop, field, t }: WidgetProps) {
+export function UploadWidget({
+  prop,
+  field,
+  t,
+  uploader,
+}: WidgetProps & { uploader?: UploadFieldProps["uploader"] }) {
   const upload = (field.value ?? {}) as UploadValue;
   return (
     <UploadField
+      uploader={uploader}
       value={typeof upload.url === "string" ? upload.url : ""}
       onChange={(url, file) => field.onChange({ url, file })}
       label={prop.hideLabel ? undefined : t(prop.title ?? "")}

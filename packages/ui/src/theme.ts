@@ -36,6 +36,7 @@ export interface FormTokens {
   controlRadius: string;
   controlPadX: string;
   controlPadY: string;
+  controlFontSize: string;
   pillRadius: string;
   badgeRadius: string;
   badgePadX: string;
@@ -64,9 +65,10 @@ const formTokens: FormTokens = {
   fieldGap: "7px",
   inlineGap: "8px",
   rowGap: "16px",
-  controlRadius: "11px",
-  controlPadX: "14px",
-  controlPadY: "11px",
+  controlRadius: "var(--recruit-control-radius, 12px)",
+  controlPadX: "var(--recruit-control-pad-x, 16px)",
+  controlPadY: "var(--recruit-control-pad-y, 12px)",
+  controlFontSize: "var(--recruit-control-font, 13.5px)",
   pillRadius: "999px",
   badgeRadius: "5px",
   badgePadX: "5px",
@@ -207,7 +209,12 @@ interface Surfaces {
   /** Subtle fill for inline chips/badges sitting on a control. */
   tint: string;
   /** Soft-primary trio: selected day toggles, quick-picks, accent chips. */
+  /** Field dropdown panel. A shade above `elevated`, which is for top-level
+   * overlays (toasts, appbar popovers). */
+  dropdownPanel: string;
   primarySoftBg: string;
+  /** Selected row inside a dropdown — a touch lighter than `primarySoftBg`. */
+  optionSelectedBg: string;
   primarySoftBorder: string;
   primarySoftFg: string;
   /** Alert/severity foregrounds — readable against each mode's background. */
@@ -268,7 +275,9 @@ function surfaces(mode: ThemeMode): Surfaces {
       headBg: "rgba(0,0,0,0.04)",
       menuShadow: "0 18px 50px rgba(0,0,0,.18)",
       tint: "rgba(0,0,0,0.06)",
+      dropdownPanel: "#FFFFFF",
       primarySoftBg: "rgba(242,106,27,0.12)",
+      optionSelectedBg: "rgba(242,106,27,0.12)",
       primarySoftBorder: "rgba(242,106,27,0.30)",
       primarySoftFg: "#C2521A",
       infoFg: "#3C5E8C",
@@ -312,7 +321,9 @@ function surfaces(mode: ThemeMode): Surfaces {
     headBg: "rgba(255,255,255,0.04)",
     menuShadow: "0 18px 50px rgba(0,0,0,.6)",
     tint: "rgba(255,255,255,0.07)",
+    dropdownPanel: "#211F1E",
     primarySoftBg: "rgba(242,106,27,0.14)",
+    optionSelectedBg: "rgba(242,106,27,0.12)",
     primarySoftBorder: "rgba(242,106,27,0.35)",
     primarySoftFg: "#F0B27C",
     infoFg: "#9BB8D9",
@@ -362,7 +373,9 @@ const v: Surfaces = {
   headBg: "var(--mui-palette-surface-headBg)",
   menuShadow: "var(--mui-palette-surface-menuShadow)",
   tint: "var(--mui-palette-surface-tint)",
+  dropdownPanel: "var(--mui-palette-surface-dropdownPanel)",
   primarySoftBg: "var(--mui-palette-surface-primarySoftBg)",
+  optionSelectedBg: "var(--mui-palette-surface-optionSelectedBg)",
   primarySoftBorder: "var(--mui-palette-surface-primarySoftBorder)",
   primarySoftFg: "var(--mui-palette-surface-primarySoftFg)",
   infoFg: "var(--mui-palette-surface-infoFg)",
@@ -451,6 +464,10 @@ export function createAppTheme(): Theme {
             fontSize: 13,
             lineHeight: 1.45,
             padding: "9px 16px",
+            // MUI pulls icons 4px outward (marginLeft/-Right: -4px), which eats
+            // into the 16px padding. The design is a plain 8px gap inside it.
+            "& .MuiButton-startIcon": { marginLeft: 0, marginRight: "8px" },
+            "& .MuiButton-endIcon": { marginRight: 0, marginLeft: "8px" },
           },
         },
         variants: [
@@ -544,6 +561,11 @@ export function createAppTheme(): Theme {
             padding: "9px 11px",
             gap: 10,
             "&:hover": { background: v.hover, color: v.textPrimary },
+            // The design tints the chosen row with the accent rather than MUI`s
+            // grey `action.selected`, matching the type-ahead`s option rows.
+            "&.Mui-selected": { background: v.optionSelectedBg, color: v.textPrimary },
+            "&.Mui-selected:hover": { background: v.optionSelectedBg, color: v.textPrimary },
+            "&.Mui-selected.Mui-focusVisible": { background: v.optionSelectedBg },
           },
         },
       },
@@ -689,10 +711,10 @@ export function createAppTheme(): Theme {
           root: {
             borderRadius: formTokens.controlRadius,
             background: v.inset,
-            fontSize: 13.5,
+            fontSize: formTokens.controlFontSize,
           },
           // Two deviations from MUI's defaults, both to land on the design's
-          // 40.5px control: it pins the input to `height: 1.4375em` (~1px too
+          // 42px control: it pins the input to `height: 1.4375em` (~1px too
           // tall), and it paints the outline on an absolutely-positioned
           // fieldset, so — unlike the design's bordered <input> — that 1px edge
           // adds no layout height. Hence the +1px on each side.
@@ -867,14 +889,14 @@ export function createAppTheme(): Theme {
                 minWidth: 0,
                 borderRadius: 999,
                 padding: "8px 6px",
+                minHeight: 0,
                 fontSize: 12.5,
                 fontWeight: 600,
                 color: v.textSecondary,
-                "&.Mui-selected": {
-                  color: v.textPrimary,
-                  background: v.elevated,
-                  boxShadow: `0 0 0 1px ${v.controlBorder}, 0 2px 4px rgba(0,0,0,.3)`,
-                },
+                // The design draws the active segment as a flat translucent white
+                // pill — the same token as the dashboard`s Today/Week filter — with
+                // no ring or shadow.
+                "&.Mui-selected": { color: v.textPrimary, background: v.pillActive },
               },
             },
           },
@@ -1015,3 +1037,15 @@ export function createAppTheme(): Theme {
 
 // Default dark theme (back-compat for direct `theme` imports).
 export const theme = createAppTheme();
+
+/**
+ * The design draws two control sizes: the form column at 12/16px, and the side
+ * rail (plus any equally dense panel) a step smaller. Spread these vars onto a
+ * container and every control inside it — themed inputs and the type-ahead
+ * alike — picks the smaller metrics up.
+ */
+export const denseFormVars = {
+  "--recruit-control-pad-x": "14px",
+  "--recruit-control-pad-y": "10px",
+  "--recruit-control-font": "13px",
+} as const;

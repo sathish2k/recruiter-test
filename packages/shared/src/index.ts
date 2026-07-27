@@ -100,6 +100,7 @@ export {
   SearchableSelectField,
   SelectField,
   type SelectOption,
+  SelectWidget,
   Slider,
   SliderWidget,
   SwitchRowWidget,
@@ -107,6 +108,7 @@ export {
   TextWidget,
   UploadField,
   type UploadValue,
+  UploadWidget,
   useRemoteOptions,
   type Widget,
   type WidgetProps,
@@ -220,6 +222,7 @@ export {
   type TextRendererConfig,
 } from "./components/renderers";
 export {
+  CardCollectionRenderer,
   type CellConfig,
   type Cells,
   type ColumnLabel,

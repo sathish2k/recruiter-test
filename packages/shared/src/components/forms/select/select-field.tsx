@@ -1,5 +1,6 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import type { SelectOption } from "../types";
@@ -11,6 +12,24 @@ export interface SelectFieldProps {
   options: SelectOption[];
   error?: boolean;
   disabled?: boolean;
+}
+
+/** The design marks a lifecycle value with a small colour dot before its label. */
+export function Dot({ color }: { color: string }) {
+  return (
+    <Box
+      component="span"
+      sx={{
+        width: 7,
+        height: 7,
+        borderRadius: "999px",
+        background: color,
+        flex: "none",
+        mr: "8px",
+        display: "inline-block",
+      }}
+    />
+  );
 }
 
 /**
@@ -41,6 +60,7 @@ export function SelectField({
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
+          {option.dot ? <Dot color={option.dot} /> : null}
           {option.label}
         </MenuItem>
       ))}

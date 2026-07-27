@@ -85,7 +85,7 @@ export function SidenavComponent({
             justifyContent: "center",
             color: "text.disabled",
             cursor: "pointer",
-            "&:hover": { color: "text.primary", background: "action.hover" },
+            "&:hover": { color: "text.primary", bgcolor: "action.hover" },
           }}
         >
           {collapsed ? (
@@ -160,7 +160,7 @@ export function SidenavComponent({
                       : {
                           color: "text.secondary",
                           "&:hover": {
-                            background: "action.hover",
+                            bgcolor: "action.hover",
                             color: "text.primary",
                           },
                         }),

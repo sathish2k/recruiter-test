@@ -1,3 +1,4 @@
+export { CardCollectionRenderer } from "./card-collection";
 export { TableCellRenderer } from "./table-cell";
 export { TableFilterExportRenderer } from "./table-filter-export";
 export { TableFooterRenderer } from "./table-footer";

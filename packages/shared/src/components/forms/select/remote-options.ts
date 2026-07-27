@@ -59,12 +59,20 @@ export function fetchOptions(source: OptionSource, search?: string): Promise<Sel
   return request.then((body) => toOptions(body, source));
 }
 
+/** Bumped on every invalidation so mounted fields refetch, not just later mounts. */
+let epoch = 0;
+const listeners = new Set<() => void>();
+
 /** Drops cached lists so a mutation elsewhere can force a refetch. */
 export function invalidateOptions(url?: string) {
-  if (!url) return cache.clear();
-  for (const key of [...cache.keys()]) {
-    if (key.includes(JSON.stringify(url))) cache.delete(key);
+  if (!url) cache.clear();
+  else {
+    for (const key of [...cache.keys()]) {
+      if (key.includes(JSON.stringify(url))) cache.delete(key);
+    }
   }
+  epoch += 1;
+  for (const listener of listeners) listener();
 }
 
 export interface UseRemoteOptionsResult {
@@ -85,7 +93,18 @@ export function useRemoteOptions(
   const [options, setOptions] = useState<SelectOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [version, setVersion] = useState(epoch);
   const latest = useRef(0);
+
+  // A create elsewhere (the quick-contact modal) invalidates the list; without
+  // this the already-mounted field would keep showing the stale options.
+  useEffect(() => {
+    const listener = () => setVersion(epoch);
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
 
   // Server-side search re-queries per term; otherwise the term never hits the
   // network, so the effect shouldn't depend on it.
@@ -122,7 +141,7 @@ export function useRemoteOptions(
       current.searchParam && query ? (current.debounceMs ?? 250) : 0,
     );
     return () => clearTimeout(timer);
-  }, [source, query]);
+  }, [source, query, version]);
 
   return { options, loading, error };
 }

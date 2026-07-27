@@ -119,7 +119,7 @@ function ListRow({
       <Box sx={{ display: "flex", gap: "11px", py: "8px" }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", flex: "none" }}>
           <Box sx={{ mt: "4px", display: "flex" }}>{item.icon}</Box>
-          {isLast ? null : <Box sx={{ flex: 1, width: "1px", background: "surface.divider" }} />}
+          {isLast ? null : <Box sx={{ flex: 1, width: "1px", bgcolor: "surface.divider" }} />}
         </Box>
         <Box sx={{ minWidth: 0, pb: "2px" }}>
           <Box sx={{ fontSize: 12.5, color: "surface.textMuted", lineHeight: 1.45 }}>
@@ -142,7 +142,7 @@ function ListRow({
           display: "flex",
           alignItems: "center",
           gap: "12px",
-          background: "surface.inset",
+          bgcolor: "surface.inset",
           border: "1px solid",
           borderColor: "divider",
           borderRadius: "12px",
@@ -174,7 +174,7 @@ function ListRow({
               p: "10px",
               mx: "-10px",
               borderRadius: "10px",
-              "&:hover": { background: "surface.hoverSubtle" },
+              "&:hover": { bgcolor: "surface.hoverSubtle" },
             }
           : { display: "flex", alignItems: "center", gap: "13px" }
       }

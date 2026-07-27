@@ -8,6 +8,9 @@ export const clientFormDatasource = (): DatasourceInstance => ({
     const { id, ...rest } = body ?? {};
     return (await httpClient.put(`/clients/${String(id)}`, rest)).data;
   },
+  /** Quick-creates a contact from the client form`s modal, returning the new row. */
+  createContact: async (body?: Record<string, unknown>) =>
+    (await httpClient.post("/contacts", body)).data,
   /** Uploads one attachment and returns its stored `{ name, url, size, type }`.
    * The endpoint lives here (the data layer), so the widget stays link-free. */
   uploadAsset: async (file?: File, onProgress?: (percent: number) => void) => {

@@ -24,6 +24,8 @@ export interface ClientCardData {
   candidates?: number;
   placements?: number;
   accountLeadName?: string;
+  /** Candidate-flow split behind the pipeline bar. */
+  flow?: { sourced: number; screening: number; interviewing: number };
   /** Optional narrative flourishes — rendered only when present. */
   activity?: string;
   insightTitle?: string;
@@ -37,6 +39,10 @@ export interface ClientCardLabels {
   requirements: string;
   candidates: string;
   placements: string;
+  candidateFlow: string;
+  inPipeline: string;
+  accountManager: string;
+  flow: Record<"sourced" | "screening" | "interviewing", string>;
   status: Record<string, string>;
   health: Record<string, string>;
   open: string;
@@ -63,6 +69,13 @@ const LOGO_PALETTE = [
   { bg: "#5B4A3A", fg: "#FFD9BC" },
   { bg: "#4A5B3A", fg: "#E0F5CF" },
 ] as const;
+
+/** Pipeline bar segments, in board order — the design's stage hues. */
+const FLOW_SEGMENTS = [
+  { key: "sourced" as const, color: "var(--mui-palette-surface-neutral)" },
+  { key: "screening" as const, color: "var(--mui-palette-surface-infoFg)" },
+  { key: "interviewing" as const, color: "var(--mui-palette-surface-accentBright)" },
+];
 
 // Health tone → themed foreground token (dot + label share it).
 const HEALTH_FG: Record<string, string> = {
@@ -96,20 +109,31 @@ const ACTION_BTN = {
   "&:hover": { bgcolor: "surface.hover", color: "text.primary" },
 } as const;
 
-function Metric({ value, label, accent }: { value: number; label: string; accent?: boolean }) {
+function CardChip({ icon, label, iconColor }: { icon: string; label: string; iconColor?: string }) {
   return (
-    <Box sx={{ flex: 1, minWidth: 0 }}>
-      <Typography
-        sx={{
-          fontSize: 17,
-          fontWeight: 700,
-          letterSpacing: "-.01em",
-          color: accent ? "surface.accentBright" : "text.primary",
-        }}
-      >
-        {value ?? 0}
-      </Typography>
-      <Typography sx={{ fontSize: 10.5, color: "text.disabled", mt: "1px" }}>{label}</Typography>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "5px",
+        flex: "none",
+        px: "10px",
+        py: "4px",
+        borderRadius: "999px",
+        bgcolor: "surface.hoverSubtle",
+        border: "1px solid",
+        borderColor: "surface.divider",
+        fontSize: 11,
+        fontWeight: 600,
+        color: "surface.textMuted",
+      }}
+    >
+      <IconRenderer
+        name={icon}
+        size={13}
+        color={iconColor ?? "var(--mui-palette-surface-textSecondary)"}
+      />
+      {label}
     </Box>
   );
 }
@@ -126,18 +150,24 @@ export function ClientCardSkeleton() {
         flexDirection: "column",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Skeleton variant="circular" width={46} height={46} />
-        <Skeleton variant="rounded" width={72} height={22} sx={{ borderRadius: "999px" }} />
+      <Box sx={{ display: "flex", alignItems: "center", gap: "11px" }}>
+        <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: "13px" }} />
+        <Box sx={{ flex: 1 }}>
+          <Skeleton variant="text" width="60%" height={20} />
+          <Skeleton variant="text" width="40%" height={14} sx={{ mt: "3px" }} />
+        </Box>
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
       </Box>
-      <Skeleton variant="text" width="55%" height={22} sx={{ mt: "15px" }} />
-      <Skeleton variant="text" width="40%" height={16} sx={{ mt: "7px" }} />
-      <Box sx={{ display: "flex", gap: "12px", mt: "16px" }}>
-        {[0, 1, 2].map((i) => (
-          <Skeleton key={i} variant="rounded" width="30%" height={38} />
-        ))}
+      <Skeleton variant="text" width="45%" height={16} sx={{ mt: "12px" }} />
+      <Box sx={{ mt: "15px" }}>
+        <Skeleton variant="text" width="100%" height={12} />
+        <Skeleton variant="rounded" height={8} sx={{ mt: "7px", borderRadius: "99px" }} />
+        <Skeleton variant="text" width="80%" height={12} sx={{ mt: "7px" }} />
       </Box>
-      <Skeleton variant="text" width="70%" height={16} sx={{ mt: "18px" }} />
+      <Box sx={{ display: "flex", gap: "7px", mt: "13px" }}>
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
+      </Box>
       <Box sx={{ flex: 1 }} />
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "6px", mt: "15px", pt: "12px" }}>
         {[0, 1, 2, 3].map((i) => (
@@ -166,6 +196,9 @@ export function ClientCard({
   const health = client.health ?? "healthy";
   const healthFg = HEALTH_FG[health] ?? "surface.textSecondary";
   const isHiring = status === "hiring";
+  const flow = client.flow ?? { sourced: 0, screening: 0, interviewing: 0 };
+  const pipeline = flow.sourced + flow.screening + flow.interviewing;
+  const lead = hue(client.accountLeadName ?? client.name);
 
   const openMenu = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -197,24 +230,63 @@ export function ClientCard({
       }}
     >
       {/* Logo + health */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Avatar
-          sx={{
-            width: 46,
-            height: 46,
-            bgcolor: logo.bg,
-            color: logo.fg,
-            fontSize: 16,
-            fontWeight: 700,
-          }}
-        >
-          {initials(client.name)}
-        </Avatar>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: "10px",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: "11px", minWidth: 0 }}>
+          <Avatar
+            variant="rounded"
+            sx={{
+              width: 44,
+              height: 44,
+              borderRadius: "13px",
+              bgcolor: logo.bg,
+              color: logo.fg,
+              fontSize: 16,
+              fontWeight: 700,
+              flex: "none",
+            }}
+          >
+            {initials(client.name)}
+          </Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "7px" }}>
+              <Typography noWrap sx={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em" }}>
+                {client.name}
+              </Typography>
+              <Box
+                sx={{
+                  flex: "none",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  px: "8px",
+                  py: "2px",
+                  borderRadius: "999px",
+                  border: "1px solid",
+                  color: isHiring ? "surface.successFg" : "surface.textMuted",
+                  bgcolor: isHiring ? "surface.successSoftBg" : "surface.tint",
+                  borderColor: isHiring ? "surface.successSoftBorder" : "surface.borderStrong",
+                }}
+              >
+                {labels.status[status] ?? status}
+              </Box>
+            </Box>
+            <Typography noWrap sx={{ fontSize: 11, color: "text.disabled", mt: "3px" }}>
+              {client.industry}
+            </Typography>
+          </Box>
+        </Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "6px",
+            flex: "none",
             fontSize: 11,
             fontWeight: 600,
             color: healthFg,
@@ -228,38 +300,6 @@ export function ClientCard({
         >
           <Box sx={{ width: 5, height: 5, borderRadius: "999px", bgcolor: healthFg }} />
           {labels.health[health] ?? health}
-        </Box>
-      </Box>
-
-      {/* Name + status */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "15px" }}>
-        <Typography
-          sx={{
-            fontSize: 15,
-            fontWeight: 700,
-            letterSpacing: "-.01em",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {client.name}
-        </Typography>
-        <Box
-          sx={{
-            flex: "none",
-            fontSize: 10,
-            fontWeight: 700,
-            px: "8px",
-            py: "2px",
-            borderRadius: "999px",
-            border: "1px solid",
-            color: isHiring ? "surface.successFg" : "text.muted",
-            bgcolor: isHiring ? "surface.successSoftBg" : "surface.tint",
-            borderColor: isHiring ? "surface.successSoftBorder" : "surface.borderStrong",
-          }}
-        >
-          {labels.status[status] ?? status}
         </Box>
       </Box>
 
@@ -283,15 +323,120 @@ export function ClientCard({
         </Box>
       ) : null}
 
-      {/* Metrics */}
-      <Box sx={{ display: "flex", mt: "16px", gap: "12px" }}>
-        <Metric value={client.openRoles ?? 0} label={labels.requirements} />
-        <Box sx={{ borderLeft: "1px solid", borderColor: "surface.divider", pl: "12px", flex: 1 }}>
-          <Metric value={client.candidates ?? 0} label={labels.candidates} />
+      {/* Candidate flow */}
+      <Box sx={{ mt: "15px" }}>
+        <Box sx={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <Box
+            sx={{ fontSize: 10, letterSpacing: ".08em", color: "text.disabled", fontWeight: 700 }}
+          >
+            {labels.candidateFlow}
+          </Box>
+          <Box sx={{ fontSize: 11, color: "text.secondary" }}>
+            <Box component="b" sx={{ color: "text.primary", fontSize: 12.5 }}>
+              {pipeline}
+            </Box>{" "}
+            {labels.inPipeline}
+          </Box>
         </Box>
-        <Box sx={{ borderLeft: "1px solid", borderColor: "surface.divider", pl: "12px", flex: 1 }}>
-          <Metric value={client.placements ?? 0} label={labels.placements} accent />
+        <Box
+          sx={{
+            display: "flex",
+            gap: "2px",
+            height: 8,
+            borderRadius: "99px",
+            overflow: "hidden",
+            mt: "7px",
+          }}
+        >
+          {FLOW_SEGMENTS.map((segment) => (
+            <Box
+              key={segment.key}
+              title={labels.flow[segment.key]}
+              sx={{
+                width: pipeline ? `${Math.round((flow[segment.key] / pipeline) * 100)}%` : "0%",
+                background: segment.color,
+                ...(segment.key === "interviewing" ? { minWidth: pipeline ? 4 : 0 } : {}),
+              }}
+            />
+          ))}
         </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            mt: "7px",
+            fontSize: 10.5,
+            color: "surface.textSecondary",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+          }}
+        >
+          {FLOW_SEGMENTS.map((segment) => (
+            <Box key={segment.key} sx={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <Box
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "99px",
+                  background: segment.color,
+                  flex: "none",
+                }}
+              />
+              {flow[segment.key]} {labels.flow[segment.key]}
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      {/* Roles / placed chips + account manager */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: "7px", mt: "13px" }}>
+        <CardChip icon="work" label={`${client.openRoles ?? 0} ${labels.requirements}`} />
+        <CardChip
+          icon="handshake"
+          iconColor="var(--mui-palette-surface-accentBright)"
+          label={`${client.placements ?? 0} ${labels.placements}`}
+        />
+        {client.accountLeadName ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "3px",
+              ml: "auto",
+              minWidth: 0,
+            }}
+          >
+            <Box
+              sx={{
+                fontSize: 9,
+                letterSpacing: ".09em",
+                color: "surface.textFaint",
+                fontWeight: 700,
+              }}
+            >
+              {labels.accountManager}
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
+              <Avatar
+                sx={{
+                  width: 18,
+                  height: 18,
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  bgcolor: lead.bg,
+                  color: lead.fg,
+                }}
+              >
+                {initials(client.accountLeadName)}
+              </Avatar>
+              <Typography noWrap sx={{ fontSize: 11, color: "text.secondary" }}>
+                {client.accountLeadName}
+              </Typography>
+            </Box>
+          </Box>
+        ) : null}
       </Box>
 
       {/* AI insight (optional) */}

@@ -58,6 +58,14 @@ export const client = pgTable("client", {
   status: text("status").$type<ClientStatus>().notNull().default("hiring"),
   health: text("health").$type<ClientHealth>().notNull().default("healthy"),
   logo: text("logo"),
+  // Company profile fields from the Add-client design.
+  linkedin: text("linkedin"),
+  careerPage: text("career_page"),
+  timezone: text("timezone"),
+  companySize: text("company_size"),
+  annualHiringVolume: text("annual_hiring_volume"),
+  /** Guarantee window on a placement, in days. */
+  replacementPeriod: text("replacement_period"),
   // Populated once jobs/candidates/placements exist; stored so the card renders.
   openRoles: integer("open_roles").notNull().default(0),
   candidates: integer("candidates").notNull().default(0),

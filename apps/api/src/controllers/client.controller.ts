@@ -15,6 +15,7 @@ export async function getClients(ctx: { user: Auth; query: Record<string, string
   const { data, totalCount } = await listClients(ctx.user.agencyId ?? "", {
     search: ctx.query.search,
     status: ctx.query.status,
+    health: ctx.query.health,
     page: ctx.query.page ? Number(ctx.query.page) : undefined,
     pageSize: ctx.query.pageSize ? Number(ctx.query.pageSize) : undefined,
     sortKey: ctx.query.sortKey,

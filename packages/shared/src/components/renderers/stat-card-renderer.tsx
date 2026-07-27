@@ -29,6 +29,9 @@ export interface StatCardRendererConfig {
     color?: string;
     variant?: "text" | "pill";
   };
+  /** Tile scale. The design draws two: `md` on the dashboard (27px value in an
+   * 18/20 card) and `sm` on list screens like Clients (25px in 16/18). */
+  size?: StatCardSize;
   /** Grid columns this card occupies in the row (default 1) — how the config
    * allocates width across the tiles. Ignored below `md`, where cards stack. */
   span?: number;
@@ -65,9 +68,31 @@ export interface StatCardRendererConfig {
   link?: LinkRendererConfig;
 }
 
+export type StatCardSize = "sm" | "md";
+
 const DELTA_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 
-const VALUE_SX = { fontSize: 27, fontWeight: 700, letterSpacing: "-.01em" };
+/** Every metric the design varies between the two tile scales. */
+const SIZES = {
+  md: {
+    padding: "18px 20px",
+    label: 13,
+    labelGap: "10px",
+    value: 27,
+    sub: 10.5,
+    subGap: "6px",
+  },
+  sm: {
+    padding: "16px 18px",
+    label: 12.5,
+    labelGap: "8px",
+    value: 25,
+    sub: 11,
+    subGap: "4px",
+  },
+} as const;
+
+const VALUE_SX = { fontWeight: 700, letterSpacing: "-.01em" };
 
 const ICON_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 const ICON_SIZE = 17;
@@ -87,6 +112,7 @@ function ProgressStatBody({
   t: T;
 }) {
   const [logged, setLogged] = useState(0);
+  const size = SIZES[config.size ?? "md"];
   const hasAction = Boolean(config.action);
   const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
   const numeratorPath =
@@ -97,13 +123,15 @@ function ProgressStatBody({
   const pct = target > 0 ? Math.round((value / target) * 100) : 0;
   const valueConfig = {
     ...config.value,
-    sx: { ...VALUE_SX, ...(overrideSx ?? {}) },
+    sx: { ...VALUE_SX, fontSize: size.value, ...(overrideSx ?? {}) },
   } as GenericRendererConfig;
 
   return (
     <>
       {hasAction ? (
-        <Typography sx={{ ...VALUE_SX, ...(overrideSx ?? {}) }}>{value}</Typography>
+        <Typography sx={{ ...VALUE_SX, fontSize: size.value, ...(overrideSx ?? {}) }}>
+          {value}
+        </Typography>
       ) : (
         <GenericRenderer config={valueConfig} data={data} />
       )}
@@ -176,6 +204,7 @@ function StatCard({
   data: Record<string, unknown>;
   t: T;
 }) {
+  const size = SIZES[config.size ?? "md"];
   const pill = config.delta?.variant === "pill";
   const clickable = Boolean(config.link);
   const kpiMode = Boolean(config.icon || config.progress);
@@ -188,6 +217,7 @@ function StatCard({
     ...config.value,
     sx: {
       ...VALUE_SX,
+      fontSize: size.value,
       ...(overrideSx ?? {}),
       ...(isZero ? { color: "text.disabled" } : {}),
     },
@@ -209,7 +239,7 @@ function StatCard({
 
   const cardSx = kpiMode
     ? { color: "text.primary", height: "100%" }
-    : { color: "text.primary", height: "100%", borderRadius: "14px", padding: "18px 20px" };
+    : { color: "text.primary", height: "100%", borderRadius: "14px", padding: size.padding };
 
   const card = (
     <Card variant={variant} sx={cardSx}>
@@ -234,7 +264,7 @@ function StatCard({
           ) : null}
         </Box>
       ) : (
-        <Typography sx={{ fontSize: 13, color: "text.secondary", mb: "10px" }}>
+        <Typography sx={{ fontSize: size.label, color: "text.secondary", mb: size.labelGap }}>
           {config.label ? t(config.label.name) : ""}
         </Typography>
       )}
@@ -284,7 +314,12 @@ function StatCard({
           </Box>
           {config.sub ? (
             <Typography
-              sx={{ fontSize: 10.5, color: "surface.textFaint", mt: "6px", ...config.sub.sx }}
+              sx={{
+                fontSize: size.sub,
+                color: "surface.textFaint",
+                mt: size.subGap,
+                ...config.sub.sx,
+              }}
             >
               {t(config.sub.name, data)}
             </Typography>

@@ -1,10 +1,11 @@
 "use client";
 
-import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import { useMemo, useState } from "react";
+import FormHelperText from "@mui/material/FormHelperText";
+import InputBase from "@mui/material/InputBase";
+import Menu from "@mui/material/Menu";
+import { useMemo, useRef, useState } from "react";
 import { avatarSwatch, initialsOf } from "../../../utils/avatar";
 import { IconRenderer } from "../../renderers";
 import type { OptionSource, SelectOption } from "../types";
@@ -29,14 +30,34 @@ export interface SearchableSelectFieldProps {
   loadingText?: string;
   /** Small caption rendered inside the control, before the value. */
   prefix?: string;
+  /** ICON_REGISTRY name drawn inside the control, before the value — the
+   * design`s Primary contact / Account manager pickers. */
+  icon?: string;
   /** Render a coloured initials avatar beside each option and the chosen value. */
   avatar?: boolean;
+  /** Leading "none" row that clears the field ("No parent company"). */
+  emptyOption?: { label: string };
+  /**
+   * Accent row pinned under the options, as the design draws it —
+   * `Create "{query}" as parent company`. `label` receives the typed query so
+   * the caller owns the copy and its translation.
+   */
+  createOption?: {
+    label: (query: string) => string;
+    icon?: string;
+    onCreate: (query: string) => void;
+  };
 }
 
 /**
- * Type-ahead select backed by either a static list or an endpoint. With a
- * `source.searchParam` the server does the filtering (for lists too big to
- * ship); otherwise the list is fetched once and filtered here.
+ * Type-ahead select backed by either a static list or an endpoint. The search
+ * box lives **inside** the dropdown (as the design draws it) rather than in the
+ * control, so the control always shows the chosen label. With a
+ * `source.searchParam` the server filters; otherwise filtering happens here.
+ *
+ * Deliberately not an MUI Autocomplete: that puts the query in the control and
+ * requires `renderInput`, whose input slot must never be overridden — see the
+ * `check:autocomplete` guard.
  */
 export function SearchableSelectField({
   value,
@@ -52,164 +73,320 @@ export function SearchableSelectField({
   noOptionsText = "No match",
   loadingText = "Loading…",
   prefix,
+  icon,
   avatar,
+  emptyOption,
+  createOption,
 }: SearchableSelectFieldProps) {
   const [search, setSearch] = useState("");
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const controlRef = useRef<HTMLDivElement>(null);
   const remote = useRemoteOptions(source, search);
-  const options = source ? remote.options : (staticOptions ?? []);
+  const all = source ? remote.options : (staticOptions ?? []);
 
-  const selected = useMemo(() => {
-    if (multiple) {
-      const chosen = new Set(Array.isArray(value) ? value : []);
-      return options.filter((option) => chosen.has(option.value));
-    }
-    return options.find((option) => option.value === value) ?? null;
-  }, [options, value, multiple]);
-
-  // A person picker draws the chosen contact's avatar inside the control.
-  const single = !multiple && selected && !Array.isArray(selected) ? selected : null;
-  const showAvatar = Boolean(avatar && single);
-
-  const control = (
-    <Autocomplete
-      options={options}
-      multiple={multiple}
-      value={selected as never}
-      openOnFocus
-      selectOnFocus
-      handleHomeEndKeys
-      // A half-typed term shouldn't linger once focus leaves.
-      clearOnBlur
-      disabled={disabled}
-      loading={remote.loading}
-      loadingText={loadingText}
-      noOptionsText={noOptionsText}
-      // The server already filtered when it owns the search.
-      filterOptions={source?.searchParam ? (all) => all : undefined}
-      getOptionLabel={(option) => option.label}
-      isOptionEqualToValue={(option, current) => option.value === current.value}
-      onChange={(_, next) =>
-        onChange(
-          (Array.isArray(next)
-            ? next.map((option) => option.value)
-            : ((next as SelectOption | null)?.value ?? "")) as never,
-        )
-      }
-      onInputChange={(_, next, reason) => {
-        if (reason === "input") setSearch(next);
-      }}
-      onBlur={onBlur}
-      renderOption={(props, option) => {
-        const { key, ...rest } = props as { key?: string } & Record<string, unknown>;
-        const swatch = avatar ? avatarSwatch(option.label) : null;
-        const isSelected = multiple
-          ? Array.isArray(value) && value.includes(option.value)
-          : option.value === value;
-        return (
-          <Box
-            component="li"
-            key={option.value}
-            {...rest}
-            sx={{
-              fontSize: 13,
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "9px 11px",
-              borderRadius: "9px",
-              color: "surface.textSecondary",
-              // Match the plain Select menu's hover/selected treatment.
-              "&.Mui-focused": { bgcolor: "surface.hover", color: "text.primary" },
-              '&[aria-selected="true"]': { bgcolor: "surface.hover", color: "text.primary" },
-              '&[aria-selected="true"].Mui-focused': { bgcolor: "surface.hover" },
-            }}
-          >
-            {swatch ? (
-              <Avatar
-                sx={{
-                  width: 24,
-                  height: 24,
-                  fontSize: 9,
-                  fontWeight: 600,
-                  bgcolor: swatch.bg,
-                  color: swatch.fg,
-                  flex: "none",
-                }}
-              >
-                {initialsOf(option.label)}
-              </Avatar>
-            ) : null}
-            <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
-              {option.label}
-            </Box>
-            {isSelected ? (
-              <Box sx={{ color: "surface.accentBright", display: "flex", flex: "none" }}>
-                <IconRenderer name="check" size={15} />
-              </Box>
-            ) : null}
-          </Box>
-        );
-      }}
-      renderInput={(params) => (
-        // Spread params untouched — overriding the input slot breaks the ref
-        // Autocomplete wires through it. Loading shows via `loadingText`.
-        <TextField {...params} placeholder={placeholder} error={error} helperText={helperText} />
-      )}
-      // With a caption/avatar, reserve room for it rather than adorning the input.
-      sx={
-        prefix
-          ? { "& .MuiAutocomplete-inputRoot": { pl: "52px" } }
-          : showAvatar
-            ? { "& .MuiAutocomplete-inputRoot": { pl: "44px" } }
-            : undefined
-      }
-    />
+  // The server already filtered when it owns the search.
+  const options = useMemo(
+    () => all.filter((option) => matchesSearch(option.label, search.trim(), source)),
+    [all, search, source],
   );
 
-  if (!prefix && !showAvatar) return control;
+  const chosen = useMemo(
+    () => new Set(multiple ? (Array.isArray(value) ? value : []) : [value as string]),
+    [value, multiple],
+  );
+  const single = multiple ? null : (all.find((option) => option.value === value) ?? null);
+  const selectedLabels = multiple
+    ? all.filter((option) => chosen.has(option.value)).map((option) => option.label)
+    : [];
+
+  const close = () => {
+    setAnchor(null);
+    setSearch("");
+    onBlur?.();
+  };
+
+  const pick = (optionValue: string) => {
+    if (multiple) {
+      const next = new Set(chosen);
+      if (next.has(optionValue)) next.delete(optionValue);
+      else next.add(optionValue);
+      onChange([...next] as never);
+      return;
+    }
+    onChange(optionValue as never);
+    close();
+  };
+
+  // The design only offers to create once the query is more than a character
+  // and matches no existing option — otherwise the row reads `Create ""`.
+  const query = search.trim();
+  const canCreate =
+    Boolean(createOption) &&
+    query.length > 1 &&
+    !all.some((option) => option.label.toLowerCase() === query.toLowerCase());
+
+  const showNoneRow =
+    Boolean(emptyOption) && !multiple && matchesSearch(emptyOption?.label ?? "", query, source);
+
+  const swatch = avatar && single ? avatarSwatch(single.label) : undefined;
+  const display = multiple
+    ? selectedLabels.join(", ")
+    : (single?.label ?? (value ? "" : (emptyOption?.label ?? "")));
 
   return (
-    <Box sx={{ position: "relative" }}>
-      {prefix ? (
+    <>
+      <Box
+        ref={controlRef}
+        onClick={() => {
+          if (!disabled) setAnchor(controlRef.current);
+        }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          bgcolor: "surface.inset",
+          border: "1px solid",
+          borderColor: error ? "error.main" : "surface.controlBorder",
+          borderRadius: (theme) => theme.form.controlRadius,
+          // Raw tokens, no +1px: unlike the outlined input this control has a
+          // real border, which already adds the design's extra 2px of height.
+          py: (theme) => theme.form.controlPadY,
+          px: (theme) => theme.form.controlPadX,
+          fontSize: 13.5,
+          cursor: disabled ? "default" : "pointer",
+          opacity: disabled ? 0.6 : 1,
+          "&:hover": { borderColor: disabled ? undefined : "surface.borderStrong" },
+        }}
+      >
+        {icon ? (
+          <Box sx={{ color: "surface.textDisabled", flex: "none", display: "flex" }}>
+            <IconRenderer name={icon} size={17} />
+          </Box>
+        ) : null}
+        {prefix ? (
+          <Box component="span" sx={{ color: "text.disabled", flex: "none" }}>
+            {prefix}
+          </Box>
+        ) : null}
+        {single?.dot ? (
+          <Box
+            sx={{
+              width: 7,
+              height: 7,
+              borderRadius: "999px",
+              background: single.dot,
+              flex: "none",
+            }}
+          />
+        ) : null}
+        {swatch && single ? (
+          <Avatar
+            sx={{
+              width: 24,
+              height: 24,
+              fontSize: 9,
+              fontWeight: 600,
+              bgcolor: swatch.bg,
+              color: swatch.fg,
+              flex: "none",
+            }}
+          >
+            {initialsOf(single.label)}
+          </Avatar>
+        ) : null}
         <Box
           component="span"
           sx={{
-            position: "absolute",
-            left: "14px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 1,
-            pointerEvents: "none",
-            fontSize: 10.5,
-            fontWeight: 600,
-            letterSpacing: ".06em",
-            color: "text.disabled",
+            flex: 1,
+            minWidth: 0,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            color: display ? "text.primary" : "text.disabled",
           }}
         >
-          {prefix}
+          {display || placeholder}
         </Box>
+        <IconRenderer
+          name={anchor ? "expand-less" : "expand-more"}
+          size={16}
+          color="var(--mui-palette-surface-textDisabled)"
+        />
+      </Box>
+      {helperText ? <FormHelperText error={error}>{helperText}</FormHelperText> : null}
+
+      <Menu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={close}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{
+          paper: {
+            sx: {
+              mt: "6px",
+              borderRadius: "13px",
+              bgcolor: "surface.dropdownPanel",
+              borderColor: "surface.border",
+              width: controlRef.current?.offsetWidth,
+            },
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            mb: "6px",
+            p: "8px 10px",
+            bgcolor: "surface.inset",
+            border: "1px solid",
+            borderColor: "surface.controlBorder",
+            borderRadius: "9px",
+          }}
+        >
+          <IconRenderer name="search" size={16} color="var(--mui-palette-surface-textDisabled)" />
+          <InputBase
+            autoFocus
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder={placeholder}
+            sx={{ flex: 1, fontSize: 12.5, color: "text.primary" }}
+          />
+        </Box>
+
+        <Box sx={{ maxHeight: 190, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+          {showNoneRow && emptyOption ? (
+            <OptionRow label={emptyOption.label} selected={!value} onPick={() => pick("")} />
+          ) : null}
+
+          {remote.loading ? (
+            <Box sx={EMPTY_SX}>{loadingText}</Box>
+          ) : options.length === 0 && !showNoneRow ? (
+            <Box sx={EMPTY_SX}>{noOptionsText}</Box>
+          ) : (
+            options.map((option) => (
+              <OptionRow
+                key={option.value}
+                label={option.label}
+                selected={chosen.has(option.value)}
+                swatch={avatar ? avatarSwatch(option.label) : undefined}
+                onPick={() => pick(option.value)}
+              />
+            ))
+          )}
+        </Box>
+
+        {canCreate && createOption ? (
+          <Box sx={{ height: "1px", bgcolor: "surface.divider", m: "6px 4px" }} />
+        ) : null}
+        {canCreate && createOption ? (
+          <Box
+            onClick={() => {
+              createOption.onCreate(search);
+              close();
+            }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "9px",
+              p: "9px 11px",
+              borderRadius: "9px",
+              fontSize: 12.5,
+              fontWeight: 600,
+              color: "surface.primarySoftFg",
+              cursor: "pointer",
+              "&:hover": { bgcolor: "surface.optionSelectedBg" },
+            }}
+          >
+            <IconRenderer name={createOption.icon ?? "add"} size={16} color="inherit" />
+            {createOption.label(search)}
+          </Box>
+        ) : null}
+      </Menu>
+    </>
+  );
+}
+
+/** Client-side match test, skipped when the server owns the search. */
+function matchesSearch(label: string, query: string, source?: OptionSource): boolean {
+  if (source?.searchParam || !query) return true;
+  return label.toLowerCase().includes(query.toLowerCase());
+}
+
+/** Loading and no-match rows, which the design centres rather than indents. */
+const EMPTY_SX = {
+  p: "12px 10px",
+  textAlign: "center",
+  fontSize: 12,
+  color: "surface.textDisabled",
+} as const;
+
+/** One row of the dropdown. Selected rows take the accent tint + tick. */
+function OptionRow({
+  label,
+  selected,
+  dot,
+  swatch,
+  onPick,
+}: {
+  label: string;
+  selected: boolean;
+  dot?: string;
+  swatch?: { bg: string; fg: string };
+  onPick: () => void;
+}) {
+  return (
+    <Box
+      onClick={onPick}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        p: "9px 11px",
+        borderRadius: "9px",
+        fontSize: 13,
+        cursor: "pointer",
+        color: "text.primary",
+        bgcolor: selected ? "surface.optionSelectedBg" : "transparent",
+        "&:hover": { bgcolor: selected ? "surface.optionSelectedBg" : "surface.hover" },
+      }}
+    >
+      {dot ? (
+        <Box
+          sx={{
+            width: 7,
+            height: 7,
+            borderRadius: "999px",
+            background: dot,
+            flex: "none",
+          }}
+        />
       ) : null}
-      {showAvatar && single ? (
+      {swatch ? (
         <Avatar
           sx={{
-            position: "absolute",
-            left: "10px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 1,
-            pointerEvents: "none",
-            width: 26,
-            height: 26,
-            fontSize: 9.5,
+            width: 24,
+            height: 24,
+            fontSize: 9,
             fontWeight: 600,
-            bgcolor: avatarSwatch(single.label).bg,
-            color: avatarSwatch(single.label).fg,
+            bgcolor: swatch.bg,
+            color: swatch.fg,
+            flex: "none",
           }}
         >
-          {initialsOf(single.label)}
+          {initialsOf(label)}
         </Avatar>
       ) : null}
-      {control}
+      <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
+        {label}
+      </Box>
+      {selected ? (
+        <Box sx={{ color: "surface.accentBright", display: "flex", flex: "none" }}>
+          <IconRenderer name="check" size={15} />
+        </Box>
+      ) : null}
     </Box>
   );
 }

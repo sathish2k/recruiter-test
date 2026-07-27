@@ -1,5 +1,7 @@
 "use client";
 
+import Box from "@mui/material/Box";
+import { denseFormVars } from "@recruit/ui";
 import type { Control, FieldValues } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { AttachmentsWidget } from "../attachments/attachments";
@@ -9,6 +11,8 @@ import { ChipsWidget } from "../chips/chips";
 import { ColorWidget } from "../color/color";
 import { DateWidget } from "../date/date";
 import { DaysWidget } from "../days/days";
+import { EmailListWidget } from "../email-list/email-list";
+import { HeadingWidget } from "../heading/heading";
 import { MarkdownWidget } from "../markdown/markdown";
 import { MultiSelectWidget } from "../multiselect/multiselect";
 import { NumberWidget } from "../number/number";
@@ -22,6 +26,7 @@ import { SelectWidget } from "../select/select";
 import { SliderWidget } from "../slider/slider";
 import { SwitchRowWidget } from "../switch-row/switch-row";
 import { TextWidget } from "../text/text";
+import { TilesWidget } from "../tiles/tiles";
 import { ToggleWidget } from "../toggle/toggle";
 import type {
   BuiltInWidget,
@@ -32,7 +37,7 @@ import type {
   Widgets,
 } from "../types";
 import { UploadWidget } from "../upload/upload";
-import { FieldRequiredContext } from "./field-shell";
+import { FieldOptionalContext, FieldRequiredContext } from "./field-shell";
 
 /**
  * Widget name → component. Adding a field type means writing a component that
@@ -45,6 +50,8 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   password: PasswordWidget,
   select: SelectWidget,
   segmented: SegmentedWidget,
+  tiles: TilesWidget,
+  "email-list": EmailListWidget,
   switch: ToggleWidget,
   "switch-row": SwitchRowWidget,
   checkbox: ToggleWidget,
@@ -66,6 +73,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   time: DateWidget,
   datetime: DateWidget,
   color: ColorWidget,
+  heading: HeadingWidget,
 };
 
 /** Picks the widget from an explicit `widget`, then from the schema's shape. */
@@ -111,16 +119,27 @@ export function Field({
       name={name}
       control={control}
       render={({ field, fieldState }) => {
-        const props: WidgetProps = { name, prop: resolved, field, fieldState, t, disabled };
+        // A schema can swap the helper line per selected value — the design
+        // explains what "Prospect" means only while Prospect is chosen.
+        const conditionalHelp = resolved.helpWhen?.[String(field.value ?? "")];
+        const shown = conditionalHelp ? { ...resolved, help: conditionalHelp } : resolved;
+        const props: WidgetProps = { name, prop: shown, field, fieldState, t, disabled };
         // Called, not mounted — an inline arrow in a `widgets` literal is a new
         // function identity every render, which as a component type would
         // remount the field (and drop focus) on each keystroke. The fragment
         // narrows a widget's ReactNode to the ReactElement Controller wants.
-        return (
+        const body = (
           <FieldRequiredContext.Provider value={Boolean(resolved.required)}>
-            {custom ? custom(props) : <Builtin {...props} />}
+            <FieldOptionalContext.Provider
+              value={resolved.optional ? t("fields.optional", "optional") : null}
+            >
+              {custom ? custom(props) : <Builtin {...props} />}
+            </FieldOptionalContext.Provider>
           </FieldRequiredContext.Provider>
         );
+        // A single field can opt into the design`s smaller control size even in
+        // the wide column — the vars scope to this field alone.
+        return resolved.dense ? <Box sx={denseFormVars}>{body}</Box> : body;
       }}
     />
   );

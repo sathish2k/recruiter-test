@@ -67,4 +67,4 @@ export type {
   WidgetProps,
   Widgets,
 } from "./types";
-export { UploadField } from "./upload/upload";
+export { UploadField, UploadWidget } from "./upload/upload";

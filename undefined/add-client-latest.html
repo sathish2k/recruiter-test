@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#131313;font-family:'Instrument Sans',system-ui,sans-serif;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}a:hover{color:#FFB877}
+input::placeholder,textarea::placeholder{color:#7C7972}
+input{min-width:0;box-sizing:border-box;width:100%}
+input[type="checkbox"],input[type="radio"]{width:auto}
+a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid rgba(242,106,27,.7);outline-offset:2px}
+@keyframes toastIn{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fileIn{0%{opacity:0;transform:translateY(8px) scale(.96)}60%{opacity:1;transform:translateY(-2px) scale(1.01)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes upBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes tickPop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+</style>
+</helmet>
+<x-import component-from-global-scope="troy-responsive" from="./responsive.js" hint-size="1px,1px"></x-import>
+<x-import component-from-global-scope="troy-cmdk" from="./cmdk.js" hint-size="1px,1px"></x-import>
+<x-import component-from-global-scope="troy-toast" from="./toast.js" hint-size="1px,1px"></x-import>
+
+<div data-screen-label="Add Client" style="display:grid;grid-template-columns:248px 1fr;min-height:100vh;min-width:1360px;background:#131313;color:#ECEAE7">
+
+  <!-- SIDEBAR -->
+  <aside style="display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.06);padding:22px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;box-sizing:border-box;align-self:start">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:26px">
+      <div style="display:flex;align-items:center;gap:10px">
+        
+        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex:none"><defs><mask id="rt1"><rect width="48" height="48" fill="white"></rect><path d="M2 31 H46" stroke="black" stroke-width="3.5"></path><path d="M18 31 L44 13" stroke="black" stroke-width="3.5"></path></mask></defs><circle cx="24" cy="24" r="19" fill="#FFFFFF" mask="url(#rt1)"></circle><circle cx="45" cy="11" r="2.6" fill="#F59E0B"></circle></svg><div style="font-family:'Manrope',ui-sans-serif,sans-serif;font-weight:700;font-size:15px;letter-spacing:-.02em">HirePilot<span style="color:#F59E0B">X</span></div>
+      </div>
+      <div style="width:26px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#8B8880;cursor:pointer"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">chevron_left</span></div>
+    </div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#7C7972;margin:6px 0 10px">MAIN</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(255,255,255,.07);padding-left:10px">
+      <a href="AIRecruiter - Dashboard.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">space_dashboard</span> Dashboard</a>
+    </nav>
+    <div style="height:1px;background:rgba(255,255,255,.07);margin:14px 0"></div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#7C7972;margin:0 0 10px">RECRUITMENT</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(255,255,255,.07);padding-left:10px">
+      <a href="AIRecruiter - Clients.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;background:linear-gradient(90deg,rgba(242,106,27,.28),rgba(242,106,27,.05));border:1px solid rgba(242,106,27,.35);font-size:13.5px;font-weight:600;color:#ECEAE7;cursor:pointer" style-hover="color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">domain</span> Clients</a>
+      <a href="AIRecruiter - Contacts.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">contacts</span> Contacts</a>
+      <a href="AIRecruiter - Jobs.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">work</span> Jobs</a>
+      <a href="AIRecruiter - Candidates.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">group</span> Candidates</a>
+      <a href="AIRecruiter - Interviews.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">event</span> Interviews</a>
+      <a href="AIRecruiter - Placements.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">handshake</span> Placements</a>
+    </nav>
+    <div style="height:1px;background:rgba(255,255,255,.07);margin:14px 0"></div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#7C7972;margin:0 0 10px">INSIGHTS</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(255,255,255,.07);padding-left:10px">
+      <a href="AIRecruiter - Analytics.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">insights</span> Analytics</a>
+      <a href="AIRecruiter - Commissions.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">payments</span> Commissions</a>
+      <a href="AIRecruiter - Team Activity.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">monitoring</span> Team Activity</a>
+    </nav>
+    <div style="height:1px;background:rgba(255,255,255,.07);margin:14px 0"></div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#7C7972;margin:0 0 10px">AI</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(255,255,255,.07);padding-left:10px">
+      <a href="AIRecruiter - AI Screening.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">auto_awesome</span> AI Screening</a>
+      <a href="AIRecruiter - Automation.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">bolt</span> Automation</a>
+    </nav>
+    <div style="height:1px;background:rgba(255,255,255,.07);margin:14px 0"></div>
+    <div style="font-size:11px;letter-spacing:.12em;color:#7C7972;margin:0 0 10px">TOOLS</div>
+    <nav style="display:flex;flex-direction:column;gap:2px;border-left:1px solid rgba(255,255,255,.07);padding-left:10px">
+      <a href="AIRecruiter - Settings.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">settings</span> Settings</a>
+      <a href="AIRecruiter - Integrations.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">hub</span> Integrations</a>
+      <a href="AIRecruiter - Help Center.dc.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:#9A968E;font-size:13.5px;cursor:pointer" style-hover="background:rgba(255,255,255,.05);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:1.25em;line-height:1">help</span> Help Center</a>
+    </nav>
+    <div style="flex:1"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="padding:22px 28px;display:flex;flex-direction:column;gap:18px;max-width:1160px;min-width:0;box-sizing:border-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div onClick="{{ guardBack }}" style="cursor:pointer;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#9A968E;font-weight:600"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">arrow_back</span> Back to Clients</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <x-import component-from-global-scope="troy-appbar" from="./appbar.js" hint-size="120px,32px"></x-import>
+        <a href="AIRecruiter - Notifications.dc.html" title="Notifications" style="position:relative;width:32px;height:32px;border-radius:999px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#9A968E;cursor:pointer" style-hover="background:rgba(255,255,255,.06);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">notifications</span><span style="position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:999px;background:#F26A1B;border:2px solid #131313"></span></a>
+        <div style="width:32px;height:32px;border-radius:999px;background:#5B4A3A;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#FFD9BC">RK</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:21px;font-weight:700;letter-spacing:-.01em">New Client</div>
+        <div style="font-size:13px;color:#9A968E;margin-top:4px">Add the company, billing details and the contract — roles come next.</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div onClick="{{ openCancel }}" style="display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.06)">Cancel</div>
+        <div onClick="{{ saveNew }}" style="display:flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:13px;cursor:pointer" style-hover="background:rgba(255,255,255,.06)">Save &amp; add another</div>
+        <div onClick="{{ save }}" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;background:linear-gradient(135deg,#FF8A3C,#E4560F);color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.08)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">domain_add</span> Save client</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start">
+      <!-- FORM -->
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+
+        <div style="background:#1C1C1B;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:15px;font-weight:700">Client information</div>
+          <div style="display:flex;align-items:center;gap:14px;background:#141413;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:12px 14px">
+            <div style="position:relative;width:50px;height:50px;flex:none">
+              <sc-if value="{{ logoUploading }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:-5px;border-radius:16px;background:conic-gradient({{ logoRing }})"></div>
+              <div style="position:absolute;inset:-2px;border-radius:14px;background:#141413"></div>
+              <div style="position:absolute;inset:0;border-radius:13px;border:1px dashed rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.7)">{{ logoPctTxt }}</div>
+              </sc-if>
+              <sc-if value="{{ logoEmpty }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;inset:0;border-radius:13px;border:1px dashed rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;color:#7C7972"><span style="font-family:'Material Symbols Rounded';font-size:22px;line-height:1">image</span></div>
+              </sc-if>
+              <sc-if value="{{ logoHas }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:0;border-radius:13px;background:#3A4A5B;color:#CFE3F5;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;animation:fileIn .4s cubic-bezier(.34,1.4,.5,1) both">{{ logoInitial }}</div>
+              </sc-if>
+              <sc-if value="{{ logoDone }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;right:-6px;bottom:-6px;width:20px;height:20px;border-radius:999px;background:#4EA874;border:2.5px solid #141413;display:flex;align-items:center;justify-content:center;animation:tickPop .5s cubic-bezier(.3,1.4,.4,1)"><span style="font-family:'Material Symbols Rounded';font-size:12px;line-height:1;color:#fff">check</span></span>
+              </sc-if>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:600;color:#C9C5BD">Company logo <span style="color:#7C7972;font-weight:400">· optional</span></div>
+              <div style="font-size:11px;color:#7C7972;margin-top:3px">PNG or SVG, 512×512 — shows on client cards, reports &amp; email branding</div>
+            </div>
+            <sc-if value="{{ logoEmpty }}" hint-placeholder-val="{{ true }}">
+            <div onClick="{{ addLogo }}" style="display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12.5px;cursor:pointer;transition:transform .15s;flex:none" style-hover="background:rgba(255,255,255,.06)" style-active="transform:scale(.95)"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">upload</span> Upload logo</div>
+            </sc-if>
+            <sc-if value="{{ logoHas }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ removeLogo }}" style="font-size:12px;font-weight:600;color:#9A968E;cursor:pointer;flex:none" style-hover="color:#E89A9A">Remove</div>
+            </sc-if>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Client name <span style="color:#FF9D57">*</span></label>
+              <input type="text" placeholder="e.g. Acme Corp" value="{{ name }}" onChange="{{ onName }}" style="background:#141413;border:1px solid {{ nameBorder }};border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              <sc-if value="{{ nameError }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:#E89A9A"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">error</span>Client name is required</div>
+              </sc-if>
+              <sc-if value="{{ dupWarn }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:flex-start;gap:6px;font-size:11.5px;color:#F0C27C;line-height:1.5"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1.4">warning</span><span>Similar client exists — <b style="color:#ECEAE7">{{ dupName }}</b> · created by {{ dupBy }}. You can still save.</span></div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Parent company</label>
+              <div style="position:relative">
+              <div onClick="{{ parentToggle }}" style="display:flex;align-items:center;justify-content:space-between;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">{{ parent }}<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ parentChevron }}</span></div>
+              <sc-if value="{{ parentOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                <label style="display:flex;align-items:center;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 10px;margin-bottom:6px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">search</span>
+                  <input type="text" placeholder="Search companies…" value="{{ parentQuery }}" onInput="{{ onParentQuery }}" onClick="{{ stopEv }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#ECEAE7;font-family:inherit;font-size:12.5px;padding:0">
+                </label>
+                <div style="max-height:190px;overflow-y:auto;display:flex;flex-direction:column">
+                <sc-if value="{{ parentNoResults }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 10px;text-align:center;font-size:12px;color:#7C7972">No company matches “{{ parentQuery }}”</div>
+                </sc-if>
+                <sc-for list="{{ parentOptions }}" as="o" hint-placeholder-count="6">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+                </div>
+                <sc-if value="{{ parentCanAdd }}" hint-placeholder-val="{{ false }}">
+                <div style="height:1px;background:rgba(255,255,255,.08);margin:6px 4px"></div>
+                <div onClick="{{ parentAdd }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;font-size:12.5px;font-weight:600;color:#F0B27C;cursor:pointer" style-hover="background:rgba(242,106,27,.1)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">add_business</span>Create “{{ parentQuery }}” as parent company</div>
+                </sc-if>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Main office phone</label>
+              <div style="display:flex;gap:8px;position:relative">
+                <div onClick="{{ toggleCodeMenu }}" style="display:flex;align-items:center;gap:7px;background:#141413;border:1px solid {{ codeBorder }};border-radius:12px;padding:12px 12px;font-size:13.5px;font-weight:600;cursor:pointer;flex:none;white-space:nowrap" style-hover="border-color:rgba(242,106,27,.4)">
+                  <span style="font-size:11px;font-weight:700;letter-spacing:.04em;color:#9A968E;background:rgba(255,255,255,.07);border-radius:5px;padding:2px 5px">{{ codeIso }}</span>
+                  {{ phoneCode }}
+                  <span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#7C7972">{{ codeChevron }}</span>
+                </div>
+                <input type="text" placeholder="{{ phonePh }}" value="{{ phone }}" onChange="{{ onPhone }}" style="flex:1;min-width:0;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <sc-if value="{{ codeMenuOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:calc(100% + 6px);left:0;z-index:30;width:270px;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                  <label style="display:flex;align-items:center;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 10px;margin-bottom:6px">
+                    <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">search</span>
+                    <input type="text" placeholder="Search country or code…" value="{{ codeQuery }}" onInput="{{ onCodeQuery }}" onClick="{{ stopEv }}" style="background:transparent;border:none;outline:none;color:#ECEAE7;font-family:inherit;font-size:12.5px;padding:0">
+                  </label>
+                  <div style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column">
+                  <sc-if value="{{ codeNoResults }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:14px 10px;text-align:center;font-size:12px;color:#7C7972">No country matches “{{ codeQuery }}”</div>
+                  </sc-if>
+                  <sc-for list="{{ codeOptions }}" as="c" hint-placeholder-count="5">
+                  <div onClick="{{ c.pick }}" style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ c.bg }}" style-hover="background:rgba(255,255,255,.07)">
+                    <span style="font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#9A968E;background:rgba(255,255,255,.07);border-radius:5px;padding:2px 5px;flex:none;width:22px;text-align:center">{{ c.iso }}</span>
+                    <span style="flex:1;color:#ECEAE7">{{ c.country }}</span>
+                    <span style="color:#9A968E;font-weight:600">{{ c.code }}</span>
+                    <sc-if value="{{ c.selected }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span>
+                    </sc-if>
+                  </div>
+                  </sc-for>
+                  </div>
+                </div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Website</label>
+              <input type="text" placeholder="e.g. acme.com" value="{{ website }}" onChange="{{ onWebsite }}" onBlur="{{ onWebsiteBlur }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              <sc-if value="{{ webErr }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:#E89A9A"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">error</span>Enter a valid website</div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Industry</label>
+              <div style="position:relative">
+              <div onClick="{{ industryToggle }}" style="display:flex;align-items:center;justify-content:space-between;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">{{ industry }}<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ industryChevron }}</span></div>
+              <sc-if value="{{ industryOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                <label style="display:flex;align-items:center;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 10px;margin-bottom:6px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">search</span>
+                  <input type="text" placeholder="Search industries…" value="{{ indQuery }}" onInput="{{ onIndQuery }}" onClick="{{ stopEv }}" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:#ECEAE7;font-family:inherit;font-size:12.5px;padding:0">
+                </label>
+                <div style="max-height:190px;overflow-y:auto;display:flex;flex-direction:column">
+                <sc-if value="{{ industryNoResults }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:14px 10px;text-align:center;font-size:12px;color:#7C7972">No industry matches</div>
+                </sc-if>
+                <sc-for list="{{ industryOptions }}" as="o" hint-placeholder-count="6">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+                </div>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Primary contact</label>
+              <div style="position:relative">
+              <div onClick="{{ contactToggle }}" style="display:flex;align-items:center;gap:10px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">
+                <sc-if value="{{ contactHasSel }}" hint-placeholder-val="{{ false }}">
+                <div style="width:26px;height:26px;border-radius:999px;background:{{ contactAvBg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:{{ contactAvFg }};flex:none">{{ contactInitials }}</div>
+                </sc-if>
+                <sc-if value="{{ contactNoSel }}" hint-placeholder-val="{{ true }}">
+                <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#7C7972;flex:none">person_search</span>
+                </sc-if>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600;color:{{ contactFg }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ contactName }}</span><span style="font-size:10.5px;color:#7C7972;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ contactRole }}</span></span>
+                <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ contactChevron }}</span>
+              </div>
+              <sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                <label style="display:flex;align-items:center;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 10px;margin-bottom:6px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">search</span>
+                  <input type="text" placeholder="Search contacts…" value="{{ contactQuery }}" onInput="{{ onContactQuery }}" onClick="{{ stopEv }}" style="background:transparent;border:none;outline:none;color:#ECEAE7;font-family:inherit;font-size:12.5px;padding:0">
+                </label>
+                <div style="max-height:190px;overflow-y:auto;display:flex;flex-direction:column">
+                <sc-if value="{{ contactNoResults }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 10px;text-align:center;font-size:12px;color:#7C7972">No contact matches “{{ contactQuery }}”</div>
+                </sc-if>
+                <sc-for list="{{ contactOptions }}" as="o" hint-placeholder-count="5">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)">
+                  <div style="width:26px;height:26px;border-radius:999px;background:{{ o.avBg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:{{ o.avFg }};flex:none">{{ o.initials }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:600;color:#ECEAE7">{{ o.name }}</div><div style="font-size:10.5px;color:#7C7972">{{ o.role }}</div></div>
+                  <sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if>
+                </div>
+                </sc-for>
+                </div>
+                <div style="height:1px;background:rgba(255,255,255,.08);margin:6px 4px"></div>
+                <sc-if value="{{ contactCanAdd }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ contactAdd }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;font-size:12.5px;font-weight:600;color:#F0B27C;cursor:pointer" style-hover="background:rgba(242,106,27,.1)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">person_add</span>{{ contactAddLabel }}</div>
+                </sc-if>
+                <sc-if value="{{ contactNoQuery }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ openQuickContact }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;font-size:12.5px;font-weight:600;color:#F0B27C;cursor:pointer" style-hover="background:rgba(242,106,27,.1)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">person_add</span>Create new contact</div>
+                </sc-if>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">LinkedIn company <span style="color:#7C7972;font-weight:400">· optional</span></label>
+              <input type="text" placeholder="linkedin.com/company/nortech" value="{{ liCo }}" onChange="{{ onLiCo }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Career page <span style="color:#7C7972;font-weight:400">· optional</span></label>
+              <input type="text" placeholder="careers.nortech.io" value="{{ careerUrl }}" onChange="{{ onCareerUrl }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Timezone</label>
+              <div style="position:relative">
+              <div onClick="{{ tzCToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tzC }}</span><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972;flex:none">{{ tzCChevron }}</span></div>
+              <sc-if value="{{ tzCOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6);max-height:190px;overflow-y:auto">
+                <sc-for list="{{ tzCOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Company size</label>
+              <div style="position:relative">
+              <div onClick="{{ sizeCToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sizeC }}</span><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972;flex:none">{{ sizeCChevron }}</span></div>
+              <sc-if value="{{ sizeCOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6);max-height:190px;overflow-y:auto">
+                <sc-for list="{{ sizeCOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Annual hiring volume</label>
+              <div style="position:relative">
+              <div onClick="{{ volCToggle }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ volC }}</span><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972;flex:none">{{ volCChevron }}</span></div>
+              <sc-if value="{{ volCOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6);max-height:190px;overflow-y:auto">
+                <sc-for list="{{ volCOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Recruiter notes</label>
+            <textarea rows="3" placeholder="Interview process, hiring manager expectations, salary range, preferred profiles, response SLA — things recruiters should know…" value="{{ about }}" onChange="{{ onAbout }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.6;color:#ECEAE7;font-family:inherit;outline:none;resize:vertical"></textarea>
+          </div>
+        </div>
+
+        <div style="background:#1C1C1B;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div style="font-size:15px;font-weight:700">Address</div>
+            <div onClick="{{ toggleSameShip }}" style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#C9C5BD;cursor:pointer" style-hover="color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:{{ sameShipColor }}">{{ sameShipIcon }}</span> Use billing address</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:11.5px;letter-spacing:.1em;color:#9A968E;font-weight:700">BILLING</div>
+              <input type="text" placeholder="Street" value="{{ bStreet }}" onChange="{{ onBStreet }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <input type="text" placeholder="City" value="{{ bCity }}" onChange="{{ onBCity }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <input type="text" placeholder="Province / State" value="{{ bProv }}" onChange="{{ onBProv }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <input type="text" placeholder="Postal code" value="{{ bCode }}" onChange="{{ onBCode }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <input type="text" placeholder="Country" value="{{ bCountry }}" onChange="{{ onBCountry }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:11.5px;letter-spacing:.1em;color:#9A968E;font-weight:700">OFFICE</div>
+              <input type="text" placeholder="Street" value="{{ sStreet }}" onChange="{{ onSStreet }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <input type="text" placeholder="City" value="{{ sCity }}" onChange="{{ onSCity }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <input type="text" placeholder="Province / State" value="{{ sProv }}" onChange="{{ onSProv }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <input type="text" placeholder="Postal code" value="{{ sCode }}" onChange="{{ onSCode }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <input type="text" placeholder="Country" value="{{ sCountry }}" onChange="{{ onSCountry }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#1C1C1B;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+          <div>
+            <div style="font-size:15px;font-weight:700">Attachments</div>
+            <div style="font-size:12px;color:#7C7972;margin-top:3px">The signed contract drives fee terms on invoices · PDF, DOCX, PNG or JPG, up to 25 MB</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Client contract (MSA)</label>
+              <sc-if value="{{ ctEmpty }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ addCt }}" style="display:flex;align-items:center;justify-content:center;gap:9px;border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:16px;font-size:12.5px;color:#9A968E;cursor:pointer" style-hover="border-color:rgba(242,106,27,.5);color:#ECEAE7">
+                <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">upload_file</span> Browse or drop a file
+              </div>
+              </sc-if>
+              <sc-if value="{{ ctUploading }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(242,106,27,.35);border-radius:12px;padding:11px 14px;background:#141413">
+                <div style="display:flex;align-items:center;gap:11px;margin-bottom:9px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1;color:#FF9D57;animation:upBounce 1s ease-in-out infinite">upload</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ctName }}</div>
+                    <div style="font-size:11px;color:#9A968E">Uploading… {{ ctPct }}%</div>
+                  </div>
+                  <span style="font-size:11.5px;font-weight:700;color:#FF9D57;flex:none">{{ ctPct }}%</span>
+                </div>
+                <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">
+                  <div style="height:100%;width:{{ ctPctW }};border-radius:999px;background:linear-gradient(90deg,#FF8A3C,#E4560F);transition:width .12s linear"></div>
+                </div>
+              </div>
+              </sc-if>
+              <sc-if value="{{ ctHas }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:11px;background:#141413;border:1px solid rgba(78,168,116,.35);border-radius:12px;padding:11px 14px;animation:fileIn .4s cubic-bezier(.34,1.4,.5,1) both">
+                <span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1;color:#E89A9A">picture_as_pdf</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ctName }}</div>
+                  <div style="font-size:11px;color:#7C7972">{{ ctSize }}</div>
+                </div>
+                <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#8FD6AC;flex:none;animation:tickPop .35s ease-out .1s both">check_circle</span>
+                <span onClick="{{ removeCt }}" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972;cursor:pointer;flex:none" style-hover="color:#E89A9A">close</span>
+              </div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Additional documents <span style="color:#7C7972;font-weight:400">· NDA, SOW, rate card</span></label>
+              <sc-if value="{{ otEmpty }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ addOt }}" style="display:flex;align-items:center;justify-content:center;gap:9px;border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:16px;font-size:12.5px;color:#9A968E;cursor:pointer" style-hover="border-color:rgba(242,106,27,.5);color:#ECEAE7">
+                <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">upload_file</span> Browse or drop a file
+              </div>
+              </sc-if>
+              <sc-if value="{{ otUploading }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px solid rgba(242,106,27,.35);border-radius:12px;padding:11px 14px;background:#141413">
+                <div style="display:flex;align-items:center;gap:11px;margin-bottom:9px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1;color:#FF9D57;animation:upBounce 1s ease-in-out infinite">upload</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ otName }}</div>
+                    <div style="font-size:11px;color:#9A968E">Uploading… {{ otPct }}%</div>
+                  </div>
+                  <span style="font-size:11.5px;font-weight:700;color:#FF9D57;flex:none">{{ otPct }}%</span>
+                </div>
+                <div style="height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">
+                  <div style="height:100%;width:{{ otPctW }};border-radius:999px;background:linear-gradient(90deg,#FF8A3C,#E4560F);transition:width .12s linear"></div>
+                </div>
+              </div>
+              </sc-if>
+              <sc-if value="{{ otHas }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:11px;background:#141413;border:1px solid rgba(78,168,116,.35);border-radius:12px;padding:11px 14px;animation:fileIn .4s cubic-bezier(.34,1.4,.5,1) both">
+                <span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1;color:#8FD6AC">table_view</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ otName }}</div>
+                  <div style="font-size:11px;color:#7C7972">{{ otSize }}</div>
+                </div>
+                <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#8FD6AC;flex:none;animation:tickPop .35s ease-out .1s both">check_circle</span>
+                <span onClick="{{ removeOt }}" style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972;cursor:pointer;flex:none" style-hover="color:#E89A9A">close</span>
+              </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDE PANEL -->
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:22px;max-height:calc(100vh - 44px);overflow-y:auto;scrollbar-width:none">
+        <div style="background:#1C1C1B;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:20px">
+          <div style="font-size:14.5px;font-weight:600;margin-bottom:4px">Ownership</div>
+          <div style="font-size:12px;color:#7C7972;margin-bottom:14px">Who owns this account and where it came from</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Account manager</label>
+              <div style="position:relative">
+              <div onClick="{{ amToggle }}" style="display:flex;align-items:center;gap:10px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">
+                <div style="width:26px;height:26px;border-radius:999px;background:{{ amBg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;color:{{ amFg }}">{{ amInitials }}</div>
+                <span style="flex:1;font-size:13px;font-weight:600">{{ amName }}</span>
+                <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ amChevron }}</span>
+              </div>
+              <sc-if value="{{ amOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                <label style="display:flex;align-items:center;gap:8px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:8px 10px;margin-bottom:6px">
+                  <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">search</span>
+                  <input type="text" placeholder="Search team…" value="{{ amQuery }}" onInput="{{ onAmQuery }}" onClick="{{ stopEv }}" style="background:transparent;border:none;outline:none;color:#ECEAE7;font-family:inherit;font-size:12.5px;padding:0">
+                </label>
+                <div style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column">
+                <sc-if value="{{ amNoResults }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:12px 10px;text-align:center;font-size:12px;color:#7C7972">No teammate matches “{{ amQuery }}”</div>
+                </sc-if>
+                <sc-for list="{{ amOptions }}" as="o" hint-placeholder-count="3">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)">
+                  <div style="width:24px;height:24px;border-radius:999px;background:{{ o.avBg }};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:{{ o.avFg }};flex:none">{{ o.initials }}</div>
+                  <span style="flex:1;color:#ECEAE7">{{ o.name }}</span>
+                  <sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if>
+                </div>
+                </sc-for>
+                </div>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Source</label>
+              <div style="position:relative">
+              <div onClick="{{ sourceToggle }}" style="display:flex;align-items:center;justify-content:space-between;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">{{ source }}<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ sourceChevron }}</span></div>
+              <sc-if value="{{ sourceOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6);max-height:230px;overflow-y:auto">
+                <sc-for list="{{ sourceOptions }}" as="o" hint-placeholder-count="5">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Client status</label>
+              <div style="position:relative">
+              <div onClick="{{ statusToggle }}" style="display:flex;align-items:center;gap:9px;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)"><span style="width:8px;height:8px;border-radius:99px;background:{{ statusDot }};flex:none"></span><span style="flex:1">{{ status }}</span><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ statusChevron }}</span></div>
+              <sc-if value="{{ statusOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6)">
+                <sc-for list="{{ statusOptions }}" as="o" hint-placeholder-count="5">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+              <div style="font-size:11px;color:#7C7972">Prospects don't count toward active-client reporting</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#1C1C1B;border:1px solid rgba(242,106,27,.35);border-radius:16px;padding:20px">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+            <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:#FF9D57">request_quote</span>
+            <div style="font-size:14.5px;font-weight:600">Fee agreement</div>
+          </div>
+          <div style="font-size:12px;color:#7C7972;margin-bottom:14px">Defaults for every role and invoice under this client</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Fee basis</label>
+              <div style="display:flex;background:#141413;border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:4px">
+                <div onClick="{{ setPct }}" style="flex:1;text-align:center;padding:8px 0;border-radius:999px;background:{{ pctBg }};font-size:12.5px;font-weight:600;color:{{ pctFg }};cursor:pointer">% of CTC</div>
+                <div onClick="{{ setFlat }}" style="flex:1;text-align:center;padding:8px 0;border-radius:999px;background:{{ flatBg }};font-size:12.5px;font-weight:600;color:{{ flatFg }};cursor:pointer">Flat fee</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">{{ feeLabel }}</label>
+              <input type="text" placeholder="{{ feePh }}" value="{{ feeVal }}" onChange="{{ onFeeVal }}" style="background:#141413;border:1px solid {{ feeBorder }};border-radius:12px;padding:10px 14px;font-size:13px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+              <sc-if value="{{ feeErr }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:#E89A9A"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">error</span>{{ feeErrMsg }}</div>
+              </sc-if>
+              <sc-if value="{{ feePrevShow }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px;color:#7C7972">{{ feePreview }}</div>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Replacement period</label>
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+                <sc-for list="{{ repOpts }}" as="r" hint-placeholder-count="4">
+                <div onClick="{{ r.pick }}" style="text-align:center;padding:9px 0;border-radius:10px;background:{{ r.bg }};border:1px solid {{ r.border }};font-size:12px;font-weight:600;color:{{ r.fg }};cursor:pointer">{{ r.label }}</div>
+                </sc-for>
+              </div>
+              <div style="font-size:11px;color:#7C7972">Free replacement if the hire leaves within this period</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Payment terms</label>
+              <div style="position:relative">
+              <div onClick="{{ termsToggle }}" style="display:flex;align-items:center;justify-content:space-between;background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer" style-hover="border-color:rgba(242,106,27,.4)">{{ terms }}<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#7C7972">{{ termsChevron }}</span></div>
+              <sc-if value="{{ termsOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:30;background:#211F1E;border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:6px;box-shadow:0 20px 55px rgba(0,0,0,.6);max-height:230px;overflow-y:auto">
+                <sc-for list="{{ termsOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-radius:9px;font-size:13px;cursor:pointer;background:{{ o.bg }}" style-hover="background:rgba(255,255,255,.07)"><span style="color:#ECEAE7">{{ o.label }}</span><sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:#FF9D57">check</span></sc-if></div>
+                </sc-for>
+              </div>
+              </sc-if>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Billing email</label>
+                <input type="text" placeholder="finance@acme.com" value="{{ billingEmail }}" onChange="{{ onBillingEmail }}" onKeyDown="{{ onBillKey }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:13px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <sc-if value="{{ hasBillChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ billChips }}" as="bc" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:6px;padding:4px 7px 4px 11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:11.5px;font-weight:600;color:#C9C5BD">{{ bc.label }}<span onClick="{{ bc.remove }}" style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1;color:#7C7972;cursor:pointer" style-hover="color:#E89A9A">close</span></div>
+                  </sc-for>
+                </div>
+                </sc-if>
+                <div style="font-size:11px;color:#7C7972">Press Enter to add multiple recipients</div>
+                <sc-if value="{{ billErr }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:#E89A9A"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">error</span>Enter a valid email address</div>
+                </sc-if>
+                <div onClick="{{ toggleBillSame }}" style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#9A968E;cursor:pointer" style-hover="color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1;color:{{ billSameColor }}">{{ billSameIcon }}</span> Same as primary contact</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Tax ID / GSTIN <span style="color:#7C7972;font-weight:400">· optional</span></label>
+                <input type="text" placeholder="29ABCDE1234F1Z5" value="{{ gstin }}" onChange="{{ onGstin }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;font-size:13px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+                <sc-if value="{{ gstWarn }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:flex-start;gap:5px;font-size:11px;color:#F0C27C;line-height:1.4"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1.3">warning</span>Doesn't look like a valid GSTIN (e.g. 29ABCDE1234F1Z5)</div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(242,106,27,.1);border:1px solid rgba(242,106,27,.25);border-radius:11px;padding:10px 13px">
+              <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:#FF9D57">info</span>
+              <div style="font-size:11.5px;line-height:1.5;color:#E8C4A6">Invoices go to the billing email — used by Finance to compute placement fees and invoice amounts.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ qtOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeQuickContact }}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:50">
+    <div onClick="{{ stopEv }}" style="width:430px;background:#1C1C1B;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:26px 28px;box-shadow:0 30px 80px rgba(0,0,0,.6)">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px">
+        <div style="font-size:17px;font-weight:700">Create contact</div>
+        <div onClick="{{ closeQuickContact }}" style="width:28px;height:28px;border-radius:999px;border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#9A968E;cursor:pointer" style-hover="background:rgba(255,255,255,.06);color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">close</span></div>
+      </div>
+      <div style="font-size:12.5px;color:#9A968E;line-height:1.55;margin-bottom:18px">Just the essentials — you stay on this client. Need owner, source &amp; preferences? <a href="AIRecruiter - Add Contact.dc.html" style="color:#F0B27C;font-weight:600">Create full contact →</a></div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Full name <span style="color:#FF9D57">*</span></label>
+          <input type="text" placeholder="e.g. Priya Menon" value="{{ qtName }}" onChange="{{ onQtName }}" style="background:#141413;border:1px solid {{ qtNameBorder }};border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+          <sc-if value="{{ qtNameErr }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:#E89A9A"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">error</span>Contact name is required</div>
+          </sc-if>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Role / title</label>
+            <input type="text" placeholder="e.g. Hiring manager" value="{{ qtRole }}" onChange="{{ onQtRole }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Direct phone</label>
+            <input type="text" placeholder="+1 (206) 555-0138" value="{{ qtPhone }}" onChange="{{ onQtPhone }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:12.5px;font-weight:600;color:#C9C5BD">Work email</label>
+          <input type="text" placeholder="priya.menon@company.com" value="{{ qtEmail }}" onChange="{{ onQtEmail }}" style="background:#141413;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:13.5px;color:#ECEAE7;font-family:inherit;outline:none" style-focus="border-color:rgba(242,106,27,.6)">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+        <div onClick="{{ closeQuickContact }}" style="padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12.5px;font-weight:600;color:#C9C5BD;cursor:pointer" style-hover="background:rgba(255,255,255,.06)">Cancel</div>
+        <div onClick="{{ qtCreate }}" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;background:linear-gradient(135deg,#FF8A3C,#E4560F);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="filter:brightness(1.08)"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">person_add</span> Create contact</div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+
+  <sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeCancel }}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:50">
+    <div onClick="{{ stopEv }}" style="width:380px;background:#1C1C1B;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:24px 26px;box-shadow:0 30px 80px rgba(0,0,0,.6)">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(214,155,60,.14);border:1px solid rgba(214,155,60,.35);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1;color:#F0C27C">warning</span></div>
+        <div style="font-size:16px;font-weight:700">Discard this client?</div>
+      </div>
+      <div style="font-size:13px;line-height:1.6;color:#9A968E;margin-bottom:20px">Your unsaved details will be lost.</div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <div onClick="{{ closeCancel }}" style="padding:9px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12.5px;font-weight:600;color:#C9C5BD;cursor:pointer" style-hover="background:rgba(255,255,255,.06)">Keep editing</div>
+        <a href="AIRecruiter - Clients.dc.html" style="padding:9px 16px;border-radius:999px;background:rgba(200,80,80,.2);border:1px solid rgba(200,80,80,.5);color:#E89A9A;font-size:12.5px;font-weight:700;cursor:pointer">Discard</a>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:26px;right:26px;z-index:60;display:flex;align-items:center;gap:11px;background:#1F1F1E;border:1px solid rgba(78,168,116,.4);border-radius:13px;padding:13px 16px;box-shadow:0 18px 50px rgba(0,0,0,.6);animation:toastIn .18s ease-out;max-width:380px">
+    <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:#8FD6AC">check_circle</span>
+    <div style="flex:1"><div style="font-size:13px;font-weight:600">{{ toastTitle }}</div><div style="font-size:11.5px;color:#9A968E;margin-top:1px">{{ toastSub }}</div></div>
+    <div onClick="{{ hideToast }}" style="color:#7C7972;cursor:pointer;flex:none" style-hover="color:#ECEAE7"><span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">close</span></div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  blank = {
+    name: '', nameError: false, parentIdx: 0, codeIdx: 0, phone: '', website: '', industryIdx: 0, contact: '', about: '',
+    bStreet: '', bCity: '', bProv: '', bCode: '', bCountry: '',
+    sStreet: '', sCity: '', sProv: '', sCode: '', sCountry: '',
+    amIdx: 0, sourceIdx: 0, statusIdx: 0, repIdx: 3, logo: false, tzCIdx: 0, sizeIdx: 0, volIdx: 0, liCo: '', careerUrl: '', billingEmails: [], feeBasis: 'pct', feeVal: '', termsIdx: 1,
+    attachCt: null, attachOt: null, ctPct: null, otPct: null
+  };
+  state = { ...this.blank, cancelOpen: false, toast: null, dd: null, amQuery: '', contactSel: null, contactQuery: '', contactExtra: [], parentQuery: '', parentsExtra: [] };
+
+  parents = ['No parent company', 'Nortech', 'Fablio', 'Vantor', 'Corely', 'Mistvale', 'Orbex'];
+  contactsBase = [
+    { name: 'Tom Weaver', role: 'VP Engineering · Nortech', initials: 'TW', avBg: '#3A4A5B', avFg: '#CFE3F5' },
+    { name: 'Lena Cho', role: 'HR Manager · Nortech', initials: 'LC', avBg: '#5B3A3A', avFg: '#F5CFCF' },
+    { name: 'Ana Kelmendi', role: 'VP Engineering · Fablio', initials: 'AK', avBg: '#4A3A5B', avFg: '#E3CFF5' },
+    { name: 'Marco Ruiz', role: 'CTO · Vantor', initials: 'MR', avBg: '#3A5B4A', avFg: '#CFF5E0' },
+    { name: 'Sara Lindt', role: 'Talent Lead · Corely', initials: 'SL', avBg: '#4A5B3A', avFg: '#E0F5CF' }
+  ];
+  codes = [
+    { iso: 'IN', country: 'India', code: '+91', ph: '98450 12345' },
+    { iso: 'US', country: 'United States', code: '+1', ph: '(415) 555-0134' },
+    { iso: 'GB', country: 'United Kingdom', code: '+44', ph: '7700 900123' },
+    { iso: 'SG', country: 'Singapore', code: '+65', ph: '8123 4567' },
+    { iso: 'AE', country: 'UAE', code: '+971', ph: '50 123 4567' },
+    { iso: 'AU', country: 'Australia', code: '+61', ph: '412 345 678' },
+    { iso: 'DE', country: 'Germany', code: '+49', ph: '1512 3456789' },
+    { iso: 'FR', country: 'France', code: '+33', ph: '6 12 34 56 78' },
+    { iso: 'JP', country: 'Japan', code: '+81', ph: '90-1234-5678' },
+    { iso: 'CA', country: 'Canada', code: '+1', ph: '(604) 555-0199' },
+    { iso: 'NL', country: 'Netherlands', code: '+31', ph: '6 12345678' },
+    { iso: 'ZA', country: 'South Africa', code: '+27', ph: '71 123 4567' }
+  ];
+  tzsC = ['Asia/Kolkata (IST)', 'Asia/Singapore (SGT)', 'Europe/London (GMT)', 'Europe/Berlin (CET)', 'America/New_York (EST)', 'America/Los_Angeles (PST)'];
+  sizesC = ['1–50', '51–200', '201–1000', '1000+'];
+  volsC = ['10–20', '20–50', '50–100', '100+'];
+  industries = ['Technology', 'Communications', 'Finance', 'Healthcare', 'Manufacturing', 'Retail'];
+  sources = ['Added by user', 'Referral', 'Inbound enquiry', 'Outbound', 'Marketing event'];
+  statuses = ['Prospect', 'Active', 'Paused', 'Inactive', 'Blacklisted'];
+  termsList = ['Net 15', 'Net 30', 'Net 45', 'Net 60', 'Custom'];
+  ams = [
+    { name: 'Riya Kapoor (you)', initials: 'RK', bg: '#5B4A3A', fg: '#FFD9BC' },
+    { name: 'Ana Novak', initials: 'AN', bg: '#4A3A5B', fg: '#E3CFF5' },
+    { name: 'Riya Kapoor', initials: 'RK', bg: '#5B4A3A', fg: '#FFD9BC' },
+    { name: 'Mira Joshi', initials: 'MJ', bg: '#3A5B4A', fg: '#CFF5E0' }
+  ];
+
+  showToast(title, sub) { if (window.troyToast) window.troyToast(title, sub); }
+
+  ctFileName() { return 'MSA_' + (this.state.name.trim() || 'Client').replace(/\s+/g, '_') + '.pdf'; }
+
+  startLogoUpload() {
+    if (this.state.logoPct != null) return;
+    clearInterval(this._logoUp);
+    this.setState({ logoPct: 0 });
+    this._logoUp = setInterval(() => {
+      this.setState(st => {
+        const p = Math.min(100, (st.logoPct || 0) + 4 + Math.random() * 9);
+        if (p >= 100) {
+          clearInterval(this._logoUp);
+          setTimeout(() => {
+            this.setState({ logoPct: null, logo: true, logoDone: true });
+            this.showToast('Logo added', 'Shown on client cards, reports & emails');
+            setTimeout(() => this.setState({ logoDone: false }), 2200);
+          }, 260);
+          return { logoPct: 100 };
+        }
+        return { logoPct: p };
+      });
+    }, 55);
+  }
+  simulateUpload(which) {
+    const pctKey = which === 'ct' ? 'ctPct' : 'otPct';
+    if (this.state[pctKey] !== null) return;
+    this.setState({ [pctKey]: 0 });
+    const tick = () => {
+      const cur = this.state[pctKey];
+      if (cur === null) return;
+      if (cur >= 100) {
+        setTimeout(() => {
+          if (which === 'ct') {
+            this.setState({ ctPct: null, attachCt: { name: this.ctFileName(), size: 'PDF · 312 KB' } },
+              () => this.showToast('Contract attached', 'Fee terms below should match the signed agreement'));
+          } else {
+            this.setState({ otPct: null, attachOt: { name: 'Rate_Card.xlsx', size: 'XLSX · 38 KB' } },
+              () => this.showToast('File attached', 'Visible to the account team only'));
+          }
+        }, 220);
+        return;
+      }
+      this.setState({ [pctKey]: Math.min(100, cur + 7 + Math.round(Math.random() * 9)) }, () => setTimeout(tick, 95));
+    };
+    setTimeout(tick, 120);
+  }
+
+  validate() {
+    const s = this.state;
+    const nameBad = !s.name.trim();
+    const fv = parseFloat(String(s.feeVal || '').replace(/[,\s]/g, ''));
+    let feeErr = null;
+    if (s.feeBasis === 'pct') {
+      if (!(fv >= 0.1 && fv <= 100)) feeErr = (s.feeVal || '').trim() ? 'Fee must be between 0.1 and 100%' : 'Fee % is required';
+    } else {
+      if (!(fv > 0)) feeErr = (s.feeVal || '').trim() ? 'Flat fee must be greater than 0' : 'Flat fee is required';
+    }
+    if (nameBad || feeErr) {
+      this.setState({ nameError: nameBad, feeErr }, () => this.showToast('Almost there', 'Fix the highlighted fields to save'));
+      return false;
+    }
+    return true;
+  }
+
+  componentDidMount() { this._snap = this.snap(); }
+
+  snap() {
+    const s = this.state;
+    return JSON.stringify([s.name, s.phone, s.website, s.about, s.feeVal, s.feeBasis, s.billingEmails, s.gstin, s.bStreet, s.bCity, s.bProv, s.bCode, s.bCountry, s.sStreet, s.sCity, s.statusIdx, s.repIdx, s.termsIdx, s.amIdx, s.industryIdx, s.sourceIdx, s.parentIdx, s.liCo, s.careerUrl, s.tzCIdx, s.sizeIdx, s.volIdx, s.logo, s.contactSel && s.contactSel.name, s.attachCt && s.attachCt.name, s.attachOt && s.attachOt.name]);
+  }
+
+  guardBack() {
+    if (this._snap !== undefined && this.snap() !== this._snap) this.setState({ cancelOpen: true });
+    else window.location.href = 'AIRecruiter - Clients.dc.html';
+  }
+
+  renderVals() {
+    const s = this.state;
+    const am = this.ams[s.amIdx % this.ams.length];
+    const isPct = s.feeBasis === 'pct';
+    const dd = s.dd;
+    const mkDd = (key, list, idxKey) => {
+      const selIdx = s[idxKey] % list.length;
+      const out = {};
+      out[key + 'Open'] = dd === key;
+      out[key + 'Toggle'] = () => this.setState(x => ({ dd: x.dd === key ? null : key, amQuery: '' }));
+      out[key + 'Chevron'] = dd === key ? 'expand_less' : 'expand_more';
+      out[key + 'Options'] = list.map((label, i) => ({
+        label,
+        selected: i === selIdx,
+        bg: i === selIdx ? 'rgba(242,106,27,.12)' : 'transparent',
+        pick: () => this.setState({ [idxKey]: i, dd: null })
+      }));
+      return out;
+    };
+    return {
+      name: s.name,
+      onName: (e) => this.setState({ name: e.target.value, nameError: false }),
+      nameBorder: s.nameError ? 'rgba(200,80,80,.55)' : 'rgba(255,255,255,.1)',
+      nameError: s.nameError,
+      ...(() => {
+        const all = [this.parents[0], ...(s.parentsExtra || []), ...this.parents.slice(1)];
+        const q = (s.parentQuery || '').trim(), ql = q.toLowerCase();
+        const list = all.map((label, i) => ({ label, i })).filter(({ label }) => !ql || label.toLowerCase().includes(ql));
+        const selIdx = s.parentIdx % all.length;
+        return {
+          parent: all[selIdx],
+          parentOpen: dd === 'parent',
+          parentToggle: () => this.setState(x => ({ dd: x.dd === 'parent' ? null : 'parent', parentQuery: '' })),
+          parentChevron: dd === 'parent' ? 'expand_less' : 'expand_more',
+          parentQuery: q, onParentQuery: (e) => this.setState({ parentQuery: e.target.value }),
+          parentNoResults: list.length === 0,
+          parentOptions: list.map(({ label, i }) => ({
+            label, selected: i === selIdx,
+            bg: i === selIdx ? 'rgba(242,106,27,.12)' : 'transparent',
+            pick: () => this.setState({ parentIdx: i, dd: null, parentQuery: '' })
+          })),
+          parentCanAdd: q.length > 1 && !all.some(p => p.toLowerCase() === ql),
+          parentAdd: () => this.setState(x => ({ parentsExtra: [q, ...(x.parentsExtra || [])], parentIdx: 1, dd: null, parentQuery: '' }), () => this.showToast('Parent company added', q + ' — selected for this client'))
+        };
+      })(),
+      ...(() => {
+        const cur = this.codes[s.codeIdx % this.codes.length];
+        return {
+          phoneCode: cur.code,
+          codeIso: cur.iso,
+          phonePh: cur.ph,
+          codeChevron: s.codeMenuOpen ? 'expand_less' : 'expand_more',
+          codeBorder: s.codeMenuOpen ? 'rgba(242,106,27,.5)' : 'rgba(255,255,255,.1)',
+          codeMenuOpen: !!s.codeMenuOpen,
+          toggleCodeMenu: () => this.setState(x => ({ codeMenuOpen: !x.codeMenuOpen, codeQuery: '' })),
+          codeQuery: s.codeQuery || '',
+          onCodeQuery: (e) => this.setState({ codeQuery: e.target.value }),
+          ...(() => {
+            const q = (s.codeQuery || '').trim().toLowerCase();
+            const list = this.codes
+              .map((c, i) => ({ c, i }))
+              .filter(({ c }) => !q || c.country.toLowerCase().includes(q) || c.code.includes(q) || c.iso.toLowerCase().includes(q));
+            return {
+              codeNoResults: list.length === 0,
+              codeOptions: list.map(({ c, i }) => ({
+                iso: c.iso, country: c.country, code: c.code,
+                selected: i === s.codeIdx % this.codes.length,
+                bg: i === s.codeIdx % this.codes.length ? 'rgba(242,106,27,.12)' : 'transparent',
+                pick: () => this.setState({ codeIdx: i, codeMenuOpen: false, codeQuery: '' })
+              }))
+            };
+          })()
+        };
+      })(),
+      phone: s.phone, onPhone: (e) => this.setState({ phone: e.target.value }),
+      website: s.website, onWebsite: (e) => this.setState({ website: e.target.value }),
+      onWebsiteBlur: (e) => { const v = (e.target.value || '').trim(); if (v && !/^https?:\/\//i.test(v)) this.setState({ website: 'https://' + v }); },
+      billingEmail: s.billingEmail || '', onBillingEmail: (e) => this.setState({ billingEmail: e.target.value, billSame: false }),
+      billSameIcon: s.billSame ? 'check_box' : 'check_box_outline_blank',
+      billSameColor: s.billSame ? '#FF9D57' : '#4A4A47',
+      toggleBillSame: () => this.setState(st => {
+        if (st.billSame) return { billSame: false };
+        if (!st.contactSel) { this.showToast('Pick a primary contact first', 'Select or create one above to reuse their email'); return {}; }
+        const parts = st.contactSel.name.trim().toLowerCase().split(/\s+/);
+        const dom = (st.website || '').replace(/^https?:\/\//i, '').replace(/\/.*$/, '') || 'company.com';
+        const email = st.contactSel.email || (parts[0] + (parts[1] ? '.' + parts[1] : '') + '@' + dom);
+        return { billSame: true, billingEmail: email };
+      }),
+      gstin: s.gstin || '', onGstin: (e) => this.setState({ gstin: e.target.value.toUpperCase() }),
+      sameShipIcon: s.sameShip ? 'check_box' : 'check_box_outline_blank',
+      sameShipColor: s.sameShip ? '#FF9D57' : '#4A4A47',
+      toggleSameShip: () => this.setState(st => st.sameShip ? { sameShip: false } : { sameShip: true, sStreet: st.bStreet, sCity: st.bCity, sProv: st.bProv, sCode: st.bCode, sCountry: st.bCountry }),
+      industry: this.industries[s.industryIdx % this.industries.length],
+      ...(() => {
+        const selIdx = s.industryIdx % this.industries.length;
+        const q = (s.indQuery || '').trim().toLowerCase();
+        const filtered = this.industries.map((label, i) => ({ label, i })).filter(x => !q || x.label.toLowerCase().includes(q));
+        return {
+          industryOpen: dd === 'industry',
+          industryChevron: dd === 'industry' ? 'expand_less' : 'expand_more',
+          industryToggle: () => this.setState(st => ({ dd: st.dd === 'industry' ? null : 'industry', indQuery: '' })),
+          indQuery: s.indQuery || '',
+          onIndQuery: (e) => this.setState({ indQuery: e.target.value }),
+          industryNoResults: filtered.length === 0,
+          industryOptions: filtered.map(x => ({
+            label: x.label,
+            selected: x.i === selIdx,
+            bg: x.i === selIdx ? 'rgba(242,106,27,.12)' : 'transparent',
+            pick: () => this.setState({ industryIdx: x.i, dd: null, indQuery: '' })
+          }))
+        };
+      })(),
+      ...(() => {
+        const sel = s.contactSel;
+        const allC = [...s.contactExtra, ...this.contactsBase];
+        const q = (s.contactQuery || '').trim();
+        const ql = q.toLowerCase();
+        const list = allC.filter(c => !ql || c.name.toLowerCase().includes(ql) || c.role.toLowerCase().includes(ql));
+        const exact = allC.some(c => c.name.toLowerCase() === ql);
+        return {
+          contactOpen: dd === 'contact',
+          contactToggle: () => this.setState(x => ({ dd: x.dd === 'contact' ? null : 'contact', contactQuery: '' })),
+          contactChevron: dd === 'contact' ? 'expand_less' : 'expand_more',
+          contactHasSel: !!sel, contactNoSel: !sel,
+          contactName: sel ? sel.name : 'Select or search a contact',
+          contactRole: sel ? sel.role.replace(/ · .*/, '') : '',
+          contactFg: sel ? '#ECEAE7' : '#7C7972',
+          contactInitials: sel ? sel.initials : '', contactAvBg: sel ? sel.avBg : '#3A3A38', contactAvFg: sel ? sel.avFg : '#C9C5BD',
+          contactQuery: s.contactQuery || '',
+          onContactQuery: (e) => this.setState({ contactQuery: e.target.value }),
+          contactNoResults: list.length === 0,
+          contactOptions: list.map(c => ({
+            ...c,
+            selected: sel && sel.name === c.name,
+            bg: sel && sel.name === c.name ? 'rgba(242,106,27,.12)' : 'transparent',
+            pick: () => this.setState({ contactSel: c, dd: null, contactQuery: '' })
+          })),
+          contactCanAdd: q.length > 1 && !exact,
+          contactNoQuery: q.length <= 1,
+          contactAddLabel: 'Add “' + q + '” as new contact',
+          contactAdd: () => {
+            const parts = q.split(/\s+/);
+            const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+            const nc = { name: q, role: 'New contact', initials, avBg: '#3A5B4A', avFg: '#CFF5E0' };
+            this.setState(x => ({ contactExtra: [nc, ...x.contactExtra], contactSel: nc, dd: null, contactQuery: '' }));
+            this.showToast('Contact added', q + ' — complete their details from the Contacts screen');
+          }
+        };
+      })(),
+      openQuickContact: () => this.setState({ qtOpen: true, qtName: (this.state.contactQuery || '').trim(), qtNameErr: false, qtRole: '', qtEmail: '', qtPhone: '', dd: null }),
+      closeQuickContact: () => this.setState({ qtOpen: false }),
+      qtOpen: !!s.qtOpen,
+      qtName: s.qtName || '', onQtName: (e) => this.setState({ qtName: e.target.value, qtNameErr: false }),
+      qtNameBorder: s.qtNameErr ? 'rgba(200,80,80,.55)' : 'rgba(255,255,255,.1)',
+      qtNameErr: !!s.qtNameErr,
+      qtRole: s.qtRole || '', onQtRole: (e) => this.setState({ qtRole: e.target.value }),
+      qtEmail: s.qtEmail || '', onQtEmail: (e) => this.setState({ qtEmail: e.target.value }),
+      qtPhone: s.qtPhone || '', onQtPhone: (e) => this.setState({ qtPhone: e.target.value }),
+      qtCreate: () => {
+        const n = (this.state.qtName || '').trim();
+        if (!n) { this.setState({ qtNameErr: true }); return; }
+        const parts = n.split(/\s+/);
+        const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+        const nc = { name: n, role: (this.state.qtRole || '').trim() || 'New contact', initials, avBg: '#3A5B4A', avFg: '#CFF5E0', email: (this.state.qtEmail || '').trim() };
+        this.setState(x => ({ contactExtra: [nc, ...x.contactExtra], contactSel: nc, qtOpen: false, contactQuery: '' }),
+          () => this.showToast('Contact created', n + ' selected — finish their details from the Contacts screen'));
+      },
+      liCo: s.liCo || '', onLiCo: (e) => this.setState({ liCo: e.target.value }),
+      careerUrl: s.careerUrl || '', onCareerUrl: (e) => this.setState({ careerUrl: e.target.value }),
+      tzC: this.tzsC[(s.tzCIdx || 0) % this.tzsC.length],
+      ...mkDd('tzC', this.tzsC, 'tzCIdx'),
+      sizeC: this.sizesC[(s.sizeIdx || 0) % this.sizesC.length],
+      ...mkDd('sizeC', this.sizesC, 'sizeIdx'),
+      volC: this.volsC[(s.volIdx || 0) % this.volsC.length],
+      ...mkDd('volC', this.volsC, 'volIdx'),
+      about: s.about, onAbout: (e) => this.setState({ about: e.target.value }),
+      bStreet: s.bStreet, onBStreet: (e) => this.setState({ bStreet: e.target.value }),
+      bCity: s.bCity, onBCity: (e) => this.setState({ bCity: e.target.value }),
+      bProv: s.bProv, onBProv: (e) => this.setState({ bProv: e.target.value }),
+      bCode: s.bCode, onBCode: (e) => this.setState({ bCode: e.target.value }),
+      bCountry: s.bCountry, onBCountry: (e) => this.setState({ bCountry: e.target.value }),
+      sStreet: s.sStreet, onSStreet: (e) => this.setState({ sStreet: e.target.value }),
+      sCity: s.sCity, onSCity: (e) => this.setState({ sCity: e.target.value }),
+      sProv: s.sProv, onSProv: (e) => this.setState({ sProv: e.target.value }),
+      sCode: s.sCode, onSCode: (e) => this.setState({ sCode: e.target.value }),
+      sCountry: s.sCountry, onSCountry: (e) => this.setState({ sCountry: e.target.value }),
+      copyBilling: () => this.setState({ sStreet: s.bStreet, sCity: s.bCity, sProv: s.bProv, sCode: s.bCode, sCountry: s.bCountry },
+        () => this.showToast('Address copied', 'Shipping now matches billing — edit any field to override')),
+      amName: am.name, amInitials: am.initials, amBg: am.bg, amFg: am.fg,
+      amOpen: dd === 'am',
+      amToggle: () => this.setState(x => ({ dd: x.dd === 'am' ? null : 'am', amQuery: '' })),
+      amChevron: dd === 'am' ? 'expand_less' : 'expand_more',
+      amQuery: s.amQuery || '',
+      onAmQuery: (e) => this.setState({ amQuery: e.target.value }),
+      ...(() => {
+        const q = (s.amQuery || '').trim().toLowerCase();
+        const list = this.ams.map((a, i) => ({ a, i })).filter(({ a }) => !q || a.name.toLowerCase().includes(q));
+        const selIdx = s.amIdx % this.ams.length;
+        return {
+          amNoResults: list.length === 0,
+          amOptions: list.map(({ a, i }) => ({
+            name: a.name, initials: a.initials, avBg: a.bg, avFg: a.fg,
+            selected: i === selIdx,
+            bg: i === selIdx ? 'rgba(242,106,27,.12)' : 'transparent',
+            pick: () => this.setState({ amIdx: i, dd: null, amQuery: '' })
+          }))
+        };
+      })(),
+      source: this.sources[s.sourceIdx % this.sources.length],
+      ...mkDd('source', this.sources, 'sourceIdx'),
+      setPct: () => this.setState({ feeBasis: 'pct' }),
+      setFlat: () => this.setState({ feeBasis: 'flat' }),
+      pctBg: isPct ? 'rgba(255,255,255,.1)' : 'transparent', pctFg: isPct ? '#ECEAE7' : '#9A968E',
+      flatBg: !isPct ? 'rgba(255,255,255,.1)' : 'transparent', flatFg: !isPct ? '#ECEAE7' : '#9A968E',
+      feeLabel: isPct ? 'Fee % of annual CTC' : 'Flat fee per placement (₹)',
+      feePh: isPct ? 'e.g. 8.33' : 'e.g. 1,50,000',
+      feeVal: s.feeVal, onFeeVal: (e) => this.setState({ feeVal: e.target.value, feeErr: null }),
+      feeErr: !!s.feeErr, feeErrMsg: s.feeErr || '',
+      ...(() => {
+        const fv = parseFloat(String(s.feeVal || '').replace(/[,\s]/g, ''));
+        const isP = s.feeBasis === 'pct';
+        const ok = isP ? (fv >= 0.1 && fv <= 100) : fv > 0;
+        return {
+          feePrevShow: ok && !s.feeErr,
+          feePreview: isP ? ('= ' + fv + '% of Annual CTC · ≈ ₹' + (Math.round(fv * 18) / 100) + 'L fee on an ₹18L offer') : ('= ₹' + String(s.feeVal).trim() + ' flat per placement, any CTC')
+        };
+      })(),
+      feeBorder: s.feeErr ? 'rgba(200,80,80,.55)' : 'rgba(255,255,255,.1)',
+      ...(() => {
+        const q = (s.name || '').trim().toLowerCase();
+        const KNOWN = [['Nortech Technologies', 'Ana Novak'], ['Fablio Labs', 'Dev Shah'], ['Vantor Group', 'Riya Kapoor'], ['Corely', 'Mira Chen'], ['Mistvale Partners', 'Ana Novak'], ['Orbex Systems', 'Dev Shah']];
+        const hit = q.length >= 3 && KNOWN.find(k => k[0].toLowerCase().includes(q) || q.includes(k[0].split(' ')[0].toLowerCase()));
+        return { dupWarn: !!hit && !s.nameError, dupName: hit ? hit[0] : '', dupBy: hit ? hit[1] : '' };
+      })(),
+      billErr: (() => { const v = (s.billingEmail || '').trim(); return !!v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); })(),
+      gstWarn: (() => { const v = (s.gstin || '').trim(); return !!v && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9A-Z]{3}$/.test(v); })(),
+      webErr: (() => { const v = (s.website || '').trim(); return !!v && !/^(https?:\/\/)?[^\s]+\.[^\s]{2,}$/.test(v); })(),
+      status: this.statuses[s.statusIdx % this.statuses.length],
+      statusDot: ['#5B9BFF', '#4EA874', '#F0C27C', '#75726B', '#E5484D'][s.statusIdx % this.statuses.length],
+      ...mkDd('status', this.statuses, 'statusIdx'),
+      repOpts: ['None', '30 days', '60 days', '90 days', 'Custom'].map((l, i) => ({
+        label: l,
+        bg: s.repIdx === i ? 'rgba(242,106,27,.14)' : '#141413',
+        border: s.repIdx === i ? 'rgba(242,106,27,.45)' : 'rgba(255,255,255,.1)',
+        fg: s.repIdx === i ? '#FF9D57' : '#9A968E',
+        pick: () => this.setState({ repIdx: i })
+      })),
+      logoHas: !!s.logo, logoEmpty: !s.logo && s.logoPct == null,
+      logoUploading: s.logoPct != null,
+      logoPctTxt: Math.round(s.logoPct || 0) + '%',
+      logoRing: '#FF8A3C ' + Math.round(s.logoPct || 0) + '%, rgba(255,255,255,.12) 0',
+      logoDone: !!s.logoDone,
+      logoInitial: ((s.name || 'A').trim().charAt(0) || 'A').toUpperCase(),
+      addLogo: () => this.startLogoUpload(),
+      removeLogo: () => this.setState({ logo: false }),
+      hasBillChips: (s.billingEmails || []).length > 0,
+      billChips: (s.billingEmails || []).map((em, i) => ({ label: em, remove: () => this.setState({ billingEmails: this.state.billingEmails.filter((_, j) => j !== i) }) })),
+      onBillKey: (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); const v = (this.state.billingEmail || '').trim().replace(/,+$/, ''); if (v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) this.setState({ billingEmails: [...(this.state.billingEmails || []), v], billingEmail: '', billSame: false }); } },
+      terms: this.termsList[s.termsIdx % this.termsList.length],
+      ...mkDd('terms', this.termsList, 'termsIdx'),
+      ctEmpty: !s.attachCt && s.ctPct === null,
+      ctUploading: s.ctPct !== null,
+      ctHas: !!s.attachCt,
+      ctPct: s.ctPct || 0, ctPctW: (s.ctPct || 0) + '%',
+      ctName: s.ctPct !== null ? this.ctFileName() : (s.attachCt ? s.attachCt.name : ''),
+      ctSize: s.attachCt ? s.attachCt.size : '',
+      addCt: () => this.simulateUpload('ct'),
+      removeCt: () => this.setState({ attachCt: null }),
+      otEmpty: !s.attachOt && s.otPct === null,
+      otUploading: s.otPct !== null,
+      otHas: !!s.attachOt,
+      otPct: s.otPct || 0, otPctW: (s.otPct || 0) + '%',
+      otName: s.otPct !== null ? 'Rate_Card.xlsx' : (s.attachOt ? s.attachOt.name : ''),
+      otSize: s.attachOt ? s.attachOt.size : '',
+      addOt: () => this.simulateUpload('ot'),
+      removeOt: () => this.setState({ attachOt: null }),
+      save: () => {
+        if (!this.validate()) return;
+        this.showToast('Client created', s.name.trim() + ' — add the first role from the client page');
+        setTimeout(() => { window.location.href = 'AIRecruiter - Clients.dc.html'; }, 1200);
+      },
+      saveNew: () => {
+        if (!this.validate()) return;
+        const saved = s.name.trim();
+        this.setState({ ...this.blank, amIdx: s.amIdx, feeBasis: s.feeBasis, termsIdx: s.termsIdx, sourceIdx: s.sourceIdx, codeIdx: s.codeIdx }, () => this.showToast('Client created', saved + ' saved — your defaults are kept for the next one'));
+      },
+      openCancel: () => this.setState({ cancelOpen: true }),
+      guardBack: () => this.guardBack(),
+      closeCancel: () => this.setState({ cancelOpen: false }),
+      cancelOpen: s.cancelOpen,
+      stopEv: (e) => e.stopPropagation(),
+      toastShow: !!s.toast,
+      toastTitle: s.toast ? s.toast.title : '',
+      toastSub: s.toast ? s.toast.sub : '',
+      hideToast: () => this.setState({ toast: null })
+    };
+  }
+}
+</script>
+</body>
+</html>

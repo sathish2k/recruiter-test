@@ -188,6 +188,8 @@ async function seed() {
       // Spread creation over ~70 days so the month-over-month delta is real.
       const age = 3 + ((index * 7) % 68);
       const status: CandidateStatus = stage === "offer" ? "placed" : i % 5 === 0 ? "new" : "active";
+      // Placed candidates carry a realistic gap so "avg time to hire" is real.
+      const closedAfter = status === "placed" ? 14 + (index % 21) : 0;
       return {
         id: id(),
         organizationId,
@@ -198,11 +200,27 @@ async function seed() {
         status,
         ownerId: owner?.id ?? null,
         createdAt: daysAgo(age),
-        updatedAt: daysAgo(age),
+        updatedAt: daysAgo(Math.max(0, age - closedAfter)),
       };
     }),
   );
   await db.insert(candidate).values(candidateRows);
+
+  // Roll the seeded jobs/candidates up onto their client, the way the app would.
+  for (const row of clientRows) {
+    const clientJobs = jobRows.filter((job) => job.clientId === row.id);
+    const openRoles = clientJobs.filter((job) => job.status === "open").length;
+    const jobIds = new Set(clientJobs.map((job) => job.id));
+    const owned = candidateRows.filter((c) => c.jobId && jobIds.has(c.jobId));
+    await db
+      .update(client)
+      .set({
+        openRoles,
+        candidates: owned.length,
+        placements: owned.filter((c) => c.status === "placed").length,
+      })
+      .where(eq(client.id, row.id));
+  }
 
   const inviteRows = INVITES_PER_DAY.flatMap((sent, dayIndex) =>
     Array.from({ length: sent }, (_, i) => {

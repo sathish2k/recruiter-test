@@ -11,7 +11,11 @@
   },
   "status": {
     "hiring": "Hiring",
-    "paused": "Paused"
+    "paused": "Paused",
+    "prospect": "Prospect",
+    "active": "Active",
+    "inactive": "Inactive",
+    "blacklisted": "Blacklisted"
   },
   "health": {
     "healthy": "Healthy",
@@ -20,15 +24,23 @@
     "dormant": "Dormant"
   },
   "card": {
-    "requirements": "Requirements",
+    "requirements": "roles",
     "candidates": "Candidates",
-    "placements": "Placements",
+    "placements": "placed",
     "open": "Open client",
     "addRole": "Add requirement",
     "contacts": "View contacts",
     "more": "More",
     "edit": "Edit client",
-    "delete": "Delete"
+    "delete": "Delete",
+    "candidateFlow": "CANDIDATE FLOW",
+    "inPipeline": "in pipeline",
+    "accountManager": "ACCOUNT MANAGER",
+    "flow": {
+      "sourced": "sourced",
+      "screening": "screening",
+      "interviewing": "interviewing"
+    }
   },
   "deleteTitle": "Delete client",
   "deleteBody": "Remove {{name}} from your workspace? This can't be undone.",
@@ -37,5 +49,23 @@
   "toast": {
     "deleted": "{{name}} removed from your workspace",
     "exportSoon": "Export is coming soon"
+  },
+  "filters": {
+    "health": "Health"
+  },
+  "moreFilters": "Filters",
+  "clearAll": "Clear all",
+  "showing": "{{shown}} of {{total}} clients · page {{page}} of {{pages}}",
+  "delete": {
+    "title": "Delete client",
+    "body": "Remove {{name}} from your workspace? This can't be undone.",
+    "confirm": "Delete client",
+    "cancel": "Cancel"
+  },
+  "exportAs": "EXPORT AS",
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "xlsx": "Excel (.xlsx)",
+    "docx": "Word (.docx)"
   }
 }

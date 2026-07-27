@@ -1,5 +1,6 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import type { ReactNode } from "react";
@@ -39,6 +40,23 @@ export function FormContainer({
   grids: (FieldGrid | undefined)[];
   children: ReactNode[];
 }) {
+  // An explicit template drives a plain CSS grid: the children sit in source
+  // order in fixed tracks, so `grid.size` has nothing to say.
+  if (gridContainer?.templateColumns) {
+    return (
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: gridContainer.templateColumns },
+          gap: gridContainer.spacing ?? "16px",
+          alignItems: gridContainer.alignItems ?? "start",
+        }}
+      >
+        {children}
+      </Box>
+    );
+  }
+
   if (gridContainer) {
     return (
       <Grid

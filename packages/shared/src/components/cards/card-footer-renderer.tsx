@@ -69,7 +69,7 @@ export function CardFooterRenderer({
                 alignItems: "center",
                 justifyContent: "center",
                 color: "text.primary",
-                "&:hover": { background: "action.hover" },
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               <IconRenderer name={config.trailingAction.icon} size={15} color="inherit" />
@@ -106,7 +106,7 @@ function CardAction({
           gap: "5px",
           p: "7px 14px",
           borderRadius: "999px",
-          background: "surface.tint",
+          bgcolor: "surface.tint",
           border: "1px solid",
           borderColor: "surface.borderStrong",
           fontSize: 12,

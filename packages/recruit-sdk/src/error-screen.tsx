@@ -208,7 +208,7 @@ function ActionButton({ action, primary }: { action: ErrorScreenAction; primary?
           borderColor: "divider",
           color: "text.primary",
           background: "transparent",
-          "&:hover": { background: "action.hover" },
+          "&:hover": { bgcolor: "action.hover" },
         }),
   };
   const content = (

@@ -4,6 +4,9 @@ export interface ClientFormConfiguration {
   schema: JsonSchema;
   sections: FormSection[];
   sectionsContainer: FormLayoutProps;
+  /** Quick-create modal behind the Primary contact picker`s "Create new contact"
+   * row — the essentials only; the full form lives on its own screen. */
+  quickContact: JsonSchema;
   listRouteId: string;
 }
 
@@ -11,6 +14,18 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
   schema: {
     type: "object",
     properties: {
+      logo: {
+        type: "string",
+        optional: true,
+        widget: "upload",
+        preview: "square",
+        title: "fields.logo",
+        uploadLabel: "fields.logoUpload",
+        help: "fields.logoHelp",
+        accept: "image/png,image/jpeg,image/webp,image/svg+xml",
+        maxSizeMb: 2,
+        grid: { size: { xs: 12 } },
+      },
       name: {
         type: "string",
         title: "fields.name",
@@ -25,6 +40,7 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
         title: "fields.parentCompany",
         placeholder: "fields.parentCompanyPlaceholder",
         optionSource: { url: "/clients", path: "data", valueKey: "name", labelKey: "name" },
+        emptyOption: "fields.noParentCompany",
         maxLength: 150,
         grid: { size: { xs: 12, md: 6 } },
       },
@@ -55,12 +71,59 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
       },
       primaryContactId: {
         type: "string",
+        dense: true,
+        icon: "person-search",
         widget: "select",
         avatar: true,
         title: "fields.primaryContact",
         placeholder: "fields.primaryContactPlaceholder",
         optionSource: { url: "/contacts", path: "data", valueKey: "id", labelKey: "name" },
         grid: { size: { xs: 12, md: 6 } },
+      },
+      linkedin: {
+        type: "string",
+        optional: true,
+        title: "fields.linkedin",
+        placeholder: "fields.linkedinPlaceholder",
+        maxLength: 255,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      careerPage: {
+        type: "string",
+        optional: true,
+        title: "fields.careerPage",
+        placeholder: "fields.careerPagePlaceholder",
+        maxLength: 255,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      timezone: {
+        type: "string",
+        widget: "select",
+        searchable: true,
+        title: "fields.timezone",
+        placeholder: "fields.timezonePlaceholder",
+        optionSource: { url: "/reference", path: "data.timezones" },
+        grid: { size: { xs: 12, md: 4 } },
+      },
+      companySize: {
+        type: "string",
+        widget: "select",
+        title: "fields.companySize",
+        placeholder: "fields.companySizePlaceholder",
+        enum: ["1-50", "51-200", "201-1000", "1000+"],
+        enumL10n: "companySize",
+        default: "1-50",
+        grid: { size: { xs: 12, md: 4 } },
+      },
+      annualHiringVolume: {
+        type: "string",
+        widget: "select",
+        title: "fields.annualHiringVolume",
+        placeholder: "fields.annualHiringVolumePlaceholder",
+        enum: ["10-20", "20-50", "50-100", "100+"],
+        enumL10n: "annualHiringVolume",
+        default: "10-20",
+        grid: { size: { xs: 12, md: 4 } },
       },
       notes: {
         type: "string",
@@ -83,65 +146,87 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
         },
         grid: { size: { xs: 12 } },
       },
+      billingHeading: {
+        type: "string",
+        widget: "heading",
+        title: "address.billing",
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      shipHeading: {
+        type: "string",
+        widget: "heading",
+        title: "address.office",
+        grid: { size: { xs: 12, md: 6 } },
+      },
       billingStreet: {
         type: "string",
+        hideLabel: true,
         title: "address.street",
         placeholder: "address.street",
         grid: { size: { xs: 12, md: 6 } },
       },
       shipStreet: {
         type: "string",
+        hideLabel: true,
         title: "address.shipStreet",
         placeholder: "address.street",
         grid: { size: { xs: 12, md: 6 } },
       },
       billingCity: {
         type: "string",
+        hideLabel: true,
         title: "address.city",
         placeholder: "address.city",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       shipCity: {
         type: "string",
+        hideLabel: true,
         title: "address.shipCity",
         placeholder: "address.city",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       billingState: {
         type: "string",
+        hideLabel: true,
         title: "address.state",
         placeholder: "address.state",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       shipState: {
         type: "string",
+        hideLabel: true,
         title: "address.shipState",
         placeholder: "address.state",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       billingPostal: {
         type: "string",
+        hideLabel: true,
         title: "address.postalCode",
         placeholder: "address.postalCode",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       shipPostal: {
         type: "string",
+        hideLabel: true,
         title: "address.shipPostalCode",
         placeholder: "address.postalCode",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       billingCountry: {
         type: "string",
+        hideLabel: true,
         title: "address.country",
         placeholder: "address.country",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       shipCountry: {
         type: "string",
+        hideLabel: true,
         title: "address.shipCountry",
         placeholder: "address.country",
-        grid: { size: { xs: 12, md: 6 } },
+        grid: { size: { xs: 12, md: 3 } },
       },
       contract: {
         type: "array",
@@ -170,11 +255,41 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
         optionSource: { url: "/users", path: "data", valueKey: "id", labelKey: "name" },
         grid: { size: { xs: 12 } },
       },
+      status: {
+        type: "string",
+        widget: "select",
+        title: "fields.status",
+        enum: ["prospect", "active", "hiring", "paused", "inactive", "blacklisted"],
+        enumL10n: "status",
+        default: "prospect",
+        optionDots: {
+          prospect: "#5B9BFF",
+          active: "#4EA874",
+          hiring: "#4EA874",
+          paused: "#F0C27C",
+          inactive: "#75726B",
+          blacklisted: "#E5484D",
+        },
+        helpWhen: { prospect: "statusHint.prospect" },
+        grid: { size: { xs: 12 } },
+      },
+      replacementPeriod: {
+        type: "string",
+        widget: "tiles",
+        title: "fields.replacementPeriod",
+        help: "fields.replacementPeriodHelp",
+        enum: ["none", "30", "60", "90", "custom"],
+        enumL10n: "replacementPeriod",
+        default: "90",
+        grid: { size: { xs: 12 } },
+      },
       source: {
         type: "string",
         widget: "select",
         title: "fields.source",
         enum: ["added_by_user", "referral", "inbound", "outbound", "event"],
+        enumL10n: "source",
+        default: "added_by_user",
         grid: { size: { xs: 12 } },
       },
       feeBasis: {
@@ -211,16 +326,17 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
         grid: { size: { xs: 12 } },
       },
       billingEmail: {
-        type: "string",
-        format: "email",
+        type: "array",
+        widget: "email-list",
         title: "fields.billingEmail",
         placeholder: "fields.billingEmailPlaceholder",
-        maxLength: 255,
-        errorMessage: { format: "fields.emailInvalid", maxLength: "fields.emailMax" },
+        help: "fields.billingEmailHint",
+        errorMessage: { format: "fields.emailInvalid" },
         grid: { size: { xs: 12, md: 6 } },
       },
       taxId: {
         type: "string",
+        optional: true,
         title: "fields.taxId",
         placeholder: "fields.taxIdPlaceholder",
         maxLength: 40,
@@ -242,18 +358,23 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
   // side column (md:4) — Ownership + Fee agreement. Stacks on mobile.
   sections: [
     {
-      grid: { size: { xs: 12, md: 8 } },
       sections: [
         {
           title: "sections.info",
           gridContainer: { columns: 12, spacing: 2 },
           fields: [
+            "logo",
             "name",
             "parentCompany",
             "phone",
             "website",
             "industry",
             "primaryContactId",
+            "linkedin",
+            "careerPage",
+            "timezone",
+            "companySize",
+            "annualHiringVolume",
             "notes",
           ],
         },
@@ -262,17 +383,22 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
           gridContainer: { columns: 12, spacing: 2 },
           // Billing (left) beside shipping (right); the checkbox copies + disables
           // the shipping column via `syncFields`.
+          // Two address blocks side by side. Street spans its block (md 6);
+          // the pairs beneath are md 3, so each block reads
+          // Street / City | State / Postal | Country — as the design draws it.
           fields: [
             "sameAsBilling",
+            "billingHeading",
+            "shipHeading",
             "billingStreet",
             "shipStreet",
             "billingCity",
-            "shipCity",
             "billingState",
+            "shipCity",
             "shipState",
             "billingPostal",
-            "shipPostal",
             "billingCountry",
+            "shipPostal",
             "shipCountry",
           ],
         },
@@ -285,13 +411,13 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
       ],
     },
     {
-      grid: { size: { xs: 12, md: 4 } },
+      sticky: true,
       sections: [
         {
           title: "sections.ownership",
           description: "sections.ownershipHint",
           gridContainer: { columns: 12, spacing: 2 },
-          fields: ["accountLeadId", "source"],
+          fields: ["accountLeadId", "source", "status"],
         },
         {
           title: "sections.fee",
@@ -303,6 +429,7 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
             "feeBasis",
             "feePercent",
             "feeFlat",
+            "replacementPeriod",
             "paymentTerms",
             "billingEmail",
             "taxId",
@@ -312,6 +439,43 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
       ],
     },
   ],
-  sectionsContainer: { gridContainer: { columns: 12, spacing: 2 } },
+  sectionsContainer: { gridContainer: { templateColumns: "minmax(0,1fr) 340px", spacing: 2 } },
+  quickContact: {
+    type: "object",
+    required: ["fullName"],
+    properties: {
+      fullName: {
+        type: "string",
+        title: "quickContact.fullName",
+        placeholder: "quickContact.fullNamePlaceholder",
+        maxLength: 150,
+        errorMessage: { required: "quickContact.nameRequired" },
+        grid: { size: { xs: 12 } },
+      },
+      title: {
+        type: "string",
+        title: "quickContact.role",
+        placeholder: "quickContact.rolePlaceholder",
+        maxLength: 150,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      phone: {
+        type: "string",
+        title: "quickContact.phone",
+        placeholder: "quickContact.phonePlaceholder",
+        maxLength: 30,
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      email: {
+        type: "string",
+        format: "email",
+        title: "quickContact.email",
+        placeholder: "quickContact.emailPlaceholder",
+        maxLength: 255,
+        errorMessage: { format: "fields.emailInvalid" },
+        grid: { size: { xs: 12 } },
+      },
+    },
+  },
   listRouteId: "Recruit.Clients.Route",
 };

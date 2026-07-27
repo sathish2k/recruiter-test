@@ -21,7 +21,8 @@
     "desktop": "turbo run dev --filter=@recruit/desktop",
     "desktop:build": "turbo run build --filter=@recruit/desktop",
     "test": "bun test apps",
-    "check:autocomplete": "bun scripts/check-autocomplete-slots.mjs"
+    "check:autocomplete": "bun scripts/check-autocomplete-slots.mjs",
+    "check:sx-background": "bun scripts/check-sx-background.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",

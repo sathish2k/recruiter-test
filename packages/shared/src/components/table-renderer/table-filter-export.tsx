@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
 import { type ActionHandler, IconRenderer } from "../renderers";
+import { CardCollectionRenderer } from "./card-collection";
 import { TableRenderer } from "./table-renderer";
 import type { Cells, TableCta, TableFilterExportConfig } from "./table-renderer.types";
 
@@ -20,6 +21,9 @@ export function TableFilterExportRenderer({
   cells,
   headerExtra,
   headerAction,
+  renderItem,
+  renderSkeleton,
+  itemMinWidth,
 }: {
   id: string;
   config?: TableFilterExportConfig;
@@ -29,6 +33,11 @@ export function TableFilterExportRenderer({
   cells?: Cells;
   headerExtra?: ReactNode;
   headerAction?: ReactNode;
+  /** Render the body as a card grid instead of a table. The toolbar, filters
+   * and pagination stay identical — only the item rendering changes. */
+  renderItem?: (row: Row) => ReactNode;
+  renderSkeleton?: () => ReactNode;
+  itemMinWidth?: number;
 }) {
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<TableFilterExportConfig>(id);
@@ -109,16 +118,28 @@ export function TableFilterExportRenderer({
         />
       ) : null}
 
-      <TableRenderer
-        id={id}
-        config={config}
-        filters={filters}
-        actionHandler={actionHandler}
-        cells={cells}
-        headerExtra={headerExtra}
-        headerAction={headerAction}
-        onEmptyAction={onCta}
-      />
+      {renderItem ? (
+        <CardCollectionRenderer
+          id={id}
+          config={config}
+          filters={filters}
+          renderItem={renderItem}
+          renderSkeleton={renderSkeleton}
+          itemMinWidth={itemMinWidth}
+          onEmptyAction={onCta}
+        />
+      ) : (
+        <TableRenderer
+          id={id}
+          config={config}
+          filters={filters}
+          actionHandler={actionHandler}
+          cells={cells}
+          headerExtra={headerExtra}
+          headerAction={headerAction}
+          onEmptyAction={onCta}
+        />
+      )}
     </Box>
   );
 }

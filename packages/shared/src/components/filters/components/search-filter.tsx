@@ -49,9 +49,14 @@ export function SearchField({
           color: "text.primary",
           // The padding belongs to the inner input, not the InputBase root —
           // stacking both (plus MUI's line-height) made this 50px tall where
-          // every other control is 40.5.
+          // every other control is 42.
           lineHeight: "normal",
-          "& .MuiInputBase-input": { p: "11px 0", height: "auto", lineHeight: "normal" },
+          "& .MuiInputBase-input": {
+            py: (theme) => theme.form.controlPadY,
+            px: 0,
+            height: "auto",
+            lineHeight: "normal",
+          },
         }}
       />
     </Box>

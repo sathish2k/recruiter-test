@@ -13,6 +13,8 @@ export type BuiltInWidget =
   | "password"
   | "select"
   | "segmented"
+  | "tiles"
+  | "email-list"
   | "switch"
   | "switch-row"
   | "checkbox"
@@ -32,7 +34,8 @@ export type BuiltInWidget =
   | "date"
   | "time"
   | "datetime"
-  | "color";
+  | "color"
+  | "heading";
 
 /**
  * A widget name a schema may use: a built-in, or any other string resolved from
@@ -71,6 +74,16 @@ export interface SyncFields {
 }
 
 export interface JsonSchemaProperty {
+  /** Value → dot colour, drawn before the label in the control and the menu —
+   * the design`s client-status lifecycle. */
+  optionDots?: Record<string, string>;
+  /** Value → help translation key, replacing `help` while that value is selected. */
+  helpWhen?: Record<string, string>;
+  /** Append the design`s dimmed " · optional" suffix to the label. */
+  optional?: boolean;
+  /** Draw this control at the design`s smaller size, as the rail`s fields are —
+   * for a dense control sitting in the wide column. */
+  dense?: boolean;
   type: JsonSchemaType;
 
   format?: "email" | "password" | "tel" | "url" | "date";
@@ -128,6 +141,8 @@ export interface JsonSchemaProperty {
   optionSource?: OptionSource;
   /** Renders a `select` as a type-ahead. Implied when `optionSource` is set. */
   searchable?: boolean;
+  /** Leading "none" row in a searchable select, e.g. "No parent company". */
+  emptyOption?: string;
   /** `select`: show a coloured initials avatar beside each option and the chosen
    * value (a person/contact picker). */
   avatar?: boolean;
@@ -206,6 +221,8 @@ export interface Attachment {
 }
 
 export interface SelectOption {
+  /** Dot colour drawn before the label, when the schema maps one. */
+  dot?: string;
   value: string;
   label: string;
   /** The original row, when options came from an endpoint. */
@@ -362,6 +379,11 @@ export interface FormLayoutProps {
     "spacing" | "direction" | "columns"
   > & {
     alignItems?: "flex-start" | "center" | "flex-end" | "stretch" | "baseline";
+    /** CSS grid template, for columns MUI`s 12-column split cannot express — the
+     * design`s fixed-width side rail (`minmax(0,1fr) 340px`). Children place
+     * themselves in order and their `grid.size` is ignored; it collapses to a
+     * single column below `md`. */
+    templateColumns?: string;
   };
 }
 

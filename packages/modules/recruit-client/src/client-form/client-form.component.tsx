@@ -2,6 +2,7 @@
 
 import Box from "@mui/material/Box";
 import {
+  useAuthUser,
   useConfiguration,
   useFetch,
   usePortalRouter,
@@ -12,11 +13,16 @@ import {
   type Attachment,
   AttachmentsWidget,
   type AttachmentUploader,
+  FormModal,
   type FormValues,
   FormWithSectionsRenderer,
+  invalidateOptions,
+  SelectWidget,
+  UploadWidget,
+  useModal,
   useToast,
 } from "@recruit/shared";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { ClientFormConfiguration } from "./client-form.configuration";
 
 interface ClientAddress {
@@ -54,6 +60,11 @@ const FEE_BASIS = ["percent", "flat"];
 const SOURCES = ["added_by_user", "referral", "inbound", "outbound", "event"];
 const PAYMENT_TERMS = ["net15", "net30", "net45", "net60"];
 const str = (v: unknown) => (typeof v === "string" ? v : "");
+const splitEmails = (raw?: string) =>
+  (raw ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
 
 export function ClientFormComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
@@ -61,6 +72,7 @@ export function ClientFormComponent({ id }: { id: string }) {
   const { show } = useToast();
   const router = usePortalRouter();
   const params = useRouteParams();
+  const user = useAuthUser();
   const clientId = params.id;
   const isEdit = Boolean(clientId);
 
@@ -72,13 +84,91 @@ export function ClientFormComponent({ id }: { id: string }) {
     const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
     return (file, onProgress) => mut.uploadAsset?.(file, onProgress) as Promise<Attachment>;
   }, [mutation]);
+
+  // The logo needs the stored URL back, not the Attachment record.
+  const uploadLogo = useMemo(
+    () => async (file: File, onProgress: (percent: number) => void) => {
+      const stored = await uploader(file, onProgress);
+      return { url: stored.url ?? "" };
+    },
+    [uploader],
+  );
+  // "Create \"…\" as parent company" pinned under the parent-company options,
+  // as the design draws it: creates the client, then selects it by name.
+  const quickContact = useModal<string>();
+  // Set when the modal opens, so the created contact lands in the field that
+  // asked for it.
+  const pickContact = useRef<((id: string) => void) | null>(null);
+
+  const saveQuickContact = async (values: FormValues) => {
+    const full = String(values.fullName ?? "").trim();
+    const [firstName, ...restName] = full.split(/\s+/);
+    const mut = mutation as Record<string, ((body: unknown) => Promise<unknown>) | undefined>;
+    const created = (await mut.createContact?.({
+      firstName,
+      lastName: restName.join(" "),
+      title: values.title,
+      phone: values.phone,
+      email: values.email,
+    })) as { data?: { id?: string } } | undefined;
+    // The picker`s options are cached by url — drop them so it sees the new row.
+    invalidateOptions("/contacts");
+    const id = created?.data?.id;
+    if (id) pickContact.current?.(id);
+    show(t("toast.contactCreated", { name: full }));
+  };
+
+  const createParent = useMemo(
+    () => async (query: string, onPicked: (name: string) => void) => {
+      const name = query.trim();
+      if (!name) return;
+      const mut = mutation as Record<string, ((body: unknown) => Promise<unknown>) | undefined>;
+      await mut.create?.({ name });
+      onPicked(name);
+      show(t("toast.parentCreated", { name }));
+    },
+    [mutation, show, t],
+  );
+
   const widgets = useMemo(
     () => ({
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
+      // The logo uploads straight away, so the tile can draw the design`s
+      // progress ring and completion tick.
+      upload: (props: Parameters<typeof UploadWidget>[0]) => (
+        <UploadWidget {...props} uploader={uploadLogo} />
+      ),
+      select: (props: Parameters<typeof SelectWidget>[0]) =>
+        props.name === "primaryContactId" ? (
+          <SelectWidget
+            {...props}
+            createOption={{
+              icon: "person-add",
+              label: () => t("quickContact.create"),
+              onCreate: (query: string) => {
+                pickContact.current = (id: string) => props.field.onChange(id);
+                quickContact.open(query);
+              },
+            }}
+          />
+        ) : props.name === "parentCompany" ? (
+          <SelectWidget
+            {...props}
+            createOption={{
+              icon: "domain-add",
+              label: (query: string) => t("fields.parentCreate", { query }),
+              onCreate: (query: string) => {
+                void createParent(query, (name) => props.field.onChange(name));
+              },
+            }}
+          />
+        ) : (
+          <SelectWidget {...props} />
+        ),
     }),
-    [uploader],
+    [uploader, uploadLogo, createParent, quickContact, t],
   );
 
   const schema = useMemo(() => {
@@ -113,6 +203,8 @@ export function ClientFormComponent({ id }: { id: string }) {
       contract: rawContract,
       // Display-only / flattened fields — not sent verbatim.
       feeInfo: _feeInfo,
+      billingHeading: _billingHeading,
+      shipHeading: _shipHeading,
       sameAsBilling,
       billingStreet,
       billingCity,
@@ -126,6 +218,7 @@ export function ClientFormComponent({ id }: { id: string }) {
       shipCountry,
       feePercent,
       feeFlat,
+      billingEmail,
       ...rest
     } = values;
 
@@ -150,6 +243,8 @@ export function ClientFormComponent({ id }: { id: string }) {
 
     const payload = {
       ...rest,
+      // One column, several recipients — comma-separated, split back on load.
+      billingEmail: Array.isArray(billingEmail) ? billingEmail.join(", ") : str(billingEmail),
       feeValue,
       address: billing,
       shippingAddress: shipping,
@@ -185,7 +280,7 @@ export function ClientFormComponent({ id }: { id: string }) {
           feePercent: data.feeBasis === "percent" ? data.feeValue : "",
           feeFlat: data.feeBasis === "flat" ? data.feeValue : "",
           paymentTerms: data.paymentTerms,
-          billingEmail: data.billingEmail,
+          billingEmail: splitEmails(data.billingEmail),
           taxId: data.taxId,
           notes: data.notes,
           contract: data.contract ?? [],
@@ -202,7 +297,12 @@ export function ClientFormComponent({ id }: { id: string }) {
           shipPostal: data.shippingAddress?.postalCode ?? "",
           shipCountry: data.shippingAddress?.country ?? "",
         }
-      : { feeBasis: "percent", paymentTerms: "net30", sameAsBilling: true };
+      : {
+          feeBasis: "percent",
+          paymentTerms: "net30",
+          sameAsBilling: true,
+          accountLeadId: user?.id ?? "",
+        };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -224,6 +324,21 @@ export function ClientFormComponent({ id }: { id: string }) {
         cancelLabel="actions.cancel"
         onCancel={() => router.push(config.listRouteId)}
         addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
+      />
+
+      <FormModal
+        id={id}
+        open={quickContact.isOpen}
+        onClose={quickContact.close}
+        title={t("quickContact.title")}
+        description={t("quickContact.description")}
+        width={460}
+        schema={config.quickContact}
+        defaultValues={{ fullName: quickContact.data ?? "" }}
+        gridContainer={{ columns: 12, spacing: 2 }}
+        onSubmit={saveQuickContact}
+        submitLabel="quickContact.submit"
+        cancelLabel="actions.cancel"
       />
     </Box>
   );

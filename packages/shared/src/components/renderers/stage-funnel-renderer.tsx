@@ -250,7 +250,7 @@ function FunnelColumn({
         borderColor: "surface.divider",
         borderRadius: "10px 10px 0 0",
         color: "text.primary",
-        "&:hover": { background: "surface.hoverSubtle" },
+        "&:hover": { bgcolor: "surface.hoverSubtle" },
       }}
     >
       <Typography sx={{ fontSize: 21, fontWeight: 700, lineHeight: 1, letterSpacing: "-.01em" }}>
@@ -330,12 +330,12 @@ function FunnelPill({ tone, children }: { tone?: "success"; children: ReactNode 
         ...(tone === "success"
           ? {
               color: "surface.successFg",
-              background: "surface.successSoftBg",
+              bgcolor: "surface.successSoftBg",
               borderColor: "surface.successSoftBorder",
             }
           : {
               color: "text.secondary",
-              background: "surface.hoverSubtle",
+              bgcolor: "surface.hoverSubtle",
               borderColor: "surface.divider",
             }),
       }}

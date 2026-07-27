@@ -151,7 +151,7 @@ function HeaderAction({ config, t }: { config: ListRendererConfig; t: (key: stri
             alignItems: "center",
             justifyContent: "center",
             color: "surface.textMuted",
-            "&:hover": { background: "action.hover" },
+            "&:hover": { bgcolor: "action.hover" },
           }}
         >
           <IconRenderer name={config.headerLink.icon} size={14} color="inherit" />
