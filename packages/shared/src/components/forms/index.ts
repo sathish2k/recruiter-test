@@ -8,6 +8,15 @@ export type {
   DayPreset,
 } from "./days/days";
 export { DaysField, DEFAULT_DAY_PRESETS, DEFAULT_DAYS } from "./days/days";
+export {
+  applyExtraction,
+  type DocumentExtractor,
+  type ExtractFieldSpec,
+  type ExtractKind,
+  type ExtractPlanField,
+  extractionPlan,
+  planToContract,
+} from "./extraction";
 export { Field, WIDGETS, widgetFor } from "./field/field";
 export { FieldLabel, FieldShell } from "./field/field-shell";
 export { FormContainer } from "./form-container";

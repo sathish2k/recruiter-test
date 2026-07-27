@@ -35,6 +35,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
     properties: {
       // ── Basic info ──
       salutation: {
+        extract: true,
         type: "string",
         widget: "select",
         // Carries the shared "First name" label; the input below hides its own
@@ -45,6 +46,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 4, md: 2 } },
       },
       firstName: {
+        extract: { hint: "Given name only, without any title" },
         type: "string",
         hideLabel: true,
         title: "fields.firstName",
@@ -54,6 +56,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 8, md: 4 } },
       },
       lastName: {
+        extract: { hint: "Family name only" },
         type: "string",
         title: "fields.lastName",
         placeholder: "fields.lastNamePlaceholder",
@@ -62,6 +65,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       email: {
+        extract: { hint: "Primary email address" },
         type: "string",
         format: "email",
         title: "fields.email",
@@ -71,6 +75,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       secondaryEmail: {
+        extract: { hint: "A second email address, only if two are listed" },
         type: "string",
         format: "email",
         title: "fields.secondaryEmail",
@@ -80,6 +85,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       phone: {
+        extract: { hint: "Primary phone number with country code" },
         type: "string",
         widget: "phone",
         title: "fields.phone",
@@ -89,6 +95,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       mobile: {
+        extract: { hint: "A second/mobile number with country code, only if two are listed" },
         type: "string",
         widget: "phone",
         title: "fields.mobile",
@@ -98,6 +105,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       website: {
+        extract: { hint: "Personal site or portfolio URL, not LinkedIn or Twitter" },
         type: "string",
         title: "fields.website",
         placeholder: "fields.websitePlaceholder",
@@ -106,30 +114,35 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       },
       // ── Address ──
       street: {
+        extract: true,
         type: "string",
         title: "address.street",
         placeholder: "address.street",
         grid: { size: { xs: 12, md: 6 } },
       },
       city: {
+        extract: true,
         type: "string",
         title: "address.city",
         placeholder: "address.city",
         grid: { size: { xs: 12, md: 6 } },
       },
       state: {
+        extract: { hint: "State or province" },
         type: "string",
         title: "address.state",
         placeholder: "address.state",
         grid: { size: { xs: 12, md: 6 } },
       },
       postalCode: {
+        extract: true,
         type: "string",
         title: "address.postalCode",
         placeholder: "address.postalCode",
         grid: { size: { xs: 12, md: 6 } },
       },
       country: {
+        extract: true,
         type: "string",
         title: "address.country",
         placeholder: "address.country",
@@ -137,6 +150,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       },
       // ── Professional details ──
       experienceYears: {
+        extract: { hint: "Total professional experience in years across all roles" },
         type: "number",
         widget: "number",
         title: "fields.experienceYears",
@@ -147,6 +161,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       highestQualification: {
+        extract: true,
         type: "string",
         widget: "select",
         title: "fields.highestQualification",
@@ -155,6 +170,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       currentJobTitle: {
+        extract: { hint: "Job title in the most recent role" },
         type: "string",
         title: "fields.currentJobTitle",
         placeholder: "fields.currentJobTitlePlaceholder",
@@ -162,6 +178,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       currentEmployer: {
+        extract: { hint: "Employer in the most recent role" },
         type: "string",
         title: "fields.currentEmployer",
         placeholder: "fields.currentEmployerPlaceholder",
@@ -189,6 +206,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       skillSet: {
+        extract: { hint: "Individual technical and professional skills, one per item" },
         type: "array",
         widget: "chips",
         title: "fields.skillSet",
@@ -196,6 +214,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12 } },
       },
       additionalInfo: {
+        extract: { hint: "A short professional summary, at most 3 sentences" },
         type: "string",
         widget: "textarea",
         rows: 4,
@@ -206,6 +225,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       },
       // ── Social links ──
       linkedin: {
+        extract: { hint: "LinkedIn profile URL" },
         type: "string",
         title: "fields.linkedin",
         placeholder: "fields.linkedinPlaceholder",
@@ -213,6 +233,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
         grid: { size: { xs: 12, md: 6 } },
       },
       twitter: {
+        extract: { hint: "Twitter or X handle or URL" },
         type: "string",
         title: "fields.twitter",
         placeholder: "fields.twitterPlaceholder",
@@ -221,6 +242,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       },
       // ── Educational details (repeater) ──
       education: {
+        extract: { hint: "One entry per school, college or university attended" },
         type: "array",
         widget: "repeater",
         title: "sections.education",
@@ -261,6 +283,7 @@ export const CandidateFormConfiguration: CandidateFormConfiguration = {
       },
       // ── Experience details (repeater) ──
       experience: {
+        extract: { hint: "One entry per job held, most recent first" },
         type: "array",
         widget: "repeater",
         title: "sections.experience",

@@ -79,6 +79,7 @@ export interface ListJobsParams {
   search?: string;
   status?: string;
   clientId?: string;
+  contactId?: string;
   page?: number;
   pageSize?: number;
   sortKey?: string;
@@ -108,6 +109,8 @@ export async function listJobs(organizationId: string, params: ListJobsParams = 
   if (statuses.length) filters.push(inArray(job.status, statuses as JobStatus[]));
   const clientIds = split(params.clientId);
   if (clientIds.length) filters.push(inArray(job.clientId, clientIds));
+  // Roles a given contact is attached to (their detail screen).
+  if (params.contactId) filters.push(eq(job.clientContactId, params.contactId));
 
   const where = and(...filters);
   const page = Math.max(1, params.page ?? 1);

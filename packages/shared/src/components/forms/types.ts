@@ -89,6 +89,13 @@ export interface JsonSchemaProperty {
    * `t("<enumL10n>.<value>")` (an empty value maps to `<enumL10n>.none`). Lets a
    * select localise its choices from config, with no component-side `enumNames`. */
   enumL10n?: string;
+  /** Opt this field into document extraction (the resume-autofill card). The
+   * form's schema *is* the extraction contract, so marking a field here is the
+   * only change needed for it to be parsed out of an upload and prefilled —
+   * nothing is hardcoded server-side. `hint` guides the model when the field
+   * name alone is ambiguous; for an `array` with `itemSchema` (a repeater) the
+   * whole row shape is requested. */
+  extract?: boolean | { hint?: string; overwrite?: boolean };
   placeholder?: string;
   /** Set by the renderer from the schema's `required` list — drives the label
    * asterisk. Not authored per-field; declare requirements in `schema.required`. */

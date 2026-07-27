@@ -84,8 +84,8 @@
     "others": "Others",
     "attachmentsBrowse": "Browse or drop a file",
     "autofillBrowse": "Browse or drop a resume",
-    "autofillParsing": "Parsing…",
-    "autofillDone": "Parsed — review the fields on the left before saving.",
+    "autofillParsing": "Reading the resume…",
+    "autofillDone": "fields filled — review them before saving.",
     "job": "Job",
     "jobPlaceholder": "Select job",
     "startingStage": "Starting stage",
@@ -94,7 +94,11 @@
     "owner": "Candidate owner",
     "ownerPlaceholder": "Search team…",
     "source": "Source",
-    "emailOptOut": "Email opt-out"
+    "emailOptOut": "Email opt-out",
+    "autofillNothing": "Nothing could be read — fill the fields in manually.",
+    "autofillRetry": "Try another file",
+    "autofillFailed": "Could not read that document",
+    "autofillTooLarge": "That file is larger than 10MB"
   },
   "salutation": {
     "none": "None",

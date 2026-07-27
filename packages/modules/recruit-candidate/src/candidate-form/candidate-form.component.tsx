@@ -11,6 +11,7 @@ import {
   type Attachment,
   AttachmentsWidget,
   type AttachmentUploader,
+  type DocumentExtractor,
   type FormValues,
   FormWithSectionsRenderer,
   ResumeAutofillWidget,
@@ -94,16 +95,25 @@ export function CandidateFormComponent({ id }: { id: string }) {
     const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
     return (file, onProgress) => mut.uploadAsset?.(file, onProgress) as Promise<Attachment>;
   }, [mutation]);
+  const extractor = useMemo<DocumentExtractor>(() => {
+    const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
+    return (file, fields) => mut.parseDocument?.(file, fields) as Promise<Record<string, unknown>>;
+  }, [mutation]);
   const widgets = useMemo(
     () => ({
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
       resumeAutofill: (props: Parameters<typeof ResumeAutofillWidget>[0]) => (
-        <ResumeAutofillWidget {...props} uploader={uploader} />
+        <ResumeAutofillWidget
+          {...props}
+          uploader={uploader}
+          extractor={extractor}
+          schema={config.schema}
+        />
       ),
     }),
-    [uploader],
+    [uploader, extractor, config.schema],
   );
 
   if (!config.schema) return null;

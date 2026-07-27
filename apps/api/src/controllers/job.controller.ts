@@ -15,6 +15,7 @@ export async function getJobs(ctx: { user: Auth; query: Record<string, string | 
     search: ctx.query.search,
     status: ctx.query.status,
     clientId: ctx.query.clientId,
+    contactId: ctx.query.contactId,
     page: ctx.query.page ? Number(ctx.query.page) : undefined,
     pageSize: ctx.query.pageSize ? Number(ctx.query.pageSize) : undefined,
     sortKey: ctx.query.sortKey,

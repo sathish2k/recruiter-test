@@ -9,6 +9,15 @@ export const candidateFormDatasource = (): DatasourceInstance => ({
     const { id, ...rest } = body ?? {};
     return (await httpClient.put(`/candidates/${String(id)}`, rest)).data;
   },
+  /** Server-side document parsing. The `fields` contract is derived from the
+   * form's own schema, so nothing about candidates is hardcoded server-side. */
+  parseDocument: async (file?: File, fields?: unknown) => {
+    const form = new FormData();
+    if (file) form.append("file", file);
+    form.append("fields", JSON.stringify(fields ?? []));
+    const response = await httpClient.post("/extractions/document", form);
+    return (response.data as { data?: Record<string, unknown> })?.data ?? {};
+  },
   uploadAsset: async (file?: File, onProgress?: (percent: number) => void) => {
     const form = new FormData();
     if (file) form.append("file", file);

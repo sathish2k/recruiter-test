@@ -61,6 +61,7 @@ export default new Elysia({ name: "job.routes" })
       search: t.Optional(t.String()),
       status: t.Optional(t.String()),
       clientId: t.Optional(t.String()),
+      contactId: t.Optional(t.String()),
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
       sortKey: t.Optional(t.String()),

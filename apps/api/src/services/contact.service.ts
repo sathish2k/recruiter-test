@@ -37,6 +37,8 @@ function mapContact(row: ContactRow & { clientName?: string | null; ownerName?: 
     isPrimary: row.isPrimary,
     emailOptOut: row.emailOptOut,
     type: row.type,
+    // "Contact since" on the detail screen.
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
