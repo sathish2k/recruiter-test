@@ -6,10 +6,15 @@ import delve from "dlv";
 
 export interface StaticTranslationRendererConfig {
   type: "static-translation";
-  /** Component id whose translation the key resolves against. */
+  /** Component id whose translation the key resolves against — the engine keys
+   * every bundle by component id, so this is the owning `*.Component`. */
   id: string;
   /** Translation key. The resolved string may contain a `{value}` placeholder. */
-  key: string;
+  key?: string;
+  /** Read the key from the row instead — `keyPrefix + data[keyPath]`. Lets one
+   * config label rows whose copy differs per record. */
+  keyPath?: string;
+  keyPrefix?: string;
   /** Path into data for the dynamic value combined with the translation. */
   value?: string;
   variant?: TypographyProps["variant"];
@@ -25,7 +30,9 @@ export function StaticTranslationRenderer({
   data?: Record<string, unknown>;
 }) {
   const { t } = useTranslation(config.id);
-  const template = t(config.key);
+  const fromRow = config.keyPath ? String(delve(data, config.keyPath) ?? "") : "";
+  const resolvedKey = fromRow ? `${config.keyPrefix ?? ""}${fromRow}` : (config.key ?? "");
+  const template = resolvedKey ? t(resolvedKey) : "";
   const dynamic = config.value != null ? delve(data, config.value) : undefined;
   const text =
     dynamic == null

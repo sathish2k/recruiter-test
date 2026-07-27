@@ -284,6 +284,9 @@ export interface IconRendererConfig {
   color?: string;
   sx?: SxProps<Theme>;
   alt?: string;
+  /** Forwarded so MUI slot APIs (Chip icon, ListItemIcon, …) can style it —
+   * without this their generated class never reaches the rendered element. */
+  className?: string;
 }
 
 export function IconRenderer({
@@ -294,6 +297,7 @@ export function IconRenderer({
   color,
   sx,
   alt = "",
+  className,
   data,
 }: IconRendererConfig & { data?: Record<string, unknown> }) {
   const resolved = path ? (delve(data ?? {}, path) as string | undefined) : undefined;
@@ -306,11 +310,12 @@ export function IconRenderer({
         component="img"
         src={source}
         alt={alt}
+        className={className}
         sx={{ width: size, height: size, objectFit: "contain", ...sx }}
       />
     );
   }
   const Icon = iconName ? ICON_REGISTRY[iconName] : undefined;
   if (!Icon) return null;
-  return <Icon sx={{ fontSize: size, color, ...sx }} />;
+  return <Icon className={className} sx={{ fontSize: size, color, ...sx }} />;
 }

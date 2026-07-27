@@ -1,5 +1,6 @@
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
 
 export interface EntityRendererConfig {
@@ -27,6 +28,11 @@ export interface EntityRendererConfig {
   suffixPath?: string;
   /** Defaults to "(you)". */
   suffixLabel?: string;
+  /** Type overrides, so a feature card can size the block without a bespoke
+   * copy of this renderer. */
+  avatarSx?: SxProps<Theme>;
+  titleSx?: SxProps<Theme>;
+  subtitleSx?: SxProps<Theme>;
 }
 
 const read = (data: Record<string, unknown>, path?: string, literal?: string) =>
@@ -85,6 +91,7 @@ export function EntityRenderer({
           color: fg,
           fontSize: circle ? 12 : 13,
           fontWeight: circle ? 600 : 700,
+          ...config.avatarSx,
         }}
       >
         {avatarText}
@@ -96,6 +103,7 @@ export function EntityRenderer({
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            ...config.titleSx,
           }}
         >
           {read(data, config.title)}
@@ -116,6 +124,7 @@ export function EntityRenderer({
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              ...config.subtitleSx,
             }}
           >
             {read(data, config.subtitle)}

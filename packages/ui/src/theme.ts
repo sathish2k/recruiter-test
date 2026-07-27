@@ -76,11 +76,17 @@ const formTokens: FormTokens = {
 declare module "@mui/material/Chip" {
   interface ChipPropsVariantOverrides {
     soft: true;
+    pill: true;
   }
 }
 declare module "@mui/material/Tabs" {
   interface TabsPropsVariantOverrides {
     segmented: true;
+  }
+}
+declare module "@mui/material/Alert" {
+  interface AlertPropsVariantOverrides {
+    accent: true;
   }
 }
 declare module "@mui/material/Paper" {
@@ -92,6 +98,9 @@ declare module "@mui/material/Paper" {
     ghost: true;
     inset: true;
     highlight: true;
+    compact: true;
+    promo: true;
+    spotlight: true;
     dropdown: true;
   }
 }
@@ -140,6 +149,34 @@ const softChip = Object.entries(SOFT).map(([color, t]) => ({
   },
 }));
 
+// The design's inline summary pill: 4/11 padding, 11.5px, a 6px icon gap and
+// slightly lighter fills than `soft`. Geometry lives here so components never
+// re-derive it in `sx`.
+const PILL = {
+  primary: { bg: "rgba(242,106,27,0.10)", border: "rgba(242,106,27,0.30)", fg: "#F0B27C" },
+  warning: { bg: "rgba(214,155,60,0.10)", border: "rgba(214,155,60,0.35)", fg: "#F0C27C" },
+  success: { bg: "rgba(78,168,116,0.10)", border: "rgba(78,168,116,0.25)", fg: "#8FD6AC" },
+  info: { bg: "rgba(90,130,180,0.10)", border: "rgba(90,130,180,0.30)", fg: "#9BB8D9" },
+  error: { bg: "rgba(200,80,80,0.10)", border: "rgba(200,80,80,0.30)", fg: "#E89A9A" },
+  default: { bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.10)", fg: "#C9C5BD" },
+} as const;
+
+const pillChip = Object.entries(PILL).map(([color, t]) => ({
+  props: { variant: "pill" as const, color: color as "primary" },
+  style: {
+    color: t.fg,
+    backgroundColor: t.bg,
+    border: `1px solid ${t.border}`,
+    height: "auto",
+    padding: "4px 11px",
+    fontSize: 11.5,
+    fontWeight: 600,
+    borderRadius: 999,
+    "& .MuiChip-label": { padding: 0 },
+    "& .MuiChip-icon": { margin: "0 6px 0 0", fontSize: 13, color: "inherit" },
+  },
+}));
+
 // Mode-aware surface tokens: flipping them re-themes every atom below in one
 // place.
 //
@@ -180,6 +217,12 @@ interface Surfaces {
   errorFg: string;
   /** Brighter orange for inline highlights (match scores, check ticks). */
   accentBright: string;
+  /** Muted tan for the small tracking-wide kicker above a feature card title. */
+  kicker: string;
+  /** Faintest text tone — stat card sub-lines sit below `textDisabled`. */
+  textFaint: string;
+  /** Selected segment in a pill toggle — heavier than `tint`, lighter than a fill. */
+  pillActive: string;
   /** Outline of an unchecked checkbox/radio — must read on either background. */
   controlOutline: string;
   /** Lighter than `hover`, for rows that only need a hint of separation. */
@@ -190,6 +233,8 @@ interface Surfaces {
   focusRing: string;
   /** Soft warning tone (Enterprise badges, "action needed" banners). */
   warningSoftBg: string;
+  /** Text on a soft-warning surface (the design amber #F0C27C). */
+  warningSoftFg: string;
   warningSoftBorder: string;
   /** Soft success tone (toasts, healthy states). */
   successSoftBg: string;
@@ -231,11 +276,15 @@ function surfaces(mode: ThemeMode): Surfaces {
       warningFg: "#8A6415",
       errorFg: "#A03A3A",
       accentBright: "#C24509",
+      kicker: "#8A6A4E",
+      textFaint: "#A9A49B",
+      pillActive: "rgba(0,0,0,0.08)",
       controlOutline: "rgba(0,0,0,0.28)",
       hoverSubtle: "rgba(0,0,0,0.035)",
       track: "rgba(0,0,0,0.10)",
       focusRing: "rgba(242,106,27,0.5)",
       warningSoftBg: "rgba(214,155,60,0.16)",
+      warningSoftFg: "#8A6415",
       warningSoftBorder: "rgba(214,155,60,0.40)",
       successSoftBg: "rgba(78,168,116,0.12)",
       successSoftBorder: "rgba(78,168,116,0.40)",
@@ -271,11 +320,15 @@ function surfaces(mode: ThemeMode): Surfaces {
     warningFg: "#E8D4A6",
     errorFg: "#E89A9A",
     accentBright: "#FF9D57",
+    kicker: "#D9B79A",
+    textFaint: "#55534E",
+    pillActive: "rgba(255,255,255,0.10)",
     controlOutline: "rgba(255,255,255,0.3)",
     hoverSubtle: "rgba(255,255,255,0.05)",
     track: "rgba(255,255,255,0.18)",
     focusRing: "rgba(242,106,27,0.5)",
     warningSoftBg: "rgba(214,155,60,0.14)",
+    warningSoftFg: "#F0C27C",
     warningSoftBorder: "rgba(214,155,60,0.35)",
     successSoftBg: "rgba(78,168,116,0.12)",
     successSoftBorder: "rgba(78,168,116,0.40)",
@@ -317,11 +370,15 @@ const v: Surfaces = {
   warningFg: "var(--mui-palette-surface-warningFg)",
   errorFg: "var(--mui-palette-surface-errorFg)",
   accentBright: "var(--mui-palette-surface-accentBright)",
+  kicker: "var(--mui-palette-surface-kicker)",
+  textFaint: "var(--mui-palette-surface-textFaint)",
+  pillActive: "var(--mui-palette-surface-pillActive)",
   controlOutline: "var(--mui-palette-surface-controlOutline)",
   hoverSubtle: "var(--mui-palette-surface-hoverSubtle)",
   track: "var(--mui-palette-surface-track)",
   focusRing: "var(--mui-palette-surface-focusRing)",
   warningSoftBg: "var(--mui-palette-surface-warningSoftBg)",
+  warningSoftFg: "var(--mui-palette-surface-warningSoftFg)",
   warningSoftBorder: "var(--mui-palette-surface-warningSoftBorder)",
   successSoftBg: "var(--mui-palette-surface-successSoftBg)",
   successSoftBorder: "var(--mui-palette-surface-successSoftBorder)",
@@ -494,7 +551,7 @@ export function createAppTheme(): Theme {
         styleOverrides: {
           root: { borderRadius: 999, fontWeight: 600, fontSize: 12 },
         },
-        variants: softChip,
+        variants: [...softChip, ...pillChip],
       },
       MuiPaper: {
         styleOverrides: {
@@ -556,10 +613,43 @@ export function createAppTheme(): Theme {
             },
           },
           {
+            // The sidenav's upgrade promo — a stronger orange wash than
+            // `accent`, on an orange border.
+            props: { variant: "promo" },
+            style: {
+              background: "linear-gradient(160deg,rgba(242,106,27,.35),rgba(242,106,27,.06))",
+              border: "1px solid rgba(242,106,27,.3)",
+              borderRadius: 14,
+              padding: 16,
+            },
+          },
+          {
+            // Accent wash on an accent border — the AI recommendation card.
+            props: { variant: "spotlight" },
+            style: {
+              background: `linear-gradient(130deg,rgba(242,106,27,.14),rgba(28,28,27,.6)),${v.paper}`,
+              border: "1px solid rgba(242,106,27,.3)",
+              borderRadius: 16,
+              padding: "16px 18px",
+            },
+          },
+          {
             props: { variant: "feature" },
             style: {
               background: `radial-gradient(120% 140% at 85% 0%,rgba(242,106,27,.4),${v.paper} 65%),${v.paper}`,
               border: `1px solid ${v.border}`,
+              borderRadius: 16,
+              padding: 20,
+            },
+          },
+          {
+            // Compact card — the design's 16/18 tiles (SLA status).
+            props: { variant: "compact" },
+            style: {
+              background: v.paper,
+              border: `1px solid ${v.divider}`,
+              borderRadius: 16,
+              padding: "16px 18px",
             },
           },
           {
@@ -684,12 +774,35 @@ export function createAppTheme(): Theme {
             border: "1px solid",
             fontSize: 12,
             alignItems: "center",
-            "& .MuiAlert-icon": { color: "inherit", fontSize: 18 },
+            // MUI pads both slots (icon 7px 0, message 8px 0) and dims the icon
+            // to .9 — that stacks on the root padding and makes the strip taller
+            // and greyer than the design. Flatten them; the row is a plain flex.
+            "& .MuiAlert-icon": {
+              color: "inherit",
+              fontSize: 18,
+              opacity: 1,
+              padding: 0,
+              marginRight: 11,
+            },
+            "& .MuiAlert-message": { padding: 0, minWidth: 0, overflow: "visible" },
           },
         },
         variants: [
           {
-            props: { severity: "info" },
+            // The design's orange insight strip — MUI has no primary severity.
+            // Lighter than `primarySoft*`: the strip is a whisper, not a chip.
+            props: { variant: "accent" },
+            style: {
+              background: "rgba(242,106,27,.08)",
+              borderColor: "rgba(242,106,27,.28)",
+              borderRadius: 13,
+              padding: "11px 16px",
+              fontSize: 12.5,
+              color: v.primarySoftFg,
+            },
+          },
+          {
+            props: { severity: "info", variant: "standard" },
             style: {
               background: "rgba(90,130,180,.1)",
               borderColor: "rgba(90,130,180,.3)",
@@ -697,7 +810,7 @@ export function createAppTheme(): Theme {
             },
           },
           {
-            props: { severity: "success" },
+            props: { severity: "success", variant: "standard" },
             style: {
               background: "rgba(78,168,116,.1)",
               borderColor: "rgba(78,168,116,.3)",
@@ -705,7 +818,7 @@ export function createAppTheme(): Theme {
             },
           },
           {
-            props: { severity: "warning" },
+            props: { severity: "warning", variant: "standard" },
             style: {
               background: "rgba(214,155,60,.08)",
               borderColor: "rgba(214,155,60,.25)",
@@ -713,7 +826,7 @@ export function createAppTheme(): Theme {
             },
           },
           {
-            props: { severity: "error" },
+            props: { severity: "error", variant: "standard" },
             style: {
               background: "rgba(200,80,80,.1)",
               borderColor: "rgba(200,80,80,.3)",
@@ -777,6 +890,7 @@ export function createAppTheme(): Theme {
             fontSize: 12.5,
             fontWeight: 400,
             color: v.textSecondary,
+            transition: "background .18s ease, color .18s ease",
             "&.Mui-selected": {
               color: v.textPrimary,
               fontWeight: 600,

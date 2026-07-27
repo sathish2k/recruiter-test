@@ -3,6 +3,7 @@ export { CandidatePages } from "./candidates";
 export { ClientPages } from "./clients";
 export { ContactPages } from "./contacts";
 export { CorePages } from "./core";
+export { DashboardPages } from "./dashboard";
 export { JobPages } from "./jobs";
 export { ProfilePages } from "./profile";
 export { SettingsPages } from "./settings";

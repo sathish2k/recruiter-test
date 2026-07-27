@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import type { ReactNode } from "react";
+import { dependencyKey } from "../engine/renderer";
 import { NavigationProgress } from "../navigation-progress";
 import type { ComponentDefinition, Configuration, LayoutElement, Route } from "../types";
 
@@ -22,8 +23,8 @@ export function MuiCoreLayout({
     const Component = def?.value;
     if (!Component) return null;
     const props = {
-      id: element.id,
-      ...(dataMap.get(element.id) || {}),
+      id: dependencyKey(element),
+      ...(dataMap.get(dependencyKey(element)) || {}),
       currentRoute,
     };
     return <Component key={element.id} {...props} />;
@@ -53,7 +54,7 @@ export function MuiCoreLayout({
       >
         {positioned.top?.map(renderComponent)}
         {positioned.breadcrumb?.map(renderComponent)}
-        <Box component="main" sx={{ flexGrow: 1, p: 3, overflow: "auto" }}>
+        <Box component="main" sx={{ flexGrow: 1, p: "22px 26px", overflow: "auto" }}>
           {children}
         </Box>
         {positioned.bottom?.map(renderComponent)}

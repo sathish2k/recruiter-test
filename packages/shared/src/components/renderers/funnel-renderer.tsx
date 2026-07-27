@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
+import { seedRecord } from "../../utils/seed-data";
 import { IconRenderer } from "./icon-renderer";
 
 export interface FunnelStage {
@@ -51,9 +52,7 @@ export function FunnelRenderer({
   const configFromId = useConfiguration<FunnelRendererConfig>(id);
   const config = configProp ?? configFromId;
   const { t } = useTranslation(id);
-  // The engine injects `data={}` when this renderer is used directly as a
-  // bootstrap value; an empty object means "no data provided → fetch".
-  const seedData = dataProp && Object.keys(dataProp).length > 0 ? dataProp : undefined;
+  const seedData = seedRecord(dataProp);
   const { data } = useFetch<FunnelData>(id, { data: seedData });
   if (!data || !config) return null;
 

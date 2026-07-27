@@ -10,6 +10,16 @@ export interface AppbarMenuItem {
   access?: AccessRule;
 }
 
+/** The avatar dropdown: an identity header, the workspace row, then the menu
+ * sections (a divider is drawn between each). */
+export interface AppbarAvatarMenu {
+  sections: AppbarMenuItem[][];
+  /** Role pill under the email. `labels` maps a user role to a translation key. */
+  role?: { icon: string; labels: Record<string, string> };
+  /** Workspace row; `seats` is a translation key interpolated with the org. */
+  workspace?: { seats: string; routeId?: string; access?: AccessRule };
+}
+
 export interface AppbarLanguage {
   code: string;
   label: string;
@@ -21,7 +31,7 @@ export interface AppbarAction {
   badge?: boolean;
   kind?: "avatar" | "theme" | "language";
   label?: string;
-  menu?: AppbarMenuItem[];
+  menu?: AppbarAvatarMenu;
   languages?: AppbarLanguage[];
 }
 
@@ -37,4 +47,5 @@ export interface AppbarComponentProps {
   id: string;
   configuration?: Partial<AppbarConfig>;
   currentRoute?: Route | null;
+  data?: Record<string, unknown>;
 }

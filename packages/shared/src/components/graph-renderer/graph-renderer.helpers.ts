@@ -55,7 +55,11 @@ export function buildColors(config: GraphRendererConfig): string[] {
   return DEFAULT_PALETTE;
 }
 
-export function buildOptions(config: GraphRendererConfig, rows: GraphRow[]): ApexOptions {
+export function buildOptions(
+  config: GraphRendererConfig,
+  rows: GraphRow[],
+  t: TFuncLike,
+): ApexOptions {
   const colors = buildColors(config);
   const legend = config.legend ?? isCircular(config.type);
 
@@ -117,7 +121,11 @@ export function buildOptions(config: GraphRendererConfig, rows: GraphRow[]): Ape
         }
       : {}),
     xaxis: {
-      categories: rows.map((r) => String(delve(r, config.categoryPath ?? "label") ?? "")),
+      categories: rows.map((r) => {
+        const raw = String(delve(r, config.categoryPath ?? "label") ?? "");
+        return config.categoryLabelPrefix ? t(`${config.categoryLabelPrefix}${raw}`) : raw;
+      }),
+      ...(config.categoryType === "datetime" ? { type: "datetime" as const } : {}),
       axisBorder: { show: false },
       axisTicks: { show: false },
       labels: { style: { colors: AXIS_COLOR, fontSize: "12px" } },

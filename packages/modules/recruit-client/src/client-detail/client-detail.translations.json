@@ -1,14 +1,18 @@
 {
-  "back": "Back to clients",
-  "edit": "Edit client",
-  "status": { "hiring": "Hiring", "paused": "Paused" },
+  "status": {
+    "hiring": "Hiring",
+    "paused": "Paused"
+  },
   "health": {
     "healthy": "Healthy",
     "attention": "Attention",
     "at_risk": "At risk",
     "dormant": "Dormant"
   },
-  "feeBasis": { "percent": "% of CTC", "flat": "Flat fee" },
+  "feeBasis": {
+    "percent": "% of CTC",
+    "flat": "Flat fee"
+  },
   "source": {
     "added_by_user": "Added by user",
     "referral": "Referral",
@@ -23,14 +27,16 @@
     "net60": "Net 60"
   },
   "metrics": {
-    "requirements": "Requirements",
-    "candidates": "Candidates",
+    "openRoles": "Open roles",
+    "candidates": "Active candidates",
     "placements": "Placements"
   },
   "sections": {
-    "about": "Client information",
-    "fee": "Fee agreement",
-    "notes": "Internal notes"
+    "about": "Company",
+    "agreement": "Agreement",
+    "roles": "Roles",
+    "contacts": "Client contacts",
+    "notes": "Notes"
   },
   "labels": {
     "industry": "Industry",
@@ -44,5 +50,31 @@
     "paymentTerms": "Payment terms",
     "billingEmail": "Billing email",
     "taxId": "GSTIN / VAT"
+  },
+  "actions": {
+    "edit": "Edit client",
+    "addRole": "Add role",
+    "addContact": "Add contact",
+    "viewJobs": "View all roles"
+  },
+  "roles": {
+    "empty": "No roles open with this client yet.",
+    "columns": {
+      "title": "Role",
+      "openings": "Openings",
+      "pipeline": "Pipeline",
+      "status": "Status",
+      "profileLead": "Profile lead"
+    }
+  },
+  "contacts": {
+    "empty": "No contacts recorded for this client.",
+    "columns": {
+      "name": "Contact",
+      "email": "Email"
+    }
+  },
+  "subtitle": {
+    "accountLead": "Account lead"
   }
 }

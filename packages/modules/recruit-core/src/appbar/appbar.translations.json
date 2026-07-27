@@ -4,12 +4,26 @@
   "language": "Language",
   "menu": {
     "profile": "My profile",
-    "settings": "Settings",
-    "logout": "Log out"
+    "notifications": "Notifications",
+    "settings": "Workspace settings",
+    "helpCenter": "Help center",
+    "logout": "Sign out"
+  },
+  "roles": {
+    "owner": "Agency owner",
+    "admin": "Administrator",
+    "manager": "Manager",
+    "recruiter": "Recruiter",
+    "viewer": "Viewer"
+  },
+  "workspace": {
+    "seats": "{{seats}} seats"
   },
   "back": {
     "candidates": "Back to candidates",
-    "jobs": "Back to jobs"
+    "jobs": "Back to jobs",
+    "clients": "Back to clients",
+    "contacts": "Back to contacts"
   },
   "titles": {
     "dashboard": "Dashboard",

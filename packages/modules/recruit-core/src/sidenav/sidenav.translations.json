@@ -4,25 +4,35 @@
   "expand": "Expand",
   "groups": {
     "main": "MAIN",
+    "recruitment": "RECRUITMENT",
+    "insights": "INSIGHTS",
     "aiFeatures": "AI FEATURES",
     "tools": "TOOLS"
   },
   "items": {
     "dashboard": "Dashboard",
+    "messages": "Messages",
     "clients": "Clients",
     "contacts": "Contacts",
     "jobs": "Jobs",
     "candidates": "Candidates",
     "pipeline": "Pipeline",
-    "teamActivity": "Team Activity",
     "interviews": "Interviews",
     "placements": "Placements",
+    "analytics": "Analytics",
     "commissions": "Commissions",
-    "messages": "Messages",
+    "teamActivity": "Team Activity",
     "aiScreening": "AI Screening",
     "automation": "Automation",
     "settings": "Settings",
+    "integrations": "Integrations",
     "auditLog": "Audit Log",
     "helpCenter": "Help center"
+  },
+  "promo": {
+    "title": "Upgrade Pro",
+    "body": "Unlock unlimited AI screenings and multi-client seats",
+    "cta": "Upgrade",
+    "secondary": "Learn More"
   }
 }

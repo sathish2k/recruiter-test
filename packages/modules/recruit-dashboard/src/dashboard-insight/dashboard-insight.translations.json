@@ -1,0 +1,5 @@
+{
+  "prefix": "AI insight:",
+  "message": "{{resumesToReview}} resumes are waiting in screening — clearing them now keeps today's submissions on track.",
+  "cta": "Review {{resumesToReview}}"
+}

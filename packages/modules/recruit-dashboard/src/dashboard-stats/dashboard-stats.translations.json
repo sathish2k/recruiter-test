@@ -1,0 +1,12 @@
+{
+  "stats": {
+    "openRoles": "Open roles",
+    "openRolesDelta": "+{value}",
+    "openRolesSub": "{{openedThisWeek}} opened this week",
+    "activeCandidates": "Active candidates",
+    "activeCandidatesDelta": "+{value}%",
+    "activeCandidatesSub": "vs last month",
+    "submissions": "Submissions",
+    "submissionsSub": "{{awaitingReview}} awaiting client review"
+  }
+}

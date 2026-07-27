@@ -1,3 +1,9 @@
+export {
+  type BarChartPeriod,
+  BarChartRenderer,
+  type BarChartRendererConfig,
+  type BarChartTab,
+} from "./bar-chart-renderer";
 export { type ApexChartType, Chart } from "./chart";
 export { GraphFilterRenderer } from "./graph-filter-renderer";
 export { GraphRenderer } from "./graph-renderer";

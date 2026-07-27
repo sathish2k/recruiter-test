@@ -10,6 +10,7 @@ export * from "../models/contact.model";
 export * from "../models/email-template.model";
 export * from "../models/industry.model";
 export * from "../models/integration.model";
+export * from "../models/interview.model";
 export * from "../models/invitation.model";
 export * from "../models/job.model";
 export * from "../models/organization.model";

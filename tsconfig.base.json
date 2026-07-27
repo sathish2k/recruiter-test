@@ -23,6 +23,7 @@
       "@recruit/shared": ["./packages/shared/src/index.ts"],
       "@recruit/module-auth": ["./packages/modules/recruit-auth/src/index.ts"],
       "@recruit/module-core": ["./packages/modules/recruit-core/src/index.ts"],
+      "@recruit/module-dashboard": ["./packages/modules/recruit-dashboard/src/index.ts"],
       "@recruit/module-settings": ["./packages/modules/recruit-settings/src/index.ts"],
       "@recruit/module-profile": ["./packages/modules/recruit-profile/src/index.ts"],
       "@recruit/module-contact": ["./packages/modules/recruit-contact/src/index.ts"],

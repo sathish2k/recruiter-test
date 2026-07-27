@@ -1,7 +1,6 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import {
   useConfiguration,
   useFetch,
@@ -15,7 +14,6 @@ import {
   type AttachmentUploader,
   type FormValues,
   FormWithSectionsRenderer,
-  IconRenderer,
   useToast,
 } from "@recruit/shared";
 import { useMemo } from "react";
@@ -208,23 +206,6 @@ export function ClientFormComponent({ id }: { id: string }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <Link
-        component="button"
-        type="button"
-        onClick={() => router.push(config.listRouteId)}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: "text.secondary",
-          alignSelf: "flex-start",
-        }}
-      >
-        <IconRenderer name="arrow-back" size={15} />
-        {t("back")}
-      </Link>
       <FormWithSectionsRenderer
         key={clientId ?? "new"}
         id={id}

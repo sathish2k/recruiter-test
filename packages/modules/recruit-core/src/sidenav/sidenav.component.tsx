@@ -3,12 +3,14 @@
 import ChevronLeftRounded from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import { type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
-import { BrandLogo, BrandWordmark, IconRenderer } from "@recruit/shared";
+import { BrandLogo, BrandWordmark, IconRenderer, LinkRenderer } from "@recruit/shared";
 import { useState } from "react";
-import type { SidenavGroup } from "./sidenav.configuration";
+import type { SidenavConfig } from "./sidenav.configuration";
 
 export function SidenavComponent({
   id,
@@ -16,13 +18,14 @@ export function SidenavComponent({
   currentRoute,
 }: {
   id: string;
-  configuration?: { groups?: SidenavGroup[] };
+  configuration?: Partial<SidenavConfig>;
   currentRoute?: Route | null;
 }) {
   const router = usePortalRouter();
   const { t } = useTranslation(id);
   const [collapsed, setCollapsed] = useState(false);
   const groups = (configuration?.groups ?? []).filter((group) => group.items.length > 0);
+  const promo = configuration?.promo;
   // Full path of the current route (child paths are built from their parent's),
   // so a nav item is active on its own route and on any descendant (e.g. the
   // "Jobs" item stays active on the New/Edit Job child routes).
@@ -95,7 +98,7 @@ export function SidenavComponent({
 
       {groups.map((group, gi) => (
         <Box key={group.title}>
-          {gi > 0 ? <Divider sx={{ my: "20px" }} /> : null}
+          {gi > 0 ? <Divider sx={{ my: "14px" }} /> : null}
           {!collapsed ? (
             <Typography
               sx={{
@@ -171,6 +174,47 @@ export function SidenavComponent({
           </Box>
         </Box>
       ))}
+
+      <Box sx={{ flex: 1, minHeight: "18px" }} />
+      {promo && !collapsed ? (
+        <Card variant="promo">
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: 14.5,
+              fontWeight: 700,
+              mb: "8px",
+            }}
+          >
+            <IconRenderer name={promo.icon} size={17} />
+            {t(promo.title)}
+          </Box>
+          <Typography sx={{ fontSize: 12, lineHeight: 1.45, color: "text.secondary", mb: "12px" }}>
+            {t(promo.body)}
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Button
+              variant="contained"
+              onClick={() => router.push(promo.cta.routeId)}
+              sx={{ fontSize: 12.5, py: "8px", px: "14px" }}
+            >
+              {t(promo.cta.label)}
+            </Button>
+            {promo.secondary ? (
+              <LinkRenderer
+                config={{
+                  id,
+                  routeId: promo.secondary.routeId,
+                  label: { name: promo.secondary.label },
+                  sx: { fontSize: 12.5, color: "text.secondary" },
+                }}
+              />
+            ) : null}
+          </Box>
+        </Card>
+      ) : null}
     </Box>
   );
 }

@@ -4,10 +4,12 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card, { type CardProps } from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
+import Skeleton from "@mui/material/Skeleton";
 import Typography, { type TypographyProps } from "@mui/material/Typography";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 import { useState } from "react";
+import { seedRecord } from "../../utils/seed-data";
 import { useToast } from "../toast/toast";
 import { GenericRenderer, type GenericRendererConfig } from "./generic-renderer";
 import { IconRenderer } from "./icon-renderer";
@@ -27,6 +29,9 @@ export interface StatCardRendererConfig {
     color?: string;
     variant?: "text" | "pill";
   };
+  /** Grid columns this card occupies in the row (default 1) — how the config
+   * allocates width across the tiles. Ignored below `md`, where cards stack. */
+  span?: number;
   /** Theme Card variant override (e.g. "accent" for the gradient hero card).
    * Defaults to "interactive" when `link` is set, else "base". */
   variant?: CardProps["variant"];
@@ -62,7 +67,7 @@ export interface StatCardRendererConfig {
 
 const DELTA_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 
-const VALUE_SX = { fontSize: 25, fontWeight: 700, letterSpacing: "-.01em" };
+const VALUE_SX = { fontSize: 27, fontWeight: 700, letterSpacing: "-.01em" };
 
 const ICON_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 const ICON_SIZE = 17;
@@ -173,7 +178,7 @@ function StatCard({
 }) {
   const pill = config.delta?.variant === "pill";
   const clickable = Boolean(config.link);
-  const kpiMode = Boolean(config.icon || config.sub || config.progress);
+  const kpiMode = Boolean(config.icon || config.progress);
   const variant = config.variant ?? (clickable ? "interactive" : "base");
   const overrideSx = (config.value as { sx?: Record<string, unknown> })?.sx;
   const valuePath = (config.value as { path?: string })?.path;
@@ -203,12 +208,8 @@ function StatCard({
   const deltaColor = config.delta?.color ?? DELTA_COLOR;
 
   const cardSx = kpiMode
-    ? { color: "text.primary" }
-    : {
-        color: "text.primary",
-        borderRadius: "14px",
-        padding: pill ? "18px 20px" : "16px 18px",
-      };
+    ? { color: "text.primary", height: "100%" }
+    : { color: "text.primary", height: "100%", borderRadius: "14px", padding: "18px 20px" };
 
   const card = (
     <Card variant={variant} sx={cardSx}>
@@ -233,13 +234,7 @@ function StatCard({
           ) : null}
         </Box>
       ) : (
-        <Typography
-          sx={{
-            fontSize: pill ? 13 : 12.5,
-            color: "text.secondary",
-            mb: pill ? "10px" : "8px",
-          }}
-        >
+        <Typography sx={{ fontSize: 13, color: "text.secondary", mb: "10px" }}>
           {config.label ? t(config.label.name) : ""}
         </Typography>
       )}
@@ -274,25 +269,27 @@ function StatCard({
           </Typography>
         </Box>
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: pill ? "center" : "baseline",
-            justifyContent: pill ? "space-between" : "flex-start",
-            gap: "9px",
-          }}
-        >
-          {config.value ? <GenericRenderer config={valueConfig} data={data} /> : null}
-          {deltaText ? (
-            pill ? (
-              <Chip variant="soft" color="primary" size="small" label={deltaText} />
-            ) : (
-              <Box component="span" sx={{ fontSize: 12, fontWeight: 600, color: deltaColor }}>
-                {deltaText}
-              </Box>
-            )
+        <>
+          <Box sx={{ display: "flex", alignItems: "baseline", gap: "9px" }}>
+            {config.value ? <GenericRenderer config={valueConfig} data={data} /> : null}
+            {deltaText ? (
+              pill ? (
+                <Chip variant="soft" color="primary" size="small" label={deltaText} />
+              ) : (
+                <Box component="span" sx={{ fontSize: 12, fontWeight: 600, color: deltaColor }}>
+                  {deltaText}
+                </Box>
+              )
+            ) : null}
+          </Box>
+          {config.sub ? (
+            <Typography
+              sx={{ fontSize: 10.5, color: "surface.textFaint", mt: "6px", ...config.sub.sx }}
+            >
+              {t(config.sub.name, data)}
+            </Typography>
           ) : null}
-        </Box>
+        </>
       )}
     </Card>
   );
@@ -307,42 +304,82 @@ function StatCard({
   return card;
 }
 
+/** Placeholder tile — same padding and rhythm as StatCard so the grid doesn't
+ * jump when the real numbers land. */
+function StatCardSkeleton({ config }: { config?: StatCardRendererConfig }) {
+  const pill = config?.delta?.variant === "pill";
+  const kpiMode = Boolean(config?.icon || config?.progress);
+  return (
+    <Card
+      variant="base"
+      sx={{
+        height: "100%",
+        color: "text.primary",
+        ...(kpiMode ? {} : { borderRadius: "14px", padding: pill ? "18px 20px" : "16px 18px" }),
+      }}
+    >
+      <Skeleton variant="text" width="45%" height={16} />
+      <Box sx={{ display: "flex", alignItems: "center", gap: "9px", mt: pill ? "10px" : "8px" }}>
+        <Skeleton variant="text" width={64} height={30} />
+        {config?.delta ? (
+          <Skeleton variant="rounded" width={48} height={20} sx={{ borderRadius: "999px" }} />
+        ) : null}
+      </Box>
+      {config?.sub ? <Skeleton variant="text" width="60%" height={13} sx={{ mt: "6px" }} /> : null}
+    </Card>
+  );
+}
+
 export function StatCardRenderer({
   id,
   config: configProp,
   data: dataProp,
-  gridTemplateColumns,
   gap = "14px",
 }: {
   id: string;
   config?: StatCardRendererConfig | StatCardRendererConfig[];
   data?: Record<string, unknown>;
-  /** When set, the cards are wrapped in a grid with this template. */
-  gridTemplateColumns?: string;
   gap?: string | number;
 }) {
   const configFromId = useConfiguration<StatCardRendererConfig | StatCardRendererConfig[]>(id);
   const source = configProp ?? configFromId;
   const configs = Array.isArray(source) ? source : [source];
   const { t } = useTranslation(id);
-  // The engine injects `data={}` when this renderer is used directly as a
-  // bootstrap value; an empty object means "no data provided → fetch".
-  const seedData = dataProp && Object.keys(dataProp).length > 0 ? dataProp : undefined;
-  const { data: resolved } = useFetch<Record<string, unknown>>(id, {
+  const seedData = seedRecord(dataProp);
+  const { data: resolved, isLoading } = useFetch<Record<string, unknown>>(id, {
     data: seedData,
   });
   const data = resolved ?? {};
 
+  // The grid comes from the config: one column per unit of `span` (default 1),
+  // stacked to a single column below `md`.
+  const columns = configs.reduce((total, config) => total + (config?.span ?? 1), 0);
+
   const cards = configs.map((config, i) => (
-    <StatCard key={config?.label?.name ?? i} config={config} data={data} t={t} />
+    <Box
+      key={config?.label?.name ?? i}
+      // `display: grid` stretches the tile (or its link wrapper) to the row
+      // height, so spans of different content stay level.
+      sx={{
+        display: "grid",
+        minWidth: 0,
+        gridColumn: { xs: "auto", md: `span ${config?.span ?? 1}` },
+      }}
+    >
+      {isLoading ? (
+        <StatCardSkeleton config={config} />
+      ) : (
+        <StatCard config={config} data={data} t={t} />
+      )}
+    </Box>
   ));
 
-  if (configs.length > 1 || gridTemplateColumns) {
+  if (configs.length > 1) {
     return (
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: gridTemplateColumns ?? `repeat(${configs.length}, 1fr)`,
+          gridTemplateColumns: { xs: "1fr", md: `repeat(${columns}, minmax(0,1fr))` },
           gap,
         }}
       >

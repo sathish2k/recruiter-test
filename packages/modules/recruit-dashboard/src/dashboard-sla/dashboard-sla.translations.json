@@ -1,0 +1,8 @@
+{
+  "title": "SLA status",
+  "metrics": {
+    "onTrack": "On track",
+    "dueToday": "Due today",
+    "overdue": "Overdue"
+  }
+}

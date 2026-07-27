@@ -8,9 +8,11 @@ import { AiMatchRenderer, type AiMatchRendererConfig } from "./ai-match-renderer
 import { BooleanRenderer, type BooleanRendererConfig } from "./boolean-renderer";
 import { CurrencyRenderer, type CurrencyRendererConfig } from "./currency-renderer";
 import { DateRenderer, type DateRendererConfig } from "./date-renderer";
+import { DotRenderer, type DotRendererConfig } from "./dot-renderer";
 import { EntityRenderer, type EntityRendererConfig } from "./entity-renderer";
 import { IconRenderer, type IconRendererConfig } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
+import { MetricGroupRenderer, type MetricGroupRendererConfig } from "./metric-group-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 import { RoleRenderer, type RoleRendererConfig } from "./role-renderer";
@@ -35,6 +37,8 @@ export type GenericRendererConfig =
   | PillRendererConfig
   | RoleRendererConfig
   | ScoreBarRendererConfig
+  | MetricGroupRendererConfig
+  | DotRendererConfig
   | ActionsRendererConfig
   | MenuRendererConfig
   | ({ type: "icon" } & IconRendererConfig)
@@ -71,6 +75,10 @@ export function GenericRenderer({
       return <AiMatchRenderer config={config} data={data} />;
     case "pill":
       return <PillRenderer config={config} data={data} />;
+    case "dot":
+      return <DotRenderer config={config} data={data} />;
+    case "metric-group":
+      return <MetricGroupRenderer config={config} data={data} />;
     case "score-bar":
       return <ScoreBarRenderer config={config} data={data} />;
     case "role":

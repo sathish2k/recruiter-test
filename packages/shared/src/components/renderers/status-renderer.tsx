@@ -1,10 +1,16 @@
+"use client";
+
 import Box from "@mui/material/Box";
 import Chip, { type ChipProps } from "@mui/material/Chip";
+import { useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 
 export interface StatusRendererConfig {
   type: "status";
   path: string;
+  /** Component id. When set, `labels` values are treated as translation keys —
+   * a missing key resolves to itself, so literal labels keep working. */
+  id?: string;
   labels?: Record<string, string>;
   colors?: Record<string, ChipProps["color"]>;
   variant?: ChipProps["variant"];
@@ -22,8 +28,10 @@ export function StatusRenderer({
   config: StatusRendererConfig;
   data?: Record<string, unknown>;
 }) {
+  const { t } = useTranslation(config.id ?? "");
   const key = String(delve(data, config.path) ?? "");
-  const label = config.labels?.[key] ?? key;
+  const raw = config.labels?.[key] ?? key;
+  const label = config.id ? t(raw) : raw;
   return (
     <Chip
       label={

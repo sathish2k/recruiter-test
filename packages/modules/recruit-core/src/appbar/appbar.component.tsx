@@ -6,13 +6,15 @@ import LanguageRounded from "@mui/icons-material/LanguageRounded";
 import LightModeRounded from "@mui/icons-material/LightModeRounded";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import { useAuthUser, useLogout, usePortalRouter, useTranslation } from "@recruit/sdk";
-import { IconRenderer, LinkRenderer } from "@recruit/shared";
+import { useAuthUser, useFetch, useLogout, usePortalRouter, useTranslation } from "@recruit/sdk";
+import { BrandLogo, IconRenderer, LinkRenderer, seedRecord } from "@recruit/shared";
 import { useColorMode } from "@recruit/ui";
 import { useState } from "react";
 import type { AppbarComponentProps, AppbarMenuItem } from "./appbar.types";
@@ -27,11 +29,14 @@ function initials(name?: string | null): string {
     .join("");
 }
 
-export function AppbarComponent({ id, configuration, currentRoute }: AppbarComponentProps) {
+export function AppbarComponent({ id, configuration, currentRoute, data }: AppbarComponentProps) {
   const router = usePortalRouter();
   const { t, language, setLanguage } = useTranslation(id);
   const user = useAuthUser();
   const logout = useLogout();
+  // The workspace row in the avatar menu — name + seat count.
+  const { data: fetched } = useFetch<Record<string, unknown>>(id, { data: seedRecord(data) });
+  const organization = (fetched ?? {}) as { name?: string; seats?: number };
   const [avatarMenu, setAvatarMenu] = useState<HTMLElement | null>(null);
   const [langMenu, setLangMenu] = useState<HTMLElement | null>(null);
   const { mode: themeMode, toggle: toggleTheme } = useColorMode();
@@ -159,11 +164,13 @@ export function AppbarComponent({ id, configuration, currentRoute }: AppbarCompo
             );
           }
           if (action.kind === "avatar") {
-            const menu = action.menu ?? [];
+            const menu = action.menu;
+            const sections = (menu?.sections ?? []).filter((section) => section.length > 0);
+            const roleLabel = menu?.role?.labels?.[user?.role ?? ""];
             return (
               <Box key="avatar">
                 <Avatar
-                  onClick={(e) => (menu.length ? setAvatarMenu(e.currentTarget) : go())}
+                  onClick={(e) => (sections.length ? setAvatarMenu(e.currentTarget) : go())}
                   title={user?.name ?? undefined}
                   sx={{
                     bgcolor: "var(--mui-palette-surface-primarySoftBg)",
@@ -179,37 +186,114 @@ export function AppbarComponent({ id, configuration, currentRoute }: AppbarCompo
                   onClose={() => setAvatarMenu(null)}
                   anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                   transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  slotProps={{ list: { sx: { p: 0, width: 270 } } }}
                 >
-                  {user?.name ? (
-                    <Box sx={{ px: "14px", py: "6px" }}>
-                      <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{user.name}</Typography>
-                      <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
-                        {user.email}
-                      </Typography>
-                    </Box>
-                  ) : null}
-                  {menu.map((item) => (
-                    <MenuItem
-                      key={item.label}
-                      onClick={() => runMenuItem(item)}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "11px",
+                      p: "15px 16px",
+                      background:
+                        "linear-gradient(150deg,var(--mui-palette-surface-primarySoftBg),transparent)",
+                    }}
+                  >
+                    <Avatar
                       sx={{
-                        gap: "10px",
-                        minWidth: 172,
-                        color: item.danger ? "error.light" : undefined,
+                        width: 40,
+                        height: 40,
+                        fontSize: 14,
+                        bgcolor: "var(--mui-palette-surface-primarySoftBg)",
+                        color: "var(--mui-palette-surface-primarySoftFg)",
                       }}
                     >
-                      {item.icon ? (
-                        <ListItemIcon sx={{ minWidth: "0 !important" }}>
-                          <IconRenderer
-                            name={item.icon}
-                            size={16}
-                            color={item.danger ? "inherit" : undefined}
-                          />
-                        </ListItemIcon>
+                      {initials(user?.name) || t(action.label ?? "")}
+                    </Avatar>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography noWrap sx={{ fontSize: 13.5, fontWeight: 700 }}>
+                        {user?.name}
+                      </Typography>
+                      <Typography noWrap sx={{ fontSize: 11.5, color: "text.secondary" }}>
+                        {user?.email}
+                      </Typography>
+                      {roleLabel ? (
+                        <Chip
+                          variant="soft"
+                          color="primary"
+                          size="small"
+                          icon={
+                            menu?.role?.icon ? (
+                              <IconRenderer name={menu.role.icon} size={12} color="inherit" />
+                            ) : undefined
+                          }
+                          label={t(roleLabel)}
+                          sx={{ mt: "5px", fontSize: 10.5, height: 20 }}
+                        />
                       ) : null}
-                      {t(item.label)}
-                    </MenuItem>
-                  ))}
+                    </Box>
+                  </Box>
+
+                  {menu?.workspace && organization.name ? (
+                    <Box
+                      onClick={() => {
+                        setAvatarMenu(null);
+                        if (menu.workspace?.routeId) router.push(menu.workspace.routeId);
+                      }}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        p: "11px 16px",
+                        borderTop: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "action.hover",
+                        cursor: menu.workspace.routeId ? "pointer" : "default",
+                      }}
+                    >
+                      <BrandLogo size={28} />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography noWrap sx={{ fontSize: 12.5, fontWeight: 600 }}>
+                          {organization.name}
+                        </Typography>
+                        <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
+                          {t(menu.workspace.seats, organization)}
+                        </Typography>
+                      </Box>
+                      <IconRenderer name="unfold-more" size={16} />
+                    </Box>
+                  ) : null}
+
+                  {sections.flatMap((section, si) => [
+                    ...(si > 0
+                      ? [<Divider key={`divider-${section[0]?.label}`} sx={{ m: 0 }} />]
+                      : []),
+                    ...section.map((item) => (
+                      <MenuItem
+                        key={item.label}
+                        onClick={() => runMenuItem(item)}
+                        sx={{
+                          gap: "11px",
+                          mx: "6px",
+                          my: "2px",
+                          borderRadius: "8px",
+                          fontSize: 13,
+                          color: item.danger ? "error.light" : "text.secondary",
+                          fontWeight: item.danger ? 600 : undefined,
+                        }}
+                      >
+                        {item.icon ? (
+                          <ListItemIcon sx={{ minWidth: "0 !important" }}>
+                            <IconRenderer
+                              name={item.icon}
+                              size={18}
+                              color={item.danger ? "inherit" : undefined}
+                            />
+                          </ListItemIcon>
+                        ) : null}
+                        {t(item.label)}
+                      </MenuItem>
+                    )),
+                  ])}
                 </Menu>
               </Box>
             );

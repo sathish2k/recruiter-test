@@ -45,9 +45,24 @@ injects `id` (+ `configuration`/`data`/`translation`), and the renderer reads
 its slice via `useConfiguration(id)`/`useFetch(id)`. So a table/stat/funnel
 screen is just `value: TableRenderer` (or `StatCardRenderer`, `FunnelRenderer`,
 `TableFilterExportRenderer`) with a `.configuration.ts` + `.datasource.ts` — no
-`.component.tsx`. (The engine injects `data={}` when there's no prefetch; those
-renderers treat an empty/non-array `data` as "no data → fetch", so direct use
-Just Works.)
+`.component.tsx`.
+
+**The injected `id` is the component id** (`Recruit.X.Component`), not the page's
+LayoutElement id. The engine keys `configurationMap`/`dataMap`/`translationMap`
+by `element.componentType`, because config, translations and datasource all come
+from the ComponentDefinition — so a nested renderer config can name its own
+component and `useTranslation(id)` resolves. Any config that translates
+(`static-translation`, `metric-group`, `role`, `menu`, `link` labels) must carry
+that `id`; naming the element id instead silently falls back to raw keys.
+
+**The `data={}` footgun.** The engine injects `data={}` into every component
+when there's no prefetch, and `useFetch` skips fetching for *any* non-`undefined`
+`data` — so a renderer that forwards the injected prop straight through never
+calls its datasource and silently renders empty. Normalise it first, always:
+`seedRows(dataProp)` for row-array renderers (graphs, tables), `seedRecord(dataProp)`
+for single-row ones (stat cards, alerts, funnels) — both from `@recruit/shared`,
+covered by `utils/seed-data.test.ts`. Never hand-roll the check inline; that's
+how GraphRenderer shipped blank.
 
 Then: add to the module's `index.ts` `components`, register the module in
 `registry.ts`, reference from a page by `componentType`, point a route at the page.

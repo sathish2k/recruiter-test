@@ -1,8 +1,14 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
 import { ClientDetailComponent } from "./client-detail.component";
+import { ClientDetailConfiguration } from "./client-detail.configuration";
 import { clientDetailDatasource } from "./client-detail.datasource";
 import fallbackTranslation from "./client-detail.translations.json";
 
+const CONFIGURATION: ComponentDependency = {
+  id: "Recruit.ClientDetail.Configuration",
+  type: "CONFIGURATION",
+  value: ClientDetailConfiguration,
+};
 const TRANSLATION: ComponentDependency = {
   id: "Recruit.ClientDetail.Translation",
   type: "TRANSLATION",
@@ -19,6 +25,7 @@ export const CLIENT_DETAIL_COMPONENT: ComponentDefinition = {
   type: "COMPONENT",
   value: ClientDetailComponent,
   default: {
+    configuration: CONFIGURATION,
     translation: TRANSLATION,
     datasource: DATASOURCE,
   },

@@ -2,7 +2,6 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import {
   useConfiguration,
@@ -228,23 +227,6 @@ export function ContactFormComponent({ id }: { id: string }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <Link
-        component="button"
-        type="button"
-        onClick={() => router.push(config.listRouteId)}
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: "text.secondary",
-          alignSelf: "flex-start",
-        }}
-      >
-        <IconRenderer name="arrow-back" size={15} />
-        {t("back")}
-      </Link>
       <FormWithSectionsRenderer
         key={`${contactId ?? "new"}-${formKey}`}
         id={id}

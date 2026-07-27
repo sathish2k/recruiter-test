@@ -42,6 +42,26 @@ export const AppbarConfiguration: AppbarConfig = {
       routeId: "Recruit.Jobs.Route",
       label: { name: "back.jobs" },
     },
+    "Recruit.ClientDetail.Route": {
+      routeId: "Recruit.Clients.Route",
+      label: { name: "back.clients" },
+    },
+    "Recruit.ClientNew.Route": {
+      routeId: "Recruit.Clients.Route",
+      label: { name: "back.clients" },
+    },
+    "Recruit.ClientEdit.Route": {
+      routeId: "Recruit.Clients.Route",
+      label: { name: "back.clients" },
+    },
+    "Recruit.ContactNew.Route": {
+      routeId: "Recruit.Contacts.Route",
+      label: { name: "back.contacts" },
+    },
+    "Recruit.ContactEdit.Route": {
+      routeId: "Recruit.Contacts.Route",
+      label: { name: "back.contacts" },
+    },
   },
   actions: [
     { kind: "theme" },
@@ -63,25 +83,60 @@ export const AppbarConfiguration: AppbarConfig = {
     {
       kind: "avatar",
       label: "avatar",
-      menu: [
-        {
-          label: "menu.profile",
-          icon: "person",
-          routeId: "Recruit.Profile.Route",
+      menu: {
+        role: {
+          icon: "shield-person",
+          labels: {
+            owner: "roles.owner",
+            admin: "roles.admin",
+            manager: "roles.manager",
+            recruiter: "roles.recruiter",
+            viewer: "roles.viewer",
+          },
         },
-        {
-          label: "menu.settings",
-          icon: "settings",
+        workspace: {
+          seats: "workspace.seats",
           routeId: "Recruit.Settings.Route",
           access: { resource: "settings" },
         },
-        {
-          label: "menu.logout",
-          icon: "logout",
-          action: "logout",
-          danger: true,
-        },
-      ],
+        sections: [
+          [
+            {
+              label: "menu.profile",
+              icon: "person",
+              routeId: "Recruit.Profile.Route",
+            },
+            {
+              label: "menu.notifications",
+              icon: "notifications",
+              routeId: "Recruit.Notifications.Route",
+            },
+          ],
+          [
+            {
+              label: "menu.settings",
+              icon: "settings",
+              routeId: "Recruit.Settings.Route",
+              access: { resource: "settings" },
+            },
+          ],
+          [
+            {
+              label: "menu.helpCenter",
+              icon: "help",
+              routeId: "Recruit.HelpCenter.Route",
+            },
+          ],
+          [
+            {
+              label: "menu.logout",
+              icon: "logout",
+              action: "logout",
+              danger: true,
+            },
+          ],
+        ],
+      },
     },
   ],
 };

@@ -161,10 +161,7 @@ export function ClientsComponent({ id }: { id: string }) {
       </Box>
 
       {/* Summary stats */}
-      <StatCardRenderer
-        id={config.statsComponentId}
-        gridTemplateColumns="repeat(auto-fit,minmax(190px,1fr))"
-      />
+      <StatCardRenderer id={config.statsComponentId} />
 
       {/* Card grid */}
       <Box

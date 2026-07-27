@@ -2,6 +2,15 @@ import type { Route } from "@recruit/sdk";
 
 export const routes: Route[] = [
   {
+    id: "Recruit.Root",
+    path: "/",
+    layout: "Recruit.Core.Layout",
+    page: "Recruit.Dashboard.Page",
+    guard: [{ type: "authenticationGuard" }],
+    access: { resource: "dashboard" },
+    children: [],
+  },
+  {
     id: "Auth.Login.Route",
     path: "login",
     layout: "Auth.Layout",

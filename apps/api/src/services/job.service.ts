@@ -1,9 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { and, asc, count, desc, eq, getTableColumns, ilike, inArray, or } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 import { client } from "../models/client.model";
 import { type JobAddress, type JobAttachment, type JobStatus, job } from "../models/job.model";
+
+/** `user` is joined twice — once as the sourcer, once as the profile lead —
+ * so the second join needs its own alias. */
+const profileLead = alias(user, "profile_lead");
 
 type JobRow = typeof job.$inferSelect;
 type JobJoins = {
@@ -92,10 +97,12 @@ function withNames() {
       ...getTableColumns(job),
       clientName: client.name,
       sourcerName: user.name,
+      profileLeadName: profileLead.name,
     })
     .from(job)
     .leftJoin(client, eq(job.clientId, client.id))
-    .leftJoin(user, eq(job.sourcerId, user.id));
+    .leftJoin(user, eq(job.sourcerId, user.id))
+    .leftJoin(profileLead, eq(job.profileLeadId, profileLead.id));
 }
 
 export async function listJobs(organizationId: string, params: ListJobsParams = {}) {

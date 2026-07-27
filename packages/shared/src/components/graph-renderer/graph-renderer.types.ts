@@ -25,6 +25,12 @@ export interface GraphRendererConfig {
   header?: GraphHeader;
   /** Cartesian (bar/line/area): path into each row for the x-axis category. */
   categoryPath?: string;
+  /** Translate each category: the row value is a key appended to this prefix
+   * (e.g. `"stage."` + `"screening"`), mirroring FunnelRenderer's
+   * `stageLabelPrefix`. Omit to plot the raw value. */
+  categoryLabelPrefix?: string;
+  /** `datetime` lets ApexCharts format an ISO-date category axis itself. */
+  categoryType?: "category" | "datetime";
   /** Cartesian: one entry per plotted series. */
   series?: GraphSeries[];
   /** Circular (pie/donut): path for the slice label. */

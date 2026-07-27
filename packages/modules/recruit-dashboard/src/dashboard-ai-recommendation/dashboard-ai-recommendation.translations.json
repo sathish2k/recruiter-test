@@ -1,0 +1,7 @@
+{
+  "kicker": "AI RECOMMENDATIONS",
+  "title": "{value} candidates ready for review",
+  "actions": {
+    "review": "Review matches"
+  }
+}

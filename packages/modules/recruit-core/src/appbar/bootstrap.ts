@@ -1,6 +1,7 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
 import { AppbarComponent } from "./appbar.component";
 import { AppbarConfiguration } from "./appbar.configuration";
+import { appbarDatasource } from "./appbar.datasource";
 import fallbackTranslation from "./appbar.translations.json";
 
 const CONFIGURATION: ComponentDependency = {
@@ -15,6 +16,12 @@ const TRANSLATION: ComponentDependency = {
   value: { fallback: fallbackTranslation },
 };
 
+const DATASOURCE: ComponentDependency = {
+  id: "Recruit.Appbar.Datasource",
+  type: "DATASOURCE",
+  value: appbarDatasource,
+};
+
 export const APPBAR_COMPONENT: ComponentDefinition = {
   id: "Recruit.Appbar.Component",
   type: "COMPONENT",
@@ -22,5 +29,6 @@ export const APPBAR_COMPONENT: ComponentDefinition = {
   default: {
     configuration: CONFIGURATION,
     translation: TRANSLATION,
+    datasource: DATASOURCE,
   },
 };

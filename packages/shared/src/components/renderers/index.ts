@@ -18,6 +18,7 @@ export {
   type CurrencyRendererConfig,
 } from "./currency-renderer";
 export { DateRenderer, type DateRendererConfig } from "./date-renderer";
+export { DotRenderer, type DotRendererConfig } from "./dot-renderer";
 export {
   type EmptyStateAction,
   type EmptyStateConfig,
@@ -46,6 +47,16 @@ export {
   type LinkRendererConfig,
   type LinkType,
 } from "./link-renderer";
+export {
+  MessageAlertRenderer,
+  type MessageAlertRendererConfig,
+  type MessageAlertTone,
+} from "./message-alert-renderer";
+export {
+  type MetricGroupItem,
+  MetricGroupRenderer,
+  type MetricGroupRendererConfig,
+} from "./metric-group-renderer";
 export { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 export { PillRenderer, type PillRendererConfig } from "./pill-renderer";
 export {
@@ -57,6 +68,11 @@ export {
   ScoreBarRenderer,
   type ScoreBarRendererConfig,
 } from "./score-bar-renderer";
+export {
+  StageFunnelRenderer,
+  type StageFunnelRendererConfig,
+  type StageFunnelRow,
+} from "./stage-funnel-renderer";
 export {
   StatCardRenderer,
   type StatCardRendererConfig,

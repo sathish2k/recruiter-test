@@ -6,9 +6,25 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import { useFetch, usePortalRouter, useRouteParams, useTranslation } from "@recruit/sdk";
-import { IconRenderer, ListSection, type ListSectionItem } from "@recruit/shared";
+import {
+  useConfiguration,
+  useFetch,
+  usePortalRouter,
+  useRouteParams,
+  useTranslation,
+} from "@recruit/sdk";
+import {
+  ActionsMenu,
+  EntityRenderer,
+  IconRenderer,
+  LinkRenderer,
+  StatCardRenderer,
+  StatusRenderer,
+  TableRenderer,
+} from "@recruit/shared";
+import delve from "dlv";
 import type { ReactNode } from "react";
+import type { ClientDetailConfiguration, DetailFieldConfig } from "./client-detail.configuration";
 
 interface ClientAddress {
   street?: string;
@@ -38,207 +54,173 @@ interface Client {
   openRoles: number;
   candidates: number;
   placements: number;
-}
-
-const HEALTH_FG: Record<string, string> = {
-  healthy: "surface.successFg",
-  attention: "surface.warningFg",
-  at_risk: "surface.accentBright",
-  dormant: "surface.textSecondary",
-};
-
-const LIST_ROUTE = "Recruit.Clients.Route";
-const EDIT_ROUTE = "Recruit.ClientEdit.Route";
-
-function valueNode(value?: string): ReactNode {
-  return (
-    <Typography sx={{ fontSize: 12.5, color: value ? "text.primary" : "text.disabled" }}>
-      {value || "—"}
-    </Typography>
-  );
+  roles: Record<string, unknown>[];
+  contacts: Record<string, unknown>[];
 }
 
 export function ClientDetailComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
+  const config = useConfiguration<ClientDetailConfiguration>(id);
   const router = usePortalRouter();
   const params = useRouteParams();
   const clientId = params.id;
   const { data, isLoading } = useFetch<Client>(id, { filters: { id: clientId } });
 
   const client = data;
-  const health = client?.health ?? "healthy";
-  const healthFg = HEALTH_FG[health] ?? "surface.textSecondary";
-  const isHiring = (client?.status ?? "hiring") === "hiring";
 
   const addr = client?.address ?? {};
-  const addressLine = [addr.street, addr.city, addr.state, addr.postalCode, addr.country]
-    .filter(Boolean)
-    .join(", ");
+  const record = {
+    ...(client ?? {}),
+    addressLine: [addr.street, addr.city, addr.state, addr.postalCode, addr.country]
+      .filter(Boolean)
+      .join(", "),
+    // The design's meta line under the client name.
+    subtitleLine: [
+      client?.industry,
+      client?.accountLeadName ? `${t("subtitle.accountLead")}: ${client.accountLeadName}` : "",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  } as Record<string, unknown>;
 
-  const about: ListSectionItem[] = [
-    { key: "industry", title: t("labels.industry"), action: valueNode(client?.industry) },
-    { key: "website", title: t("labels.website"), action: valueNode(client?.website) },
-    { key: "phone", title: t("labels.phone"), action: valueNode(client?.phone) },
-    { key: "lead", title: t("labels.accountLead"), action: valueNode(client?.accountLeadName) },
-    {
-      key: "source",
-      title: t("labels.source"),
-      action: valueNode(client?.source ? t(`source.${client.source}`, client.source) : ""),
-    },
-    { key: "address", title: t("labels.address"), action: valueNode(addressLine) },
-  ];
+  /** One key/value row, rendered from its config entry. */
+  const fieldRow = (field: DetailFieldConfig): ReactNode => {
+    const raw = delve(record, field.path);
+    const text = raw === undefined || raw === null || raw === "" ? "" : String(raw);
+    const label = field.translate && text ? t(`${field.translate}.${text}`, text) : text;
+    const href =
+      !text || field.as === "text" || !field.as
+        ? undefined
+        : field.as === "email"
+          ? `mailto:${text}`
+          : field.as === "phone"
+            ? `tel:${text.replace(/\s+/g, "")}`
+            : text.startsWith("http")
+              ? text
+              : `https://${text}`;
 
-  const fee: ListSectionItem[] = [
-    {
-      key: "feeBasis",
-      title: t("labels.feeBasis"),
-      action: valueNode(client?.feeBasis ? t(`feeBasis.${client.feeBasis}`) : ""),
-    },
-    { key: "feeValue", title: t("labels.feeValue"), action: valueNode(client?.feeValue) },
-    {
-      key: "paymentTerms",
-      title: t("labels.paymentTerms"),
-      action: valueNode(
-        client?.paymentTerms
-          ? t(`paymentTermsOptions.${client.paymentTerms}`, client.paymentTerms)
-          : "",
-      ),
-    },
-    {
-      key: "billingEmail",
-      title: t("labels.billingEmail"),
-      action: valueNode(client?.billingEmail),
-    },
-    { key: "taxId", title: t("labels.taxId"), action: valueNode(client?.taxId) },
-  ];
-
-  const metrics: { key: string; label: string; value: number; accent?: boolean }[] = [
-    { key: "req", label: t("metrics.requirements"), value: client?.openRoles ?? 0 },
-    { key: "cand", label: t("metrics.candidates"), value: client?.candidates ?? 0 },
-    { key: "plac", label: t("metrics.placements"), value: client?.placements ?? 0, accent: true },
-  ];
-
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: 900 }}>
-      <Link
-        component="button"
-        type="button"
-        onClick={() => router.push(LIST_ROUTE)}
+    return (
+      <Box
+        key={field.key}
         sx={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          fontSize: 12.5,
-          fontWeight: 600,
-          color: "text.secondary",
-          alignSelf: "flex-start",
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: "14px",
+          py: "7px",
         }}
       >
-        <IconRenderer name="arrow-back" size={15} />
-        {t("back")}
-      </Link>
-
-      {/* Header */}
-      <Card variant="base" sx={{ p: "22px", display: "flex", alignItems: "center", gap: "16px" }}>
-        <Avatar
-          sx={{
-            width: 54,
-            height: 54,
-            fontSize: 20,
-            fontWeight: 700,
-            bgcolor: "#3A4A5B",
-            color: "#CFE3F5",
-          }}
-        >
-          {(client?.name ?? "?").charAt(0).toUpperCase()}
-        </Avatar>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <Typography sx={{ fontSize: 18, fontWeight: 700, letterSpacing: "-.01em" }}>
-              {client?.name ?? (isLoading ? "…" : "—")}
-            </Typography>
-            <Box
-              sx={{
-                fontSize: 10,
-                fontWeight: 700,
-                px: "8px",
-                py: "2px",
-                borderRadius: "999px",
-                border: "1px solid",
-                color: isHiring ? "surface.successFg" : "text.muted",
-                bgcolor: isHiring ? "surface.successSoftBg" : "surface.tint",
-                borderColor: isHiring ? "surface.successSoftBorder" : "surface.borderStrong",
-              }}
-            >
-              {t(`status.${client?.status ?? "hiring"}`)}
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: 11,
-                fontWeight: 600,
-                color: healthFg,
-              }}
-            >
-              <Box sx={{ width: 5, height: 5, borderRadius: "999px", bgcolor: healthFg }} />
-              {t(`health.${health}`)}
-            </Box>
-          </Box>
-          <Typography sx={{ fontSize: 12.5, color: "text.secondary", mt: "3px" }}>
-            {[client?.industry, client?.website].filter(Boolean).join(" · ") || " "}
+        <Typography sx={{ fontSize: 12, color: "text.disabled", flex: "none" }}>
+          {t(field.label)}
+        </Typography>
+        {href ? (
+          <Link
+            href={href}
+            target={field.as === "link" ? "_blank" : undefined}
+            rel={field.as === "link" ? "noopener noreferrer" : undefined}
+            sx={{ fontSize: 12.5, textAlign: "right", minWidth: 0, wordBreak: "break-word" }}
+          >
+            {label}
+          </Link>
+        ) : (
+          <Typography
+            sx={{
+              fontSize: 12.5,
+              color: text ? "text.primary" : "text.disabled",
+              textAlign: "right",
+              minWidth: 0,
+              wordBreak: "break-word",
+            }}
+          >
+            {label || "—"}
           </Typography>
+        )}
+      </Box>
+    );
+  };
+
+  const card = (title: string, fields: DetailFieldConfig[]) => (
+    <Card variant="base" sx={{ p: "18px 20px" }}>
+      <Typography sx={{ fontSize: 14, fontWeight: 700, mb: "6px" }}>{t(title)}</Typography>
+      {fields.map(fieldRow)}
+    </Card>
+  );
+
+  if (!config.stats) return null;
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {/* Header — identity, state and the action row. */}
+      <Card
+        variant="base"
+        sx={{ p: "22px", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}
+      >
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <EntityRenderer config={config.header.entity} data={record} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "8px" }}>
+            <StatusRenderer config={config.header.status} data={record} />
+            <StatusRenderer config={config.header.health} data={record} />
+          </Box>
         </Box>
-        <Button variant="outlined" onClick={() => router.push(EDIT_ROUTE, { id: clientId })}>
-          {t("edit")}
-        </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px", flex: "none" }}>
+          <LinkRenderer config={{ id, ...config.primaryAction }} data={record}>
+            <Button
+              variant="contained"
+              startIcon={
+                config.primaryAction.icon ? (
+                  <IconRenderer name={config.primaryAction.icon} size={15} />
+                ) : undefined
+              }
+            >
+              {t(config.primaryAction.label?.name ?? "")}
+            </Button>
+          </LinkRenderer>
+          <ActionsMenu id={id} actions={config.menuActions} data={record} />
+        </Box>
       </Card>
 
-      {/* Metrics */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
-        {metrics.map((m) => (
-          <Card key={m.key} variant="base" sx={{ p: "16px 18px" }}>
-            <Typography
-              sx={{
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: "-.01em",
-                color: m.accent ? "surface.accentBright" : "text.primary",
-              }}
-            >
-              {m.value}
+      {/* Main column + rail. */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "minmax(0,1fr) 350px" },
+          gap: "16px",
+          alignItems: "start",
+        }}
+      >
+        <Box sx={{ minWidth: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
+          <StatCardRenderer id={id} config={config.stats} data={record} />
+
+          <Box>
+            <Typography sx={{ fontSize: 14, fontWeight: 700, mb: "10px" }}>
+              {t("sections.roles")}
             </Typography>
-            <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "2px" }}>
-              {m.label}
+            <TableRenderer id={id} config={config.roles} data={client?.roles ?? []} />
+          </Box>
+
+          {client?.notes ? (
+            <Card variant="base" sx={{ p: "20px" }}>
+              <Typography sx={{ fontSize: 14, fontWeight: 700, mb: "8px" }}>
+                {t("sections.notes")}
+              </Typography>
+              <Typography sx={{ fontSize: 12.5, color: "text.secondary", whiteSpace: "pre-wrap" }}>
+                {client.notes}
+              </Typography>
+            </Card>
+          ) : null}
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
+          {card("sections.about", config.about)}
+          {card("sections.agreement", config.agreement)}
+          <Box>
+            <Typography sx={{ fontSize: 14, fontWeight: 700, mb: "10px" }}>
+              {t("sections.contacts")}
             </Typography>
-          </Card>
-        ))}
+            <TableRenderer id={id} config={config.contacts} data={client?.contacts ?? []} />
+          </Box>
+        </Box>
       </Box>
-
-      <ListSection
-        title={t("sections.about")}
-        items={about}
-        isLoading={isLoading}
-        skeletonShape={{ action: "none" }}
-      />
-      <ListSection
-        title={t("sections.fee")}
-        items={fee}
-        isLoading={isLoading}
-        skeletonShape={{ action: "none" }}
-      />
-
-      {client?.notes ? (
-        <Card variant="base" sx={{ p: "20px" }}>
-          <Typography sx={{ fontSize: 13, fontWeight: 700, mb: "8px" }}>
-            {t("sections.notes")}
-          </Typography>
-          <Typography sx={{ fontSize: 12.5, color: "text.secondary", whiteSpace: "pre-wrap" }}>
-            {client.notes}
-          </Typography>
-        </Card>
-      ) : null}
     </Box>
   );
 }

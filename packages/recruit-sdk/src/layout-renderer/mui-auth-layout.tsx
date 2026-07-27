@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import type { ReactNode } from "react";
+import { dependencyKey } from "../engine/renderer";
 import type { ComponentDefinition, Configuration, LayoutElement, Route } from "../types";
 
 export function MuiAuthLayout({
@@ -20,7 +21,11 @@ export function MuiAuthLayout({
     const def = componentRegistry.get(element.componentType ?? "");
     const Component = def?.value;
     if (!Component) return null;
-    const props = { ...(dataMap.get(element.id) || {}), currentRoute };
+    const props = {
+      id: dependencyKey(element),
+      ...(dataMap.get(dependencyKey(element)) || {}),
+      currentRoute,
+    };
     return <Component key={element.id} {...props} />;
   };
 

@@ -12,6 +12,21 @@ export interface SidenavGroup {
   items: SidenavItem[];
 }
 
+/** The gradient promo pinned to the bottom of the rail. Omit to hide it. */
+export interface SidenavPromo {
+  icon: string;
+  title: string;
+  body: string;
+  cta: { label: string; routeId: string };
+  secondary?: { label: string; routeId: string };
+  access?: AccessRule;
+}
+
+export interface SidenavConfig {
+  groups: SidenavGroup[];
+  promo?: SidenavPromo;
+}
+
 // Nav structure. `title`/`label` are translation keys; `icon` maps to an MUI
 // icon in the component; `routeId` navigates via usePortalRouter.
 const groups: SidenavGroup[] = [
@@ -24,6 +39,11 @@ const groups: SidenavGroup[] = [
         icon: "dashboard",
         routeId: "Recruit.Root",
       },
+    ],
+  },
+  {
+    title: "groups.recruitment",
+    items: [
       {
         label: "items.clients",
         access: { resource: "clients" },
@@ -49,18 +69,8 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Candidates.Route",
       },
       {
-        label: "items.pipeline",
-        access: { resource: "candidates" },
-        icon: "kanban",
-        routeId: "Recruit.Pipeline.Route",
-      },
-      {
-        label: "items.teamActivity",
-        icon: "monitoring",
-        routeId: "Recruit.TeamActivity.Route",
-      },
-      {
         label: "items.interviews",
+        access: { resource: "interviews" },
         icon: "event",
         routeId: "Recruit.Interviews.Route",
       },
@@ -69,6 +79,16 @@ const groups: SidenavGroup[] = [
         icon: "handshake",
         routeId: "Recruit.Placements.Route",
       },
+    ],
+  },
+  {
+    title: "groups.insights",
+    items: [
+      {
+        label: "items.analytics",
+        icon: "insights",
+        routeId: "Recruit.Analytics.Route",
+      },
       {
         label: "items.commissions",
         access: { resource: "commissions" },
@@ -76,9 +96,9 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Commissions.Route",
       },
       {
-        label: "items.messages",
-        icon: "mail-filled",
-        routeId: "Recruit.Messages.Route",
+        label: "items.teamActivity",
+        icon: "monitoring",
+        routeId: "Recruit.TeamActivity.Route",
       },
     ],
   },
@@ -109,6 +129,12 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Settings.Route",
       },
       {
+        label: "items.integrations",
+        access: { resource: "settings" },
+        icon: "hub",
+        routeId: "Recruit.SettingsIntegrations.Route",
+      },
+      {
         label: "items.auditLog",
         access: { resource: "audit", action: ["read"] },
         icon: "history",
@@ -123,4 +149,14 @@ const groups: SidenavGroup[] = [
   },
 ];
 
-export const SidenavConfiguration = { groups };
+export const SidenavConfiguration: SidenavConfig = {
+  groups,
+  promo: {
+    icon: "sparkle",
+    title: "promo.title",
+    body: "promo.body",
+    cta: { label: "promo.cta", routeId: "Recruit.SettingsBilling.Route" },
+    secondary: { label: "promo.secondary", routeId: "Recruit.SettingsBilling.Route" },
+    access: { resource: "settings" },
+  },
+};

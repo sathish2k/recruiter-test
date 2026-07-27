@@ -6,6 +6,7 @@ import Select from "@mui/material/Select";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 import { useState } from "react";
+import { seedRows } from "../../utils/seed-data";
 import { IconRenderer } from "../renderers";
 import { GraphRenderer } from "./graph-renderer";
 import type { GraphFilterConfig, GraphRow } from "./graph-renderer.types";
@@ -32,7 +33,7 @@ export function GraphFilterRenderer({
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<GraphFilterConfig>(id);
   const config = configProp ?? configFromId;
-  const { data } = useFetch<GraphRow[]>(id, { data: dataProp });
+  const { data } = useFetch<GraphRow[]>(id, { data: seedRows<GraphRow>(dataProp) });
   const rows = Array.isArray(data) ? data : [];
 
   const [values, setValues] = useState<Record<string, string>>({});

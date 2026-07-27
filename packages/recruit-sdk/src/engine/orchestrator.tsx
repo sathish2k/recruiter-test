@@ -17,7 +17,7 @@ import type {
   Route,
   RouteGuardFn,
 } from "../types";
-import { generateRenderTree } from "./renderer";
+import { dependencyKey, generateRenderTree } from "./renderer";
 import { findRouteBySlug } from "./router";
 
 type DataMap = Map<string, Record<string, unknown>>;
@@ -203,13 +203,13 @@ function RenderElements({
           if (!definition) return null;
           const Component = definition.value;
           const { configuration, data, translation, schema } = splitComponentData(
-            dataMap.get(element.id),
+            dataMap.get(dependencyKey(element)),
           );
 
           const rendered = (
             <Component
               key={element.id}
-              id={element.id}
+              id={dependencyKey(element)}
               configuration={configuration}
               data={data}
               translation={translation}
@@ -323,7 +323,7 @@ export function createPortalApp(sdkConfig: {
               if (typeof getter === "function") props.data = await getter();
             }
           }
-          dataMap.set(element.id, props);
+          dataMap.set(dependencyKey(element), props);
         })(),
       );
     };

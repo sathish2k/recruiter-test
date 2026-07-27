@@ -166,7 +166,11 @@ function flattenOrganization(row: typeof organization.$inferSelect) {
 
 export async function getOrganization(id: string) {
   const [org] = await db.select().from(organization).where(eq(organization.id, id)).limit(1);
-  return org ? flattenOrganization(org) : null;
+  if (!org) return null;
+  const flat = flattenOrganization(org);
+  // `seats` is the member count — the appbar's workspace row reads it.
+  flat.seats = await countMembers(id);
+  return flat;
 }
 
 /** The workspace form posts one flat object; anything that isn't a real column

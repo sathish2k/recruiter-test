@@ -19,7 +19,18 @@ export interface ListSectionItem {
   action?: ReactNode;
   /** Full-width control rendered beneath the row (e.g. a segmented picker). */
   control?: ReactNode;
+  /** Right-hand pill after the title block (the design's interview time). */
+  trailing?: ReactNode;
+  /** Wraps the row — pass a LinkRenderer to make the whole row clickable. */
+  wrap?: (row: ReactNode) => ReactNode;
 }
+
+/**
+ * Row shape. `divided` is the settings-screen default (a hairline between
+ * rows); `inset` renders each row as its own inset card; `timeline` draws a dot
+ * and a connector down the left edge.
+ */
+export type ListVariant = "divided" | "inset" | "timeline";
 
 /** Shape of the skeleton rows — match it to the real row layout. */
 export interface ListSkeletonShape {
@@ -47,6 +58,11 @@ export interface ListSectionProps {
   footer?: ReactNode;
   /** Top divider between rows (and above the footer). Default true. */
   divided?: boolean;
+  variant?: ListVariant;
+  /** Tightens rows to the dashboard's compact rhythm (design: 10px rows). */
+  dense?: boolean;
+  /** Space under the header. The design varies it per list (8 / 12 / 14px). */
+  headerGap?: string;
   /** Renders skeleton rows (header/footer still render) instead of `items`. */
   isLoading?: boolean;
   /** Skeleton row count while `isLoading` (default 3). */
@@ -84,6 +100,130 @@ function SkeletonRow({ shape, divided }: { shape: ListSkeletonShape; divided: bo
   );
 }
 
+function ListRow({
+  item,
+  variant,
+  dense,
+  divided,
+  isLast,
+}: {
+  item: ListSectionItem;
+  variant: ListVariant;
+  dense: boolean;
+  divided: boolean;
+  isLast: boolean;
+}) {
+  // Timeline: dot + connector down the left, text stacked beside it.
+  if (variant === "timeline") {
+    const row = (
+      <Box sx={{ display: "flex", gap: "11px", py: "8px" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", flex: "none" }}>
+          <Box sx={{ mt: "4px", display: "flex" }}>{item.icon}</Box>
+          {isLast ? null : <Box sx={{ flex: 1, width: "1px", background: "surface.divider" }} />}
+        </Box>
+        <Box sx={{ minWidth: 0, pb: "2px" }}>
+          <Box sx={{ fontSize: 12.5, color: "surface.textMuted", lineHeight: 1.45 }}>
+            {item.title}
+          </Box>
+          {item.description != null ? (
+            <Box sx={{ fontSize: 11, color: "text.disabled", mt: "2px" }}>{item.description}</Box>
+          ) : null}
+        </Box>
+      </Box>
+    );
+    return item.wrap ? <>{item.wrap(row)}</> : row;
+  }
+
+  // Inset: each row is its own card, stacked with a gap by the parent.
+  if (variant === "inset") {
+    const row = (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          background: "surface.inset",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "12px",
+          p: "12px 14px",
+        }}
+      >
+        {item.icon}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ fontSize: 13.5, fontWeight: 600 }}>{item.title}</Box>
+          {item.description != null ? (
+            <Box sx={{ fontSize: 12, color: "text.secondary", mt: "1px" }}>{item.description}</Box>
+          ) : null}
+        </Box>
+        {item.trailing}
+        {item.action}
+      </Box>
+    );
+    return item.wrap ? <>{item.wrap(row)}</> : row;
+  }
+
+  const row = (
+    <Box
+      sx={
+        dense
+          ? {
+              display: "flex",
+              alignItems: "center",
+              gap: "11px",
+              p: "10px",
+              mx: "-10px",
+              borderRadius: "10px",
+              "&:hover": { background: "surface.hoverSubtle" },
+            }
+          : { display: "flex", alignItems: "center", gap: "13px" }
+      }
+    >
+      {item.icon ? (
+        <Box sx={{ display: "flex", color: dense ? "inherit" : "text.disabled", flex: "none" }}>
+          {item.icon}
+        </Box>
+      ) : null}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box
+          sx={
+            dense
+              ? { fontSize: 12.5, lineHeight: 1.45 }
+              : { display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }
+          }
+        >
+          {dense ? (
+            item.title
+          ) : (
+            <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{item.title}</Typography>
+          )}
+          {dense ? null : item.chips}
+        </Box>
+        {item.description != null ? (
+          <Box sx={{ fontSize: 11.5, color: "text.secondary", mt: "2px" }}>{item.description}</Box>
+        ) : null}
+      </Box>
+      {dense ? item.chips : null}
+      {item.trailing}
+      {item.action}
+    </Box>
+  );
+
+  const wrapped = item.wrap ? item.wrap(row) : row;
+  return (
+    <Box
+      sx={{
+        py: dense ? 0 : "13px",
+        borderTop: divided ? "1px solid" : "none",
+        borderColor: "divider",
+      }}
+    >
+      {wrapped}
+      {item.control != null ? <Box sx={{ mt: "10px" }}>{item.control}</Box> : null}
+    </Box>
+  );
+}
+
 /**
  * The one list primitive behind every settings/account section: a `SectionCard`
  * with an optional header and a configurable list of rows. Each row can carry a
@@ -102,6 +242,9 @@ export function ListSection({
   items = [],
   footer,
   divided = true,
+  variant = "divided",
+  dense = false,
+  headerGap,
   isLoading = false,
   skeletonRows = 3,
   skeletonShape,
@@ -110,7 +253,14 @@ export function ListSection({
   const hasHeader = title != null || subtitle != null || icon != null || headerAction != null;
   const shape = skeletonShape ?? {};
   return (
-    <Card variant="base" sx={{ p: "20px 22px", borderRadius: "16px", ...sx }}>
+    <Card
+      variant="base"
+      sx={{
+        p: variant === "divided" && !dense ? "20px 22px" : "18px 20px",
+        borderRadius: "16px",
+        ...sx,
+      }}
+    >
       {hasHeader ? (
         <Box
           sx={{
@@ -118,14 +268,14 @@ export function ListSection({
             alignItems: "center",
             justifyContent: "space-between",
             gap: "14px",
-            mb: subtitle ? "14px" : "8px",
+            mb: headerGap ?? (subtitle ? "14px" : "8px"),
           }}
         >
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {icon ? <Box sx={{ display: "flex" }}>{icon}</Box> : null}
               {title != null ? (
-                <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{title}</Typography>
+                <Typography sx={{ fontSize: 14.5, fontWeight: 600 }}>{title}</Typography>
               ) : null}
               {badge}
             </Box>
@@ -139,39 +289,28 @@ export function ListSection({
         </Box>
       ) : null}
 
-      {isLoading
-        ? Array.from({ length: skeletonRows }, (_, index) => index).map((row) => (
-            <SkeletonRow key={row} shape={shape} divided={divided} />
-          ))
-        : items.map((item) => (
-            <Box
-              key={item.key}
-              sx={{
-                py: "13px",
-                borderTop: divided ? "1px solid" : "none",
-                borderColor: "divider",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: "13px" }}>
-                {item.icon ? (
-                  <Box sx={{ display: "flex", color: "text.disabled" }}>{item.icon}</Box>
-                ) : null}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{item.title}</Typography>
-                    {item.chips}
-                  </Box>
-                  {item.description != null ? (
-                    <Box sx={{ fontSize: 11.5, color: "text.secondary", mt: "2px" }}>
-                      {item.description}
-                    </Box>
-                  ) : null}
-                </Box>
-                {item.action}
-              </Box>
-              {item.control != null ? <Box sx={{ mt: "10px" }}>{item.control}</Box> : null}
-            </Box>
-          ))}
+      <Box
+        sx={
+          variant === "inset"
+            ? { display: "flex", flexDirection: "column", gap: "10px" }
+            : { display: "flex", flexDirection: "column" }
+        }
+      >
+        {isLoading
+          ? Array.from({ length: skeletonRows }, (_, index) => index).map((row) => (
+              <SkeletonRow key={row} shape={shape} divided={divided} />
+            ))
+          : items.map((item, index) => (
+              <ListRow
+                key={item.key}
+                item={item}
+                variant={variant}
+                dense={dense}
+                divided={divided}
+                isLast={index === items.length - 1}
+              />
+            ))}
+      </Box>
 
       {footer != null ? (
         <Box
