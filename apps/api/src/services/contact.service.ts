@@ -35,6 +35,11 @@ function mapContact(row: ContactRow & { clientName?: string | null; ownerName?: 
     title: row.title ?? "",
     department: row.department ?? "",
     linkedin: row.linkedin ?? "",
+    website: row.website ?? "",
+    github: row.github ?? "",
+    preferredChannel: row.preferredChannel ?? "",
+    timezone: row.timezone ?? "",
+    assistant: row.assistant ?? "",
     twitter: row.twitter ?? "",
     source: row.source ?? "",
     notes: row.notes ?? "",
@@ -46,6 +51,7 @@ function mapContact(row: ContactRow & { clientName?: string | null; ownerName?: 
     status: row.status,
     isPrimary: row.isPrimary,
     emailOptOut: row.emailOptOut,
+    phoneOptOut: row.phoneOptOut,
     type: row.type,
     // "Contact since" on the detail screen.
     createdAt: row.createdAt.toISOString(),
@@ -145,6 +151,11 @@ export interface ContactInput {
   title?: string;
   department?: string;
   linkedin?: string;
+  website?: string;
+  github?: string;
+  preferredChannel?: string;
+  timezone?: string;
+  assistant?: string;
   twitter?: string;
   source?: string;
   notes?: string;
@@ -154,6 +165,7 @@ export interface ContactInput {
   status?: string;
   isPrimary?: boolean;
   emailOptOut?: boolean;
+  phoneOptOut?: boolean;
   type?: string;
 }
 
@@ -169,6 +181,11 @@ const EDITABLE = [
   "department",
   "linkedin",
   "twitter",
+  "website",
+  "github",
+  "preferredChannel",
+  "timezone",
+  "assistant",
   "source",
   "notes",
   "attachments",
@@ -177,6 +194,7 @@ const EDITABLE = [
   "status",
   "isPrimary",
   "emailOptOut",
+  "phoneOptOut",
 ] as const;
 
 function pickEditable(input: ContactInput): Partial<ContactRow> {

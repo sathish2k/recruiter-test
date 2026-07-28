@@ -13,6 +13,11 @@ const contactBody = t.Object({
   title: t.Optional(t.String({ maxLength: 150 })),
   department: t.Optional(t.String({ maxLength: 100 })),
   linkedin: t.Optional(t.String({ maxLength: 255 })),
+  website: t.Optional(t.String({ maxLength: 255 })),
+  github: t.Optional(t.String({ maxLength: 255 })),
+  preferredChannel: t.Optional(t.String({ maxLength: 40 })),
+  timezone: t.Optional(t.String({ maxLength: 60 })),
+  assistant: t.Optional(t.String({ maxLength: 150 })),
   twitter: t.Optional(t.String({ maxLength: 100 })),
   source: t.Optional(t.String({ maxLength: 40 })),
   notes: t.Optional(t.String({ maxLength: 5000 })),
@@ -31,6 +36,7 @@ const contactBody = t.Object({
   status: t.Optional(t.String()),
   isPrimary: t.Optional(t.Boolean()),
   emailOptOut: t.Optional(t.Boolean()),
+  phoneOptOut: t.Optional(t.Boolean()),
   type: t.Optional(t.String()),
 });
 

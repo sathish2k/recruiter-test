@@ -1,4 +1,9 @@
-import type { ControllerFieldState, ControllerRenderProps, FieldValues } from "react-hook-form";
+import type {
+  Control,
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldValues,
+} from "react-hook-form";
 
 /** Resolves a translation key, optionally falling back to literal English. */
 export type Translate = (key: string, fallback?: string) => string;
@@ -64,6 +69,11 @@ export interface FieldCondition {
   equals?: string | number | boolean;
   notEquals?: string | number | boolean;
   in?: Array<string | number | boolean>;
+  /** True while the field holds a non-blank value (`false` inverts it). */
+  filled?: boolean;
+  /** True once the field holds at least this many digits, ignoring a leading
+   * dial code — a phone field is never "empty", it starts at `+91`. */
+  digitsMin?: number;
 }
 
 /** On a checkbox: while checked, live-copy each `from[i]` into `to[i]` and render
@@ -146,6 +156,22 @@ export interface JsonSchemaProperty {
   /** `select`: show a coloured initials avatar beside each option and the chosen
    * value (a person/contact picker). */
   avatar?: boolean;
+  /** `select`: `"pill"` is the design's section-header category chip (rounded,
+   * borderless-looking); `"compact"` is the short prefix control that sits
+   * beside another field (the salutation before a first name). */
+  selectVariant?: "pill" | "compact";
+  /** Schema property rendered as a small control immediately before this
+   * field's own, sharing its label — the design's salutation + first name. */
+  leading?: string;
+  /** `select`: option value → predicate that must hold for it to be selectable.
+   * An option whose predicate fails is greyed and shows `optionDisabledHint`;
+   * if the current value becomes unselectable the field falls to the first
+   * option that is. */
+  optionEnabledWhen?: Record<string, FieldCondition>;
+  /** Suffix on a disabled option's label, e.g. "— add details first". A t-key. */
+  optionDisabledHint?: string;
+  /** `heading`: rule above the label, separating it from the block before. */
+  divider?: boolean;
   /** Show this field only while the predicate holds; hidden fields are stripped
    * from the payload and skipped in validation. */
   condition?: FieldCondition;
@@ -227,6 +253,10 @@ export interface SelectOption {
   label: string;
   /** The original row, when options came from an endpoint. */
   raw?: Record<string, unknown>;
+  /** Shown greyed and not selectable — the design's "add details first" rows. */
+  disabled?: boolean;
+  /** Dimmed note after the label, in the menu only (not the closed control). */
+  hint?: string;
 }
 
 /** Where a select (or the phone picker) gets its options. */
@@ -317,8 +347,18 @@ export type FormSectionField = string | { name: string; span?: number; grid?: Fi
 export interface FormSection extends FormLayoutProps {
   /** Section heading translation key. */
   title?: string;
+  /**
+   * Field names hidden behind a "more" toggle at the foot of the section — the
+   * design keeps secondary handles out of the way until asked for. The two
+   * labels are translation keys for the collapsed and expanded states.
+   */
+  moreFields?: string[];
+  moreLabel?: { show: string; hide: string };
   /** Section sub-text translation key. */
   description?: string;
+  /** Field name pulled out of the body and rendered at the right of the card
+   * header — the design's Attachments category pill. */
+  headerField?: string;
   /** Skip the section card chrome and render the fields bare — for a single
    * display widget (e.g. a callout) that draws its own container. */
   bare?: boolean;
@@ -431,6 +471,9 @@ export interface WidgetProps {
   /** Set by the renderer from `disabledWhen` / a checkbox's `syncFields`: render
    * the control disabled, but keep the value in form state so it still submits. */
   disabled?: boolean;
+  /** The form's control, so a widget can watch sibling fields — e.g. a select
+   * whose options unlock as the fields they depend on are filled. */
+  control?: Control<FieldValues>;
 }
 
 /** Grid placement for a field, mirroring the engine's LayoutElement. */

@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import { useTranslation } from "@recruit/sdk";
 import { denseFormVars } from "@recruit/ui";
 import type { ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { type FieldValues, FormProvider, useForm } from "react-hook-form";
 import { IconRenderer } from "../../renderers";
 import { Field } from "../field/field";
@@ -40,19 +40,23 @@ function sectionGrid(section: FormSection) {
   };
 }
 
-function fieldGrids(section: FormSection, schema: JsonSchema, useShorthand: boolean) {
-  return (section.fields ?? []).map((field) => {
+/** The cells a section actually draws — the same subset `renderEntry` keeps, so
+ * the skeleton has one placeholder per real field and lands on the same tracks. */
+function visibleFields(section: FormSection, schema: JsonSchema): FormSectionField[] {
+  const led = new Set(Object.values(schema.properties).map((prop) => prop.leading));
+  return (section.fields ?? [])
+    .filter((field) => !(section.moreFields ?? []).includes(fieldName(field)))
+    .filter((field) => fieldName(field) !== section.headerField)
+    .filter((field) => !led.has(fieldName(field)));
+}
+
+function fieldGrids(fields: FormSectionField[], schema: JsonSchema, useShorthand: boolean) {
+  return fields.map((field) => {
+    if (typeof field === "object" && field.grid) return field.grid;
     const prop = schema.properties[fieldName(field)];
     if (prop?.grid) return prop.grid;
     return useShorthand ? { size: fieldSpan(field) } : undefined;
   });
-}
-
-/** Groups are layout-only; the skeleton just needs the leaf field cards. */
-function leafSections(sections: FormSection[]): FormSection[] {
-  return sections.flatMap((section) =>
-    section.sections ? leafSections(section.sections) : [section],
-  );
 }
 
 function SkeletonField({ prop }: { prop?: JsonSchemaProperty }) {
@@ -64,6 +68,13 @@ function SkeletonField({ prop }: { prop?: JsonSchemaProperty }) {
       </Box>
     );
   }
+  // Display-only widgets have no control to stand in for — a heading is one
+  // short bar, a callout its own block.
+  if (prop?.widget === "heading") return <Skeleton variant="text" width={90} height={14} />;
+  if (prop?.widget === "callout")
+    return <Skeleton variant="rounded" height={92} sx={{ borderRadius: "16px" }} />;
+  if (prop?.widget === "checkbox" || prop?.widget === "switch")
+    return <Skeleton variant="text" width={150} height={22} />;
   const rows = prop?.widget === "textarea" ? (prop.rows ?? 4) : 0;
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
@@ -73,17 +84,109 @@ function SkeletonField({ prop }: { prop?: JsonSchemaProperty }) {
   );
 }
 
+/** Mirrors `renderEntry`: a group lays its children out through the same
+ * container, a leaf draws the card. Walking the same tree is what keeps the
+ * loading state on the real layout — a two-column form stays two columns. */
+function SkeletonEntry({
+  section,
+  schema,
+  inRail,
+}: {
+  section: FormSection;
+  schema: JsonSchema;
+  inRail: boolean;
+}) {
+  if (section.sections) {
+    return (
+      <Box sx={section.sticky ? { position: "sticky", top: "22px" } : undefined}>
+        <FormContainer
+          stackContainer={section.stackContainer ?? { spacing: 2 }}
+          gridContainer={section.gridContainer}
+          grids={section.sections.map((child) => child.grid)}
+        >
+          {section.sections.map((child, index) => (
+            <SkeletonEntry
+              key={child.title ?? index}
+              section={child}
+              schema={schema}
+              inRail={inRail || Boolean(section.sticky)}
+            />
+          ))}
+        </FormContainer>
+      </Box>
+    );
+  }
+
+  const { useShorthand, gridContainer } = sectionGrid(section);
+  const fields = visibleFields(section, schema);
+  const body = (
+    <FormContainer
+      stackContainer={section.stackContainer}
+      gridContainer={gridContainer}
+      grids={fieldGrids(fields, schema, useShorthand)}
+    >
+      {fields.map((field, index) => (
+        <SkeletonField key={fieldName(field) ?? index} prop={schema.properties[fieldName(field)]} />
+      ))}
+    </FormContainer>
+  );
+
+  if (section.bare) return body;
+  return (
+    <Card
+      variant="base"
+      sx={{
+        p: section.iconBadge ? "18px" : inRail ? "20px" : "22px 24px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}
+    >
+      {section.title ? <Skeleton variant="text" width={130} height={20} /> : null}
+      {body}
+    </Card>
+  );
+}
+
 function FormSectionsSkeleton({
   schema,
   sections,
+  sectionsContainer,
   hasHeader,
   hasSidePanel,
+  hasFooterActions,
 }: {
   schema: JsonSchema;
   sections: FormSection[];
+  sectionsContainer?: FormWithSectionsProps["sectionsContainer"];
   hasHeader: boolean;
   hasSidePanel: boolean;
+  /** Actions sit under the form rather than in the header — stand them in there. */
+  hasFooterActions: boolean;
 }) {
+  const footer = hasFooterActions ? (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px", pt: "2px" }}>
+      <Skeleton variant="rounded" width={92} height={38} sx={{ borderRadius: "999px" }} />
+      <Skeleton variant="rounded" width={132} height={38} sx={{ borderRadius: "999px" }} />
+    </Box>
+  ) : null;
+  const tree = (
+    <FormContainer
+      stackContainer={sectionsContainer?.stackContainer ?? { spacing: 2 }}
+      gridContainer={sectionsContainer?.gridContainer}
+      grids={sections.map((section) => section.grid)}
+    >
+      {sections.map((section, index) => (
+        <SkeletonEntry
+          key={section.title ?? index}
+          section={section}
+          schema={schema}
+          inRail={false}
+        />
+      ))}
+    </FormContainer>
+  );
+
   return (
     <Box>
       {hasHeader ? (
@@ -92,47 +195,21 @@ function FormSectionsSkeleton({
           <Skeleton variant="text" width={320} height={18} />
         </Box>
       ) : null}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: hasSidePanel ? "8fr 4fr" : "1fr" },
-          gap: "16px",
-          alignItems: "start",
-        }}
-      >
-        <Box sx={{ minWidth: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
-          <FormContainer stackContainer={{ spacing: 2 }} grids={[]}>
-            {leafSections(sections).map((section, index) => {
-              const { useShorthand, gridContainer } = sectionGrid(section);
-              return (
-                <Card
-                  key={section.title ?? index}
-                  variant="base"
-                  sx={{ p: "20px 22px", display: "flex", flexDirection: "column", gap: "16px" }}
-                >
-                  {section.title ? <Skeleton variant="text" width={130} height={20} /> : null}
-                  <FormContainer
-                    stackContainer={section.stackContainer}
-                    gridContainer={gridContainer}
-                    grids={fieldGrids(section, schema, useShorthand)}
-                  >
-                    {(section.fields ?? []).map((field, fieldIndex) => (
-                      <SkeletonField
-                        key={fieldName(field) ?? fieldIndex}
-                        prop={schema.properties[fieldName(field)]}
-                      />
-                    ))}
-                  </FormContainer>
-                </Card>
-              );
-            })}
-          </FormContainer>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-            <Skeleton variant="rounded" width={92} height={38} sx={{ borderRadius: "999px" }} />
-            <Skeleton variant="rounded" width={132} height={38} sx={{ borderRadius: "999px" }} />
+      {hasSidePanel ? (
+        // Backward-compat display side panel; config-driven forms carry their
+        // own columns in `sections` and take the branch below.
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "8fr 4fr" },
+            gap: "16px",
+            alignItems: "start",
+          }}
+        >
+          <Box sx={{ minWidth: 0, display: "flex", flexDirection: "column", gap: "16px" }}>
+            {tree}
+            {footer}
           </Box>
-        </Box>
-        {hasSidePanel ? (
           <Card
             variant="base"
             sx={{ p: "20px", display: "flex", flexDirection: "column", gap: "13px" }}
@@ -146,11 +223,19 @@ function FormSectionsSkeleton({
               </Box>
             ))}
           </Card>
-        ) : null}
-      </Box>
+        </Box>
+      ) : (
+        <>
+          {tree}
+          {footer}
+        </>
+      )}
     </Box>
   );
 }
+
+/** Widgets that render text only — never part of the submitted payload. */
+const DISPLAY_ONLY = new Set<string | undefined>(["heading", "callout"]);
 
 const savePop = keyframes`0%{transform:scale(.6);opacity:.5}60%{transform:scale(1.15)}100%{transform:scale(1)}`;
 
@@ -202,6 +287,22 @@ export function FormWithSectionsRenderer({
   });
   const { control, handleSubmit, getValues, reset, formState } = methods;
   const { hiddenSet, disabledSet } = useFieldEffects(schema, control, methods.setValue);
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+
+  // `useForm` reads `defaultValues` once, at mount. An edit screen mounts this
+  // before its record has loaded (it needs the schema to draw the skeleton), so
+  // the values that arrive afterwards would never reach the fields. Seed them
+  // when they actually change — compared by content, since the caller builds a
+  // fresh object every render.
+  const initialRef = useRef(initial);
+  initialRef.current = initial;
+  const defaultsKey = JSON.stringify(defaultValues ?? {});
+  const seeded = useRef(defaultsKey);
+  useEffect(() => {
+    if (seeded.current === defaultsKey) return;
+    seeded.current = defaultsKey;
+    reset(initialRef.current);
+  }, [defaultsKey, reset]);
 
   // A leaf section renders as one card of fields; a `sections` group lays its
   // children out through the same config-driven FormContainer (grid or stack),
@@ -235,7 +336,21 @@ export function FormWithSectionsRenderer({
       ? { spacing: 2, columns: evenColumns }
       : section.gridContainer;
     // Condition-hidden fields drop out so their grid cell collapses (no gap).
-    const fields = (section.fields ?? []).filter((field) => !hiddenSet.has(fieldName(field)));
+    // Secondary fields stay folded away until the section is expanded.
+    const moreOpen = expanded.has(String(key));
+    const isMore = (name: string) => (section.moreFields ?? []).includes(name);
+    // A field named as another's `leading` is drawn inside that field, not as a
+    // cell of its own.
+    const led = new Set(
+      Object.values(schema.properties)
+        .map((prop) => prop.leading)
+        .filter(Boolean),
+    );
+    const fields = (section.fields ?? [])
+      .filter((field) => !hiddenSet.has(fieldName(field)))
+      .filter((field) => moreOpen || !isMore(fieldName(field)))
+      .filter((field) => fieldName(field) !== section.headerField)
+      .filter((field) => !led.has(fieldName(field)));
     const body = fields.length ? (
       <FormContainer
         stackContainer={section.stackContainer}
@@ -258,6 +373,7 @@ export function FormWithSectionsRenderer({
               key={name}
               name={name}
               prop={required ? { ...prop, required } : prop}
+              leadingProp={prop.leading ? schema.properties[prop.leading] : undefined}
               control={control}
               t={t}
               widgets={widgets}
@@ -266,6 +382,50 @@ export function FormWithSectionsRenderer({
           );
         })}
       </FormContainer>
+    ) : null;
+
+    const headerProp = section.headerField ? schema.properties[section.headerField] : undefined;
+    const headerFieldNode =
+      section.headerField && headerProp ? (
+        <Box sx={{ flex: "none" }}>
+          <Field
+            name={section.headerField}
+            prop={headerProp}
+            control={control}
+            t={t}
+            widgets={widgets}
+            disabled={disabledSet.has(section.headerField)}
+          />
+        </Box>
+      ) : null;
+
+    const moreToggle = section.moreFields?.length ? (
+      <Box
+        onClick={() =>
+          setExpanded((current) => {
+            const next = new Set(current);
+            const id = String(key);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+          })
+        }
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "5px",
+          mt: "2px",
+          fontSize: 12,
+          fontWeight: 600,
+          color: "surface.textSecondary",
+          cursor: "pointer",
+          alignSelf: "flex-start",
+          "&:hover": { color: "text.primary" },
+        }}
+      >
+        <IconRenderer name={moreOpen ? "expand-less" : "expand-more"} size={15} />
+        {t(moreOpen ? (section.moreLabel?.hide ?? "") : (section.moreLabel?.show ?? ""))}
+      </Box>
     ) : null;
 
     // A `bare` section is just a layout slot — the field (e.g. a callout) draws
@@ -331,30 +491,43 @@ export function FormWithSectionsRenderer({
               </Box>
             </Box>
           ) : (
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                {section.icon ? (
-                  <Box sx={{ color: "surface.accentBright", flex: "none", display: "flex" }}>
-                    <IconRenderer name={section.icon} size={17} />
-                  </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "10px",
+              }}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: "9px" }}>
+                  {section.icon ? (
+                    <Box sx={{ color: "surface.accentBright", flex: "none", display: "flex" }}>
+                      <IconRenderer name={section.icon} size={17} />
+                    </Box>
+                  ) : null}
+                  <Typography
+                    sx={
+                      inRail
+                        ? { fontSize: 14.5, fontWeight: 600 }
+                        : { fontSize: 15, fontWeight: 700 }
+                    }
+                  >
+                    {t(section.title)}
+                  </Typography>
+                </Box>
+                {section.description ? (
+                  <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}>
+                    {t(section.description)}
+                  </Typography>
                 ) : null}
-                <Typography
-                  sx={
-                    inRail ? { fontSize: 14.5, fontWeight: 600 } : { fontSize: 15, fontWeight: 700 }
-                  }
-                >
-                  {t(section.title)}
-                </Typography>
               </Box>
-              {section.description ? (
-                <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "4px" }}>
-                  {t(section.description)}
-                </Typography>
-              ) : null}
+              {headerFieldNode}
             </Box>
           )
         ) : null}
         {body}
+        {moreToggle}
       </Card>
     );
   };
@@ -366,7 +539,12 @@ export function FormWithSectionsRenderer({
   const submitHandler = async (values: FieldValues) => {
     const addAnother = addAnotherRef.current;
     addAnotherRef.current = false;
-    await onSubmit(values as FormValues, { addAnother });
+    // `heading` and `callout` are display-only — they seed a value like any
+    // other property but hold nothing worth sending.
+    const payload = Object.fromEntries(
+      Object.entries(values).filter(([name]) => !DISPLAY_ONLY.has(schema.properties[name]?.widget)),
+    );
+    await onSubmit(payload as FormValues, { addAnother });
     // Add-another clears the form and stays; the caller skips navigation.
     if (addAnother) {
       reset(initial);
@@ -486,8 +664,10 @@ export function FormWithSectionsRenderer({
       <FormSectionsSkeleton
         schema={schema}
         sections={sections}
+        sectionsContainer={sectionsContainer}
         hasHeader={Boolean(title || description)}
         hasSidePanel={Boolean(sidePanel)}
+        hasFooterActions={actionsPlacement === "footer"}
       />
     );
   }

@@ -14,10 +14,13 @@ import {
   type Attachment,
   AttachmentsWidget,
   type AttachmentUploader,
+  FormModal,
   type FormValues,
   FormWithSectionsRenderer,
   IconRenderer,
+  invalidateOptions,
   Modal,
+  SelectWidget,
   useModal,
   useToast,
 } from "@recruit/shared";
@@ -38,27 +41,20 @@ interface Contact {
   mobile: string;
   linkedin: string;
   twitter: string;
+  website: string;
+  github: string;
   notes: string;
   source: string;
+  preferredChannel: string;
+  timezone: string;
+  assistant: string;
   attachments: Attachment[];
   clientId: string;
   ownerId: string;
   isPrimary: boolean;
   emailOptOut: boolean;
+  phoneOptOut: boolean;
 }
-
-const SOURCES = [
-  "added_by_user",
-  "referral",
-  "linkedin",
-  "inbound",
-  "event",
-  "cold_outreach",
-  "import",
-  "api",
-  "other",
-];
-const SALUTATIONS = ["", "mr", "ms", "mrs", "dr", "mx"];
 
 const str = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 /** Does a phone field hold an actual number (not just a dial code)? */
@@ -103,30 +99,44 @@ export function ContactFormComponent({ id }: { id: string }) {
     const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
     return (file, onProgress) => mut.uploadAsset?.(file, onProgress) as Promise<Attachment>;
   }, [mutation]);
+  const quickClient = useModal<string>();
+  const pickClient = useRef<((id: string) => void) | null>(null);
+
+  const saveQuickClient = async (values: FormValues) => {
+    const mut = mutation as Record<string, ((body: unknown) => Promise<unknown>) | undefined>;
+    const created = (await mut.createClient?.(values)) as { data?: { id?: string } } | undefined;
+    // The picker caches its options by url — drop them so it sees the new row.
+    invalidateOptions("/clients");
+    const newId = created?.data?.id;
+    if (newId) pickClient.current?.(newId);
+    show(t("toast.clientCreated", { name: String(values.name ?? "") }));
+  };
+
   const widgets = useMemo(
     () => ({
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
         <AttachmentsWidget {...props} uploader={uploader} />
       ),
+      select: (props: Parameters<typeof SelectWidget>[0]) =>
+        props.name === "clientId" ? (
+          <SelectWidget
+            {...props}
+            createOption={{
+              icon: "domain-add",
+              persistent: true,
+              label: () => t("quickClient.create"),
+              onCreate: (query: string) => {
+                pickClient.current = (newId: string) => props.field.onChange(newId);
+                quickClient.open(query);
+              },
+            }}
+          />
+        ) : (
+          <SelectWidget {...props} />
+        ),
     }),
-    [uploader],
+    [uploader, quickClient, t],
   );
-
-  const schema = useMemo(() => {
-    if (!config.schema) return config.schema;
-    const { source, salutation } = config.schema.properties;
-    return {
-      ...config.schema,
-      properties: {
-        ...config.schema.properties,
-        source: { ...source, enumNames: SOURCES.map((s) => t(`source.${s}`)) },
-        salutation: {
-          ...salutation,
-          enumNames: SALUTATIONS.map((s) => t(`salutation.${s || "none"}`)),
-        },
-      },
-    };
-  }, [config.schema, t]);
 
   if (!config.schema) return null;
   const loading = isEdit && (isLoading || !data);
@@ -149,8 +159,8 @@ export function ContactFormComponent({ id }: { id: string }) {
 
   const save = async (all: FormValues) => {
     const mut = mutation as Record<string, ((query?: unknown) => Promise<unknown>) | undefined>;
-    // `tips` is a display-only callout — never persisted.
-    const { tips: _tips, ...values } = all;
+    // The attachments category only tags the picker — it isn't a contact field.
+    const { attachmentCategory: _category, ...values } = all;
 
     // Cross-field rules ajv can't express per-field.
     const email = normalizeEmail(str(values.email));
@@ -216,12 +226,20 @@ export function ContactFormComponent({ id }: { id: string }) {
           mobile: data.mobile,
           linkedin: data.linkedin,
           twitter: data.twitter,
+          website: data.website,
+          github: data.github,
           notes: data.notes,
           attachments: data.attachments ?? [],
           ownerId: data.ownerId,
-          source: data.source,
+          // A blank means the record predates the field — let the schema default
+          // fill it rather than showing an empty picker.
+          source: data.source || undefined,
+          preferredChannel: data.preferredChannel || undefined,
+          timezone: data.timezone,
+          assistant: data.assistant,
           isPrimary: data.isPrimary,
           emailOptOut: data.emailOptOut,
+          phoneOptOut: data.phoneOptOut,
         }
       : {};
 
@@ -232,7 +250,7 @@ export function ContactFormComponent({ id }: { id: string }) {
         id={id}
         title={isEdit ? "editTitle" : "newTitle"}
         description={isEdit ? "editDescription" : "newDescription"}
-        schema={schema}
+        schema={config.schema}
         sections={config.sections}
         sectionsContainer={config.sectionsContainer}
         defaultValues={defaultValues}
@@ -326,6 +344,21 @@ export function ContactFormComponent({ id }: { id: string }) {
           ))}
         </Box>
       </Modal>
+
+      <FormModal
+        id={id}
+        open={quickClient.isOpen}
+        onClose={quickClient.close}
+        title={t("quickClient.title")}
+        description={t("quickClient.description")}
+        width={460}
+        schema={config.quickClient}
+        defaultValues={{ name: quickClient.data ?? "" }}
+        gridContainer={{ columns: 12, spacing: 2 }}
+        onSubmit={saveQuickClient}
+        submitLabel="quickClient.submit"
+        cancelLabel="actions.cancel"
+      />
     </Box>
   );
 }

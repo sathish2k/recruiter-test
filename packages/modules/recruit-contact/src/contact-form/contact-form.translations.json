@@ -7,11 +7,13 @@
   "sections": {
     "info": "Contact information",
     "social": "Social links",
-    "description": "Description",
+    "description": "Recruiter notes",
     "attachments": "Attachments",
-    "attachmentsHint": "NDAs, org charts or anything tied to this person",
-    "other": "Other info",
-    "otherHint": "Ownership, source and mailing preferences"
+    "attachmentsHint": "NDAs, org charts & other documents · PDF, DOCX, XLSX, PNG, JPG · Max 25 MB",
+    "settings": "Contact settings",
+    "settingsHint": "Ownership, communication preferences and status",
+    "moreSocial": "More social links",
+    "hideSocial": "Hide social links"
   },
   "fields": {
     "salutation": "Salutation",
@@ -36,9 +38,9 @@
     "emailPlaceholder": "ana@nortech.io",
     "emailInvalid": "Enter a valid email address",
     "emailMax": "Keep the email under 255 characters",
-    "secondaryEmail": "Secondary email",
+    "secondaryEmail": "Alternate email",
     "secondaryEmailPlaceholder": "Optional",
-    "phone": "Work phone",
+    "phone": "Direct phone",
     "phonePlaceholder": "98450 12345",
     "phoneInvalid": "Enter a valid phone number for the selected country",
     "mobile": "Mobile",
@@ -47,28 +49,39 @@
     "linkedinPlaceholder": "linkedin.com/in/ana-kelmendi",
     "twitter": "X (formerly Twitter)",
     "twitterPlaceholder": "handle",
-    "notes": "Description",
+    "notes": "Recruiter notes",
     "notesPlaceholder": "Context for the team — decision style, preferences, history…",
     "notesMax": "Keep the description under 5000 characters",
     "attachments": "Attachments",
-    "others": "Others",
+    "others": "Additional documents",
     "attachmentsBrowse": "Browse or drop a file",
     "owner": "Contact owner",
     "ownerPlaceholder": "Search team…",
     "source": "Source",
-    "isPrimary": "Primary contact for this client",
-    "emailOptOut": "Email opt-out"
+    "isPrimary": "Primary client contact",
+    "emailOptOut": "Email opt-out",
+    "website": "Personal website",
+    "websitePlaceholder": "https://…",
+    "github": "GitHub",
+    "githubPlaceholder": "github.com/username",
+    "preferredChannel": "Preferred communication",
+    "timezone": "Timezone",
+    "timezonePlaceholder": "Select timezone",
+    "assistant": "Assistant",
+    "assistantPlaceholder": "Search contacts…",
+    "attachmentCategory": "Category",
+    "phoneOptOut": "Phone opt-out",
+    "optOutWarning": "Excluded from weekly client reports and bulk emails. Direct messages still allowed.",
+    "channelLocked": "— add details first"
   },
   "source": {
-    "added_by_user": "Added by user",
-    "referral": "Referral",
+    "manual": "Manual",
+    "outlook_sync": "Outlook sync",
+    "gmail_sync": "Gmail sync",
     "linkedin": "LinkedIn",
-    "inbound": "Inbound",
-    "event": "Event",
-    "cold_outreach": "Cold outreach",
-    "import": "Import",
+    "csv_import": "CSV import",
     "api": "API",
-    "other": "Other"
+    "candidate_referral": "Candidate referral"
   },
   "errors": {
     "contactMethod": "Add at least one way to reach this person — email, work phone or mobile.",
@@ -76,15 +89,15 @@
   },
   "salutation": {
     "none": "None",
-    "mr": "Mr",
-    "ms": "Ms",
-    "mrs": "Mrs",
-    "dr": "Dr",
-    "mx": "Mx"
+    "mr": "Mr.",
+    "ms": "Ms.",
+    "mrs": "Mrs.",
+    "dr": "Dr.",
+    "prof": "Prof."
   },
   "tips": {
     "title": "Primary contact",
-    "body": "The primary contact receives candidate submissions, weekly reports and invoice notifications. Other contacts can still be selected during submissions and interview coordination."
+    "body": "Receives candidate submissions, status updates and invoice notifications by default. Any contact can still be picked during submissions."
   },
   "duplicate": {
     "title": "Possible duplicate contact",
@@ -100,6 +113,40 @@
   },
   "toast": {
     "created": "Contact added",
-    "updated": "Contact updated"
+    "updated": "Contact updated",
+    "clientCreated": "{{name}} added as a client"
+  },
+  "channels": {
+    "email": "Email",
+    "mobile": "Mobile",
+    "whatsapp": "WhatsApp",
+    "linkedin": "LinkedIn",
+    "teams": "Teams"
+  },
+  "quickClient": {
+    "title": "Create client",
+    "description": "Just the essentials — you stay on this contact.",
+    "create": "Create new client",
+    "submit": "Create client",
+    "name": "Client name",
+    "namePlaceholder": "e.g. Acme Technologies",
+    "nameRequired": "Client name is required",
+    "website": "Website",
+    "websitePlaceholder": "acme.com",
+    "industry": "Industry",
+    "industryPlaceholder": "e.g. Technology",
+    "phone": "Direct phone",
+    "phonePlaceholder": "+91 98450 12345"
+  },
+  "groups": {
+    "ownership": "OWNERSHIP",
+    "communication": "COMMUNICATION",
+    "preferences": "PREFERENCES"
+  },
+  "attachmentCategories": {
+    "nda": "NDA",
+    "orgChart": "Org chart",
+    "businessCard": "Business card",
+    "other": "Other"
   }
 }

@@ -33,4 +33,7 @@ export const contactFormDatasource = (): DatasourceInstance => ({
       type: file?.type,
     };
   },
+  /** Quick-creates a client from the contact form, returning the new row. */
+  createClient: async (body?: Record<string, unknown>) =>
+    (await httpClient.post("/clients", body)).data,
 });

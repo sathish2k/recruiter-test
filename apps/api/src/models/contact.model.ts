@@ -40,6 +40,11 @@ export const contact = pgTable("contact", {
   title: text("title"),
   department: text("department"),
   linkedin: text("linkedin"),
+  website: text("website"),
+  github: text("github"),
+  preferredChannel: text("preferred_channel"),
+  timezone: text("timezone"),
+  assistant: text("assistant"),
   twitter: text("twitter"),
   source: text("source"),
   /** Free-form "Description" — context for the team. */
@@ -51,6 +56,8 @@ export const contact = pgTable("contact", {
   isPrimary: boolean("is_primary").notNull().default(false),
   /** Excluded from weekly client reports and bulk emails. */
   emailOptOut: boolean("email_opt_out").notNull().default(false),
+  /** Excluded from call campaigns. */
+  phoneOptOut: boolean("phone_opt_out").notNull().default(false),
   archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

@@ -46,6 +46,10 @@ export interface SearchableSelectFieldProps {
     label: (query: string) => string;
     icon?: string;
     onCreate: (query: string) => void;
+    /** Pin the row open regardless of what is typed — the design offers
+     * "Create new client" as a standing option, not only a fallback for a
+     * query that matched nothing. */
+    persistent?: boolean;
   };
 }
 
@@ -122,7 +126,7 @@ export function SearchableSelectField({
   const query = search.trim();
   const canCreate =
     Boolean(createOption) &&
-    query.length > 1 &&
+    (createOption?.persistent || query.length > 1) &&
     !all.some((option) => option.label.toLowerCase() === query.toLowerCase());
 
   const showNoneRow =

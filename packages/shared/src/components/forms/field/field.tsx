@@ -37,7 +37,7 @@ import type {
   Widgets,
 } from "../types";
 import { UploadWidget } from "../upload/upload";
-import { FieldOptionalContext, FieldRequiredContext } from "./field-shell";
+import { FieldLabel, FieldOptionalContext, FieldRequiredContext } from "./field-shell";
 
 /**
  * Widget name → component. Adding a field type means writing a component that
@@ -93,6 +93,7 @@ export function widgetFor(prop: JsonSchemaProperty): Widget {
 export function Field({
   name,
   prop,
+  leadingProp,
   control,
   t,
   widgets,
@@ -100,12 +101,52 @@ export function Field({
 }: {
   name: string;
   prop: JsonSchemaProperty;
+  /** Resolved by the renderer from `prop.leading` — the small control drawn
+   * before this field, under this field's label. */
+  leadingProp?: JsonSchemaProperty;
   control: Control<FieldValues>;
   t: Translate;
   widgets?: Widgets;
   /** Set by the renderer from `disabledWhen` / a checkbox's `syncFields`. */
   disabled?: boolean;
 }) {
+  // Two controls, one label: the outer shell owns the label and the pair render
+  // label-less inside it (the design's salutation + first name).
+  if (prop.leading && leadingProp) {
+    return (
+      <FieldRequiredContext.Provider value={Boolean(prop.required)}>
+        <FieldOptionalContext.Provider
+          value={prop.optional ? t("fields.optional", "optional") : null}
+        >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+            <FieldLabel label={t(prop.title ?? name)} />
+            <Box sx={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+              <Box sx={{ flex: "none" }}>
+                <Field
+                  name={prop.leading}
+                  prop={{ ...leadingProp, hideLabel: true }}
+                  control={control}
+                  t={t}
+                  widgets={widgets}
+                />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Field
+                  name={name}
+                  prop={{ ...prop, leading: undefined, hideLabel: true }}
+                  control={control}
+                  t={t}
+                  widgets={widgets}
+                  disabled={disabled}
+                />
+              </Box>
+            </Box>
+          </Box>
+        </FieldOptionalContext.Provider>
+      </FieldRequiredContext.Provider>
+    );
+  }
+
   // Custom is checked first, so a screen can add a widget the form layer lacks
   // — or override a built-in — without touching WIDGETS.
   const key = widgetFor(prop);
@@ -123,7 +164,7 @@ export function Field({
         // explains what "Prospect" means only while Prospect is chosen.
         const conditionalHelp = resolved.helpWhen?.[String(field.value ?? "")];
         const shown = conditionalHelp ? { ...resolved, help: conditionalHelp } : resolved;
-        const props: WidgetProps = { name, prop: shown, field, fieldState, t, disabled };
+        const props: WidgetProps = { name, prop: shown, field, fieldState, t, disabled, control };
         // Called, not mounted — an inline arrow in a `widgets` literal is a new
         // function identity every render, which as a component type would
         // remount the field (and drop focus) on each keystroke. The fragment

@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useWatch } from "react-hook-form";
+import { evalCondition } from "../conditions";
 import { FieldShell } from "../field/field-shell";
 import type { SelectOption, WidgetProps } from "../types";
 import { SearchableSelectField } from "./searchable-select";
@@ -16,6 +19,7 @@ export function SelectWidget({
   fieldState,
   t,
   disabled,
+  control,
   createOption,
 }: WidgetProps & {
   /** Accent "create …" row pinned under the options (design behaviour). Passed
@@ -25,9 +29,21 @@ export function SelectWidget({
     label: (query: string) => string;
     icon?: string;
     onCreate: (query: string) => void;
+    /** Keep the row visible whatever is typed. */
+    persistent?: boolean;
   };
 }) {
   const error = fieldState.error?.message ? t(fieldState.error.message) : undefined;
+  // Only the fields the gates name are watched, so unrelated keystrokes don't
+  // re-render this control.
+  const gates = prop.optionEnabledWhen;
+  const gateNames = gates ? [...new Set(Object.values(gates).map((gate) => gate.field))] : [];
+  const watched = useWatch({
+    control,
+    name: gateNames.length ? gateNames : [" __none__"],
+  }) as unknown[];
+  const gateValues = Object.fromEntries(gateNames.map((name, index) => [name, watched[index]]));
+
   const options: SelectOption[] = (prop.enum ?? []).map((option, index) => {
     const raw = String(option);
     const label = prop.enumNames?.[index]
@@ -35,8 +51,28 @@ export function SelectWidget({
       : prop.enumL10n
         ? t(`${prop.enumL10n}.${raw || "none"}`)
         : t(raw);
-    return { value: raw, label, dot: prop.optionDots?.[raw] };
+    const locked = gates?.[raw] ? !evalCondition(gates[raw], gateValues) : false;
+    return {
+      value: raw,
+      label,
+      hint: locked && prop.optionDisabledHint ? t(prop.optionDisabledHint) : undefined,
+      dot: prop.optionDots?.[raw],
+      disabled: locked,
+    };
   });
+
+  // A gated select can hold a value its own fields no longer justify (the
+  // default is "email" before an email is typed) or none at all (an older
+  // record saved before the field existed). Either way, fall to the first
+  // option the form has earned rather than showing an unpickable or blank one.
+  const current = typeof field.value === "string" ? field.value : "";
+  const firstOpen = options.find((option) => !option.disabled)?.value;
+  const stranded =
+    Boolean(gates) && !options.some((option) => option.value === current && !option.disabled);
+  const { onChange } = field;
+  useEffect(() => {
+    if (stranded && firstOpen !== undefined) onChange(firstOpen);
+  }, [stranded, firstOpen, onChange]);
 
   return (
     <FieldShell
@@ -47,7 +83,7 @@ export function SelectWidget({
     >
       {prop.optionSource || prop.searchable ? (
         <SearchableSelectField
-          value={typeof field.value === "string" ? field.value : ""}
+          value={current}
           onChange={field.onChange}
           onBlur={field.onBlur}
           source={prop.optionSource}
@@ -64,11 +100,12 @@ export function SelectWidget({
         />
       ) : (
         <SelectField
-          value={typeof field.value === "string" ? field.value : ""}
+          value={current}
           onChange={field.onChange}
           onBlur={field.onBlur}
           options={options}
           disabled={disabled}
+          look={prop.selectVariant}
           error={!!fieldState.error}
         />
       )}
