@@ -21,6 +21,19 @@ export interface JobAttachment {
   type?: string;
 }
 
+/**
+ * A disqualifying question asked before a candidate reaches the pipeline.
+ * `expected` is the answer that keeps them in it; anything else knocks out.
+ */
+export interface KnockoutQuestion {
+  question: string;
+  expected: "yes" | "no";
+}
+
+/** Stage id → the days this requirement allows in that stage, overriding the
+ * workspace default on `pipeline_stage`. */
+export type StageSlas = Record<string, number>;
+
 /** An open requirement the agency is recruiting for, under a client. */
 export const job = pgTable("job", {
   id: text("id").primaryKey(),
@@ -60,9 +73,13 @@ export const job = pgTable("job", {
   screeningCriteria: text("screening_criteria"),
   matchThreshold: integer("match_threshold").notNull().default(80),
   autoAdvance: boolean("auto_advance").notNull().default(true),
-  knockoutCount: integer("knockout_count").notNull().default(4),
+  knockoutQuestions: jsonb("knockout_questions").$type<KnockoutQuestion[]>(),
+  /** Per-stage day limits for this requirement only; unset stages fall back to
+   * `pipeline_stage.sla_days`. */
+  stageSlas: jsonb("stage_slas").$type<StageSlas>(),
   dailyDigest: boolean("daily_digest").notNull().default(true),
-  /** System reference shown to the client, e.g. REQ-2041. */
+  /** System reference shown to the client, e.g. REQ-0041. Assigned on create
+   * from the workspace's requirement prefix — never edited. */
   reference: text("reference"),
   roleCategory: text("role_category"),
   workModel: text("work_model"),

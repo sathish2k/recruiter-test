@@ -1,30 +1,69 @@
 {
   "title": "Email templates",
-  "subtitle": "Automated emails sent to candidates across the hiring flow.",
+  "subtitle": "Every email the platform sends — edit once, and it applies everywhere.",
   "templatesLabel": "TEMPLATES",
   "newTemplate": "+ New",
-  "enabled": "Enabled",
-  "disabled": "Disabled",
+  "searchTemplates": "Search templates…",
+  "noTemplates": "No templates match",
   "namePlaceholder": "Template name",
-  "subjectLabel": "Subject",
+  "nameTitle": "Template name — click to edit",
+  "subjectLabel": "Subject line",
   "subjectPlaceholder": "Email subject line",
-  "variablesLabel": "Insert variable",
-  "variablesHint": "Click a variable to insert it into the focused field.",
+  "preheaderLabel": "Preheader",
+  "preheaderHint": "Shown next to the subject in the inbox, never inside the email.",
+  "headingLabel": "Heading",
+  "headingPlaceholder": "The big line at the top of the email",
+  "ctaLabel": "Button label",
+  "insertVariable": "Insert variable",
+  "insertVariableHint": "Filled with real data when the email is sent",
+  "searchVariables": "Search variables…",
+  "noVariables": "No variable matches",
   "bodyLabel": "Body",
+  "bodyHint": "— blank line = new paragraph, variables allowed",
   "bodyPlaceholder": "Write your email…",
-  "bodyHint": "A blank line starts a new paragraph.",
   "save": "Save changes",
-  "delete": "Delete",
-  "previewLabel": "LIVE PREVIEW",
-  "resetDefault": "Reset to default",
-  "sendTest": "Send test to me",
+  "delete": "Delete template",
   "empty": "Select a template to start editing.",
-  "toast": {
-    "saved": "Template saved",
-    "created": "Template created",
-    "deleted": "Template deleted",
-    "reset": "Reverted to last saved",
-    "testSent": "Test email sent to you"
+  "lockedStatus": "Account emails always send — recipients could not verify their address or reset a password otherwise.",
+  "status": {
+    "enabled": "Enabled",
+    "draft": "Draft",
+    "disabled": "Disabled"
+  },
+  "preview": {
+    "label": "Live preview",
+    "desktop": "Desktop",
+    "mobile": "Mobile",
+    "dataLabel": "PREVIEW DATA — edit sample values",
+    "justNow": "just now",
+    "to": "to",
+    "codeLabel": "YOUR CODE",
+    "fallback": "Button not working? Paste this into your browser:",
+    "footerWhyAuth": "This is a transactional email about your {workspace} account. You cannot unsubscribe from it.",
+    "footerWhyBiz": "You're receiving this because you're in conversation with {workspace} about a role.",
+    "caption": "Variables like {candidate_name} are filled with the sample data above · the subject line and preheader render in the inbox, not in the email"
+  },
+  "resetDefault": "Reset to default",
+  "resetTitle": "Reset this template?",
+  "resetDescription": "The subject, heading and body go back to the copy this template shipped with. Your edits are lost.",
+  "cancel": "Cancel",
+  "confirmReset": "Reset template",
+  "sendTest": "Send test",
+  "recipient": "Recipient",
+  "recipientPlaceholder": "teammate@example.com",
+  "send": "Send",
+  "toolbar": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "link": "Insert link",
+    "bullet": "Bullet list",
+    "divider": "Divider"
+  },
+  "ai": {
+    "improve": "Improve",
+    "shorten": "Shorten",
+    "professional": "Make professional",
+    "rewrite": "Rewrite"
   },
   "categories": {
     "authentication": "AUTHENTICATION",
@@ -33,6 +72,22 @@
     "offers": "OFFERS",
     "custom": "CUSTOM"
   },
-  "searchTemplates": "Search templates…",
-  "noTemplates": "No templates match"
+  "variableGroups": {
+    "candidate": "CANDIDATE",
+    "client": "CLIENT",
+    "job": "JOB",
+    "recruiter": "RECRUITER",
+    "workspace": "WORKSPACE"
+  },
+  "toast": {
+    "saved": "Template saved",
+    "created": "Template created",
+    "deleted": "Template deleted",
+    "reset": "Reset to default",
+    "statusChanged": "Template {{status}}",
+    "testSent": "Test email sent",
+    "testFailed": "Could not send the test email",
+    "aiApplied": "AI rewrote the draft",
+    "aiFailed": "The AI could not rewrite that"
+  }
 }

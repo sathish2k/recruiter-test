@@ -141,8 +141,19 @@ export function SearchableSelectField({
     <>
       <Box
         ref={controlRef}
+        // Roles rather than a native select: the control is a div, so without
+        // these the value is unreachable to a screen reader — and to any test.
+        role="combobox"
+        aria-expanded={Boolean(anchor)}
+        aria-disabled={disabled}
+        tabIndex={disabled ? -1 : 0}
         onClick={() => {
           if (!disabled) setAnchor(controlRef.current);
+        }}
+        onKeyDown={(event) => {
+          if (disabled || (event.key !== "Enter" && event.key !== " ")) return;
+          event.preventDefault();
+          setAnchor(controlRef.current);
         }}
         sx={{
           display: "flex",
@@ -343,6 +354,8 @@ function OptionRow({
 }) {
   return (
     <Box
+      role="option"
+      aria-selected={selected}
       onClick={onPick}
       sx={{
         display: "flex",

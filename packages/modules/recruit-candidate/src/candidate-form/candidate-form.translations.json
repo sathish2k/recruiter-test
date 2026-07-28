@@ -158,6 +158,8 @@
   },
   "source": {
     "added_by_user": "Added by user",
+    "resume_upload": "CV upload",
+    "csv_import": "CSV import",
     "referral": "Referral",
     "inbound": "Inbound enquiry",
     "outbound": "Outbound",
@@ -181,7 +183,8 @@
     "created": "Candidate created",
     "updated": "Candidate updated",
     "noResume": "Attach a resume first — skills are read back out of it.",
-    "nameFirst": "Add a name first — the formatted resume is built from this form."
+    "nameFirst": "Add a name first — the formatted resume is built from this form.",
+    "merged": "Merged into {{name}}"
   },
   "noticePeriods": {
     "immediate": "Immediate",
@@ -236,5 +239,23 @@
     "open_to_offers": "Open to offers",
     "not_looking": "Not looking",
     "placed": "Placed"
+  },
+  "duplicate": {
+    "warning": "Possible duplicate — {{name}} already exists in this workspace (matched on {{on}}).",
+    "review": "Review & merge",
+    "dismiss": "Not a duplicate",
+    "createAnyway": "Create anyway",
+    "on": {
+      "email": "email",
+      "phone": "phone",
+      "linkedin": "LinkedIn"
+    }
+  },
+  "merge": {
+    "title": "Merge into the existing candidate",
+    "body": "Choose which value to keep for each field. {{name}} is kept; this record is archived.",
+    "confirm": "Merge",
+    "noConflicts": "Nothing conflicts — the empty fields will be filled from this form.",
+    "fills": "{{count}} empty field(s) will be filled from this form."
   }
 }

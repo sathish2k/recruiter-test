@@ -74,8 +74,8 @@
     "timeFormat": "Time format",
     "candidatePrefix": "Candidate ID prefix",
     "candidatePrefixPlaceholder": "CAN-",
-    "jobPrefix": "Job ID prefix",
-    "jobPrefixPlaceholder": "JOB-",
+    "jobPrefix": "Requirement ID prefix",
+    "jobPrefixPlaceholder": "REQ-",
     "clientPrefix": "Client ID prefix",
     "clientPrefixPlaceholder": "CLI-",
     "invoicePrefix": "Invoice prefix",
@@ -93,7 +93,7 @@
   "previews": {
     "label": "Preview",
     "candidatePrefix": "000123",
-    "jobPrefix": "000045",
+    "jobPrefix": "0045",
     "clientPrefix": "000102",
     "invoicePrefix": "2026-0007"
   },

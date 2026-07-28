@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
-import { isEmailConfigured, sendEmail } from "../lib/mailjet";
 import { user } from "../models/auth.model";
 import { emailVerification } from "../models/email-verification.model";
+import { sendTemplateEmail } from "./transactional-email.service";
 
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
 
@@ -97,21 +97,21 @@ export async function sendVerification(email: string, { initial = false } = {}) 
   });
 
   const link = `${webOrigin}/verify?token=${token}`;
-  if (!isEmailConfigured()) {
-    console.warn(`[verify] mail not configured — code for ${account.email}: ${code} (${link})`);
-    return { sent: false as const };
-  }
-
-  await sendEmail({
+  const result = await sendTemplateEmail({
+    agencyId: account.agencyId ?? "",
+    key: "verify",
     to: { email: account.email, name: account.name },
-    subject: "Verify your email",
-    html:
-      `<p>Your verification code is <strong style="font-size:20px;letter-spacing:3px">${code}</strong></p>` +
-      `<p>Or use this link: <a href="${link}">${link}</a></p>` +
-      `<p>Both expire in 30 minutes.</p>`,
-    text: `Your verification code is ${code}. Or open ${link}. Both expire in 30 minutes.`,
+    vars: {
+      name: account.name,
+      code,
+      expiry_minutes: String(TTL_MS / 60_000),
+    },
+    actionUrl: link,
   });
-  return { sent: true as const };
+  if (!result.sent) {
+    console.warn(`[verify] not sent (${result.reason}) — code for ${account.email}: ${code}`);
+  }
+  return { sent: result.sent };
 }
 
 /** Marks the account verified and burns the row. Shared by both paths. */

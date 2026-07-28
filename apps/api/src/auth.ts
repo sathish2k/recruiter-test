@@ -3,9 +3,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
 import { bearer } from "better-auth/plugins";
 import { db, schema } from "./db";
-import { isEmailConfigured, sendEmail } from "./lib/mailjet";
 import { record as recordAudit } from "./services/audit-log.service";
 import { parseUserAgent, recordLogin } from "./services/security.service";
+import { sendTemplateEmail } from "./services/transactional-email.service";
 
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
 
@@ -65,15 +65,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
-      if (!isEmailConfigured()) {
-        console.warn(`[auth] mail not configured — reset link for ${user.email}: ${url}`);
-        return;
-      }
-      await sendEmail({
+      const agencyId = (user as { agencyId?: string | null }).agencyId ?? "";
+      await sendTemplateEmail({
+        agencyId,
+        key: "forgot",
         to: { email: user.email, name: user.name },
-        subject: "Reset your password",
-        html: `<p>We received a request to reset your password. Use the link below (valid for 1 hour):</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can ignore this email.</p>`,
-        text: `Reset your password using this link (valid for 1 hour): ${url}`,
+        vars: { name: user.name, expiry_minutes: "60" },
+        actionUrl: url,
       });
     },
   },

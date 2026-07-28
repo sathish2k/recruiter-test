@@ -3,8 +3,36 @@ import { and, asc, eq } from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 import { invitation } from "../models/invitation.model";
+import { sendTemplateEmail } from "./transactional-email.service";
 
 const INVITE_TTL_DAYS = 14;
+const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
+
+/**
+ * Emails the invitee the agency's `invite` template. There is no accept token
+ * yet — the invite is matched on the address, so the CTA lands on sign-up with
+ * the email prefilled. Never throws: a mail failure must not lose the invite.
+ */
+async function sendInvite(row: InvitationRow) {
+  const inviter = row.invitedBy
+    ? await db.query.user.findFirst({ where: (u, { eq: is }) => is(u.id, row.invitedBy as string) })
+    : null;
+  try {
+    await sendTemplateEmail({
+      agencyId: row.organizationId,
+      key: "invite",
+      to: { email: row.email },
+      vars: {
+        name: row.email.split("@")[0] ?? row.email,
+        inviter: inviter?.name ?? "A teammate",
+        role: row.role,
+      },
+      actionUrl: `${webOrigin}/create-account?email=${encodeURIComponent(row.email)}`,
+    });
+  } catch (error) {
+    console.error(`[invite] could not email ${row.email}`, error);
+  }
+}
 
 type InvitationRow = typeof invitation.$inferSelect;
 
@@ -96,6 +124,7 @@ export async function createInvitations(
       })),
     )
     .returning();
+  await Promise.all(rows.map(sendInvite));
   return { created: rows.map(mapInvitation), skipped };
 }
 
@@ -108,7 +137,7 @@ export async function cancelInvitation(organizationId: string, id: string) {
   return updated ? mapInvitation(updated) : null;
 }
 
-/** Pushes the expiry out; the caller re-sends the email. */
+/** Pushes the expiry out and re-sends the invite email. */
 export async function resendInvitation(organizationId: string, id: string) {
   const [updated] = await db
     .update(invitation)
@@ -118,5 +147,7 @@ export async function resendInvitation(organizationId: string, id: string) {
     })
     .where(and(eq(invitation.id, id), eq(invitation.organizationId, organizationId)))
     .returning();
-  return updated ? mapInvitation(updated) : null;
+  if (!updated) return null;
+  await sendInvite(updated);
+  return mapInvitation(updated);
 }

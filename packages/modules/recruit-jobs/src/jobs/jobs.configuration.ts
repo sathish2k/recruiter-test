@@ -3,17 +3,22 @@ import type { TableFilterExportConfig } from "@recruit/shared";
 export const JobsConfiguration: TableFilterExportConfig = {
   columns: [
     {
+      label: { name: "columns.reference" },
+      width: "12%",
+      value: { type: "string", path: "reference", sx: { color: "text.secondary" } },
+    },
+    {
       label: { name: "columns.title" },
-      width: "32%",
+      width: "26%",
       sort: { key: "title" },
       value: { type: "string", path: "title", sx: { fontWeight: 600 } },
     },
     {
       label: { name: "columns.client" },
-      width: "22%",
+      width: "20%",
       value: { type: "string", path: "clientName", sx: { color: "text.secondary" } },
     },
-    { label: { name: "columns.status" }, width: "14%", value: { type: "string", path: "status" } },
+    { label: { name: "columns.status" }, width: "12%", value: { type: "string", path: "status" } },
     {
       label: { name: "columns.openings" },
       width: "12%",
@@ -22,7 +27,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
     },
     {
       label: { name: "columns.updated" },
-      width: "16%",
+      width: "14%",
       value: { type: "date", path: "updatedAt" },
     },
   ],

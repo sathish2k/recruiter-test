@@ -35,6 +35,11 @@ interface JobAddress {
   postalCode?: string;
 }
 
+interface KnockoutQuestion {
+  question: string;
+  expected: "yes" | "no";
+}
+
 interface Job {
   id: string;
   title: string;
@@ -68,8 +73,10 @@ interface Job {
   aiScreening: boolean;
   matchThreshold: number;
   autoAdvance: boolean;
-  knockoutCount: number;
+  knockoutQuestions: KnockoutQuestion[];
+  stageSlas: Record<string, number>;
   dailyDigest: boolean;
+  reference: string;
   sourcerId: string;
   profileLeadId: string;
   dailyInviteTarget: number;
@@ -208,8 +215,9 @@ export function JobFormComponent({ id }: { id: string }) {
       postalCode,
       jobSummary: rawSummary,
       attachments: rawAttachments,
-      // Server computes this — never sent.
+      // Server computes these — never sent.
       expectedRevenue: _expectedRevenue,
+      reference: _reference,
       ...rest
     } = values;
     const payload = {
@@ -273,8 +281,10 @@ export function JobFormComponent({ id }: { id: string }) {
           aiScreening: data.aiScreening,
           matchThreshold: data.matchThreshold,
           autoAdvance: data.autoAdvance,
-          knockoutCount: data.knockoutCount,
+          knockoutQuestions: data.knockoutQuestions ?? [],
+          stageSlas: data.stageSlas ?? {},
           dailyDigest: data.dailyDigest,
+          reference: data.reference,
           sourcerId: data.sourcerId,
           profileLeadId: data.profileLeadId,
           dailyInviteTarget: data.dailyInviteTarget,

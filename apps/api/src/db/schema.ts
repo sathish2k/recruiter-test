@@ -18,3 +18,4 @@ export * from "../models/organization.model";
 export * from "../models/pipeline.model";
 export * from "../models/role-permission.model";
 export * from "../models/security.model";
+export * from "../models/sequence.model";

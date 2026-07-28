@@ -1,0 +1,57 @@
+{
+  "title": "Import candidates",
+  "description": "Drop a batch of CVs or a CSV. Every row is checked against the workspace before anything is created.",
+  "sources": {
+    "resumes": {
+      "title": "Upload CVs",
+      "hint": "PDF or Word · up to 25 at a time · each is parsed into a record"
+    },
+    "csv": {
+      "title": "Upload a CSV",
+      "hint": "Columns are matched to candidate fields by their heading"
+    }
+  },
+  "columns": {
+    "source": "Source",
+    "status": "Status",
+    "action": "Action"
+  },
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "mobile": "Mobile",
+    "currentJobTitle": "Current job title"
+  },
+  "status": {
+    "ready": "Ready",
+    "failed": "Could not read",
+    "duplicate": "Matches {{name}}",
+    "created": "Created",
+    "merged": "Merged",
+    "skipped": "Skipped"
+  },
+  "actions": {
+    "back": "Back to candidates",
+    "import": "Import {{count}}",
+    "clear": "Clear",
+    "merge": "Merge into match",
+    "createAnyway": "Create anyway",
+    "skip": "Skip",
+    "open": "Open"
+  },
+  "progress": {
+    "parsing": "Reading CV {{done}} of {{total}}…"
+  },
+  "source": {
+    "csvRow": "CSV row {{line}}"
+  },
+  "errors": {
+    "parse": "The file could not be read",
+    "noName": "No name found — fill it in on the candidate form instead",
+    "noColumns": "No column matched a candidate field. Name the headings as the form labels them."
+  },
+  "toast": {
+    "imported": "{{created}} created · {{merged}} merged · {{duplicates}} need a decision"
+  }
+}

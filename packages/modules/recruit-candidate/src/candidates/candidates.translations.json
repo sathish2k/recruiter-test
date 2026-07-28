@@ -13,7 +13,8 @@
   "actions": {
     "new": "New candidate",
     "edit": "Edit",
-    "archive": "Archive"
+    "archive": "Archive",
+    "import": "Import"
   },
   "exportCsv": "Export CSV",
   "empty": "No candidates yet",

@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "../auth";
 import { db } from "../db";
 import { user } from "../models/auth.model";
+import { seedAgencyTemplates } from "./email-template.service";
 import { provisionSignup } from "./organization.service";
 import { seedAgencyPermissions } from "./permission.service";
 
@@ -45,6 +46,9 @@ export async function registerAccount(input: RegisterInput) {
     .where(eq(user.id, res.user.id));
 
   await seedAgencyPermissions(organization.id);
+  // The transactional senders read these by key, so they have to exist before
+  // the very first email (the verification one) goes out.
+  await seedAgencyTemplates(organization.id);
 
   return {
     id: res.user.id,

@@ -1,9 +1,36 @@
+import { readFileSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Loads `.env` into the environment for anything it doesn't already define.
+ *
+ * `bun run` does this on its own, but `bunx playwright`, UI mode and the IDE
+ * extensions do not — and without E2E_EMAIL the setup project throws, every
+ * project that depends on it skips, and the UI looks like it simply did
+ * nothing. Reading the file here makes every entry point behave the same.
+ */
+function loadEnvFile(path = ".env") {
+  let contents: string;
+  try {
+    contents = readFileSync(path, "utf8");
+  } catch {
+    return; // No .env is fine — the variables may come from the shell or CI.
+  }
+  for (const line of contents.split("\n")) {
+    const match = /^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(line);
+    if (!match?.[1] || line.trimStart().startsWith("#")) continue;
+    if (process.env[match[1]] !== undefined) continue;
+    process.env[match[1]] = (match[2] ?? "").trim().replace(/^(['"])(.*)\1$/, "$2");
+  }
+}
+
+loadEnvFile();
 
 /**
  * E2E configuration for the Phase 1 journeys in `delivery-plan.md` §1.4.
  *
- * The suite assumes the web app and API are already running (`bun run dev`).
+ * The suite assumes the web app and API are already running (`bun run dev`),
+ * and that `.env` names the test account (E2E_EMAIL / E2E_PASSWORD).
  *
  * Watching it: `bun run test:e2e:headed` opens a real browser, and
  * `E2E_SLOWMO=300` slows each action enough to follow. `bun run test:e2e:ui`

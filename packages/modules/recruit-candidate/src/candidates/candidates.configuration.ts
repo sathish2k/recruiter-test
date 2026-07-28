@@ -64,7 +64,15 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
     { type: "edit", icon: "edit", label: { name: "actions.edit" } },
     { type: "archive", icon: "archive", label: { name: "actions.archive" } },
   ],
-  ctas: [{ label: { name: "actions.new" }, icon: "person-add", action: "add" }],
+  ctas: [
+    {
+      label: { name: "actions.import" },
+      icon: "upload-file",
+      variant: "secondary",
+      routeId: "Recruit.CandidateImport.Route",
+    },
+    { label: { name: "actions.new" }, icon: "person-add", action: "add" },
+  ],
   export: { types: [{ label: "exportCsv", value: "csv", icon: "download" }] },
   pagination: { pageSize: 10 },
   emptyLabel: "empty",

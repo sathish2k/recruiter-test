@@ -9,6 +9,14 @@ export const candidateFormDatasource = (): DatasourceInstance => ({
     const { id, ...rest } = body ?? {};
     return (await httpClient.put(`/candidates/${String(id)}`, rest)).data;
   },
+  /** The workspace's duplicate check — the same one import and apply run. */
+  checkDuplicates: async (query?: Record<string, unknown>) =>
+    (await httpClient.get("/candidates/duplicates", { params: query })).data,
+  /** Field-level merge into an existing candidate (TC-CAN-002). */
+  merge: async (body?: Record<string, unknown>) => {
+    const { id, ...rest } = body ?? {};
+    return (await httpClient.post(`/candidates/${String(id)}/merge`, rest)).data;
+  },
   /** Server-side document parsing. The `fields` contract is derived from the
    * form's own schema, so nothing about candidates is hardcoded server-side. */
   parseDocument: async (file?: File, fields?: unknown) => {

@@ -183,6 +183,20 @@
       "when": 1784814078015,
       "tag": "0025_glamorous_invaders",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1785257889110,
+      "tag": "0026_email_template_design",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1785257920975,
+      "tag": "0027_productive_blur",
+      "breakpoints": true
     }
   ]
 }

@@ -13,8 +13,9 @@ setup("authenticate", async ({ page }) => {
   const password = process.env.E2E_PASSWORD;
   if (!email || !password) {
     throw new Error(
-      "Set E2E_EMAIL and E2E_PASSWORD to run the suite. They should name a seeded " +
-        "test workspace, not a real agency.",
+      "Set E2E_EMAIL and E2E_PASSWORD to run the suite — put them in .env " +
+        "(gitignored), which playwright.config.ts loads. They should name a " +
+        "seeded test workspace, not a real agency.",
     );
   }
 

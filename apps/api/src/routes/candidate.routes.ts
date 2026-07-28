@@ -106,10 +106,44 @@ export default new Elysia({ name: "candidate.routes" })
       sortDir: t.Optional(t.String()),
     }),
   })
+  /** The same check every intake path runs — see findDuplicateCandidates. */
+  .get("/candidates/duplicates", (ctx) => candidateController.getDuplicates(ctx), {
+    isAuth: true,
+    query: t.Object({
+      email: t.Optional(t.String()),
+      secondaryEmail: t.Optional(t.String()),
+      phone: t.Optional(t.String()),
+      mobile: t.Optional(t.String()),
+      linkedin: t.Optional(t.String()),
+      excludeId: t.Optional(t.String()),
+    }),
+  })
   .get("/candidates/:id", (ctx) => candidateController.getCandidateById(ctx), { isAuth: true })
   .post("/candidates", (ctx) => candidateController.postCandidate(ctx), {
     isVerified: true,
     body: t.Optional(candidateBody),
+  })
+  .post("/candidates/import", (ctx) => candidateController.postImport(ctx), {
+    isVerified: true,
+    body: t.Object({
+      rows: t.Array(
+        t.Object({
+          values: candidateBody,
+          mode: t.Optional(t.Union([t.Literal("create"), t.Literal("skip"), t.Literal("merge")])),
+          targetId: t.Optional(t.String()),
+          force: t.Optional(t.Boolean()),
+        }),
+        { maxItems: 200 },
+      ),
+      defaults: t.Optional(candidateBody),
+    }),
+  })
+  .post("/candidates/:id/merge", (ctx) => candidateController.postMerge(ctx), {
+    isVerified: true,
+    body: t.Object({
+      sourceId: t.Optional(t.String()),
+      values: candidateBody,
+    }),
   })
   .put("/candidates/:id", (ctx) => candidateController.putCandidate(ctx), {
     isAuth: true,

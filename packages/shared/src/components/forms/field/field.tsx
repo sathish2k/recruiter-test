@@ -20,6 +20,7 @@ import { HeadingWidget } from "../heading/heading";
 import { MarkdownWidget } from "../markdown/markdown";
 import { MultiSelectWidget } from "../multiselect/multiselect";
 import { NumberWidget } from "../number/number";
+import { NumberMapWidget } from "../number-map/number-map";
 import { PasswordWidget } from "../password/password";
 import { PhoneWidget } from "../phone/phone";
 import { RadioWidget } from "../radio/radio";
@@ -73,6 +74,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   "checkbox-group": CheckboxGroupWidget,
   multiselect: MultiSelectWidget,
   number: NumberWidget,
+  "number-map": NumberMapWidget,
   slider: SliderWidget,
   date: DateWidget,
   time: DateWidget,

@@ -9,6 +9,12 @@ const MIN = 50;
 const MAX = 95;
 const clamp = (v: number) => Math.min(MAX, Math.max(MIN, v));
 
+/** The questions live in the wide column; the card only summarises them. */
+function goToKnockouts() {
+  const cell = document.querySelector('[data-field="knockoutQuestions"]');
+  (cell?.closest(".MuiCard-root") ?? cell)?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 /** A 40×23 pill toggle matching the design (orange when on, white knob). */
 function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
@@ -78,7 +84,7 @@ export function AiScreeningWidget({ field, t }: WidgetProps) {
   const enabled = Boolean(field.value);
   const threshold = clamp(Number(watch("matchThreshold") ?? 80));
   const autoAdvance = Boolean(watch("autoAdvance"));
-  const knockout = Number(watch("knockoutCount") ?? 4);
+  const knockout = (watch("knockoutQuestions") as unknown[] | undefined)?.length ?? 0;
   const dailyDigest = Boolean(watch("dailyDigest"));
   // Rough "for similar roles" estimate: a lower bar admits more candidates.
   const estMatches = Math.max(2, Math.round((100 - threshold) * 0.85));
@@ -180,7 +186,20 @@ export function AiScreeningWidget({ field, t }: WidgetProps) {
             <Row icon="quiz" label={t("fields.knockout")}>
               <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <Typography sx={{ fontSize: 13, fontWeight: 700 }}>{knockout}</Typography>
-                <Typography sx={{ fontSize: 12, fontWeight: 600, color: "surface.primarySoftFg" }}>
+                <Typography
+                  component="button"
+                  type="button"
+                  onClick={goToKnockouts}
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "surface.primarySoftFg",
+                    background: "none",
+                    border: 0,
+                    p: 0,
+                    cursor: "pointer",
+                  }}
+                >
                   {t("fields.knockoutEdit")}
                 </Typography>
               </Box>

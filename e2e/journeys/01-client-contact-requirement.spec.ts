@@ -1,5 +1,13 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { fillField, goto, row, selectOption } from "../fixtures/app";
+
+/** Picks whatever the first option is — for pickers whose contents are the
+ * seeded workspace's, not this test's. */
+async function pickFirst(page: Page, field: string) {
+  const control = page.locator(`[data-field="${field}"]`);
+  await control.locator('[role="combobox"], .MuiSelect-select').first().click();
+  await page.getByRole("option").first().click();
+}
 
 /**
  * `delivery-plan.md` §1.4 — "Client → contact → requirement → assign team".
@@ -59,6 +67,46 @@ test.describe("Client, contact and requirement intake", () => {
     // unstaffed requirement can never be created.
     const team = page.locator('[data-field="sourcerId"], [data-field="profileLeadId"]');
     await expect(team.first()).toBeVisible();
+  });
+
+  test("TC-REQ-004 — a saved requirement carries a generated REQ- reference", async ({ page }) => {
+    await goto(page, "/jobs/new");
+    await fillField(page, "Job title", requirementTitle);
+    await selectOption(page, "Client", clientName);
+    // Whoever the workspace has — the point is that both are filled, not who.
+    await pickFirst(page, "sourcerId");
+    await pickFirst(page, "profileLeadId");
+    await page
+      .getByRole("button", { name: /publish|save/i })
+      .last()
+      .click();
+    await page.waitForURL(/\/jobs(?!\/new)/);
+
+    // The reference is the workspace's own sequence, never typed by anyone.
+    await expect(row(page, requirementTitle).first()).toContainText(/REQ-\d{4}/);
+  });
+
+  test("TC-REQ-005 — knockout questions count on the screening card", async ({ page }) => {
+    await goto(page, "/jobs/new");
+    const card = page.locator(".MuiCard-root").filter({ hasText: "Knockout questions" }).last();
+    await card.getByRole("button", { name: /add question/i }).click();
+    await card.locator("input").first().fill("Do you have a valid work permit?");
+
+    // The AI Screening card summarises what the wide column holds.
+    const screening = page
+      .locator("div")
+      .filter({ hasText: /^AI Screening/ })
+      .first();
+    await expect(screening).toContainText("1");
+  });
+
+  test("TC-SET-001 — per-stage SLAs are editable on the requirement", async ({ page }) => {
+    await goto(page, "/jobs/new");
+    const slas = page.locator('[data-field="stageSlas"]');
+    // One row per workspace stage, each overriding the workspace default.
+    await expect(slas.locator("[data-option]").first()).toBeVisible();
+    await slas.locator("input").first().fill("3");
+    await expect(slas.locator("input").first()).toHaveValue("3");
   });
 
   test("TC-REQ-002 — salary band validation rejects max below min", async ({ page }) => {

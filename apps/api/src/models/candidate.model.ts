@@ -106,6 +106,9 @@ export const candidate = pgTable("candidate", {
   emailOptOut: boolean("email_opt_out").notNull().default(false),
   /** Hidden from lists and pickers; history retained. Never hard-deleted. */
   archived: boolean("archived").notNull().default(false),
+  /** Set when this row lost a merge — the surviving record's id, so the trail
+   * back from an archived duplicate is never lost (TC-CAN-002). */
+  mergedIntoId: text("merged_into_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

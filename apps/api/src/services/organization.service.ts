@@ -111,7 +111,8 @@ export const WORKSPACE_DEFAULTS: Record<string, unknown> = {
   whiteLabel: true,
   accentColor: "#E4560F",
   candidatePrefix: "CAN-",
-  jobPrefix: "JOB-",
+  // D6 — the requirement's reference is generated from this on create.
+  jobPrefix: "REQ-",
   clientPrefix: "CLI-",
   invoicePrefix: "INV-",
 };
@@ -171,6 +172,32 @@ export async function getOrganization(id: string) {
   // `seats` is the member count — the appbar's workspace row reads it.
   flat.seats = await countMembers(id);
   return flat;
+}
+
+/**
+ * A few workspace settings with their defaults applied, for services that need
+ * one value (the requirement prefix, the duplicate rules) rather than the whole
+ * flattened record and its member count.
+ */
+export async function workspaceSettings(
+  organizationId: string,
+  keys: string[],
+): Promise<Record<string, unknown>> {
+  const [org] = await db
+    .select({ settings: organization.settings })
+    .from(organization)
+    .where(eq(organization.id, organizationId))
+    .limit(1);
+  const stored = (org?.settings ?? {}) as Record<string, unknown>;
+  return Object.fromEntries(
+    keys.map((key) => {
+      const value = stored[key];
+      return [
+        key,
+        value === undefined || value === null || value === "" ? WORKSPACE_DEFAULTS[key] : value,
+      ];
+    }),
+  );
 }
 
 /** The workspace form posts one flat object; anything that isn't a real column

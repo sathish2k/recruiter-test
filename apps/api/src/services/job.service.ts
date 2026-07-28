@@ -4,7 +4,16 @@ import { alias } from "drizzle-orm/pg-core";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 import { client } from "../models/client.model";
-import { type JobAddress, type JobAttachment, type JobStatus, job } from "../models/job.model";
+import {
+  type JobAddress,
+  type JobAttachment,
+  type JobStatus,
+  job,
+  type KnockoutQuestion,
+  type StageSlas,
+} from "../models/job.model";
+import { workspaceSettings } from "./organization.service";
+import { formatReference, nextSequence } from "./sequence.service";
 
 /** `user` is joined twice — once as the sourcer, once as the profile lead —
  * so the second join needs its own alias. */
@@ -61,7 +70,8 @@ function mapJob(row: JobRow & JobJoins) {
     screeningCriteria: row.screeningCriteria ?? "",
     matchThreshold: row.matchThreshold,
     autoAdvance: row.autoAdvance,
-    knockoutCount: row.knockoutCount,
+    knockoutQuestions: row.knockoutQuestions ?? [],
+    stageSlas: row.stageSlas ?? {},
     dailyDigest: row.dailyDigest,
     sourcerId: row.sourcerId ?? "",
     sourcerName: row.sourcerName ?? "",
@@ -116,7 +126,7 @@ export async function listJobs(organizationId: string, params: ListJobsParams = 
   const filters = [eq(job.organizationId, organizationId), eq(job.archived, false)];
   if (params.search) {
     const term = `%${params.search}%`;
-    const match = or(ilike(job.title, term), ilike(job.industry, term));
+    const match = or(ilike(job.title, term), ilike(job.industry, term), ilike(job.reference, term));
     if (match) filters.push(match);
   }
   const statuses = split(params.status);
@@ -183,7 +193,8 @@ export interface JobInput {
   screeningCriteria?: string;
   matchThreshold?: number;
   autoAdvance?: boolean;
-  knockoutCount?: number;
+  knockoutQuestions?: KnockoutQuestion[];
+  stageSlas?: StageSlas;
   dailyDigest?: boolean;
   sourcerId?: string;
   profileLeadId?: string;
@@ -224,7 +235,8 @@ const EDITABLE = [
   "screeningCriteria",
   "matchThreshold",
   "autoAdvance",
-  "knockoutCount",
+  "knockoutQuestions",
+  "stageSlas",
   "dailyDigest",
   "sourcerId",
   "profileLeadId",
@@ -240,6 +252,32 @@ function pickEditable(input: JobInput): Partial<JobRow> {
   return patch as Partial<JobRow>;
 }
 
+/** The form's repeater always submits its trailing blank row, and a cleared SLA
+ * arrives as 0 — neither is an answer, so neither is stored. */
+function normalize(input: JobInput): JobInput {
+  const clean = { ...input };
+  if (clean.knockoutQuestions) {
+    clean.knockoutQuestions = clean.knockoutQuestions
+      .filter((row) => row?.question?.trim())
+      .map((row) => ({ ...row, question: row.question.trim() }));
+  }
+  if (clean.stageSlas) {
+    clean.stageSlas = Object.fromEntries(
+      Object.entries(clean.stageSlas).filter(([, days]) => Number(days) > 0),
+    );
+  }
+  return clean;
+}
+
+const REFERENCE_KIND = "requirement";
+
+/** REQ-0001 against the workspace's own counter and prefix. */
+async function nextJobReference(organizationId: string) {
+  const settings = await workspaceSettings(organizationId, ["jobPrefix"]);
+  const prefix = String(settings.jobPrefix || "REQ-");
+  return formatReference(prefix, await nextSequence(organizationId, REFERENCE_KIND));
+}
+
 export async function createJob(organizationId: string, input: JobInput) {
   const [created] = await db
     .insert(job)
@@ -247,7 +285,9 @@ export async function createJob(organizationId: string, input: JobInput) {
       id: randomUUID(),
       organizationId,
       title: input.title?.trim() || "Untitled job",
-      ...pickEditable({ ...input, title: undefined }),
+      // Never client-supplied: the reference is the workspace's own sequence.
+      reference: await nextJobReference(organizationId),
+      ...pickEditable(normalize({ ...input, title: undefined })),
     })
     .returning();
   return created ? mapJob(created) : null;
@@ -256,7 +296,7 @@ export async function createJob(organizationId: string, input: JobInput) {
 export async function updateJob(organizationId: string, id: string, input: JobInput) {
   const [updated] = await db
     .update(job)
-    .set({ ...pickEditable(input), updatedAt: new Date() })
+    .set({ ...pickEditable(normalize(input)), updatedAt: new Date() })
     .where(and(eq(job.id, id), eq(job.organizationId, organizationId)))
     .returning();
   return updated ? mapJob(updated) : null;

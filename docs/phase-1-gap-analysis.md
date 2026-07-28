@@ -15,7 +15,7 @@ the requirements.
 | | Count |
 |---|---|
 | Design screens | 70 |
-| Routes implemented | 26 |
+| Routes implemented | 27 |
 | Phase 1 modules built | 6 of ~18 |
 | Golden-path stages covered end to end | 3 of 9 |
 
@@ -64,7 +64,7 @@ Ordered by `requirements.md` §7.2 ranking, with the exit criterion each blocks.
 | 14 | **Multi-currency** — client billing currency, stored FX rate | Neither | Exit 3 · TC-CUR-001–003 |
 | 15 | **String catalogue + Requirement terminology** | Neither | Exit 6 · TC-SET-004 |
 | 16 | **Archive vs erasure as distinct paths** | Neither | Exit 5 · REG-10 |
-| 17 | **Settings → Pipeline** (stages, SLAs, rejection reasons) | Neither | TC-SET-001 |
+| 17 | **Settings → Pipeline** (stages, SLAs, rejection reasons) | Neither | TC-SET-001 — the models and `GET /pipeline/stages` exist; the screen does not |
 | 18 | **Settings → Data & privacy** (retention, residency, export) | Neither | TC-SET-002 |
 | 19 | **Tasks** | Neither | §5.14 |
 | 20 | **Post-offer onboarding checklist** | Neither | §5.11 |
@@ -93,10 +93,11 @@ of `LinkedIn Extension` / `Sourcing Plugin`.
 | Client add/edit | Off-limits period | §5.3.2, TC-CLI-007 | **Done** — field only; derivation needs placements |
 | Requirement add/edit | Assigned team required on create | §5.5.2, TC-REQ-001 | **Done** |
 | Requirement add/edit | Role category, work model, priority | §5.5.2 | **Done** |
-| Requirement add/edit | Reference (REQ-nnnn) | §5.5.2 | Column added, generator to build |
-| Requirement add/edit | Knockout questions, stage SLAs | §5.5.2 | To build |
+| Requirement add/edit | Reference (REQ-nnnn) | §5.5.2 | **Done** — generated from the workspace sequence on create |
+| Requirement add/edit | Knockout questions, stage SLAs | §5.5.2 | **Done** — see step 6 |
 | Candidate add/edit | Availability, available-from, tags, do-not-contact | §5.6.2 | **Done** |
 | Candidate add/edit | Consent, off-limits | §5.6.2 | Columns added; both need applications/placements |
+| Candidate add/edit | Duplicate detection + merge | §5.6.2, TC-CAN-001/002 | **Done** — see step 7 |
 | Candidate list | Availability column | §5.6.1 | **Done** |
 | Candidate list | Off-limits shield, live application count | §5.6.1 | Blocked on placements and applications |
 | Contact list | Portal access state column | §5.4.1 | Blocked on the portal concept |
@@ -123,7 +124,7 @@ test named for its `test-cases.md` ID.
 e2e/auth.setup.ts                       one sign-in, reused by every project
 e2e/fixtures/app.ts                     navigation + config-driven form helpers
 e2e/journeys/01-client-contact-requirement.spec.ts   runs today
-e2e/journeys/02-candidate-intake.spec.ts             runs today, 6 stubs
+e2e/journeys/02-candidate-intake.spec.ts             runs today, 4 stubs
 e2e/journeys/03-golden-path.spec.ts                  all stubs — section 3 above
 e2e/journeys/04-tenancy-rbac.spec.ts                 2 run, 4 stubs
 e2e/journeys/05-mobile.spec.ts                       2 run, 3 stubs
@@ -229,17 +230,89 @@ Lands correctly. Counts will need rechecking once applications exist.
 Including billing currency, tax treatment and off-limits period, all added this
 cycle.
 
-### Step 6 · Create requirement + assign team ⚠️
+### Step 6 · Create requirement + assign team ✅ *(built)*
 
-Works, and the team is now required on create. Still missing: the REQ-nnnn
-reference generator, knockout questions, and per-stage SLA overrides.
+The team was already required on create; the three remaining §5.5.2 items now
+exist.
 
-### Step 7 · Get candidates in ⚠️
+**Reference (REQ-0001).** A `sequence` table holds one counter per workspace ×
+kind, incremented in a single insert-or-update, so two requirements created at
+the same moment can never share a number. The prefix is the workspace's own
+`jobPrefix` setting — its default moved from `JOB-` to `REQ-` with the D6
+rename, and the Settings label follows. The field is generated server-side and
+is not in the editable set, so no client can set or change it; the form shows it
+read-only and the list has a **Ref** column that search also matches on.
 
-Manual add works. The other three intake paths of flow §4 do not exist:
-resume-upload-to-record, CSV import, and inbound apply. **Duplicate detection
-and field-level merge are missing on every path** — flow §4 says all five must
-run the same check, and TC-CAN-001/002 are P0.
+**Knockout questions.** A repeater on the requirement, stored as
+`job.knockout_questions`: each row is a question plus the yes/no answer that
+keeps a candidate in. The AI Screening card now counts the real questions
+instead of a standalone number, and its "Edit" scrolls to them. The old
+`knockout_count` column is gone — a count that could disagree with the list is
+worse than no count.
+
+**Per-stage SLAs.** `pipeline_stage.sla_days` is the workspace default;
+`job.stage_slas` is this requirement's override, keyed by stage **id** so a
+rename never orphans it. The editor is a new shared `number-map` widget — one
+number per option from an `optionSource` — so it follows whatever the
+workspace's pipeline is, with each row's placeholder showing the default it
+overrides.
+
+| Piece | Where |
+|---|---|
+| Counter table + `nextSequence` | `models/sequence.model.ts`, `services/sequence.service.ts` |
+| Reference assigned on create | `services/job.service.ts` |
+| Knockout + SLA columns | `models/job.model.ts`, `models/pipeline.model.ts` |
+| `GET /pipeline/stages` (+ rejection reasons) | `routes/pipeline.routes.ts` |
+| `number-map` widget | `packages/shared/src/components/forms/number-map/` |
+| Form sections | `packages/modules/recruit-jobs/src/job-form/` |
+
+**Not done:** nothing evaluates a knockout answer or breaches an SLA yet —
+both are read by the application record (step 8), which is where the answers
+and the stage clock will live. Editing the workspace-level stage defaults still
+needs Settings → Pipeline (item 17); the requirement override is editable today.
+
+### Step 7 · Get candidates in ✅ *(built, minus inbound apply)*
+
+**Duplicate detection is now one function**, `findDuplicateCandidates`, and
+every path calls it: the form (on email blur *and* again before a create), and
+the import endpoint, per row. Which identifiers count is the workspace's own
+Settings choice — Email, Phone, LinkedIn URL — and a workspace that turns
+detection off is never nagged. Phone numbers compare as bare digits on both
+sides, so `+91 98450 12340` and `9845012340` are the same person. "Resume hash"
+is offered in Settings but contributes no matcher: no hash is stored yet.
+
+**Field-level merge** (TC-CAN-002) compares the form against the match and asks
+per conflicting field which value to keep; fields only the form has are filled
+in silently. The survivor is the record already on file, and the loser is
+archived with `merged_into_id` pointing at it — never deleted (§6.1).
+
+**Two of the three missing intake paths** land as one screen, `/candidates/import`:
+
+- **CV batch** — each file goes through the existing contract-driven extraction,
+  the same one the form's autofill uses, so the candidate form's schema is the
+  only place that decides what gets read out of a CV. Parsed one at a time; a
+  dropped folder is a paid model call per file.
+- **CSV** — columns are matched to fields by heading, against both the field
+  name and its label, so a spreadsheet titled "First name, Email, Mobile" maps
+  itself. List columns split on `;`/`,`/`|`.
+
+Both land in one review table, and both commit through `POST /candidates/import`,
+which runs the duplicate check on every row: a flagged row comes back
+`duplicate` rather than being written, and the reviewer picks merge / create
+anyway / skip. `source` records which path a candidate came in by.
+
+| Piece | Where |
+|---|---|
+| The shared check, merge and bulk import | `services/candidate.service.ts` |
+| `GET /candidates/duplicates` · `POST /candidates/:id/merge` · `POST /candidates/import` | `routes/candidate.routes.ts` |
+| Warning strip + merge dialog | `packages/modules/recruit-candidate/src/candidate-form/` |
+| Import screen | `packages/modules/recruit-candidate/src/candidate-import/` |
+| CSV reader | `packages/shared/src/utils/csv.ts` |
+
+**Not built: inbound apply.** It is the fourth path, and it is blocked rather
+than skipped — an application arriving from a careers board has nowhere to go
+until the `application` record of step 8 exists. It plugs into the same check
+when it lands.
 
 ### Step 8 · Pipeline ❌ **← the second wall, and the widest**
 
@@ -327,7 +400,7 @@ tasks.
 
 ### The answer to "what first"
 
-~~**Step 2, verify email.**~~ Done, together with step 3 — see those sections
+~~**Step 2, verify email.**~~ Done, with steps 3, 6 and 7 — see those sections
 for what landed and what was deliberately left out.
 
 **Step 8, the application record.** It is now both the first broken thing a real

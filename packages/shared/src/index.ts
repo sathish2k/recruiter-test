@@ -107,6 +107,7 @@ export {
   MarkdownToolbar,
   MarkdownWidget,
   markdownToHtml,
+  NumberMapWidget,
   type OptionSource,
   type PasswordStrengthConfig,
   type PasswordStrengthLevel,
@@ -124,6 +125,7 @@ export {
   SwitchRowWidget,
   splitPhone,
   TextWidget,
+  type Translate,
   UploadField,
   type UploadValue,
   UploadWidget,
@@ -279,6 +281,7 @@ export {
   useToast,
 } from "./components/toast";
 export { cn } from "./utils/cn";
+export { parseCsv } from "./utils/csv";
 export {
   formatCurrency,
   formatDate,

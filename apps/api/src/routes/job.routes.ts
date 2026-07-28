@@ -51,7 +51,17 @@ const jobBody = t.Object({
   screeningCriteria: t.Optional(t.String({ maxLength: 2000 })),
   matchThreshold: t.Optional(t.Number()),
   autoAdvance: t.Optional(t.Boolean()),
-  knockoutCount: t.Optional(t.Number()),
+  knockoutQuestions: t.Optional(
+    t.Array(
+      t.Object({
+        question: t.String({ maxLength: 300 }),
+        expected: t.Union([t.Literal("yes"), t.Literal("no")]),
+      }),
+      { maxItems: 20 },
+    ),
+  ),
+  /** Stage id → days. */
+  stageSlas: t.Optional(t.Record(t.String(), t.Number())),
   dailyDigest: t.Optional(t.Boolean()),
   sourcerId: t.Optional(t.String()),
   profileLeadId: t.Optional(t.String()),

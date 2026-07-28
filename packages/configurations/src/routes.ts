@@ -219,12 +219,22 @@ export const routes: Route[] = [
     page: "Recruit.Candidates.Page",
     guard: [{ type: "authenticationGuard" }],
     access: { resource: "candidates" },
-    children: ["Recruit.CandidateNew.Route", "Recruit.CandidateEdit.Route"],
+    children: [
+      "Recruit.CandidateNew.Route",
+      "Recruit.CandidateImport.Route",
+      "Recruit.CandidateEdit.Route",
+    ],
   },
   {
     id: "Recruit.CandidateNew.Route",
     path: "new",
     page: "Recruit.CandidateForm.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.CandidateImport.Route",
+    path: "import",
+    page: "Recruit.CandidateImport.Page",
     children: [],
   },
   {

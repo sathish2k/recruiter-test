@@ -18,6 +18,9 @@ export const pipelineStage = pgTable("pipeline_stage", {
   position: integer("position").notNull(),
   /** Whether clients see this stage in their portal. */
   clientVisible: boolean("client_visible").notNull().default(false),
+  /** Days a candidate may sit here before the stage is breached. 0 is "no
+   * limit". A requirement can override it per stage (`job.stage_slas`). */
+  slaDays: integer("sla_days").notNull().default(0),
   kind: text("kind").$type<"entry" | "middle" | "hire">().notNull().default("middle"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });

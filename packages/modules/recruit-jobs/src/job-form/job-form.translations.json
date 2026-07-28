@@ -17,9 +17,14 @@
     "assignedTeam": "Assigned team",
     "assignedTeamHint": "Who sources and who reviews for this role",
     "publishTo": "Publish to",
-    "mustHaveSkills": "Must-have skills"
+    "mustHaveSkills": "Must-have skills",
+    "knockout": "Knockout questions",
+    "slas": "Stage time limits",
+    "slasHint": "Days a candidate may sit in each stage on this requirement. Blank keeps the workspace default."
   },
   "fields": {
+    "reference": "Reference",
+    "referenceHelp": "Generated when the requirement is created",
     "title": "Requirement title",
     "titlePlaceholder": "e.g. Senior Backend Engineer",
     "titleMax": "Keep the title under 150 characters",
@@ -69,6 +74,12 @@
     "autoAdvance": "Auto-advance to shortlist",
     "knockout": "Knockout questions",
     "knockoutEdit": "Edit",
+    "addKnockout": "Add question",
+    "knockoutQuestion": "Question",
+    "knockoutQuestionPlaceholder": "e.g. Do you have a valid work permit?",
+    "knockoutExpected": "Answer that passes",
+    "slaUnit": "days",
+    "slaNone": "—",
     "dailyDigest": "Daily digest of new matches",
     "sourcer": "Employee (sourcer)",
     "sourcerPlaceholder": "Search team…",
@@ -196,5 +207,9 @@
     "normal": "Normal",
     "high": "High",
     "critical": "Critical"
+  },
+  "knockoutAnswers": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

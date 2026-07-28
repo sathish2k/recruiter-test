@@ -1,5 +1,8 @@
 "use client";
 
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import {
   useConfiguration,
   useFetch,
@@ -16,11 +19,15 @@ import {
   type FormValues,
   FormWithSectionsRenderer,
   GeneratedDocWidget,
+  IconRenderer,
   ResumeAutofillWidget,
+  TextWidget,
+  useModal,
   useToast,
 } from "@recruit/shared";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { CandidateFormConfiguration } from "./candidate-form.configuration";
+import { type DuplicateMatch, DuplicateMergeDialog } from "./duplicate-merge.dialog";
 
 interface CandidateAddress {
   street?: string;
@@ -115,6 +122,41 @@ export function CandidateFormComponent({ id }: { id: string }) {
   const isEdit = Boolean(candidateId);
 
   const { data, isLoading, mutation } = useFetch<Candidate>(id, { filters: { id: candidateId } });
+
+  // Duplicate detection (TC-CAN-001) — the warning strip is raised on email
+  // blur and again before a create; the merge dialog resolves it field by
+  // field (TC-CAN-002).
+  const [dupe, setDupe] = useState<{
+    matches: DuplicateMatch[];
+    values: Record<string, unknown>;
+  } | null>(null);
+  const [merging, setMerging] = useState(false);
+  const mergeModal = useModal<{
+    match: DuplicateMatch;
+    incoming: Record<string, unknown>;
+    payload?: Record<string, unknown>;
+  }>();
+
+  const checkDuplicates = useCallback(
+    async (values: Record<string, unknown>) => {
+      const mut = mutation as Record<
+        string,
+        ((query?: Record<string, unknown>) => Promise<unknown>) | undefined
+      >;
+      const result = (await mut.checkDuplicates?.({
+        email: str(values.email),
+        secondaryEmail: str(values.secondaryEmail),
+        phone: str(values.phone),
+        mobile: str(values.mobile),
+        linkedin: str(values.linkedin),
+        excludeId: candidateId,
+      })) as { data?: DuplicateMatch[] } | undefined;
+      const found = result?.data ?? [];
+      setDupe(found.length ? { matches: found, values } : null);
+      return found;
+    },
+    [mutation, candidateId],
+  );
 
   const uploader = useMemo<AttachmentUploader>(() => {
     const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
@@ -224,8 +266,27 @@ export function CandidateFormComponent({ id }: { id: string }) {
         ) : (
           <ChipsWidget {...props} />
         ),
+      // Leaving the email field is the first moment we can tell the recruiter
+      // they are about to re-add someone the workspace already holds.
+      text: (props: Parameters<typeof TextWidget>[0]) =>
+        props.name === "email" ? (
+          <TextWidget
+            {...props}
+            field={{
+              ...props.field,
+              onBlur: () => {
+                props.field.onBlur();
+                const form =
+                  (props.control as { _formValues?: Record<string, unknown> })?._formValues ?? {};
+                if (str(form.email)) void checkDuplicates(form);
+              },
+            }}
+          />
+        ) : (
+          <TextWidget {...props} />
+        ),
     }),
-    [uploader, extractor, config.schema, suggestSkills, generateFormatted],
+    [uploader, extractor, config.schema, suggestSkills, generateFormatted, checkDuplicates],
   );
 
   if (!config.schema) return null;
@@ -235,6 +296,21 @@ export function CandidateFormComponent({ id }: { id: string }) {
     ((raw as Attachment[] | undefined) ?? [])
       .filter((item) => item.url)
       .map(({ name, url, size, type }) => ({ name, url, size, type }));
+
+  /** Writes the kept values onto the record that survives, archiving this one
+   * when it already exists. */
+  const merge = async (match: DuplicateMatch, values: Record<string, string>) => {
+    const mut = mutation as Record<string, ((body?: unknown) => Promise<unknown>) | undefined>;
+    setMerging(true);
+    try {
+      await mut.merge?.({ id: match.id, sourceId: candidateId, values });
+      mergeModal.close();
+      show(t("toast.merged", { name: match.name }));
+      router.push("Recruit.CandidateEdit.Route", { id: match.id });
+    } finally {
+      setMerging(false);
+    }
+  };
 
   const save = async (values: FormValues, meta?: { addAnother?: boolean }) => {
     const mut = mutation as Record<string, ((body?: unknown) => Promise<unknown>) | undefined>;
@@ -278,9 +354,23 @@ export function CandidateFormComponent({ id }: { id: string }) {
       router.push(config.listRouteId);
       return;
     }
+
+    // A create runs the check once more: the email may never have been blurred,
+    // and a phone or LinkedIn match only shows up here.
+    const found = await checkDuplicates(values);
+    if (found.length) {
+      mergeModal.open({ match: found[0], incoming: values, payload });
+      return;
+    }
+
+    await create(payload, meta?.addAnother);
+  };
+
+  const create = async (payload: Record<string, unknown>, addAnother?: boolean) => {
+    const mut = mutation as Record<string, ((body?: unknown) => Promise<unknown>) | undefined>;
     await mut.create?.(payload);
     show(t("toast.created"));
-    if (!meta?.addAnother) router.push(config.listRouteId);
+    if (!addAnother) router.push(config.listRouteId);
   };
 
   const defaultValues: FormValues =
@@ -351,25 +441,95 @@ export function CandidateFormComponent({ id }: { id: string }) {
           lastActivityLabel: t("audit.onSave"),
         };
 
+  const warning = dupe?.matches[0];
+
   return (
-    <FormWithSectionsRenderer
-      key={candidateId ?? "new"}
-      id={id}
-      title={isEdit ? "editTitle" : "newTitle"}
-      description={isEdit ? "editDescription" : "newDescription"}
-      schema={config.schema}
-      sections={config.sections}
-      sectionsContainer={config.sectionsContainer}
-      defaultValues={defaultValues}
-      onSubmit={save}
-      isLoading={loading}
-      actionsPlacement="header"
-      widgets={widgets}
-      submitLabel={isEdit ? "actions.save" : "actions.create"}
-      submitIcon={isEdit ? "check" : "person-add"}
-      cancelLabel="actions.cancel"
-      onCancel={() => router.push(config.listRouteId)}
-      addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
-    />
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {warning ? (
+        <Box
+          data-testid="duplicate-warning"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            p: "12px 16px",
+            borderRadius: "12px",
+            border: "1px solid",
+            borderColor: "surface.primarySoftBorder",
+            bgcolor: "surface.primarySoftBg",
+          }}
+        >
+          <Box sx={{ color: "surface.accentBright", display: "flex", flex: "none" }}>
+            <IconRenderer name="warning" size={18} />
+          </Box>
+          <Typography sx={{ flex: 1, minWidth: 0, fontSize: 13 }}>
+            {t("duplicate.warning", {
+              name: warning.name,
+              on: (warning.matchedOn ?? []).map((reason) => t(`duplicate.on.${reason}`)).join(", "),
+            })}
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{ flex: "none" }}
+            onClick={() => mergeModal.open({ match: warning, incoming: dupe?.values ?? {} })}
+          >
+            {t("duplicate.review")}
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{ flex: "none" }}
+            onClick={() => setDupe(null)}
+          >
+            {t("duplicate.dismiss")}
+          </Button>
+        </Box>
+      ) : null}
+
+      <FormWithSectionsRenderer
+        key={candidateId ?? "new"}
+        id={id}
+        title={isEdit ? "editTitle" : "newTitle"}
+        description={isEdit ? "editDescription" : "newDescription"}
+        schema={config.schema}
+        sections={config.sections}
+        sectionsContainer={config.sectionsContainer}
+        defaultValues={defaultValues}
+        onSubmit={save}
+        isLoading={loading}
+        actionsPlacement="header"
+        widgets={widgets}
+        submitLabel={isEdit ? "actions.save" : "actions.create"}
+        submitIcon={isEdit ? "check" : "person-add"}
+        cancelLabel="actions.cancel"
+        onCancel={() => router.push(config.listRouteId)}
+        addAnotherLabel={isEdit ? undefined : "actions.saveAnother"}
+      />
+
+      {mergeModal.data ? (
+        <DuplicateMergeDialog
+          open={mergeModal.isOpen}
+          onClose={mergeModal.close}
+          t={t}
+          schema={config.schema}
+          match={mergeModal.data.match}
+          incoming={mergeModal.data.incoming}
+          busy={merging}
+          onConfirm={(values) => merge(mergeModal.data?.match as DuplicateMatch, values)}
+          onCreateAnyway={
+            mergeModal.data.payload
+              ? async () => {
+                  const payload = mergeModal.data?.payload;
+                  mergeModal.close();
+                  setDupe(null);
+                  if (payload) await create(payload);
+                }
+              : undefined
+          }
+          createAnywayLabel={t("duplicate.createAnyway")}
+        />
+      ) : null}
+    </Box>
   );
 }

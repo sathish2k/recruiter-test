@@ -36,6 +36,7 @@ export type BuiltInWidget =
   | "checkbox-group"
   | "multiselect"
   | "number"
+  | "number-map"
   | "slider"
   | "date"
   | "time"
@@ -233,6 +234,9 @@ export interface JsonSchemaProperty {
   unit?: string;
   /** `number`: which end `unit` sits on. Default "start". */
   unitPosition?: "start" | "end";
+  /** `number-map`: field on each option row holding the fallback shown as that
+   * row's placeholder — the workspace default a requirement overrides. */
+  defaultKey?: string;
   /** `slider`: captions under the track ends (translation keys), e.g.
    * "50 · broad" / "95 · strict". The value readout uses `unit` as its suffix. */
   minLabel?: string;

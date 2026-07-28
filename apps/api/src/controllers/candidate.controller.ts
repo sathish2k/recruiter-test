@@ -5,8 +5,13 @@ import {
   type CandidateInput,
   createCandidate,
   deleteCandidate,
+  findDuplicateCandidates,
   getCandidate,
+  type ImportRow,
+  importCandidates,
   listCandidates,
+  type MergeInput,
+  mergeCandidate,
   updateCandidate,
 } from "../services/candidate.service";
 
@@ -51,6 +56,55 @@ export async function getCandidateById(ctx: { user: Auth; params: { id: string }
   const found = await getCandidate(ctx.user.agencyId ?? "", ctx.params.id);
   if (!found) return status(404, "Candidate not found");
   return found;
+}
+
+export async function getDuplicates(ctx: {
+  user: Auth;
+  query: Record<string, string | undefined>;
+}) {
+  const data = await findDuplicateCandidates(ctx.user.agencyId ?? "", {
+    email: ctx.query.email,
+    secondaryEmail: ctx.query.secondaryEmail,
+    phone: ctx.query.phone,
+    mobile: ctx.query.mobile,
+    linkedin: ctx.query.linkedin,
+    excludeId: ctx.query.excludeId,
+  });
+  return { data };
+}
+
+export async function postMerge(ctx: {
+  user: Auth;
+  params: { id: string };
+  body?: MergeInput | null;
+}) {
+  if (!ctx.body?.values) return status(422, "Nothing to merge");
+  try {
+    const merged = await mergeCandidate(ctx.user.agencyId ?? "", ctx.params.id, ctx.body);
+    if (!merged) return status(404, "Candidate not found");
+    return { data: merged };
+  } catch (error) {
+    return status(422, (error as Error).message);
+  }
+}
+
+export async function postImport(ctx: {
+  user: Auth;
+  body?: { rows?: ImportRow[]; defaults?: CandidateInput } | null;
+}) {
+  const rows = ctx.body?.rows ?? [];
+  if (!rows.length) return status(422, "Nothing to import");
+  const results = await importCandidates(ctx.user.agencyId ?? "", rows, ctx.body?.defaults ?? {});
+  const tally = (outcome: string) => results.filter((row) => row.status === outcome).length;
+  return {
+    data: results,
+    meta: {
+      created: tally("created"),
+      merged: tally("merged"),
+      skipped: tally("skipped"),
+      duplicates: tally("duplicate"),
+    },
+  };
 }
 
 export async function postCandidate(ctx: { user: Auth; body?: CandidateInput | null }) {

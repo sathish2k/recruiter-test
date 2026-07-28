@@ -32,6 +32,7 @@ export { markdownToHtml } from "./markdown/markdown-to-html";
 export { MarkdownToolbar } from "./markdown/markdown-toolbar";
 export { MultiSelectWidget } from "./multiselect/multiselect";
 export { NumberWidget } from "./number/number";
+export { NumberMapWidget } from "./number-map/number-map";
 export {
   DEFAULT_PASSWORD_STRENGTH,
   PasswordStrengthMeter,
@@ -64,6 +65,7 @@ export type {
   PasswordStrengthConfig,
   PasswordStrengthLevel,
   SelectOption,
+  Translate,
   UploadValue,
   Widget,
   WidgetProps,

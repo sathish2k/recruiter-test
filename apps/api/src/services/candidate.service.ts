@@ -1,5 +1,17 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, count, desc, eq, getTableColumns, ilike, inArray, or } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 import {
@@ -11,6 +23,7 @@ import {
   type Experience,
 } from "../models/candidate.model";
 import { job } from "../models/job.model";
+import { workspaceSettings } from "./organization.service";
 
 type CandidateRow = typeof candidate.$inferSelect;
 type CandidateJoins = { jobTitle?: string | null; ownerName?: string | null };
@@ -64,6 +77,7 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     offer: row.offer ?? [],
     contracts: row.contracts ?? [],
     attachments: row.attachments ?? [],
+    mergedIntoId: row.mergedIntoId ?? "",
     jobId: row.jobId ?? "",
     jobTitle: row.jobTitle ?? "",
     startingStage: row.startingStage ?? "",
@@ -277,6 +291,204 @@ export async function deleteCandidate(organizationId: string, id: string) {
     .where(and(eq(candidate.id, id), eq(candidate.organizationId, organizationId)))
     .returning();
   return deleted ? { id: deleted.id } : null;
+}
+
+export interface DuplicateQuery {
+  email?: string;
+  secondaryEmail?: string;
+  phone?: string;
+  mobile?: string;
+  linkedin?: string;
+  excludeId?: string;
+}
+
+/** Which workspace identifiers a match was found on — the warning names them. */
+export type DuplicateReason = "email" | "phone" | "linkedin";
+
+const onlyDigits = (value?: string | null) => (value ?? "").replace(/\D/g, "");
+const lower = (value?: string | null) => (value ?? "").trim().toLowerCase();
+
+/**
+ * The one duplicate check every intake path runs — the form, the import and
+ * (once it exists) inbound apply. Which identifiers count is the workspace's
+ * own setting, so a workspace that turns detection off is never nagged.
+ *
+ * "Resume hash" is offered in Settings but not implemented here: no hash is
+ * stored yet, so selecting it simply contributes no matcher.
+ */
+export async function findDuplicateCandidates(organizationId: string, query: DuplicateQuery) {
+  const settings = await workspaceSettings(organizationId, [
+    "duplicateDetection",
+    "duplicateIdentifiers",
+  ]);
+  if (settings.duplicateDetection === false) return [];
+  const identifiers = new Set(
+    Array.isArray(settings.duplicateIdentifiers) ? settings.duplicateIdentifiers.map(String) : [],
+  );
+
+  const emails = [lower(query.email), lower(query.secondaryEmail)].filter(Boolean);
+  const phones = [onlyDigits(query.mobile), onlyDigits(query.phone)].filter(
+    (value) => value.length >= 7,
+  );
+  const linkedin = lower(query.linkedin);
+
+  const matchers = [];
+  if (identifiers.has("Email")) {
+    for (const email of emails) {
+      matchers.push(ilike(candidate.email, email), ilike(candidate.secondaryEmail, email));
+    }
+  }
+  if (identifiers.has("Phone")) {
+    for (const phone of phones) {
+      // Stored numbers carry the dial code and spacing the phone widget writes,
+      // so both sides are compared as bare digits.
+      matchers.push(
+        sql`regexp_replace(coalesce(${candidate.mobile}, ''), '[^0-9]', '', 'g') = ${phone}`,
+        sql`regexp_replace(coalesce(${candidate.phone}, ''), '[^0-9]', '', 'g') = ${phone}`,
+      );
+    }
+  }
+  if (identifiers.has("LinkedIn URL") && linkedin) {
+    matchers.push(ilike(candidate.linkedin, linkedin));
+  }
+
+  const anyMatch = or(...matchers);
+  if (!anyMatch) return [];
+
+  const filters = [
+    eq(candidate.organizationId, organizationId),
+    eq(candidate.archived, false),
+    anyMatch,
+  ];
+  if (query.excludeId) filters.push(ne(candidate.id, query.excludeId));
+
+  const rows = await withNames()
+    .where(and(...filters))
+    .limit(5);
+  return rows.map((row) => {
+    const reasons: DuplicateReason[] = [];
+    if (emails.includes(lower(row.email)) || emails.includes(lower(row.secondaryEmail))) {
+      reasons.push("email");
+    }
+    if (phones.includes(onlyDigits(row.mobile)) || phones.includes(onlyDigits(row.phone))) {
+      reasons.push("phone");
+    }
+    if (linkedin && lower(row.linkedin) === linkedin) reasons.push("linkedin");
+    return { ...mapCandidate(row), matchedOn: reasons };
+  });
+}
+
+export interface MergeInput {
+  /** The losing record, archived and pointed at the survivor. Omitted when the
+   * loser is an unsaved form the user chose to merge instead of create. */
+  sourceId?: string;
+  /** The values the user kept, field by field. */
+  values: CandidateInput;
+}
+
+/**
+ * Field-level merge (TC-CAN-002): the chosen values are written onto the
+ * surviving record and the loser is archived, never deleted, with
+ * `mergedIntoId` recording where its history went.
+ */
+export async function mergeCandidate(organizationId: string, targetId: string, input: MergeInput) {
+  if (input.sourceId === targetId) throw new Error("A candidate cannot be merged into itself");
+
+  return db.transaction(async (tx) => {
+    const [merged] = await tx
+      .update(candidate)
+      .set({ ...pickEditable(input.values), updatedAt: new Date() })
+      .where(and(eq(candidate.id, targetId), eq(candidate.organizationId, organizationId)))
+      .returning();
+    if (!merged) return null;
+
+    if (input.sourceId) {
+      await tx
+        .update(candidate)
+        .set({ archived: true, mergedIntoId: targetId, updatedAt: new Date() })
+        .where(and(eq(candidate.id, input.sourceId), eq(candidate.organizationId, organizationId)));
+    }
+    return mapCandidate(merged);
+  });
+}
+
+/** How many records one import may carry — a CSV is user input, not a job. */
+export const IMPORT_LIMIT = 200;
+
+export interface ImportRow {
+  values: CandidateInput;
+  /** What to do with this row. `merge` needs `targetId`. */
+  mode?: "create" | "skip" | "merge";
+  targetId?: string;
+  /** Create even though the check found a match — the reviewer said so. */
+  force?: boolean;
+}
+
+export interface ImportOutcome {
+  index: number;
+  status: "created" | "merged" | "skipped" | "duplicate";
+  candidateId?: string;
+  duplicates?: { id: string; name: string; matchedOn: DuplicateReason[] }[];
+}
+
+/**
+ * The bulk path behind CV and CSV import. Every `create` row runs the same
+ * `findDuplicateCandidates` check the form runs, so no path can slip a
+ * duplicate in; a row the reviewer has not forced comes back as `duplicate`
+ * rather than being written.
+ */
+export async function importCandidates(
+  organizationId: string,
+  rows: ImportRow[],
+  defaults: CandidateInput = {},
+): Promise<ImportOutcome[]> {
+  const outcomes: ImportOutcome[] = [];
+
+  for (const [index, row] of rows.slice(0, IMPORT_LIMIT).entries()) {
+    const values = { ...defaults, ...row.values };
+
+    if (row.mode === "skip") {
+      outcomes.push({ index, status: "skipped" });
+      continue;
+    }
+    if (row.mode === "merge" && row.targetId) {
+      const merged = await mergeCandidate(organizationId, row.targetId, { values });
+      outcomes.push(
+        merged ? { index, status: "merged", candidateId: merged.id } : { index, status: "skipped" },
+      );
+      continue;
+    }
+
+    if (!row.force) {
+      const matches = await findDuplicateCandidates(organizationId, {
+        email: values.email,
+        secondaryEmail: values.secondaryEmail,
+        phone: values.phone,
+        mobile: values.mobile,
+        linkedin: values.linkedin,
+      });
+      if (matches.length) {
+        outcomes.push({
+          index,
+          status: "duplicate",
+          duplicates: matches.map((match) => ({
+            id: match.id,
+            name: match.name,
+            matchedOn: match.matchedOn,
+          })),
+        });
+        continue;
+      }
+    }
+
+    const created = await createCandidate(organizationId, values);
+    outcomes.push(
+      created
+        ? { index, status: "created", candidateId: created.id }
+        : { index, status: "skipped" },
+    );
+  }
+  return outcomes;
 }
 
 /** §6.1 — archive, never delete. Distinct from erasure, which destroys data. */
