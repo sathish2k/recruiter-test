@@ -1,7 +1,7 @@
 {
   "back": "Back to candidates",
   "newTitle": "New Candidate",
-  "newDescription": "Add the person, their CV and history — screening starts the moment the resume lands.",
+  "newDescription": "Add the person, their CV and history — HirePilotX screens them the moment the resume lands.",
   "editTitle": "Edit candidate",
   "editDescription": "Update this candidate's profile, experience and status.",
   "sections": {
@@ -53,13 +53,13 @@
     "expectedSalaryPlaceholder": "e.g. 36",
     "lpa": "LPA",
     "skillSet": "Skill set",
-    "skillSetPlaceholder": "Type a skill and press Enter",
+    "skillSetPlaceholder": "Add skill + Enter",
     "additionalInfo": "Additional info",
-    "additionalInfoPlaceholder": "Notes about this candidate…",
+    "additionalInfoPlaceholder": "Notice period, relocation, visa status…",
     "linkedin": "LinkedIn",
-    "linkedinPlaceholder": "linkedin.com/in/…",
+    "linkedinPlaceholder": "linkedin.com/in/sanya-iyer",
     "twitter": "X (formerly Twitter)",
-    "twitterPlaceholder": "@handle",
+    "twitterPlaceholder": "handle",
     "degree": "Degree",
     "degreePlaceholder": "e.g. B.Tech",
     "institution": "Institute / School",
@@ -98,7 +98,27 @@
     "autofillNothing": "Nothing could be read — fill the fields in manually.",
     "autofillRetry": "Try another file",
     "autofillFailed": "Could not read that document",
-    "autofillTooLarge": "That file is larger than 10MB"
+    "autofillTooLarge": "That file is larger than 10MB",
+    "noticePeriod": "Notice period",
+    "workAuthorization": "Work authorization",
+    "preferredLocation": "Preferred location",
+    "preferredLocationPlaceholder": "e.g. Bangalore · Pune",
+    "github": "GitHub",
+    "githubPlaceholder": "github.com/handle",
+    "stackOverflow": "Stack Overflow",
+    "stackOverflowPlaceholder": "stackoverflow.com/users/…",
+    "autofillDrop": "Drop resume here",
+    "autofillFormats": "PDF · DOCX · max 10 MB",
+    "autofillHint": "AI extracts contact details, experience, education and skills automatically",
+    "openToRelocate": "Open to relocate",
+    "openToRemote": "Open to remote",
+    "formattedResumeHint": "Generated from the parsed CV with your agency template",
+    "salaryCurrency": "Currency",
+    "suggestSkills": "Suggest from resume",
+    "autofillOr": "or",
+    "autofillBrowseVerb": "browse",
+    "formattedResumeEmpty": "No formatted resume yet",
+    "formattedResumeGenerate": "Generate"
   },
   "salutation": {
     "none": "None",
@@ -113,7 +133,8 @@
     "diploma": "Diploma",
     "bachelors": "Bachelor's",
     "masters": "Master's",
-    "phd": "PhD"
+    "phd": "PhD",
+    "none": "None"
   },
   "stage": {
     "sourced": "Sourced",
@@ -134,7 +155,8 @@
     "referral": "Referral",
     "inbound": "Inbound enquiry",
     "outbound": "Outbound",
-    "event": "Marketing event"
+    "event": "Marketing event",
+    "none": "Not set"
   },
   "address": {
     "street": "Street",
@@ -151,6 +173,56 @@
   },
   "toast": {
     "created": "Candidate created",
-    "updated": "Candidate updated"
+    "updated": "Candidate updated",
+    "noResume": "Attach a resume first — skills are read back out of it.",
+    "nameFirst": "Add a name first — the formatted resume is built from this form."
+  },
+  "noticePeriods": {
+    "immediate": "Immediate",
+    "15_days": "15 days",
+    "30_days": "30 days",
+    "60_days": "60 days",
+    "90_days": "90 days",
+    "serving": "Serving notice",
+    "none": "Not set"
+  },
+  "workAuthorizations": {
+    "citizen": "Citizen",
+    "permanent_resident": "Permanent resident",
+    "work_visa": "Work visa",
+    "needs_sponsorship": "Needs sponsorship",
+    "unknown": "Not known",
+    "none": "Not set"
+  },
+  "completeness": {
+    "title": "Candidate completeness",
+    "met": "{{done}} of {{total}} quality checks met",
+    "contact": "Contact",
+    "resume": "Resume",
+    "experience": "Experience",
+    "skills": "Skills",
+    "linkedin": "LinkedIn",
+    "job": "Job association"
+  },
+  "salaryUnits": {
+    "INR": "LPA ₹",
+    "USD": "K $",
+    "EUR": "K €",
+    "GBP": "K £",
+    "AED": "K د.إ",
+    "SGD": "K S$"
+  },
+  "audit": {
+    "createdBy": "Created by",
+    "created": "Created",
+    "lastActivity": "Last activity",
+    "justNow": "Just now",
+    "onSave": "— starts on save"
+  },
+  "formatted": {
+    "summary": "SUMMARY",
+    "experience": "EXPERIENCE",
+    "education": "EDUCATION",
+    "skills": "SKILLS"
   }
 }

@@ -70,6 +70,7 @@ export {
   applyExtraction,
   buildResolver,
   CalloutWidget,
+  ChipsWidget,
   type DayOption,
   type DayPreset,
   DaysField,
@@ -95,11 +96,14 @@ export {
   type FormWithSectionsProps,
   FormWithSectionsRenderer,
   fetchOptions,
+  GeneratedDocWidget,
   invalidateOptions,
   type JsonSchema,
   type JsonSchemaProperty,
   MarkdownEditor,
+  MarkdownPreview,
   MarkdownToolbar,
+  MarkdownWidget,
   markdownToHtml,
   type OptionSource,
   type PasswordStrengthConfig,
@@ -126,6 +130,7 @@ export {
   type WidgetProps,
   type Widgets,
 } from "./components/forms";
+export type { CompletenessCheck } from "./components/forms/completeness/completeness";
 export {
   type ApexChartType,
   type BarChartPeriod,

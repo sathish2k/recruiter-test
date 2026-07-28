@@ -1,6 +1,7 @@
 export { AttachmentsWidget, type AttachmentUploader } from "./attachments/attachments";
 export { CalloutWidget } from "./callout/callout";
 export { CheckboxGroupWidget } from "./checkbox-group/checkbox-group";
+export { ChipsWidget } from "./chips/chips";
 export { ColorWidget } from "./color/color";
 export { DateWidget } from "./date/date";
 export type {
@@ -25,7 +26,8 @@ export {
   FormRenderer,
 } from "./form-renderer/form-renderer";
 export { FormWithSectionsRenderer } from "./form-with-section-renderer/form-with-section-renderer";
-export { MarkdownEditor } from "./markdown/markdown";
+export { GeneratedDocWidget } from "./generated-doc/generated-doc";
+export { MarkdownEditor, MarkdownPreview, MarkdownWidget } from "./markdown/markdown";
 export { markdownToHtml } from "./markdown/markdown-to-html";
 export { MarkdownToolbar } from "./markdown/markdown-toolbar";
 export { MultiSelectWidget } from "./multiselect/multiselect";

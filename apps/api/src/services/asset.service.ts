@@ -107,11 +107,14 @@ function keyFor(input: UploadInput, storedContentType: string): string {
   }
 }
 
-export async function uploadAsset(input: UploadInput) {
+export async function uploadAsset(rawInput: UploadInput) {
   if (!isStorageConfigured()) {
     throw new AssetError("Object storage is not configured", "unconfigured");
   }
 
+  // A browser sends "text/plain;charset=utf-8" for text parts — the parameters
+  // are not part of the type, so strip them before the allow-list check.
+  const input = { ...rawInput, contentType: (rawInput.contentType.split(";")[0] ?? "").trim() };
   const isImage = IMAGE_TYPES.has(input.contentType);
   const isDocument = DOCUMENT_TYPES.has(input.contentType);
   if (!isImage && !isDocument) {

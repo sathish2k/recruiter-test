@@ -45,6 +45,8 @@ export function FieldShell({
   help,
   error,
   children,
+  labelAction,
+  labelSuffix,
 }: {
   label: string;
   hideLabel?: boolean;
@@ -53,10 +55,32 @@ export function FieldShell({
   /** Already translated; takes precedence over `help`. */
   error?: string;
   children: ReactNode;
+  /** Control pinned to the right of the label row — the design's "Suggest
+   * from resume" action beside a chips field. */
+  labelAction?: ReactNode;
+  /** Small note rendered immediately after the label text. */
+  labelSuffix?: ReactNode;
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-      <FieldLabel label={label} hide={hideLabel} />
+      {labelAction ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "10px",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <FieldLabel label={label} hide={hideLabel} />
+            {labelSuffix}
+          </Box>
+          {labelAction}
+        </Box>
+      ) : (
+        <FieldLabel label={label} hide={hideLabel} />
+      )}
       {children}
       {error ? (
         <Typography sx={{ fontSize: 11, color: "error.main" }}>{error}</Typography>

@@ -12,4 +12,12 @@ export default new Elysia({ name: "extraction.routes" })
       file: t.File(),
       fields: t.String({ maxLength: 16384 }),
     }),
+  })
+  /** The same contract, over text the caller already holds. */
+  .post("/extractions/text", (ctx) => extractionController.postTextExtraction(ctx), {
+    isAuth: true,
+    body: t.Object({
+      text: t.String({ maxLength: 24000 }),
+      fields: t.String({ maxLength: 16384 }),
+    }),
   });

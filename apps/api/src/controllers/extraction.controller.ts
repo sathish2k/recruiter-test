@@ -5,7 +5,11 @@ import {
   UnsupportedDocumentError,
 } from "../lib/document-text";
 import { isGeminiConfigured, ModelError } from "../lib/gemini";
-import { extractFromDocument, InvalidContractError } from "../services/document-extraction.service";
+import {
+  extractFromDocument,
+  extractFromText,
+  InvalidContractError,
+} from "../services/document-extraction.service";
 
 type Auth = { id: string; name?: string | null; agencyId?: string | null };
 
@@ -54,6 +58,35 @@ export async function postDocumentExtraction(ctx: {
       contract,
     });
     return { data: values, meta: { characters } };
+  } catch (error) {
+    return toStatus(error);
+  }
+}
+
+const MAX_TEXT_CHARS = 24_000;
+
+export async function postTextExtraction(ctx: {
+  user: Auth;
+  body: { text: string; fields: string };
+}) {
+  if (!isGeminiConfigured()) return status(503, "Extraction is not configured");
+  if (!ctx.user.agencyId) return status(403, "No agency for this user");
+  if (!ctx.body.text.trim()) return status(422, "Nothing to read yet");
+  if (ctx.body.text.length > MAX_TEXT_CHARS) return status(413, "Too much text to read");
+  if (ctx.body.fields.length > MAX_CONTRACT_CHARS) {
+    return status(400, "Requested field list is too large");
+  }
+
+  let contract: unknown;
+  try {
+    contract = JSON.parse(ctx.body.fields);
+  } catch {
+    return status(400, "`fields` must be a JSON array");
+  }
+
+  try {
+    const result = await extractFromText({ text: ctx.body.text, contract });
+    return { data: result.values };
   } catch (error) {
     return toStatus(error);
   }

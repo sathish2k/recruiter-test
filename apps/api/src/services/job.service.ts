@@ -38,6 +38,9 @@ function mapJob(row: JobRow & JobJoins) {
     requirements: row.requirements ?? "",
     benefits: row.benefits ?? "",
     skills: row.skills ?? [],
+    niceToHaveSkills: row.niceToHaveSkills ?? [],
+    salaryCurrency: row.salaryCurrency ?? "INR",
+    remote: row.remote,
     openings: row.openings,
     salaryMin: row.salaryMin ?? "",
     salaryMax: row.salaryMax ?? "",
@@ -156,6 +159,9 @@ export interface JobInput {
   requirements?: string;
   benefits?: string;
   skills?: string[];
+  niceToHaveSkills?: string[];
+  salaryCurrency?: string;
+  remote?: boolean;
   openings?: number;
   salaryMin?: string;
   salaryMax?: string;
@@ -191,6 +197,9 @@ const EDITABLE = [
   "requirements",
   "benefits",
   "skills",
+  "niceToHaveSkills",
+  "salaryCurrency",
+  "remote",
   "openings",
   "salaryMin",
   "salaryMax",

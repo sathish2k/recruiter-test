@@ -67,6 +67,16 @@ export const candidate = pgTable("candidate", {
   additionalInfo: text("additional_info"),
   linkedin: text("linkedin"),
   twitter: text("twitter"),
+  github: text("github"),
+  stackOverflow: text("stack_overflow"),
+  /** How long before they could start, e.g. "30_days". */
+  noticePeriod: text("notice_period"),
+  /** Right to work in the hiring country, e.g. "citizen" / "needs_sponsorship". */
+  workAuthorization: text("work_authorization"),
+  preferredLocation: text("preferred_location"),
+  salaryCurrency: text("salary_currency"),
+  openToRelocate: boolean("open_to_relocate").notNull().default(false),
+  openToRemote: boolean("open_to_remote").notNull().default(false),
   education: jsonb("education").$type<Education[]>(),
   experience: jsonb("experience").$type<Experience[]>(),
   resume: jsonb("resume").$type<CandidateAttachment[]>(),

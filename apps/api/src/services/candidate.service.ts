@@ -42,6 +42,14 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     additionalInfo: row.additionalInfo ?? "",
     linkedin: row.linkedin ?? "",
     twitter: row.twitter ?? "",
+    github: row.github ?? "",
+    stackOverflow: row.stackOverflow ?? "",
+    noticePeriod: row.noticePeriod ?? "",
+    workAuthorization: row.workAuthorization ?? "",
+    preferredLocation: row.preferredLocation ?? "",
+    salaryCurrency: row.salaryCurrency ?? "INR",
+    openToRelocate: row.openToRelocate,
+    openToRemote: row.openToRemote,
     education: row.education ?? [],
     experience: row.experience ?? [],
     resume: row.resume ?? [],
@@ -153,6 +161,14 @@ export interface CandidateInput {
   additionalInfo?: string;
   linkedin?: string;
   twitter?: string;
+  github?: string;
+  stackOverflow?: string;
+  noticePeriod?: string;
+  workAuthorization?: string;
+  preferredLocation?: string;
+  salaryCurrency?: string;
+  openToRelocate?: boolean;
+  openToRemote?: boolean;
   education?: Education[];
   experience?: Experience[];
   resume?: CandidateAttachment[];
@@ -189,6 +205,14 @@ const EDITABLE = [
   "additionalInfo",
   "linkedin",
   "twitter",
+  "github",
+  "stackOverflow",
+  "noticePeriod",
+  "workAuthorization",
+  "preferredLocation",
+  "salaryCurrency",
+  "openToRelocate",
+  "openToRemote",
   "education",
   "experience",
   "resume",

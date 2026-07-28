@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type FieldValues, FormProvider, useForm } from "react-hook-form";
 import { IconRenderer } from "../../renderers";
+import { SlidingPillTabs } from "../../tabs/sliding-pill-tabs";
 import { Field } from "../field/field";
 import { useFieldEffects } from "../field/use-field-effects";
 import { FormContainer } from "../form-container";
@@ -43,7 +44,12 @@ function sectionGrid(section: FormSection) {
 /** The cells a section actually draws — the same subset `renderEntry` keeps, so
  * the skeleton has one placeholder per real field and lands on the same tracks. */
 function visibleFields(section: FormSection, schema: JsonSchema): FormSectionField[] {
-  const led = new Set(Object.values(schema.properties).map((prop) => prop.leading));
+  const led = new Set(
+    Object.values(schema.properties).flatMap((prop) => [
+      ...(prop.leading ? [prop.leading] : []),
+      ...(prop.trailing ?? []),
+    ]),
+  );
   return (section.fields ?? [])
     .filter((field) => !(section.moreFields ?? []).includes(fieldName(field)))
     .filter((field) => fieldName(field) !== section.headerField)
@@ -288,6 +294,8 @@ export function FormWithSectionsRenderer({
   const { control, handleSubmit, getValues, reset, formState } = methods;
   const { hiddenSet, disabledSet } = useFieldEffects(schema, control, methods.setValue);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  // Per-section active tab, for sections that render their fields as tabs.
+  const [activeTab, setActiveTab] = useState<Record<string, string>>({});
 
   // `useForm` reads `defaultValues` once, at mount. An edit screen mounts this
   // before its record has loaded (it needs the schema to draw the skeleton), so
@@ -338,19 +346,27 @@ export function FormWithSectionsRenderer({
     // Condition-hidden fields drop out so their grid cell collapses (no gap).
     // Secondary fields stay folded away until the section is expanded.
     const moreOpen = expanded.has(String(key));
+    const tabKey = String(key);
     const isMore = (name: string) => (section.moreFields ?? []).includes(name);
-    // A field named as another's `leading` is drawn inside that field, not as a
-    // cell of its own.
+    // A field named as another's `leading`/`trailing` is drawn inside that
+    // field, not as a cell of its own.
     const led = new Set(
-      Object.values(schema.properties)
-        .map((prop) => prop.leading)
-        .filter(Boolean),
+      Object.values(schema.properties).flatMap((prop) => [
+        ...(prop.leading ? [prop.leading] : []),
+        ...(prop.trailing ?? []),
+      ]),
     );
     const fields = (section.fields ?? [])
       .filter((field) => !hiddenSet.has(fieldName(field)))
       .filter((field) => moreOpen || !isMore(fieldName(field)))
       .filter((field) => fieldName(field) !== section.headerField)
-      .filter((field) => !led.has(fieldName(field)));
+      .filter((field) => !led.has(fieldName(field)))
+      // A tabbed section shows the picked field only; its tabs carry the labels.
+      .filter(
+        (field) =>
+          !section.tabbed ||
+          fieldName(field) === (activeTab[tabKey] ?? fieldName((section.fields ?? [])[0])),
+      );
     const body = fields.length ? (
       <FormContainer
         stackContainer={section.stackContainer}
@@ -369,16 +385,26 @@ export function FormWithSectionsRenderer({
           if (!prop) return <Box key={name} />;
           const required = schema.required?.includes(name);
           return (
-            <Field
-              key={name}
-              name={name}
-              prop={required ? { ...prop, required } : prop}
-              leadingProp={prop.leading ? schema.properties[prop.leading] : undefined}
-              control={control}
-              t={t}
-              widgets={widgets}
-              disabled={disabledSet.has(name)}
-            />
+            // Stamped so anything outside the form (the completeness card) can
+            // find a field and scroll the user to it.
+            <Box key={name} data-field={name}>
+              <Field
+                name={name}
+                prop={required ? { ...prop, required } : prop}
+                leadingProp={prop.leading ? schema.properties[prop.leading] : undefined}
+                trailingProps={
+                  prop.trailing
+                    ? Object.fromEntries(
+                        prop.trailing.map((sibling) => [sibling, schema.properties[sibling]]),
+                      )
+                    : undefined
+                }
+                control={control}
+                t={t}
+                widgets={widgets}
+                disabled={disabledSet.has(name)}
+              />
+            </Box>
           );
         })}
       </FormContainer>
@@ -460,7 +486,18 @@ export function FormWithSectionsRenderer({
               : {}),
         }}
       >
-        {section.title ? (
+        {section.tabbed ? (
+          <SlidingPillTabs
+            items={(section.fields ?? []).map((field) => ({
+              value: fieldName(field),
+              render: () => t(schema.properties[fieldName(field)]?.title ?? fieldName(field)),
+            }))}
+            value={activeTab[tabKey] ?? fieldName((section.fields ?? [])[0])}
+            onChange={(value) => setActiveTab((current) => ({ ...current, [tabKey]: value }))}
+            sx={{ alignSelf: "flex-start" }}
+          />
+        ) : null}
+        {section.title && !section.tabbed ? (
           section.iconBadge && section.icon ? (
             // Filled orange square badge + title/subtitle beside it (AI cards).
             <Box sx={{ display: "flex", gap: "11px", alignItems: "flex-start" }}>

@@ -41,7 +41,21 @@ function phoneProblem(value: unknown): boolean {
 export function defaultFor(prop: JsonSchemaProperty): unknown {
   if (prop.widget === "upload") return { url: prop.default ?? "" };
   if (prop.default !== undefined) return prop.default;
-  if (prop.type === "array") return [];
+  if (prop.type === "array") {
+    // A repeater the design opens on one blank row seeds that row here rather
+    // than from an effect, so it lands exactly once.
+    if (prop.startEmptyRow && prop.itemSchema) {
+      return [
+        Object.fromEntries(
+          Object.entries(prop.itemSchema).map(([key, item]) => [
+            key,
+            item.type === "boolean" ? false : "",
+          ]),
+        ),
+      ];
+    }
+    return [];
+  }
   if (prop.type === "boolean") return false;
   return "";
 }

@@ -1,10 +1,15 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
+import ListSubheader from "@mui/material/ListSubheader";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { useRef, useState } from "react";
+import { IconRenderer } from "../../renderers";
 import { FieldShell } from "../field/field-shell";
 import type { Translate, WidgetProps } from "../types";
 import { esc, markdownToHtml, tokens } from "./markdown-to-html";
@@ -119,7 +124,39 @@ export function MarkdownEditor({
 }
 
 /** The `markdown` widget. */
-export function MarkdownWidget({ prop, field, fieldState, t }: WidgetProps) {
+export function MarkdownWidget({
+  prop,
+  field,
+  fieldState,
+  t,
+  onGenerate,
+  onTemplates,
+}: WidgetProps & {
+  /** Injected by the screen — drafts this section and returns its text. */
+  onGenerate?: () => Promise<string | null>;
+  /** Injected by the screen — bodies this section can be seeded from. */
+  onTemplates?: () => Promise<{ label: string; body: string }[]>;
+}) {
+  const [drafting, setDrafting] = useState(false);
+  const [menu, setMenu] = useState<HTMLElement | null>(null);
+  const [templates, setTemplates] = useState<{ label: string; body: string }[] | null>(null);
+
+  const openTemplates = async (anchor: HTMLElement) => {
+    setMenu(anchor);
+    if (templates || !onTemplates) return;
+    setTemplates(await onTemplates());
+  };
+  const draft = async () => {
+    if (!onGenerate || drafting) return;
+    setDrafting(true);
+    try {
+      const written = await onGenerate();
+      if (written) field.onChange(written);
+    } finally {
+      setDrafting(false);
+    }
+  };
+
   return (
     <FieldShell
       label={t(prop.title ?? "")}
@@ -127,6 +164,56 @@ export function MarkdownWidget({ prop, field, fieldState, t }: WidgetProps) {
       help={prop.help ? t(prop.help) : undefined}
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
+      {onGenerate || onTemplates ? (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px", mb: "10px" }}>
+          {onTemplates ? (
+            <>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={(event) => openTemplates(event.currentTarget)}
+                startIcon={<IconRenderer name="description" size={14} />}
+                endIcon={<IconRenderer name="expand-more" size={14} />}
+              >
+                {t("markdown.templates", "Templates")}
+              </Button>
+              <Menu anchorEl={menu} open={Boolean(menu)} onClose={() => setMenu(null)}>
+                <ListSubheader sx={{ fontSize: 10, letterSpacing: ".1em", lineHeight: 2.4 }}>
+                  {t("markdown.fromExisting", "FROM AN EXISTING JOB")}
+                </ListSubheader>
+                {templates === null ? (
+                  <MenuItem disabled>{t("form.loading", "Loading…")}</MenuItem>
+                ) : templates.length === 0 ? (
+                  <MenuItem disabled>{t("markdown.noTemplates", "Nothing to copy yet")}</MenuItem>
+                ) : (
+                  templates.map((template) => (
+                    <MenuItem
+                      key={template.label}
+                      onClick={() => {
+                        field.onChange(template.body);
+                        setMenu(null);
+                      }}
+                    >
+                      {template.label}
+                    </MenuItem>
+                  ))
+                )}
+              </Menu>
+            </>
+          ) : null}
+          {onGenerate ? (
+            <Button
+              variant="contained"
+              size="small"
+              loading={drafting}
+              onClick={draft}
+              startIcon={<IconRenderer name="sparkle" size={14} />}
+            >
+              {t("markdown.generate", "Generate with AI")}
+            </Button>
+          ) : null}
+        </Box>
+      ) : null}
       <MarkdownEditor
         value={String(field.value ?? "")}
         onChange={field.onChange}
@@ -135,5 +222,16 @@ export function MarkdownWidget({ prop, field, fieldState, t }: WidgetProps) {
         t={t}
       />
     </FieldShell>
+  );
+}
+
+/** Read-only render of a markdown body — the job's review-before-publish view. */
+export function MarkdownPreview({ value }: { value: string }) {
+  return (
+    <Box
+      sx={{ fontSize: 13.5, lineHeight: 1.6, color: "surface.textMuted" }}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: input is escaped before rendering.
+      dangerouslySetInnerHTML={{ __html: markdownToHtml(value) }}
+    />
   );
 }

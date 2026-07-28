@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { useMemo, useState } from "react";
 import { type FieldValues, useFormContext } from "react-hook-form";
@@ -39,6 +40,7 @@ type State = "idle" | "working" | "done" | "error";
  */
 export function ResumeAutofillWidget({
   field,
+  prop,
   t,
   uploader,
   extractor,
@@ -133,16 +135,20 @@ export function ResumeAutofillWidget({
 
   const working = state === "working";
   const failed = state === "error";
-  return (
-    <Box>
+  // At the top of a form the design gives this its own tall panel; in the rail
+  // it is a single strip.
+  const hero = prop.variant === "hero";
+  const zone = (
+    <>
       <Box
         component="label"
         sx={{
           display: "flex",
+          flexDirection: hero ? "column" : "row",
           alignItems: "center",
           justifyContent: "center",
-          gap: "8px",
-          p: "14px 10px",
+          gap: hero ? "6px" : "8px",
+          p: hero ? "26px 20px" : "14px 10px",
           borderRadius: "12px",
           border: "1px dashed",
           borderColor: failed ? "error.main" : "rgba(242,106,27,.5)",
@@ -152,15 +158,57 @@ export function ResumeAutofillWidget({
         }}
       >
         <Box sx={{ display: "flex" }}>
-          <IconRenderer name={working ? "sparkle" : failed ? "warning" : "upload-file"} size={17} />
+          <IconRenderer
+            name={working ? "sparkle" : failed ? "warning" : "upload-file"}
+            size={hero ? 26 : 17}
+          />
         </Box>
-        <Typography sx={{ fontSize: 12, fontWeight: 600, color: "inherit" }}>
-          {working
-            ? t("fields.autofillParsing", "Reading the resume…")
-            : failed
-              ? t("fields.autofillRetry", "Try another file")
-              : t("fields.autofillBrowse", "Browse or drop a resume")}
+        <Typography
+          sx={{
+            fontSize: hero ? 14 : 12,
+            fontWeight: 600,
+            color: working || failed || !hero ? "inherit" : "text.primary",
+          }}
+        >
+          {working ? (
+            t("fields.autofillParsing", "Reading the resume…")
+          ) : failed ? (
+            t("fields.autofillRetry", "Try another file")
+          ) : hero ? (
+            <>
+              {t("fields.autofillDrop", "Drop resume here")}{" "}
+              <Box component="span" sx={{ color: "text.disabled", fontWeight: 400 }}>
+                {t("fields.autofillOr", "or")}
+              </Box>{" "}
+              <Box component="span" sx={{ color: "surface.primarySoftFg" }}>
+                {t("fields.autofillBrowseVerb", "browse")}
+              </Box>
+            </>
+          ) : (
+            t("fields.autofillBrowse", "Browse or drop a resume")
+          )}
         </Typography>
+        {hero && !working && !failed ? (
+          <>
+            <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
+              {t("fields.autofillFormats", "PDF · DOCX · max 10 MB")}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                mt: "6px",
+                fontSize: 11.5,
+                fontWeight: 600,
+                color: "surface.primarySoftFg",
+              }}
+            >
+              <IconRenderer name="sparkle" size={13} />
+              {t("fields.autofillHint", "")}
+            </Box>
+          </>
+        ) : null}
         <input
           type="file"
           hidden
@@ -172,6 +220,22 @@ export function ResumeAutofillWidget({
       {failed && message ? (
         <Typography sx={{ fontSize: 11, color: "error.main", mt: "6px" }}>{message}</Typography>
       ) : null}
-    </Box>
+    </>
+  );
+
+  if (!hero) return <Box>{zone}</Box>;
+  return (
+    <Card
+      variant="base"
+      sx={{
+        p: "18px",
+        background: (theme) =>
+          `linear-gradient(140deg,${theme.palette.surface.heroTint},rgba(28,28,27,.35) 70%),${theme.palette.surface.paper}`,
+        border: "1px solid",
+        borderColor: "surface.heroBorder",
+      }}
+    >
+      {zone}
+    </Card>
   );
 }

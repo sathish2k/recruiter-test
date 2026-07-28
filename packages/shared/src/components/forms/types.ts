@@ -4,9 +4,10 @@ import type {
   ControllerRenderProps,
   FieldValues,
 } from "react-hook-form";
+import type { CompletenessCheck } from "./completeness/completeness";
 
 /** Resolves a translation key, optionally falling back to literal English. */
-export type Translate = (key: string, fallback?: string) => string;
+export type Translate = (key: string, fallback?: string | Record<string, unknown>) => string;
 
 export type JsonSchemaType = "string" | "number" | "integer" | "boolean" | "array" | "object";
 
@@ -40,7 +41,10 @@ export type BuiltInWidget =
   | "time"
   | "datetime"
   | "color"
-  | "heading";
+  | "heading"
+  | "completeness"
+  | "facts"
+  | "generated-doc";
 
 /**
  * A widget name a schema may use: a built-in, or any other string resolved from
@@ -129,8 +133,9 @@ export interface JsonSchemaProperty {
   matchesField?: string;
   icon?: string;
   /** `callout`: `"card"` (default, bordered tip) or `"banner"` (filled accent
-   * strip — icon + help text, no title). */
-  variant?: "card" | "banner";
+   * strip — icon + help text, no title). `resumeAutofill`: `"hero"` draws the
+   * design's tall drop zone for the top of a form rather than the rail's strip. */
+  variant?: "card" | "banner" | "hero";
   /** `switch-row`: soft chip beside the title, e.g. a plan gate. A t-key. */
   badge?: string;
   /** `switch-row`: ICON_REGISTRY name rendered inside the badge. */
@@ -159,10 +164,13 @@ export interface JsonSchemaProperty {
   /** `select`: `"pill"` is the design's section-header category chip (rounded,
    * borderless-looking); `"compact"` is the short prefix control that sits
    * beside another field (the salutation before a first name). */
-  selectVariant?: "pill" | "compact";
+  selectVariant?: "pill" | "compact" | "label";
   /** Schema property rendered as a small control immediately before this
    * field's own, sharing its label — the design's salutation + first name. */
   leading?: string;
+  /** Schema properties rendered after this field's own control, sharing its
+   * label — the design's "Salary range" row of currency, from and to. */
+  trailing?: string[];
   /** `select`: option value → predicate that must hold for it to be selectable.
    * An option whose predicate fails is greyed and shows `optionDisabledHint`;
    * if the current value becomes unselectable the field falls to the first
@@ -170,6 +178,23 @@ export interface JsonSchemaProperty {
   optionEnabledWhen?: Record<string, FieldCondition>;
   /** Suffix on a disabled option's label, e.g. "— add details first". A t-key. */
   optionDisabledHint?: string;
+  /** Fixed width for a `leading` companion control (the design gives the
+   * salary currency 104px). */
+  width?: number;
+  /** `chips`: label for the header suggest action. */
+  suggestLabel?: string;
+  /** `chips`: show the "= AI-extracted" legend beside the label. */
+  suggestLegend?: boolean;
+  /** `repeater`: open with one blank row instead of an empty list. */
+  startEmptyRow?: boolean;
+  /** `generated-doc`: headline shown before the document exists. */
+  emptyTitle?: string;
+  /** `generated-doc`: label on the build action. */
+  generateLabel?: string;
+  /** `facts`: label/value provenance rows. */
+  facts?: { label: string; path: string }[];
+  /** `completeness`: the quality checks the card scores. */
+  checks?: CompletenessCheck[];
   /** `heading`: rule above the label, separating it from the block before. */
   divider?: boolean;
   /** Show this field only while the predicate holds; hidden fields are stripped
@@ -359,6 +384,9 @@ export interface FormSection extends FormLayoutProps {
   /** Field name pulled out of the body and rendered at the right of the card
    * header — the design's Attachments category pill. */
   headerField?: string;
+  /** Show one field at a time behind pill tabs labelled from each field's
+   * title — the design's Description / Requirements / Benefits editor. */
+  tabbed?: boolean;
   /** Skip the section card chrome and render the fields bare — for a single
    * display widget (e.g. a callout) that draws its own container. */
   bare?: boolean;

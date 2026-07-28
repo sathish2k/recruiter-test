@@ -215,3 +215,19 @@ export async function extractFromDocument({ file, contract }: ExtractDocumentInp
   const raw = await extractStructured(text, fields);
   return { values: coerceToContract(fields, raw), characters: text.length };
 }
+
+export interface ExtractTextInput {
+  text: string;
+  contract: unknown;
+}
+
+/**
+ * The same contract-driven extraction, but over text the caller already has —
+ * a job's title and description rather than an uploaded file. Backs "suggest
+ * skills" and "generate with AI", which have no document to read.
+ */
+export async function extractFromText({ text, contract }: ExtractTextInput) {
+  const fields = sanitizeContract(contract);
+  const raw = await extractStructured(text, fields);
+  return { values: coerceToContract(fields, raw), characters: text.length };
+}

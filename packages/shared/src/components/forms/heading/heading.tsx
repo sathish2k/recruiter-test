@@ -17,6 +17,14 @@ export function HeadingWidget({ prop, t }: WidgetProps) {
       }}
     >
       {t(prop.title ?? "")}
+      {prop.help ? (
+        <Box
+          component="span"
+          sx={{ ml: "6px", fontWeight: 400, letterSpacing: 0, color: "text.disabled" }}
+        >
+          · {t(prop.help)}
+        </Box>
+      ) : null}
     </Typography>
   );
   if (!prop.divider) return label;

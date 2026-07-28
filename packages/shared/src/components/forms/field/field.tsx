@@ -9,9 +9,12 @@ import { CalloutWidget } from "../callout/callout";
 import { CheckboxGroupWidget } from "../checkbox-group/checkbox-group";
 import { ChipsWidget } from "../chips/chips";
 import { ColorWidget } from "../color/color";
+import { CompletenessWidget } from "../completeness/completeness";
 import { DateWidget } from "../date/date";
 import { DaysWidget } from "../days/days";
 import { EmailListWidget } from "../email-list/email-list";
+import { FactsWidget } from "../facts/facts";
+import { GeneratedDocWidget } from "../generated-doc/generated-doc";
 import { HeadingWidget } from "../heading/heading";
 import { MarkdownWidget } from "../markdown/markdown";
 import { MultiSelectWidget } from "../multiselect/multiselect";
@@ -74,6 +77,9 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   datetime: DateWidget,
   color: ColorWidget,
   heading: HeadingWidget,
+  completeness: CompletenessWidget,
+  facts: FactsWidget,
+  "generated-doc": GeneratedDocWidget,
 };
 
 /** Picks the widget from an explicit `widget`, then from the schema's shape. */
@@ -94,6 +100,7 @@ export function Field({
   name,
   prop,
   leadingProp,
+  trailingProps,
   control,
   t,
   widgets,
@@ -104,24 +111,28 @@ export function Field({
   /** Resolved by the renderer from `prop.leading` — the small control drawn
    * before this field, under this field's label. */
   leadingProp?: JsonSchemaProperty;
+  /** Resolved by the renderer from `prop.trailing`, keyed by field name. */
+  trailingProps?: Record<string, JsonSchemaProperty>;
   control: Control<FieldValues>;
   t: Translate;
   widgets?: Widgets;
   /** Set by the renderer from `disabledWhen` / a checkbox's `syncFields`. */
   disabled?: boolean;
 }) {
-  // Two controls, one label: the outer shell owns the label and the pair render
-  // label-less inside it (the design's salutation + first name).
-  if (prop.leading && leadingProp) {
+  // Several controls, one label: the outer shell owns the label and the row
+  // renders label-less inside it (salutation + first name, or a salary range).
+  const grouped = (prop.leading && leadingProp) || prop.trailing?.length;
+  const inLabel = leadingProp?.selectVariant === "label";
+  if (grouped) {
     return (
       <FieldRequiredContext.Provider value={Boolean(prop.required)}>
         <FieldOptionalContext.Provider
           value={prop.optional ? t("fields.optional", "optional") : null}
         >
           <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-            <FieldLabel label={t(prop.title ?? name)} />
-            <Box sx={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
-              <Box sx={{ flex: "none" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <FieldLabel label={t(prop.title ?? name)} />
+              {inLabel && prop.leading && leadingProp ? (
                 <Field
                   name={prop.leading}
                   prop={{ ...leadingProp, hideLabel: true }}
@@ -129,17 +140,43 @@ export function Field({
                   t={t}
                   widgets={widgets}
                 />
-              </Box>
+              ) : null}
+            </Box>
+            <Box sx={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+              {!inLabel && prop.leading && leadingProp ? (
+                <Box sx={{ flex: "none", width: leadingProp.width }}>
+                  <Field
+                    name={prop.leading}
+                    prop={{ ...leadingProp, hideLabel: true }}
+                    control={control}
+                    t={t}
+                    widgets={widgets}
+                  />
+                </Box>
+              ) : null}
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Field
                   name={name}
-                  prop={{ ...prop, leading: undefined, hideLabel: true }}
+                  prop={{ ...prop, leading: undefined, trailing: undefined, hideLabel: true }}
                   control={control}
                   t={t}
                   widgets={widgets}
                   disabled={disabled}
                 />
               </Box>
+              {(prop.trailing ?? []).map((sibling) =>
+                trailingProps?.[sibling] ? (
+                  <Box key={sibling} sx={{ flex: 1, minWidth: 0 }}>
+                    <Field
+                      name={sibling}
+                      prop={{ ...trailingProps[sibling], hideLabel: true }}
+                      control={control}
+                      t={t}
+                      widgets={widgets}
+                    />
+                  </Box>
+                ) : null,
+              )}
             </Box>
           </Box>
         </FieldOptionalContext.Provider>

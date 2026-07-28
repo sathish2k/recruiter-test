@@ -15,7 +15,7 @@ export interface SelectFieldProps {
   disabled?: boolean;
   /** `"pill"` — a rounded section-header chip. `"compact"` — a short control
    * that sits beside another field, sized to its content. */
-  look?: "pill" | "compact";
+  look?: "pill" | "compact" | "label";
 }
 
 /** The design marks a lifecycle value with a small colour dot before its label. */
@@ -47,6 +47,17 @@ const LOOKS = {
       color: "surface.textMuted",
     },
     "& .MuiSelect-select": { padding: "7px 30px 7px 12px" },
+  },
+  label: {
+    "& .MuiInputBase-root": {
+      fontSize: 12.5,
+      fontWeight: 700,
+      color: "surface.primarySoftFg",
+      bgcolor: "transparent",
+      "& fieldset": { border: "none" },
+    },
+    "& .MuiSelect-select": { padding: "0 20px 0 0" },
+    "& .MuiSelect-icon": { color: "surface.primarySoftFg", right: 0 },
   },
   compact: {
     "& .MuiInputBase-root": { fontSize: 13.5, fontWeight: 600, color: "surface.textMuted" },

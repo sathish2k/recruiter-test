@@ -41,9 +41,14 @@ export const job = pgTable("job", {
   requirements: text("requirements"),
   benefits: text("benefits"),
   skills: jsonb("skills").$type<string[]>(),
+  /** Weighted lower than `skills` by AI screening. */
+  niceToHaveSkills: jsonb("nice_to_have_skills").$type<string[]>(),
   openings: integer("openings").notNull().default(1),
+  salaryCurrency: text("salary_currency"),
   salaryMin: text("salary_min"),
   salaryMax: text("salary_max"),
+  /** No office address — the design hides the address block. */
+  remote: boolean("remote").notNull().default(false),
   status: text("status").$type<JobStatus>().notNull().default("open"),
   address: jsonb("address").$type<JobAddress>(),
   revenuePerPosition: text("revenue_per_position"),

@@ -1,7 +1,7 @@
 {
   "back": "Back to jobs",
-  "newTitle": "New Job",
-  "newDescription": "Open a requirement under a client — sourcing and screening come next.",
+  "newTitle": "New Requirement",
+  "newDescription": "Publish a requirement and let HirePilotX start sourcing and screening.",
   "editTitle": "Edit job",
   "editDescription": "Update this requirement's details, forecast and team.",
   "sections": {
@@ -16,7 +16,8 @@
     "aiScreening": "AI Screening",
     "assignedTeam": "Assigned team",
     "assignedTeamHint": "Who sources and who reviews for this role",
-    "publishTo": "Publish to"
+    "publishTo": "Publish to",
+    "mustHaveSkills": "Must-have skills"
   },
   "fields": {
     "title": "Job title",
@@ -28,7 +29,7 @@
     "clientSearch": "Search clients…",
     "clientRequired": "Client is required",
     "clientContact": "Client contact",
-    "clientContactPlaceholder": "e.g. Ana Kelmendi",
+    "clientContactPlaceholder": "Search contacts…",
     "dateOpened": "Date opened",
     "targetDate": "Target date",
     "employmentType": "Employment type",
@@ -39,7 +40,7 @@
     "salaryMin": "Salary min",
     "salaryMax": "Salary max",
     "usd": "USD",
-    "status": "Job opening status",
+    "status": "Status",
     "description": "Description",
     "descriptionPlaceholder": "Describe the role, team and day-to-day…",
     "requirements": "Requirements",
@@ -56,7 +57,7 @@
     "missedRevenue": "Missed revenue",
     "missedRevenuePlaceholder": "— unfilled openings at close",
     "jobSummary": "Job summary (JD)",
-    "others": "Others",
+    "others": "Supporting documents",
     "attachmentsBrowse": "Browse or drop a file",
     "aiScreening": "AI Screening",
     "aiScreeningHelp": "Scores applicants against skills + description",
@@ -74,8 +75,20 @@
     "teamSearch": "Search team…",
     "profileLead": "Profile lead (reviews & submits)",
     "profileLeadPlaceholder": "Search team…",
-    "dailyInviteTarget": "Daily invite target",
-    "publishChannels": "Publish to"
+    "dailyInviteTarget": "Daily sourcing target",
+    "publishChannels": "Publish to",
+    "salaryRange": "Salary range",
+    "salaryCurrency": "Currency",
+    "salaryFrom": "From · 150,000",
+    "salaryTo": "To · 180,000",
+    "niceToHaveSkills": "Nice-to-have skills",
+    "openingsPlaceholder": "1",
+    "dailyInviteTargetPlaceholder": "50",
+    "dailyInviteTargetHint": "Candidates/day across all sourcing channels",
+    "niceToHaveSkillsHint": "Weighted lower by AI screening",
+    "suggestSkills": "Suggest skills",
+    "publishLock": "Save a draft to unlock destinations.",
+    "statusNote": "Draft — becomes Active when published."
   },
   "employmentType": {
     "full_time": "Full-time",
@@ -89,7 +102,8 @@
     "1_3": "1–3 years",
     "3_5": "3–5 years",
     "5_8": "5–8 years",
-    "8plus": "8+ years"
+    "8plus": "8+ years",
+    "none": "Not set"
   },
   "status": {
     "open": "Open",
@@ -98,7 +112,7 @@
     "closed": "Closed"
   },
   "channels": {
-    "website": "Website",
+    "website": "HirePilotX career page",
     "linkedin": "LinkedIn",
     "naukri": "Naukri",
     "indeed": "Indeed"
@@ -110,16 +124,53 @@
     "statePlaceholder": "e.g. Karnataka",
     "country": "Country",
     "postalCode": "Postal code",
-    "postalCodePlaceholder": "e.g. 560001"
+    "postalCodePlaceholder": "e.g. 560001",
+    "remote": "Remote job",
+    "remoteHint": "Remote role — no office address needed. Uncheck “Remote job” to add one."
   },
   "actions": {
     "create": "Publish job",
     "save": "Save changes",
     "cancel": "Cancel",
-    "saveAnother": "Save & add another"
+    "saveAnother": "Save & add another",
+    "saveDraft": "Save draft",
+    "review": "Review"
   },
   "toast": {
     "created": "Job created",
-    "updated": "Job updated"
+    "updated": "Job updated",
+    "titleFirst": "Add a job title first — the AI reads the brief you have so far."
+  },
+  "completeness": {
+    "title": "Job completeness",
+    "met": "{{done}} of {{total}} required items complete",
+    "basics": "Basics",
+    "description": "Description",
+    "benefits": "Benefits",
+    "salary": "Salary range",
+    "skills": "Must-have skills",
+    "screening": "AI screening"
+  },
+  "generate": {
+    "description": "Describe the role, the team and the day-to-day, in markdown",
+    "requirements": "List the must-have and nice-to-have qualifications, in markdown",
+    "benefits": "List the benefits and perks offered, in markdown"
+  },
+  "markdown": {
+    "generate": "Generate with AI",
+    "templates": "Templates",
+    "fromExisting": "FROM AN EXISTING JOB",
+    "noTemplates": "No written job to copy yet"
+  },
+  "review": {
+    "title": "Review before publishing",
+    "description": "How this requirement reads once it goes live.",
+    "untitled": "Untitled requirement",
+    "remote": "Remote",
+    "section": {
+      "description": "DESCRIPTION",
+      "requirements": "REQUIREMENTS",
+      "benefits": "BENEFITS"
+    }
   }
 }

@@ -39,6 +39,14 @@ const candidateBody = t.Object({
   additionalInfo: t.Optional(t.String({ maxLength: 5000 })),
   linkedin: t.Optional(t.String({ maxLength: 255 })),
   twitter: t.Optional(t.String({ maxLength: 100 })),
+  github: t.Optional(t.String({ maxLength: 255 })),
+  stackOverflow: t.Optional(t.String({ maxLength: 255 })),
+  noticePeriod: t.Optional(t.String({ maxLength: 255 })),
+  workAuthorization: t.Optional(t.String({ maxLength: 255 })),
+  preferredLocation: t.Optional(t.String({ maxLength: 255 })),
+  salaryCurrency: t.Optional(t.String({ maxLength: 8 })),
+  openToRelocate: t.Optional(t.Boolean()),
+  openToRemote: t.Optional(t.Boolean()),
   education: t.Optional(
     t.Array(
       t.Object({

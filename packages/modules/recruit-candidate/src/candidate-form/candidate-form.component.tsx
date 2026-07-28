@@ -11,13 +11,15 @@ import {
   type Attachment,
   AttachmentsWidget,
   type AttachmentUploader,
+  ChipsWidget,
   type DocumentExtractor,
   type FormValues,
   FormWithSectionsRenderer,
+  GeneratedDocWidget,
   ResumeAutofillWidget,
   useToast,
 } from "@recruit/shared";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import type { CandidateFormConfiguration } from "./candidate-form.configuration";
 
 interface CandidateAddress {
@@ -62,6 +64,14 @@ interface Candidate {
   additionalInfo: string;
   linkedin: string;
   twitter: string;
+  github: string;
+  stackOverflow: string;
+  noticePeriod: string;
+  workAuthorization: string;
+  preferredLocation: string;
+  salaryCurrency: string;
+  openToRelocate: boolean;
+  openToRemote: boolean;
   education: Education[];
   experience: Experience[];
   resume: Attachment[];
@@ -76,7 +86,19 @@ interface Candidate {
   ownerId: string;
   source: string;
   emailOptOut: boolean;
+  createdByName: string;
+  createdAt: string;
+  updatedAt: string;
 }
+
+/** "Today" / "Yesterday" / "5d ago", matching the detail screens. */
+const relativeDays = (when: Date) => {
+  const days = Math.floor((Date.now() - when.getTime()) / 86_400_000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  return `${Math.floor(days / 7)}w ago`;
+};
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 
@@ -99,6 +121,82 @@ export function CandidateFormComponent({ id }: { id: string }) {
     const mut = mutation as Record<string, ((...args: unknown[]) => Promise<unknown>) | undefined>;
     return (file, fields) => mut.parseDocument?.(file, fields) as Promise<Record<string, unknown>>;
   }, [mutation]);
+  // Reads the attached resume back through the extractor, asking only for
+  // skills. Returns [] when there is no resume yet — the toast says why.
+  const suggestSkills = useCallback(
+    async (props: { control?: unknown }) => {
+      const form = (props.control as { _formValues?: Record<string, unknown> })?._formValues ?? {};
+      const attached = [
+        ...((form.resume as { file?: File }[] | undefined) ?? []),
+        ...((form.autofillCv as { file?: File }[] | undefined) ?? []),
+      ];
+      const file = attached.find((item) => item?.file)?.file;
+      if (!file) {
+        show(t("toast.noResume"));
+        return [];
+      }
+      const parsed = await extractor(file, [
+        {
+          name: "skillSet",
+          type: "array",
+          itemType: "string",
+          hint: "Individual technical and professional skills, one per item",
+        },
+      ]);
+      const skills = parsed?.skillSet;
+      return Array.isArray(skills) ? skills.map((entry) => String(entry)) : [];
+    },
+    [extractor, show, t],
+  );
+
+  // Builds the formatted CV from what the form already holds and stores it
+  // through the same uploader every other attachment uses.
+  const generateFormatted = useCallback(
+    async (props: { control?: unknown }) => {
+      const form = (props.control as { _formValues?: Record<string, unknown> })?._formValues ?? {};
+      const value = (key: string) => str(form[key]);
+      const rows = (key: string) =>
+        Array.isArray(form[key]) ? (form[key] as Record<string, unknown>[]) : [];
+      const name = [value("firstName"), value("lastName")].filter(Boolean).join(" ");
+      if (!name) {
+        show(t("toast.nameFirst"));
+        return null;
+      }
+
+      const lines = [
+        name.toUpperCase(),
+        [value("currentJobTitle"), value("currentEmployer")].filter(Boolean).join(" · "),
+        [value("email"), value("mobile") || value("phone"), value("linkedin")]
+          .filter(Boolean)
+          .join(" | "),
+        "",
+        ...(value("additionalInfo") ? [t("formatted.summary"), value("additionalInfo"), ""] : []),
+        ...(rows("experience").length ? [t("formatted.experience")] : []),
+        ...rows("experience")
+          .filter((row) => str(row.jobTitle) || str(row.company))
+          .flatMap((row) => [
+            `- ${[str(row.jobTitle), str(row.company)].filter(Boolean).join(" — ")}`,
+            ...(str(row.summary) ? [`  ${str(row.summary)}`] : []),
+          ]),
+        ...(rows("experience").length ? [""] : []),
+        ...(rows("education").length ? [t("formatted.education")] : []),
+        ...rows("education")
+          .filter((row) => str(row.institution) || str(row.degree))
+          .map((row) => `- ${[str(row.degree), str(row.institution)].filter(Boolean).join(", ")}`),
+        ...(rows("education").length ? [""] : []),
+        ...(Array.isArray(form.skillSet) && form.skillSet.length
+          ? [t("formatted.skills"), (form.skillSet as string[]).join(", ")]
+          : []),
+      ];
+
+      const file = new File([lines.join("\n")], `${name} - Formatted Resume.txt`, {
+        type: "text/plain",
+      });
+      return (await uploader(file, () => {})) as Attachment;
+    },
+    [uploader, show, t],
+  );
+
   const widgets = useMemo(
     () => ({
       attachments: (props: Parameters<typeof AttachmentsWidget>[0]) => (
@@ -112,8 +210,19 @@ export function CandidateFormComponent({ id }: { id: string }) {
           schema={config.schema}
         />
       ),
+      // Skills can be read back out of the CV that is already attached, so the
+      // design's "Suggest from resume" re-runs extraction for that one field.
+      "generated-doc": (props: Parameters<typeof GeneratedDocWidget>[0]) => (
+        <GeneratedDocWidget {...props} onGenerate={() => generateFormatted(props)} />
+      ),
+      chips: (props: Parameters<typeof ChipsWidget>[0]) =>
+        props.name === "skillSet" ? (
+          <ChipsWidget {...props} onSuggest={() => suggestSkills(props)} />
+        ) : (
+          <ChipsWidget {...props} />
+        ),
     }),
-    [uploader, extractor, config.schema],
+    [uploader, extractor, config.schema, suggestSkills, generateFormatted],
   );
 
   if (!config.schema) return null;
@@ -197,6 +306,14 @@ export function CandidateFormComponent({ id }: { id: string }) {
           additionalInfo: data.additionalInfo,
           linkedin: data.linkedin,
           twitter: data.twitter,
+          github: data.github,
+          stackOverflow: data.stackOverflow,
+          noticePeriod: data.noticePeriod,
+          workAuthorization: data.workAuthorization,
+          preferredLocation: data.preferredLocation,
+          salaryCurrency: data.salaryCurrency,
+          openToRelocate: data.openToRelocate,
+          openToRemote: data.openToRemote,
           education: data.education ?? [],
           experience: data.experience ?? [],
           resume: data.resume ?? [],
@@ -211,8 +328,22 @@ export function CandidateFormComponent({ id }: { id: string }) {
           ownerId: data.ownerId,
           source: data.source,
           emailOptOut: data.emailOptOut,
+          createdByName: data.createdByName,
+          createdLabel: data.createdAt
+            ? new Date(data.createdAt).toLocaleDateString(undefined, {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : "",
+          lastActivityLabel: data.updatedAt ? relativeDays(new Date(data.updatedAt)) : "",
         }
-      : { status: "new" };
+      : {
+          status: "new",
+          // A record that does not exist yet still says what happens on save.
+          createdLabel: t("audit.justNow"),
+          lastActivityLabel: t("audit.onSave"),
+        };
 
   return (
     <FormWithSectionsRenderer

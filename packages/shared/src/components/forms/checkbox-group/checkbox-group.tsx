@@ -50,7 +50,13 @@ export function CheckboxGroupWidget({ prop, field, fieldState, t }: WidgetProps)
                 sx={prop.row ? { p: 0, "& .MuiSvgIcon-root": { fontSize: 17 } } : undefined}
               />
             }
-            label={t(prop.enumNames?.[index] ?? String(option))}
+            label={
+              prop.enumNames?.[index]
+                ? t(prop.enumNames[index])
+                : prop.enumL10n
+                  ? t(`${prop.enumL10n}.${String(option) || "none"}`)
+                  : t(String(option))
+            }
             sx={{
               ...(prop.row ? { m: 0, gap: "6px" } : {}),
               "& .MuiFormControlLabel-label": prop.row
