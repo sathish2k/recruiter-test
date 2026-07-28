@@ -1,0 +1,10 @@
+{
+  "metrics": {
+    "openRoles": "Open roles",
+    "openRolesDelta": "{value} named on",
+    "waiting": "Awaiting their feedback",
+    "waitingDelta": "oldest {value}h",
+    "response": "Avg. decision time",
+    "responseDelta": "faster than {value}%"
+  }
+}

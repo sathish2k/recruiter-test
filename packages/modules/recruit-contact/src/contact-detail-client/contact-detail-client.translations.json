@@ -1,0 +1,8 @@
+{
+  "client": {
+    "since": "Client since {{date}}",
+    "openJobs": "open jobs",
+    "candidates": "candidates",
+    "waiting": "waiting feedback"
+  }
+}

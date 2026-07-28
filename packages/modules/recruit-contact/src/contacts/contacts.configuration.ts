@@ -113,5 +113,5 @@ export const ContactsConfiguration: TableFilterExportConfig = {
   exportFilename: "contacts",
   pagination: { pageSize: 10 },
   emptyLabel: "empty",
-  rowRouteId: "Recruit.ContactEdit.Route",
+  rowRouteId: "Recruit.ContactDetail.Route",
 };

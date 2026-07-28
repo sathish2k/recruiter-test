@@ -31,6 +31,18 @@ export {
   ClientCardSkeleton,
 } from "./components/client-card";
 export {
+  type DetailFieldConfig,
+  type DetailHeaderAction,
+  type DetailHeaderConfig,
+  DetailHeaderRenderer,
+  FactRows,
+  FactRowsSkeleton,
+  SlaMeter,
+  type SlaMeterProps,
+  TabbedWorkspaceRenderer,
+  type WorkspaceTabConfig,
+} from "./components/detail";
+export {
   Export,
   type ExportConfig,
   type ExportType,

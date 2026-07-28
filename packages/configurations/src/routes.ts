@@ -217,7 +217,11 @@ export const routes: Route[] = [
     page: "Recruit.Contacts.Page",
     guard: [{ type: "authenticationGuard" }],
     access: { resource: "contacts" },
-    children: ["Recruit.ContactNew.Route", "Recruit.ContactEdit.Route"],
+    children: [
+      "Recruit.ContactNew.Route",
+      "Recruit.ContactEdit.Route",
+      "Recruit.ContactDetail.Route",
+    ],
   },
   {
     id: "Recruit.ContactNew.Route",
@@ -229,6 +233,12 @@ export const routes: Route[] = [
     id: "Recruit.ContactEdit.Route",
     path: ":id/edit",
     page: "Recruit.ContactForm.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.ContactDetail.Route",
+    path: ":id",
+    page: "Recruit.ContactDetail.Page",
     children: [],
   },
   {

@@ -1,0 +1,18 @@
+{
+  "subtitle": { "since": "Contact since {{date}}", "owner": "Owner" },
+  "chips": {
+    "primary": "PRIMARY",
+    "active": "Active",
+    "inactive": "Inactive",
+    "left": "Left company",
+    "fastResponder": "Fast responder"
+  },
+  "actions": {
+    "email": "Email",
+    "meeting": "Schedule meeting",
+    "edit": "Edit contact",
+    "viewClient": "Open client",
+    "addRole": "New requirement",
+    "backToList": "All contacts"
+  }
+}

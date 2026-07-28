@@ -1,0 +1,14 @@
+{
+  "info": {
+    "title": "Contact info",
+    "preferredChannel": "Preferred channel",
+    "timezone": "Timezone"
+  },
+  "channels": {
+    "email": "Email",
+    "mobile": "Mobile",
+    "whatsapp": "WhatsApp",
+    "linkedin": "LinkedIn",
+    "teams": "Teams"
+  }
+}

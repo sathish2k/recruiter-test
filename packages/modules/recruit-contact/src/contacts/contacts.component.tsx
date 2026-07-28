@@ -34,6 +34,7 @@ const OWNER_SOURCE = { url: "/users", path: "data", valueKey: "id", labelKey: "n
 
 const NEW_ROUTE = "Recruit.ContactNew.Route";
 const EDIT_ROUTE = "Recruit.ContactEdit.Route";
+const DETAIL_ROUTE = "Recruit.ContactDetail.Route";
 
 export function ContactsComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
@@ -105,7 +106,7 @@ export function ContactsComponent({ id }: { id: string }) {
           clientCell: (row) => ClientCell(row),
         }}
         actionHandler={{
-          view: (row) => router.push(EDIT_ROUTE, { id: String(row.id ?? "") }),
+          view: (row) => router.push(DETAIL_ROUTE, { id: String(row.id ?? "") }),
           edit: (row) => router.push(EDIT_ROUTE, { id: String(row.id ?? "") }),
           setPrimary: (row) => setPrimary(row as unknown as Contact),
           archive: (row) => archive(row as unknown as Contact),

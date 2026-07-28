@@ -1,0 +1,90 @@
+{
+  "tabs": {
+    "activity": "Activity",
+    "roles": "Roles",
+    "candidates": "Candidates",
+    "interviews": "Interviews",
+    "notes": "Notes"
+  },
+  "workspace": {
+    "activity": "Activity",
+    "roles": "Roles this contact is named on",
+    "candidates": "Candidates in play",
+    "interviews": "Meetings & interviews",
+    "notes": "Recruiter notes"
+  },
+  "activity": {
+    "filters": {
+      "all": "All",
+      "email": "Email",
+      "submissions": "Submissions",
+      "meetings": "Meetings"
+    },
+    "days": {
+      "today": "TODAY",
+      "yesterday": "YESTERDAY",
+      "earlier": "EARLIER"
+    },
+    "empty": "No activity recorded for this contact yet."
+  },
+  "herRole": {
+    "primary": "Primary contact",
+    "named": "Named contact"
+  },
+  "jobStatus": {
+    "open": "Open",
+    "on_hold": "On hold",
+    "closed": "Closed",
+    "filled": "Filled"
+  },
+  "stage": {
+    "sourced": "Sourced",
+    "screening": "Screening",
+    "submitted": "Submitted",
+    "interview": "Interview",
+    "offer": "Offer",
+    "placed": "Placed"
+  },
+  "interviewStatus": {
+    "scheduled": "Scheduled",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "no_show": "No show"
+  },
+  "roles": {
+    "columns": {
+      "title": "Requirement",
+      "herRole": "Their role",
+      "pipeline": "Pipeline",
+      "submitted": "Submitted",
+      "status": "Status"
+    },
+    "empty": "This contact is not named on any requirement yet.",
+    "emptyHint": "Name this contact on a requirement to see it here."
+  },
+  "candidates": {
+    "columns": {
+      "name": "Candidate",
+      "role": "Requirement",
+      "stage": "Stage",
+      "match": "AI match",
+      "updated": "Last update"
+    },
+    "empty": "No candidates in play on this contact's requirements.",
+    "emptyHint": "Candidates appear once they are added to those requirements."
+  },
+  "interviews": {
+    "columns": {
+      "name": "Candidate",
+      "role": "Requirement",
+      "when": "When",
+      "panel": "Panel",
+      "status": "Status"
+    },
+    "empty": "No meetings scheduled on this contact's requirements.",
+    "emptyHint": "Schedule one from the interviews screen."
+  },
+  "notes": {
+    "empty": "No recruiter notes yet — add one from Edit contact."
+  }
+}

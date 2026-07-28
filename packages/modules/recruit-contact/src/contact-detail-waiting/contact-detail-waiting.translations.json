@@ -1,0 +1,10 @@
+{
+  "waiting": {
+    "title": "Waiting on {{name}}",
+    "sla": "{{hours}}h SLA",
+    "remaining": "{{hours}}h left",
+    "viewAll": "View all",
+    "review": "Review",
+    "empty": "Nothing is waiting on this contact."
+  }
+}

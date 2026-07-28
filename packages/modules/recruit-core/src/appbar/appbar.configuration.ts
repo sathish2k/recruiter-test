@@ -57,6 +57,10 @@ export const AppbarConfiguration: AppbarConfig = {
       routeId: "Recruit.Clients.Route",
       label: { name: "back.clients" },
     },
+    "Recruit.ContactDetail.Route": {
+      routeId: "Recruit.Contacts.Route",
+      label: { name: "back.contacts" },
+    },
     "Recruit.ContactNew.Route": {
       routeId: "Recruit.Contacts.Route",
       label: { name: "back.contacts" },

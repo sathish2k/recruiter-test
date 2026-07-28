@@ -1,15 +1,6 @@
-import type { TableRendererConfig } from "@recruit/shared";
+import type { WorkspaceTabConfig } from "@recruit/shared";
 
 const ID = "Recruit.ClientDetailWorkspace.Component";
-
-/** One tab of the workspace panel — its title, table and data path. */
-export interface WorkspaceTabConfig {
-  value: string;
-  label: { name: string };
-  title: { name: string };
-  table: TableRendererConfig;
-  viewAllRouteId?: string;
-}
 
 export const ClientDetailWorkspaceConfiguration: WorkspaceTabConfig[] = [
   {

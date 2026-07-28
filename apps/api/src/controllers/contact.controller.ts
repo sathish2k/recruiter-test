@@ -2,6 +2,15 @@ import { status } from "elysia";
 import {
   archiveContact,
   type ContactInput,
+  type ContactWorkspaceTab,
+  contactBriefing,
+  contactClientCard,
+  contactInfo,
+  contactKpis,
+  contactRelationship,
+  contactSummary,
+  contactWaiting,
+  contactWorkspace,
   createContact,
   deleteContact,
   findDuplicates,
@@ -79,4 +88,62 @@ export async function postPrimary(ctx: { user: Auth; params: { id: string } }) {
   const updated = await setPrimary(ctx.user.agencyId ?? "", ctx.params.id);
   if (!updated) return status(404, "Contact not found");
   return { data: updated };
+}
+
+/* The contact detail screen — one handler per card, so a slow panel never
+ * holds up the rest of the page. */
+
+export async function getContactSummary(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactSummary(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
+}
+
+export async function getContactBriefing(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactBriefing(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
+}
+
+export async function getContactWaiting(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactWaiting(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
+}
+
+export async function getContactWorkspace(ctx: {
+  user: Auth;
+  params: { id: string };
+  query: Record<string, string | undefined>;
+}) {
+  const data = await contactWorkspace(
+    ctx.user.agencyId ?? "",
+    ctx.params.id,
+    (ctx.query.tab as ContactWorkspaceTab) ?? "activity",
+    ctx.query.activity ?? "all",
+  );
+  return { data };
+}
+
+export async function getContactInfo(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactInfo(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
+}
+
+export async function getContactRelationship(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactRelationship(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
+}
+
+export async function getContactClientCard(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactClientCard(ctx.user.agencyId ?? "", ctx.params.id);
+  return { data };
+}
+
+export async function getContactKpis(ctx: { user: Auth; params: { id: string } }) {
+  const data = await contactKpis(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Contact not found");
+  return { data };
 }

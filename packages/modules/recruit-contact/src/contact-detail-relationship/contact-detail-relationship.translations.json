@@ -1,0 +1,33 @@
+{
+  "relationship": {
+    "title": "Relationship",
+    "ownerRole": "Contact owner",
+    "change": "Change",
+    "lastTouch": "Last contact",
+    "health": "Relationship health",
+    "avgReply": "Avg decision time",
+    "hours": "{{hours}}h",
+    "more": "More details",
+    "less": "Fewer details",
+    "reference": "Contact ID",
+    "source": "Source",
+    "added": "Added",
+    "replyRate": "Decision rate",
+    "interactions": "Updates · 90 days"
+  },
+  "health": {
+    "strong": "Strong",
+    "steady": "Steady",
+    "slipping": "Slipping",
+    "new": "No history"
+  },
+  "source": {
+    "manual": "Manual",
+    "outlook_sync": "Outlook sync",
+    "gmail_sync": "Gmail sync",
+    "linkedin": "LinkedIn",
+    "csv_import": "CSV import",
+    "api": "API",
+    "candidate_referral": "Candidate referral"
+  }
+}

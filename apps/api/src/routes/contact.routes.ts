@@ -66,6 +66,23 @@ export default new Elysia({ name: "contact.routes" })
     }),
   })
   .get("/contacts/:id", (ctx) => contactController.getContactById(ctx), { isAuth: true })
+  .get("/contacts/:id/summary", (ctx) => contactController.getContactSummary(ctx), { isAuth: true })
+  .get("/contacts/:id/briefing", (ctx) => contactController.getContactBriefing(ctx), {
+    isAuth: true,
+  })
+  .get("/contacts/:id/kpis", (ctx) => contactController.getContactKpis(ctx), { isAuth: true })
+  .get("/contacts/:id/waiting", (ctx) => contactController.getContactWaiting(ctx), { isAuth: true })
+  .get("/contacts/:id/workspace", (ctx) => contactController.getContactWorkspace(ctx), {
+    isAuth: true,
+    query: t.Object({ tab: t.Optional(t.String()), activity: t.Optional(t.String()) }),
+  })
+  .get("/contacts/:id/info", (ctx) => contactController.getContactInfo(ctx), { isAuth: true })
+  .get("/contacts/:id/relationship", (ctx) => contactController.getContactRelationship(ctx), {
+    isAuth: true,
+  })
+  .get("/contacts/:id/client", (ctx) => contactController.getContactClientCard(ctx), {
+    isAuth: true,
+  })
   .post("/contacts", (ctx) => contactController.postContact(ctx), {
     isAuth: true,
     body: t.Optional(contactBody),

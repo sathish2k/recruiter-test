@@ -78,11 +78,15 @@ export function ListRenderer({
   config: configProp,
   data: dataProp,
   actionHandler,
+  isLoading: loadingProp,
 }: {
   id: string;
   config?: ListRendererConfig;
   data?: Row[];
   actionHandler?: ActionHandler;
+  /** Set by an owner that fetched the rows itself (a tabbed panel), so the
+   * skeleton follows that request rather than this list's seeded data. */
+  isLoading?: boolean;
 }) {
   const configFromId = useConfiguration<ListRendererConfig>(id);
   const config = configProp ?? configFromId;
@@ -91,10 +95,11 @@ export function ListRenderer({
   const routeParams = useRouteParams();
   const param = config?.filterParam;
   const paramValue = param ? searchParams.get(param) : null;
-  const { data, isLoading } = useFetch<Row[]>(id, {
+  const { data, isLoading: fetching } = useFetch<Row[]>(id, {
     data: seedRows<Row>(dataProp),
     filters: { ...routeParams, ...(param && paramValue ? { [param]: paramValue } : {}) },
   });
+  const isLoading = loadingProp ?? fetching;
   const rows = Array.isArray(data) ? data : [];
 
   if (!config) return null;

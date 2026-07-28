@@ -1,5 +1,5 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
-import { ClientDetailWorkspaceComponent } from "./client-detail-workspace.component";
+import { TabbedWorkspaceRenderer } from "@recruit/shared";
 import { ClientDetailWorkspaceConfiguration } from "./client-detail-workspace.configuration";
 import { clientDetailWorkspaceDatasource } from "./client-detail-workspace.datasource";
 import fallbackTranslation from "./client-detail-workspace.translations.json";
@@ -23,7 +23,7 @@ const DATASOURCE: ComponentDependency = {
 export const CLIENT_DETAIL_WORKSPACE_COMPONENT: ComponentDefinition = {
   id: "Recruit.ClientDetailWorkspace.Component",
   type: "COMPONENT",
-  value: ClientDetailWorkspaceComponent,
+  value: TabbedWorkspaceRenderer,
   default: {
     configuration: CONFIGURATION,
     translation: TRANSLATION,
