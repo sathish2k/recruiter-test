@@ -66,6 +66,7 @@ export const client = pgTable("client", {
   annualHiringVolume: text("annual_hiring_volume"),
   /** Guarantee window on a placement, in days. */
   replacementPeriod: text("replacement_period"),
+  contractRenewsAt: text("contract_renews_at"),
   // Populated once jobs/candidates/placements exist; stored so the card renders.
   openRoles: integer("open_roles").notNull().default(0),
   candidates: integer("candidates").notNull().default(0),

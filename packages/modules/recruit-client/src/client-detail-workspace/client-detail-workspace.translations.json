@@ -1,0 +1,75 @@
+{
+  "tabs": {
+    "roles": "Requirements",
+    "interviews": "Interviews",
+    "placements": "Placements",
+    "invoices": "Invoices"
+  },
+  "workspace": {
+    "roles": "Open requirements",
+    "interviews": "Interviews",
+    "placements": "Placements",
+    "invoices": "Invoices"
+  },
+  "roles": {
+    "empty": "No requirements open with this client yet.",
+    "columns": {
+      "title": "Requirement",
+      "contact": "Hiring contact",
+      "profileLead": "Profile lead",
+      "pipeline": "Pipeline",
+      "submitted": "Submitted",
+      "status": "Status",
+      "coverage": "AI Coverage"
+    }
+  },
+  "interviews": {
+    "empty": "No interviews scheduled with this client.",
+    "columns": {
+      "candidate": "Candidate",
+      "role": "Requirement",
+      "when": "When",
+      "panel": "Panel",
+      "status": "Status"
+    }
+  },
+  "placements": {
+    "empty": "No placements with this client yet.",
+    "columns": {
+      "candidate": "Candidate",
+      "role": "Requirement",
+      "joined": "Joined",
+      "guarantee": "Guarantee"
+    }
+  },
+  "jobStatus": {
+    "open": "Open",
+    "on_hold": "On hold",
+    "filled": "Filled",
+    "closed": "Closed"
+  },
+  "interviewStatus": {
+    "scheduled": "Confirmed",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "coverageBand": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "sourcing": "Need sourcing"
+  },
+  "invoices": {
+    "empty": "No invoices raised for this client yet.",
+    "columns": {
+      "number": "Invoice",
+      "amount": "Amount",
+      "issued": "Issued",
+      "status": "Status"
+    }
+  },
+  "invoiceStatus": {
+    "paid": "Paid",
+    "due": "Due",
+    "overdue": "Overdue"
+  }
+}

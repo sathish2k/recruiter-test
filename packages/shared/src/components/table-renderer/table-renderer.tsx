@@ -2,6 +2,7 @@
 
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Skeleton from "@mui/material/Skeleton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,11 +12,18 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
-import type { ReactNode } from "react";
-import { type ActionHandler, EmptyStateRenderer, IconRenderer } from "../renderers";
+import { type ReactNode, useState } from "react";
+import { type ActionHandler, EmptyStateRenderer, IconRenderer, LinkRenderer } from "../renderers";
+import { TableBulkBar } from "./table-bulk-bar";
 import { TableFooterRenderer } from "./table-footer";
 import { TableHeaderRenderer } from "./table-header";
-import type { Cells, Row, TableColumnConfig, TableRendererConfig } from "./table-renderer.types";
+import type {
+  BulkHandler,
+  Cells,
+  Row,
+  TableColumnConfig,
+  TableRendererConfig,
+} from "./table-renderer.types";
 import { TableRowRenderer } from "./table-row";
 import { TableTitle } from "./table-title";
 import { TableTotalsRenderer } from "./table-totals";
@@ -38,10 +46,17 @@ export function TableRenderer({
   headerAction,
   footerData,
   onEmptyAction,
+  isLoading: isLoadingProp,
+  bulkHandler,
 }: {
   id: string;
   config?: TableRendererConfig;
   data?: Row[];
+  /** Owner-driven loading, for a table whose rows are fetched by its parent —
+   * without it the table would show its empty state during that fetch. */
+  isLoading?: boolean;
+  /** Bulk action `type` → what to do with the selected rows. */
+  bulkHandler?: BulkHandler;
   /** External filter params merged into the server query (server mode). */
   filters?: Record<string, unknown>;
   actionHandler?: ActionHandler;
@@ -94,10 +109,18 @@ export function TableRenderer({
       }
     : undefined;
 
-  const { data, meta, isLoading, error } = useFetch<Row[]>(id, {
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+
+  const {
+    data,
+    meta,
+    isLoading: isFetching,
+    error,
+  } = useFetch<Row[]>(id, {
     data: clientRows,
     filters: query,
   });
+  const isLoading = isLoadingProp || isFetching;
   const fetched = Array.isArray(data) ? data : [];
 
   const sorted =
@@ -126,8 +149,54 @@ export function TableRenderer({
 
   const hasWidths = (config?.columns ?? []).some((column) => column.width !== undefined);
 
+  const selectable = Boolean(config?.selectable);
+  const pageKeys = paged.map((row) => String(row.id ?? ""));
+  const allSelected = pageKeys.length > 0 && pageKeys.every((key) => selected.has(key));
+  const someSelected = pageKeys.some((key) => selected.has(key));
+  const toggleAll = () =>
+    setSelected((current) => {
+      const next = new Set(current);
+      if (allSelected) for (const key of pageKeys) next.delete(key);
+      else for (const key of pageKeys) next.add(key);
+      return next;
+    });
+  const selectedRows = paged.filter((row) => selected.has(String(row.id ?? "")));
+
+  // Full-bleed list chrome, scoped here so the theme keeps serving panels.
+  const listSx =
+    config?.variant === "list"
+      ? {
+          p: 0,
+          overflow: "hidden",
+          "& .MuiTableCell-paddingCheckbox": {
+            paddingLeft: "20px",
+            paddingRight: 0,
+            width: 46,
+          },
+          "& .MuiTableCell-paddingCheckbox + .MuiTableCell-root": { paddingLeft: "12px" },
+          "& .MuiTableCell-head": {
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: ".1em",
+            textTransform: "uppercase" as const,
+            whiteSpace: "nowrap" as const,
+            padding: "11px 10px",
+            borderRadius: 0,
+            "&:first-of-type": { paddingLeft: "20px", borderRadius: 0 },
+            "&:last-of-type": { paddingRight: "20px", borderRadius: 0 },
+          },
+          "& .MuiTableBody-root .MuiTableCell-root": {
+            padding: "13px 10px",
+            borderTop: "1px solid",
+            borderColor: "surface.divider",
+            "&:first-of-type": { paddingLeft: "20px" },
+            "&:last-of-type": { paddingRight: "20px" },
+          },
+        }
+      : undefined;
+
   return (
-    <TableContainer>
+    <TableContainer sx={listSx}>
       {config?.header ? (
         <TableTitle
           config={config.header}
@@ -135,6 +204,16 @@ export function TableRenderer({
           t={t}
           extra={headerExtra}
           action={headerAction}
+        />
+      ) : null}
+      {selectable && selected.size > 0 ? (
+        <TableBulkBar
+          count={selected.size}
+          actions={config?.bulkActions ?? []}
+          rows={selectedRows}
+          bulkHandler={bulkHandler}
+          onClear={() => setSelected(new Set())}
+          t={t}
         />
       ) : null}
       {/* Declared column widths only bind under a fixed layout; tables that
@@ -148,6 +227,7 @@ export function TableRenderer({
             sort={sort}
             onSort={toggleSort}
             t={t}
+            selection={selectable ? { all: allSelected, some: someSelected, toggleAll } : undefined}
           />
         </TableHead>
         <TableBody>
@@ -211,6 +291,27 @@ export function TableRenderer({
                     <Box sx={{ fontSize: 12.5, color: "text.secondary" }}>
                       {t("emptyHint", "Try adjusting or clearing the filters.")}
                     </Box>
+                    {config?.emptyActions?.length ? (
+                      <Box sx={{ display: "flex", gap: "8px", mt: "6px" }}>
+                        {config.emptyActions.map((action) => (
+                          <LinkRenderer
+                            key={action.type ?? action.routeId}
+                            config={{ id, ...action }}
+                          >
+                            <Button
+                              variant={action.type === "add" ? "contained" : "outlined"}
+                              startIcon={
+                                action.icon ? (
+                                  <IconRenderer name={action.icon} size={15} />
+                                ) : undefined
+                              }
+                            >
+                              {t(action.label?.name ?? "")}
+                            </Button>
+                          </LinkRenderer>
+                        ))}
+                      </Box>
+                    ) : null}
                   </Box>
                 )}
               </TableCell>
@@ -226,6 +327,21 @@ export function TableRenderer({
                 actionHandler={actionHandler}
                 cells={cells}
                 rowRouteId={config?.rowRouteId}
+                selection={
+                  selectable
+                    ? {
+                        checked: selected.has(String(row.id ?? "")),
+                        toggle: () =>
+                          setSelected((current) => {
+                            const next = new Set(current);
+                            const key = String(row.id ?? "");
+                            if (next.has(key)) next.delete(key);
+                            else next.add(key);
+                            return next;
+                          }),
+                      }
+                    : undefined
+                }
               />
             ))
           )}
@@ -242,6 +358,7 @@ export function TableRenderer({
       </Table>
       {pageSize && totalCount > 0 ? (
         <TableFooterRenderer
+          variant={config?.variant}
           shown={paged.length}
           total={totalCount}
           page={page}

@@ -48,10 +48,13 @@ export function GenericRenderer({
   config,
   data = {},
   actionHandler,
+  id,
 }: {
   config: GenericRendererConfig;
   data?: Record<string, unknown>;
   actionHandler?: ActionHandler;
+  /** Component id, for cells that resolve their own copy (a button action). */
+  id?: string;
 }) {
   switch (config.type) {
     case "string":
@@ -84,7 +87,7 @@ export function GenericRenderer({
     case "role":
       return <RoleRenderer config={config} data={data} actionHandler={actionHandler} />;
     case "actions":
-      return <ActionsRenderer config={config} data={data} actionHandler={actionHandler} />;
+      return <ActionsRenderer config={config} data={data} actionHandler={actionHandler} id={id} />;
     case "menu":
       return (
         <ActionsMenu

@@ -1,0 +1,17 @@
+{
+  "activity": {
+    "title": "Recent Activity",
+    "viewAll": "View all",
+    "empty": "No recent activity.",
+    "filters": {
+      "all": "All",
+      "recruitment": "Recruitment",
+      "billing": "Billing"
+    },
+    "days": {
+      "today": "TODAY",
+      "yesterday": "YESTERDAY",
+      "earlier": "EARLIER"
+    }
+  }
+}

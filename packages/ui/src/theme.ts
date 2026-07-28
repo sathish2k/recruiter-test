@@ -75,10 +75,19 @@ const formTokens: FormTokens = {
   badgePadY: "2px",
 };
 
+declare module "@mui/material/Button" {
+  interface ButtonPropsVariantOverrides {
+    /** Accent-tinted action pill — the design`s row-level call to action. */
+    soft: true;
+  }
+}
+
 declare module "@mui/material/Chip" {
   interface ChipPropsVariantOverrides {
     soft: true;
     pill: true;
+    /** Micro badge beside a name (PRIMARY, status). */
+    badge: true;
   }
 }
 declare module "@mui/material/Tabs" {
@@ -163,6 +172,25 @@ const PILL = {
   default: { bg: "rgba(255,255,255,0.05)", border: "rgba(255,255,255,0.10)", fg: "#C9C5BD" },
 } as const;
 
+/**
+ * The design's micro badge beside a name — 9px uppercase in a 2/7 pill. Small
+ * enough that a row can carry two of them without the name truncating.
+ */
+const badgeChip = Object.entries(SOFT).map(([color, t]) => ({
+  props: { variant: "badge" as const, color: color as "primary" },
+  style: {
+    color: t.fg,
+    backgroundColor: t.bg,
+    border: `1px solid ${t.border}`,
+    height: "auto",
+    fontSize: 9,
+    fontWeight: 700,
+    letterSpacing: ".05em",
+    padding: "2px 7px",
+    "& .MuiChip-label": { padding: 0 },
+  },
+}));
+
 const pillChip = Object.entries(PILL).map(([color, t]) => ({
   props: { variant: "pill" as const, color: color as "primary" },
   style: {
@@ -209,6 +237,10 @@ interface Surfaces {
   /** Subtle fill for inline chips/badges sitting on a control. */
   tint: string;
   /** Soft-primary trio: selected day toggles, quick-picks, accent chips. */
+  /** Accent hero strip — a stronger wash than `primarySoftBg`, with its own
+   * border, for a full-width call to action. */
+  heroTint: string;
+  heroBorder: string;
   /** Field dropdown panel. A shade above `elevated`, which is for top-level
    * overlays (toasts, appbar popovers). */
   dropdownPanel: string;
@@ -275,6 +307,8 @@ function surfaces(mode: ThemeMode): Surfaces {
       headBg: "rgba(0,0,0,0.04)",
       menuShadow: "0 18px 50px rgba(0,0,0,.18)",
       tint: "rgba(0,0,0,0.06)",
+      heroTint: "rgba(242,106,27,0.22)",
+      heroBorder: "rgba(242,106,27,0.40)",
       dropdownPanel: "#FFFFFF",
       primarySoftBg: "rgba(242,106,27,0.12)",
       optionSelectedBg: "rgba(242,106,27,0.12)",
@@ -321,6 +355,8 @@ function surfaces(mode: ThemeMode): Surfaces {
     headBg: "rgba(255,255,255,0.04)",
     menuShadow: "0 18px 50px rgba(0,0,0,.6)",
     tint: "rgba(255,255,255,0.07)",
+    heroTint: "rgba(242,106,27,0.32)",
+    heroBorder: "rgba(242,106,27,0.40)",
     dropdownPanel: "#211F1E",
     primarySoftBg: "rgba(242,106,27,0.14)",
     optionSelectedBg: "rgba(242,106,27,0.12)",
@@ -373,6 +409,8 @@ const v: Surfaces = {
   headBg: "var(--mui-palette-surface-headBg)",
   menuShadow: "var(--mui-palette-surface-menuShadow)",
   tint: "var(--mui-palette-surface-tint)",
+  heroTint: "var(--mui-palette-surface-heroTint)",
+  heroBorder: "var(--mui-palette-surface-heroBorder)",
   dropdownPanel: "var(--mui-palette-surface-dropdownPanel)",
   primarySoftBg: "var(--mui-palette-surface-primarySoftBg)",
   optionSelectedBg: "var(--mui-palette-surface-optionSelectedBg)",
@@ -501,6 +539,18 @@ export function createAppTheme(): Theme {
               },
             },
           },
+          {
+            props: { variant: "soft" },
+            style: {
+              background: v.primarySoftBg,
+              border: `1px solid ${v.primarySoftBorder}`,
+              color: v.primarySoftFg,
+              padding: "8px 16px",
+              fontSize: 12,
+              fontWeight: 700,
+              "&:hover": { background: v.optionSelectedBg, borderColor: v.accentBright },
+            },
+          },
         ],
       },
       MuiIconButton: {
@@ -573,7 +623,7 @@ export function createAppTheme(): Theme {
         styleOverrides: {
           root: { borderRadius: 999, fontWeight: 600, fontSize: 12 },
         },
-        variants: [...softChip, ...pillChip],
+        variants: [...softChip, ...pillChip, ...badgeChip],
       },
       MuiPaper: {
         styleOverrides: {

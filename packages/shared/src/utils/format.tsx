@@ -77,10 +77,17 @@ export function formatNumber(
   return new Intl.NumberFormat(language, options).format(value);
 }
 
-export function formatCurrency(value: number, language: string, currency = "USD"): string {
+export function formatCurrency(
+  value: number,
+  language: string,
+  currency = "USD",
+  compact = false,
+): string {
   return new Intl.NumberFormat(language, {
     style: "currency",
     currency,
+    // Large money on a small tile: the design abbreviates rather than wraps.
+    ...(compact ? { notation: "compact" as const, maximumFractionDigits: 1 } : {}),
   }).format(value);
 }
 
@@ -98,8 +105,8 @@ export function useFormatters() {
         formatDate(value, language, options, { dateFormat, timeFormat, timezone }),
       formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
         formatNumber(value, language, options),
-      formatCurrency: (value: number, currency?: string) =>
-        formatCurrency(value, language, currency),
+      formatCurrency: (value: number, currency?: string, compact?: boolean) =>
+        formatCurrency(value, language, currency, compact),
     }),
     [language, timezone, dateFormat, timeFormat],
   );

@@ -24,7 +24,13 @@ export function DateRangeFilterComponent({
   const summary = range.from || range.to ? `${range.from ?? "…"} – ${range.to ?? "…"}` : undefined;
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary} minWidth={220} active={active}>
+    <FilterPopover
+      icon={config.icon}
+      label={config.label?.name}
+      summary={summary}
+      minWidth={220}
+      active={active}
+    >
       {() => (
         <Box
           sx={{

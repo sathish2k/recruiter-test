@@ -32,7 +32,7 @@ export function CheckboxFilterComponent({
     onChange(values.includes(v) ? values.filter((x) => x !== v) : [...values, v]);
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary} active={active}>
+    <FilterPopover icon={config.icon} label={config.label?.name} summary={summary} active={active}>
       {() =>
         options.map((option) => {
           const checked = values.includes(option.value);

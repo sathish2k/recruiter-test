@@ -64,7 +64,22 @@ export interface TableHeaderConfig {
   actionIcon?: string;
 }
 
+/** Bulk action `type` → what to do with every selected row. */
+export type BulkHandler = Record<string, (rows: Row[]) => void>;
+
 export interface TableRendererConfig {
+  /**
+   * `panel` (default) is the embedded table the theme draws — a padded card
+   * with a rounded header band. `list` is the design`s full-page list: the
+   * band spans the card edge to edge and the labels are uppercase.
+   */
+  variant?: "panel" | "list";
+  /** Adds a leading checkbox column and, once rows are picked, the bulk bar. */
+  selectable?: boolean;
+  /** Actions offered in that bar; each receives the selected rows. */
+  bulkActions?: ActionItem[];
+  /** Calls to action under the "no results" message. */
+  emptyActions?: ActionItem[];
   columns: TableColumnConfig[];
   /** Titled header rendered inside the card, above the column header. */
   header?: TableHeaderConfig;

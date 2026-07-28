@@ -73,7 +73,8 @@
     "noParentCompany": "No parent company",
     "replacementPeriodHelp": "Free replacement if the hire leaves within this period",
     "optional": "optional",
-    "billingEmailHint": "Press Enter to add multiple recipients"
+    "billingEmailHint": "Press Enter to add multiple recipients",
+    "contractRenewsAt": "Contract renews"
   },
   "source": {
     "added_by_user": "Added by user",

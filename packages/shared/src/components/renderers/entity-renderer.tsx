@@ -2,6 +2,7 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
+import type { ReactNode } from "react";
 
 export interface EntityRendererConfig {
   type: "entity";
@@ -13,6 +14,9 @@ export interface EntityRendererConfig {
   bgPath?: string;
   fg?: string;
   fgPath?: string;
+  /** Render the avatar alone, deriving its initials from `title` — for a list
+   * row`s leading slot, where the row already prints the name. */
+  avatarOnly?: boolean;
   /** The tile/avatar text (initial or initials) — literal or data path. */
   text?: string;
   textPath?: string;
@@ -66,9 +70,12 @@ function initialsOf(name: string) {
 export function EntityRenderer({
   config,
   data = {},
+  titleAdornment,
 }: {
   config: EntityRendererConfig;
   data?: Record<string, unknown>;
+  /** Rendered inline after the title — the design`s state chips beside a name. */
+  titleAdornment?: ReactNode;
 }) {
   const circle = config.shape === "circle";
   const size = config.size ?? 34;
@@ -80,25 +87,35 @@ export function EntityRenderer({
   // Explicit text/textPath wins; otherwise derive initials from the title.
   const avatarText =
     read(data, config.textPath, config.text) || initialsOf(read(data, config.title));
+  const avatar = (
+    <Avatar
+      variant={circle ? "circular" : "rounded"}
+      sx={{
+        width: size,
+        height: size,
+        bgcolor: bg,
+        color: fg,
+        fontSize: circle ? 12 : 13,
+        fontWeight: circle ? 600 : 700,
+        ...config.avatarSx,
+      }}
+    >
+      {avatarText}
+    </Avatar>
+  );
+
+  if (config.avatarOnly) return avatar;
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: "11px" }}>
-      <Avatar
-        variant={circle ? "circular" : "rounded"}
-        sx={{
-          width: size,
-          height: size,
-          bgcolor: bg,
-          color: fg,
-          fontSize: circle ? 12 : 13,
-          fontWeight: circle ? 600 : 700,
-          ...config.avatarSx,
-        }}
-      >
-        {avatarText}
-      </Avatar>
+      {avatar}
       <Box sx={{ minWidth: 0 }}>
         <Box
           sx={{
+            display: titleAdornment ? "flex" : undefined,
+            alignItems: titleAdornment ? "center" : undefined,
+            gap: titleAdornment ? "10px" : undefined,
+            flexWrap: titleAdornment ? "wrap" : undefined,
             fontWeight: 600,
             whiteSpace: "nowrap",
             overflow: "hidden",
@@ -106,7 +123,13 @@ export function EntityRenderer({
             ...config.titleSx,
           }}
         >
-          {read(data, config.title)}
+          {titleAdornment ? (
+            <Box component="span" sx={{ minWidth: 0 }}>
+              {read(data, config.title)}
+            </Box>
+          ) : (
+            read(data, config.title)
+          )}
           {config.suffixPath && data?.[config.suffixPath] ? (
             <Box
               component="span"
@@ -115,6 +138,7 @@ export function EntityRenderer({
               {config.suffixLabel ?? "(you)"}
             </Box>
           ) : null}
+          {titleAdornment}
         </Box>
         {config.subtitle ? (
           <Box

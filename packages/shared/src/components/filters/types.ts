@@ -15,6 +15,8 @@ export interface RemoteOptions {
 interface BaseFilter {
   /** State key (also the URL param key via useFilters). */
   key: string;
+  /** ICON_REGISTRY name drawn before the label, as the design`s chips do. */
+  icon?: string;
   /** Label (name is a translation key resolved by the caller, or a literal). */
   label?: { name: string };
 }

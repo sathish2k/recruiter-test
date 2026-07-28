@@ -2,6 +2,9 @@ import type { AppbarConfig } from "./appbar.types";
 
 // Icons and labels resolve in the component; see appbar.types.ts for the shape.
 export const AppbarConfiguration: AppbarConfig = {
+  subtitles: {
+    "Recruit.Contacts.Route": "subtitles.contacts",
+  },
   titles: {
     "Recruit.Root": "titles.dashboard",
     "Recruit.Clients.Route": "titles.clients",

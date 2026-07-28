@@ -64,19 +64,43 @@ export function ContactCell(row: Row, t: T) {
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              minWidth: 70,
+              maxWidth: "100%",
             }}
           >
             {name}
           </Typography>
           {row.isPrimary ? (
-            <Chip variant="soft" size="small" color="primary" label={t("badges.primary")} />
+            <Chip
+              variant="badge"
+              color="primary"
+              label={t("badges.primary")}
+              sx={{ flex: "none" }}
+            />
           ) : null}
           {status !== "active" ? (
             <Chip
-              variant="soft"
-              size="small"
+              variant="badge"
               color={STATUS_COLOR[status] ?? "default"}
-              label={t(`status.${status}`)}
+              sx={{ flex: "none" }}
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 5,
+                      height: 5,
+                      borderRadius: "999px",
+                      bgcolor: "currentColor",
+                      flex: "none",
+                    }}
+                  />
+                  {t(`status.${status}`)}
+                </Box>
+              }
             />
           ) : null}
         </Box>

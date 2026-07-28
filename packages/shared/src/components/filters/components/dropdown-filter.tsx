@@ -19,7 +19,12 @@ export function DropdownFilterComponent({
   const options = useFilterOptions(config);
   const selected = options.find((o) => o.value === value);
   return (
-    <FilterPopover label={config.label?.name} summary={selected?.label} active={active}>
+    <FilterPopover
+      icon={config.icon}
+      label={config.label?.name}
+      summary={selected?.label}
+      active={active}
+    >
       {(close) =>
         options.map((option) => (
           <Box

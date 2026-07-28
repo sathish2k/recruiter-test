@@ -1,12 +1,19 @@
 import { status } from "elysia";
 import {
   type ClientInput,
+  clientActivity,
+  clientContacts,
+  clientKpis,
   clientStats,
+  clientSubmissions,
+  clientSummary,
+  clientWorkspace,
   createClient,
   deleteClient,
   getClient,
   listClients,
   updateClient,
+  type WorkspaceTab,
 } from "../services/client.service";
 
 type Auth = { agencyId?: string | null };
@@ -32,6 +39,41 @@ export async function getClientById(ctx: { user: Auth; params: { id: string } })
   const found = await getClient(ctx.user.agencyId ?? "", ctx.params.id);
   if (!found) return status(404, "Client not found");
   return found;
+}
+
+export async function getClientSummary(ctx: { user: Auth; params: { id: string } }) {
+  const found = await clientSummary(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!found) return status(404, "Client not found");
+  return { data: found };
+}
+
+export async function getClientKpis(ctx: { user: Auth; params: { id: string } }) {
+  return { data: await clientKpis(ctx.user.agencyId ?? "", ctx.params.id) };
+}
+
+export async function getClientSubmissions(ctx: { user: Auth; params: { id: string } }) {
+  return { data: await clientSubmissions(ctx.user.agencyId ?? "", ctx.params.id) };
+}
+
+export async function getClientWorkspace(ctx: {
+  user: Auth;
+  params: { id: string };
+  query: { tab?: string };
+}) {
+  const tab = (ctx.query.tab ?? "roles") as WorkspaceTab;
+  return { data: await clientWorkspace(ctx.user.agencyId ?? "", ctx.params.id, tab) };
+}
+
+export async function getClientActivityFeed(ctx: {
+  user: Auth;
+  params: { id: string };
+  query: { filter?: string };
+}) {
+  return { data: await clientActivity(ctx.user.agencyId ?? "", ctx.query.filter ?? "all") };
+}
+
+export async function getClientContactList(ctx: { user: Auth; params: { id: string } }) {
+  return { data: await clientContacts(ctx.user.agencyId ?? "", ctx.params.id) };
 }
 
 export async function postClient(ctx: { user: Auth; body?: ClientInput | null }) {

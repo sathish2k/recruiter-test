@@ -19,7 +19,12 @@ export function RadioFilterComponent({
   const options = useFilterOptions(config);
   const selected = options.find((o) => o.value === value);
   return (
-    <FilterPopover label={config.label?.name} summary={selected?.label} active={activeProp}>
+    <FilterPopover
+      icon={config.icon}
+      label={config.label?.name}
+      summary={selected?.label}
+      active={activeProp}
+    >
       {(close) =>
         options.map((option) => {
           const active = option.value === value;

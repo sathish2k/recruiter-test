@@ -16,7 +16,13 @@ export function DateFilterComponent({
   active?: boolean;
 }) {
   return (
-    <FilterPopover label={config.label?.name} summary={value} minWidth={180} active={active}>
+    <FilterPopover
+      icon={config.icon}
+      label={config.label?.name}
+      summary={value}
+      minWidth={180}
+      active={active}
+    >
       {() => (
         <Box sx={{ p: "4px" }}>
           <input

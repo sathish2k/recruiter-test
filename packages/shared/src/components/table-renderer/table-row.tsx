@@ -1,5 +1,6 @@
 "use client";
 
+import Checkbox from "@mui/material/Checkbox";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { usePortalRouter } from "@recruit/sdk";
@@ -15,6 +16,7 @@ export function TableRowRenderer({
   actionHandler,
   cells,
   rowRouteId,
+  selection,
 }: {
   id: string;
   row: Row;
@@ -23,6 +25,7 @@ export function TableRowRenderer({
   actionHandler?: ActionHandler;
   cells?: Cells;
   rowRouteId?: string;
+  selection?: { checked: boolean; toggle: () => void };
 }) {
   const router = usePortalRouter();
   return (
@@ -30,6 +33,11 @@ export function TableRowRenderer({
       onClick={rowRouteId ? () => router.push(rowRouteId, { id: String(row.id ?? "") }) : undefined}
       sx={rowRouteId ? { cursor: "pointer" } : undefined}
     >
+      {selection ? (
+        <TableCell padding="checkbox" onClick={(event) => event.stopPropagation()}>
+          <Checkbox size="small" checked={selection.checked} onChange={selection.toggle} />
+        </TableCell>
+      ) : null}
       {columns.map((column) => (
         <TableCellRenderer
           key={column.label.name}

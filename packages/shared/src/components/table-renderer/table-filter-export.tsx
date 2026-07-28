@@ -9,7 +9,7 @@ import { type FilterConfig, Filters, useFilters } from "../filters";
 import { type ActionHandler, IconRenderer } from "../renderers";
 import { CardCollectionRenderer } from "./card-collection";
 import { TableRenderer } from "./table-renderer";
-import type { Cells, TableCta, TableFilterExportConfig } from "./table-renderer.types";
+import type { BulkHandler, Cells, TableCta, TableFilterExportConfig } from "./table-renderer.types";
 
 type Row = Record<string, unknown>;
 
@@ -23,6 +23,7 @@ export function TableFilterExportRenderer({
   headerAction,
   renderItem,
   renderSkeleton,
+  bulkHandler,
   itemMinWidth,
 }: {
   id: string;
@@ -38,6 +39,8 @@ export function TableFilterExportRenderer({
   renderItem?: (row: Row) => ReactNode;
   renderSkeleton?: () => ReactNode;
   itemMinWidth?: number;
+  /** Bulk action `type` → what to do with the selected rows. */
+  bulkHandler?: BulkHandler;
 }) {
   const { t } = useTranslation(id);
   const configFromId = useConfiguration<TableFilterExportConfig>(id);
@@ -138,6 +141,7 @@ export function TableFilterExportRenderer({
           headerExtra={headerExtra}
           headerAction={headerAction}
           onEmptyAction={onCta}
+          bulkHandler={bulkHandler}
         />
       )}
     </Box>

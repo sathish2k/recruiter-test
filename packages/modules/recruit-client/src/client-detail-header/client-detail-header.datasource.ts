@@ -1,0 +1,15 @@
+import { type DatasourceInstance, httpClient } from "@recruit/sdk";
+
+interface Envelope {
+  data?: unknown;
+}
+
+/** Identity row and the feedback-SLA strip. */
+export const clientDetailHeaderDatasource = (): DatasourceInstance => ({
+  get: async (query?: Record<string, unknown>) => {
+    const id = query?.id ? String(query.id) : "";
+    if (!id) return {};
+    const response = await httpClient.get(`/clients/${id}/summary`);
+    return ((response.data as Envelope)?.data as Record<string, unknown>) ?? {};
+  },
+});

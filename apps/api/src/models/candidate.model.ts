@@ -1,4 +1,4 @@
-import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.model";
 import { job } from "./job.model";
 import { organization } from "./organization.model";
@@ -77,6 +77,8 @@ export const candidate = pgTable("candidate", {
   attachments: jsonb("attachments").$type<CandidateAttachment[]>(),
   jobId: text("job_id").references(() => job.id, { onDelete: "set null" }),
   startingStage: text("starting_stage"),
+  matchScore: integer("match_score"),
+  reminderSentAt: timestamp("reminder_sent_at"),
   status: text("status").$type<CandidateStatus>().notNull().default("new"),
   ownerId: text("owner_id").references(() => user.id, { onDelete: "set null" }),
   source: text("source"),

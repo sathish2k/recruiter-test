@@ -8,6 +8,8 @@ import type { ReactNode } from "react";
 
 export interface ListSectionItem {
   key: string;
+  /** Renders as an uppercase group heading rather than a row. */
+  groupLabel?: string;
   /** Leading icon or tile (session/calendar/token lists). */
   icon?: ReactNode;
   title: ReactNode;
@@ -30,7 +32,7 @@ export interface ListSectionItem {
  * rows); `inset` renders each row as its own inset card; `timeline` draws a dot
  * and a connector down the left edge.
  */
-export type ListVariant = "divided" | "inset" | "timeline";
+export type ListVariant = "divided" | "inset" | "timeline" | "plain";
 
 /** Shape of the skeleton rows — match it to the real row layout. */
 export interface ListSkeletonShape {
@@ -45,6 +47,10 @@ export interface ListSkeletonShape {
 }
 
 export interface ListSectionProps {
+  /** Which of the design`s three card-title scales this card uses. */
+  titleScale?: ListTitleScale;
+  /** Rendered between the header and the rows — e.g. filter chips. */
+  beforeItems?: ReactNode;
   /** Header title (omit for a header-less list). */
   title?: ReactNode;
   subtitle?: ReactNode;
@@ -145,15 +151,28 @@ function ListRow({
           bgcolor: "surface.inset",
           border: "1px solid",
           borderColor: "divider",
-          borderRadius: "12px",
-          p: "12px 14px",
+          borderRadius: "13px",
+          p: "12px 15px",
         }}
       >
         {item.icon}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ fontSize: 13.5, fontWeight: 600 }}>{item.title}</Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: 13.5,
+              fontWeight: 700,
+            }}
+          >
+            {item.title}
+            {item.chips}
+          </Box>
           {item.description != null ? (
-            <Box sx={{ fontSize: 12, color: "text.secondary", mt: "1px" }}>{item.description}</Box>
+            <Box sx={{ fontSize: 11.5, color: "surface.textSecondary", mt: "2px" }}>
+              {item.description}
+            </Box>
           ) : null}
         </Box>
         {item.trailing}
@@ -163,14 +182,28 @@ function ListRow({
     return item.wrap ? <>{item.wrap(row)}</> : row;
   }
 
+  if (variant === "plain") {
+    const plain = (
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: "9px", fontSize: 12.5 }}>
+        {item.icon ? (
+          <Box sx={{ display: "flex", flex: "none", mt: "1px" }}>{item.icon}</Box>
+        ) : null}
+        <Box sx={{ flex: 1, minWidth: 0, lineHeight: 1.5, color: "surface.textMuted" }}>
+          {item.title}
+        </Box>
+      </Box>
+    );
+    return item.wrap ? <>{item.wrap(plain)}</> : plain;
+  }
+
   const row = (
     <Box
       sx={
         dense
           ? {
               display: "flex",
-              alignItems: "center",
-              gap: "11px",
+              alignItems: "flex-start",
+              gap: "9px",
               p: "10px",
               mx: "-10px",
               borderRadius: "10px",
@@ -233,8 +266,19 @@ function ListRow({
  * different `items`. Pass `isLoading` (+ `skeletonRows`/`skeletonShape`) to show
  * a skeleton whose row shape matches the real one.
  */
+/** The design draws card titles at three weights depending on where the card
+ * sits: a rail card, a section card, or a main-column panel. */
+export const TITLE_SCALE = {
+  rail: { fontSize: 14, fontWeight: 700 },
+  section: { fontSize: 14.5, fontWeight: 600 },
+  panel: { fontSize: 15, fontWeight: 700 },
+} as const;
+
+export type ListTitleScale = keyof typeof TITLE_SCALE;
+
 export function ListSection({
   title,
+  titleScale,
   subtitle,
   icon,
   badge,
@@ -245,6 +289,7 @@ export function ListSection({
   variant = "divided",
   dense = false,
   headerGap,
+  beforeItems,
   isLoading = false,
   skeletonRows = 3,
   skeletonShape,
@@ -275,7 +320,7 @@ export function ListSection({
             <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {icon ? <Box sx={{ display: "flex" }}>{icon}</Box> : null}
               {title != null ? (
-                <Typography sx={{ fontSize: 14.5, fontWeight: 600 }}>{title}</Typography>
+                <Typography sx={TITLE_SCALE[titleScale ?? "section"]}>{title}</Typography>
               ) : null}
               {badge}
             </Box>
@@ -289,9 +334,11 @@ export function ListSection({
         </Box>
       ) : null}
 
+      {beforeItems != null ? <Box sx={{ mb: "12px" }}>{beforeItems}</Box> : null}
+
       <Box
         sx={
-          variant === "inset"
+          variant === "inset" || variant === "plain"
             ? { display: "flex", flexDirection: "column", gap: "10px" }
             : { display: "flex", flexDirection: "column" }
         }
@@ -300,16 +347,32 @@ export function ListSection({
           ? Array.from({ length: skeletonRows }, (_, index) => index).map((row) => (
               <SkeletonRow key={row} shape={shape} divided={divided} />
             ))
-          : items.map((item, index) => (
-              <ListRow
-                key={item.key}
-                item={item}
-                variant={variant}
-                dense={dense}
-                divided={divided}
-                isLast={index === items.length - 1}
-              />
-            ))}
+          : items.map((item, index) =>
+              item.groupLabel ? (
+                <Typography
+                  key={item.key}
+                  sx={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: ".1em",
+                    color: "text.disabled",
+                    mt: index === 0 ? 0 : "14px",
+                    mb: "9px",
+                  }}
+                >
+                  {item.groupLabel}
+                </Typography>
+              ) : (
+                <ListRow
+                  key={item.key}
+                  item={item}
+                  variant={variant}
+                  dense={dense}
+                  divided={divided}
+                  isLast={index === items.length - 1}
+                />
+              ),
+            )}
       </Box>
 
       {footer != null ? (

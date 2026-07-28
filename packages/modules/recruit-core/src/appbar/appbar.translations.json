@@ -47,5 +47,8 @@
     "templates": "Settings · Email templates",
     "notifications": "Notifications",
     "helpCenter": "Help center"
+  },
+  "subtitles": {
+    "contacts": "Everyone you talk to at your clients — hiring managers, HR and finance."
   }
 }

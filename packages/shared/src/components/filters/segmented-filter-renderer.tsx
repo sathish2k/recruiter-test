@@ -24,6 +24,9 @@ export interface SegmentedFilterRendererConfig {
   options: SegmentedFilterOption[];
   /** Right-hand call to action. */
   cta?: { label: { name: string }; icon?: string; link: LinkRendererConfig };
+  /** `segmented` (default) is the sliding pill track; `chips` is the design`s
+   * row of discrete bordered pills, as the activity feed uses. */
+  variant?: "segmented" | "chips";
 }
 
 /**
@@ -61,6 +64,35 @@ export function SegmentedFilterRenderer({
   );
 
   if (!config) return null;
+
+  if (config.variant === "chips") {
+    return (
+      <Box sx={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+        {config.options.map((option) => {
+          const on = option.value === selected;
+          return (
+            <Box
+              key={option.value}
+              onClick={() => select(option.value)}
+              sx={{
+                p: "5px 12px",
+                borderRadius: "999px",
+                fontSize: 11.5,
+                fontWeight: 600,
+                cursor: "pointer",
+                border: "1px solid",
+                borderColor: on ? "surface.primarySoftBorder" : "surface.controlBorder",
+                bgcolor: on ? "surface.optionSelectedBg" : "surface.inset",
+                color: on ? "surface.primarySoftFg" : "surface.textSecondary",
+              }}
+            >
+              {t(option.label)}
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  }
 
   return (
     <Box

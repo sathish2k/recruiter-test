@@ -1,0 +1,34 @@
+{
+  "status": {
+    "prospect": "Prospect",
+    "active": "Active",
+    "hiring": "Hiring",
+    "paused": "Paused",
+    "inactive": "Inactive",
+    "blacklisted": "Blacklisted"
+  },
+  "subtitle": {
+    "accountLead": "Account lead",
+    "since": "Client since {{date}}"
+  },
+  "actions": {
+    "edit": "Edit client",
+    "report": "Weekly AI Report",
+    "addRole": "New requirement",
+    "addContact": "Add contact",
+    "viewJobs": "View all roles",
+    "portal": "Share portal"
+  },
+  "hero": {
+    "title": "Client waiting — {{count}} submissions need {{name}}’s feedback",
+    "sla": "{{hours}}h SLA",
+    "elapsed": "{{hours}}h elapsed on oldest",
+    "cta": "Review"
+  },
+  "attention": {
+    "on_track": "On track",
+    "waiting_feedback": "Waiting feedback",
+    "invoice_overdue": "Invoice overdue",
+    "dormant": "Dormant"
+  }
+}

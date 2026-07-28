@@ -316,6 +316,13 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
         condition: { field: "feeBasis", equals: "flat" },
         grid: { size: { xs: 12 } },
       },
+      contractRenewsAt: {
+        type: "string",
+        widget: "date",
+        title: "fields.contractRenewsAt",
+        optional: true,
+        grid: { size: { xs: 12 } },
+      },
       paymentTerms: {
         type: "string",
         widget: "select",
@@ -430,6 +437,7 @@ export const ClientFormConfiguration: ClientFormConfiguration = {
             "feePercent",
             "feeFlat",
             "replacementPeriod",
+            "contractRenewsAt",
             "paymentTerms",
             "billingEmail",
             "taxId",

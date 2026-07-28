@@ -1,0 +1,8 @@
+{
+  "contacts": {
+    "title": "Client contacts",
+    "viewAll": "View all",
+    "empty": "No contacts recorded for this client.",
+    "primary": "PRIMARY"
+  }
+}

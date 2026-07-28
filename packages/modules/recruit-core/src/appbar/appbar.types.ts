@@ -37,6 +37,8 @@ export interface AppbarAction {
 
 export interface AppbarConfig {
   titles: Record<string, string>;
+  /** Route id → sub-heading under the title, as the design pairs them. */
+  subtitles?: Record<string, string>;
   /** Per-route back link, shown on the left in place of the title (config-driven
    * via LinkRenderer). Keyed by route id; the target is the link's `routeId`. */
   back?: Record<string, LinkRendererConfig>;

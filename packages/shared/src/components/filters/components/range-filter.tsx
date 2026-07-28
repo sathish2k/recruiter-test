@@ -29,7 +29,13 @@ export function RangeFilterComponent({
   const toNum = (raw: string) => (raw === "" ? undefined : Number(raw));
 
   return (
-    <FilterPopover label={config.label?.name} summary={summary} minWidth={220} active={active}>
+    <FilterPopover
+      icon={config.icon}
+      label={config.label?.name}
+      summary={summary}
+      minWidth={220}
+      active={active}
+    >
       {() => (
         <Box sx={{ display: "flex", gap: "8px", p: "4px" }}>
           <input

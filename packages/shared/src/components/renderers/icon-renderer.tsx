@@ -282,6 +282,8 @@ export interface IconRendererConfig {
   path?: string;
   size?: number;
   color?: string;
+  /** Read the colour per row — an activity feed tints its glyph by severity. */
+  colorPath?: string;
   sx?: SxProps<Theme>;
   alt?: string;
   /** Forwarded so MUI slot APIs (Chip icon, ListItemIcon, …) can style it —
@@ -295,12 +297,14 @@ export function IconRenderer({
   path,
   size = 18,
   color,
+  colorPath,
   sx,
   alt = "",
   className,
   data,
 }: IconRendererConfig & { data?: Record<string, unknown> }) {
   const resolved = path ? (delve(data ?? {}, path) as string | undefined) : undefined;
+  const tint = colorPath ? (delve(data ?? {}, colorPath) as string | undefined) : undefined;
   const source = src ?? (resolved && /^(https?:|data:|\/)/.test(resolved) ? resolved : undefined);
   const iconName = name ?? (source ? undefined : resolved);
 
@@ -317,5 +321,5 @@ export function IconRenderer({
   }
   const Icon = iconName ? ICON_REGISTRY[iconName] : undefined;
   if (!Icon) return null;
-  return <Icon className={className} sx={{ fontSize: size, color, ...sx }} />;
+  return <Icon className={className} sx={{ fontSize: size, color: tint ?? color, ...sx }} />;
 }

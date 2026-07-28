@@ -42,6 +42,7 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
   const { mode: themeMode, toggle: toggleTheme } = useColorMode();
   const titleKey = configuration?.titles?.[currentRoute?.id ?? ""];
   const backLink = configuration?.back?.[currentRoute?.id ?? ""];
+  const subtitleKey = configuration?.subtitles?.[currentRoute?.id ?? ""];
   const actions = configuration?.actions ?? [];
 
   const runMenuItem = (item: AppbarMenuItem) => {
@@ -80,9 +81,16 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
           </Box>
         </LinkRenderer>
       ) : (
-        <Typography sx={{ fontSize: 17, fontWeight: 600 }}>
-          {titleKey ? t(titleKey) : ""}
-        </Typography>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={{ fontSize: 17, fontWeight: 600 }}>
+            {titleKey ? t(titleKey) : ""}
+          </Typography>
+          {subtitleKey ? (
+            <Typography sx={{ fontSize: 12.5, color: "text.disabled", mt: "2px" }}>
+              {t(subtitleKey)}
+            </Typography>
+          ) : null}
+        </Box>
       )}
       <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
         {actions.map((action) => {

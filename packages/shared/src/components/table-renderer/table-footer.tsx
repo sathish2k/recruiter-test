@@ -11,6 +11,7 @@ export function TableFooterRenderer({
   totalPages,
   onPageChange,
   t,
+  variant,
 }: {
   shown: number;
   total: number;
@@ -18,15 +19,21 @@ export function TableFooterRenderer({
   totalPages: number;
   onPageChange: (page: number) => void;
   t: TFunc;
+  /** The full-page list draws a divided footer inset to the card edge. */
+  variant?: "panel" | "list";
 }) {
+  const list = variant === "list";
   return (
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        pt: "14px",
-        px: "14px",
+        gap: "12px",
+        flexWrap: "wrap",
+        ...(list
+          ? { p: "12px 20px", borderTop: "1px solid", borderColor: "surface.divider" }
+          : { pt: "14px", px: "14px" }),
         fontSize: 12.5,
         color: "text.disabled",
       }}

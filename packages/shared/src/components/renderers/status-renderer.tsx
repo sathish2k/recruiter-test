@@ -6,6 +6,9 @@ import { useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 
 export interface StatusRendererConfig {
+  /** Render nothing when the value has no entry in `labels` — for a badge that
+   * marks one state and stays absent otherwise. */
+  onlyMapped?: boolean;
   type: "status";
   path: string;
   /** Component id. When set, `labels` values are treated as translation keys —
@@ -30,8 +33,13 @@ export function StatusRenderer({
 }) {
   const { t } = useTranslation(config.id ?? "");
   const key = String(delve(data, config.path) ?? "");
-  const raw = config.labels?.[key] ?? key;
+  const mapped = config.labels?.[key];
+  const raw = mapped ?? key;
   const label = config.id ? t(raw) : raw;
+  // A labels map that covers only some values is a badge that shows for those
+  // values alone — the design`s PRIMARY marker, absent on everyone else.
+  if (config.labels && mapped === undefined && config.onlyMapped) return null;
+
   return (
     <Chip
       label={

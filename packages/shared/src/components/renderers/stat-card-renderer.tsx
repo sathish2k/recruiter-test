@@ -6,7 +6,7 @@ import Card, { type CardProps } from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import Skeleton from "@mui/material/Skeleton";
 import Typography, { type TypographyProps } from "@mui/material/Typography";
-import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
+import { useConfiguration, useFetch, useRouteParams, useTranslation } from "@recruit/sdk";
 import delve from "dlv";
 import { useState } from "react";
 import { seedRecord } from "../../utils/seed-data";
@@ -68,7 +68,7 @@ export interface StatCardRendererConfig {
   link?: LinkRendererConfig;
 }
 
-export type StatCardSize = "sm" | "md";
+export type StatCardSize = "compact" | "sm" | "md";
 
 const DELTA_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 
@@ -81,6 +81,8 @@ const SIZES = {
     value: 27,
     sub: 10.5,
     subGap: "6px",
+    delta: 12,
+    deltaGap: "9px",
   },
   sm: {
     padding: "16px 18px",
@@ -89,6 +91,19 @@ const SIZES = {
     value: 25,
     sub: 11,
     subGap: "4px",
+    delta: 12,
+    deltaGap: "9px",
+  },
+  // The client-detail tiles, a step down again from the clients grid.
+  compact: {
+    padding: "15px 17px",
+    label: 12,
+    labelGap: "7px",
+    value: 23,
+    sub: 11,
+    subGap: "4px",
+    delta: 11.5,
+    deltaGap: "8px",
   },
 } as const;
 
@@ -300,13 +315,16 @@ function StatCard({
         </Box>
       ) : (
         <>
-          <Box sx={{ display: "flex", alignItems: "baseline", gap: "9px" }}>
+          <Box sx={{ display: "flex", alignItems: "baseline", gap: size.deltaGap }}>
             {config.value ? <GenericRenderer config={valueConfig} data={data} /> : null}
             {deltaText ? (
               pill ? (
                 <Chip variant="soft" color="primary" size="small" label={deltaText} />
               ) : (
-                <Box component="span" sx={{ fontSize: 12, fontWeight: 600, color: deltaColor }}>
+                <Box
+                  component="span"
+                  sx={{ fontSize: size.delta, fontWeight: 600, color: deltaColor }}
+                >
                   {deltaText}
                 </Box>
               )
@@ -381,8 +399,13 @@ export function StatCardRenderer({
   const configs = Array.isArray(source) ? source : [source];
   const { t } = useTranslation(id);
   const seedData = seedRecord(dataProp);
+  // Route params travel to the datasource as filters, so a tile on a detail
+  // screen can scope its endpoint to that record. Datasources that don`t take
+  // them simply ignore the extra keys.
+  const routeParams = useRouteParams();
   const { data: resolved, isLoading } = useFetch<Record<string, unknown>>(id, {
     data: seedData,
+    filters: routeParams,
   });
   const data = resolved ?? {};
 

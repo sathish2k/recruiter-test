@@ -1,0 +1,12 @@
+{
+  "metrics": {
+    "openJobs": "Open jobs",
+    "openJobsDelta": "{value} on hold",
+    "candidates": "Active candidates",
+    "candidatesDelta": "in pipeline",
+    "placements": "Placements · avg time",
+    "placementsDelta": "{value} days",
+    "revenue": "Revenue",
+    "revenueDelta": "{value} outstanding"
+  }
+}

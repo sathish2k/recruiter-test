@@ -4,18 +4,22 @@ import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import Button from "@mui/material/Button";
 import Popover from "@mui/material/Popover";
 import { type ReactNode, useState } from "react";
+import { IconRenderer } from "../../renderers/icon-renderer";
 
 export function FilterPopover({
   label,
   summary,
   minWidth = 220,
   active = false,
+  icon,
   children,
 }: {
   label?: string;
   summary?: string;
   minWidth?: number;
   active?: boolean;
+  /** ICON_REGISTRY name drawn before the label. */
+  icon?: string;
   children: (close: () => void) => ReactNode;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
@@ -24,6 +28,7 @@ export function FilterPopover({
       <Button
         variant="outlined"
         onClick={(e) => setAnchor(e.currentTarget)}
+        startIcon={icon ? <IconRenderer name={icon} size={15} /> : undefined}
         endIcon={<ExpandMoreRounded sx={{ color: "text.disabled" }} />}
         sx={{
           fontSize: 12.5,

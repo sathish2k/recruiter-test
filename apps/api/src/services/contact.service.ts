@@ -11,6 +11,16 @@ function fullName(first: string, last: string) {
   return `${first} ${last}`.trim();
 }
 
+/** "Today" / "Yesterday" / "5d ago" / "3w ago", as the design writes it. */
+function relativeDays(when: Date): string {
+  const days = Math.floor((Date.now() - when.getTime()) / (24 * 60 * 60 * 1000));
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
+
 function mapContact(row: ContactRow & { clientName?: string | null; ownerName?: string | null }) {
   return {
     id: row.id,
@@ -39,6 +49,14 @@ function mapContact(row: ContactRow & { clientName?: string | null; ownerName?: 
     type: row.type,
     // "Contact since" on the detail screen.
     createdAt: row.createdAt.toISOString(),
+    // How long since anyone touched this contact — the list flags anything
+    // that has gone quiet for a fortnight.
+    lastTouch: relativeDays(row.updatedAt),
+    lastTouchStale: Date.now() - row.updatedAt.getTime() > 14 * 24 * 60 * 60 * 1000,
+    lastTouchColor:
+      Date.now() - row.updatedAt.getTime() > 14 * 24 * 60 * 60 * 1000
+        ? "var(--mui-palette-surface-warningFg)"
+        : "var(--mui-palette-surface-textSecondary)",
   };
 }
 

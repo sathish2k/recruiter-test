@@ -1,5 +1,6 @@
 "use client";
 
+import Checkbox from "@mui/material/Checkbox";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
@@ -12,6 +13,7 @@ export function TableHeaderRenderer({
   sort,
   onSort,
   t,
+  selection,
 }: {
   columns: TableColumnConfig[];
   hasActions: boolean;
@@ -19,9 +21,21 @@ export function TableHeaderRenderer({
   sort: SortState;
   onSort: (key: string) => void;
   t: TFunc;
+  /** Present when the table is selectable — drives the select-page checkbox. */
+  selection?: { all: boolean; some: boolean; toggleAll: () => void };
 }) {
   return (
     <TableRow>
+      {selection ? (
+        <TableCell padding="checkbox" sx={{ width: 44 }}>
+          <Checkbox
+            size="small"
+            checked={selection.all}
+            indeterminate={selection.some && !selection.all}
+            onChange={selection.toggleAll}
+          />
+        </TableCell>
+      ) : null}
       {columns.map((column) => (
         <TableCell key={column.label.name} align={column.align} sx={{ width: column.width }}>
           {column.sort ? (

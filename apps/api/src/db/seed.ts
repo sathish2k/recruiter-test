@@ -15,6 +15,8 @@ import { auditLog } from "../models/audit-log.model";
 import { user } from "../models/auth.model";
 import { type CandidateStatus, candidate } from "../models/candidate.model";
 import { client } from "../models/client.model";
+import { clientInvoice } from "../models/client-invoice.model";
+import { contact } from "../models/contact.model";
 import { interview } from "../models/interview.model";
 import { invitation } from "../models/invitation.model";
 import { job } from "../models/job.model";
@@ -28,11 +30,62 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const daysAgo = (days: number) => new Date(Date.now() - days * DAY_MS);
 
 const CLIENTS = [
-  { name: "Nortech Systems", industry: "Technology", status: "hiring", health: "healthy" },
-  { name: "Bluewave Financial", industry: "Finance", status: "hiring", health: "healthy" },
-  { name: "Corvus Health", industry: "Healthcare", status: "hiring", health: "attention" },
-  { name: "Halden Logistics", industry: "Logistics", status: "hiring", health: "at_risk" },
-  { name: "Verdant Energy", industry: "Energy", status: "paused", health: "dormant" },
+  {
+    name: "Nortech Systems",
+    industry: "Technology",
+    status: "hiring",
+    health: "healthy",
+    fee: "20",
+    terms: "net30",
+    replacement: "90",
+    sinceDaysAgo: 480,
+  },
+  {
+    name: "Bluewave Financial",
+    industry: "Finance",
+    status: "hiring",
+    health: "healthy",
+    fee: "18.5",
+    terms: "net45",
+    replacement: "60",
+    sinceDaysAgo: 300,
+  },
+  {
+    name: "Corvus Health",
+    industry: "Healthcare",
+    status: "hiring",
+    health: "attention",
+    fee: "22",
+    terms: "net30",
+    replacement: "90",
+    sinceDaysAgo: 210,
+  },
+  {
+    name: "Halden Logistics",
+    industry: "Logistics",
+    status: "hiring",
+    health: "at_risk",
+    fee: "16",
+    terms: "net60",
+    replacement: "30",
+    sinceDaysAgo: 150,
+  },
+  {
+    name: "Verdant Energy",
+    industry: "Energy",
+    status: "paused",
+    health: "dormant",
+    fee: "15",
+    terms: "net30",
+    replacement: "none",
+    sinceDaysAgo: 90,
+  },
+] as const;
+
+/** Two contacts per client — a primary decision maker and an HR counterpart. */
+const CONTACTS = [
+  { first: "Tom", last: "Weaver", title: "VP Engineering", primary: true },
+  { first: "Lena", last: "Cho", title: "HR Manager", primary: false },
 ] as const;
 
 // `targetInDays` drives the SLA card: negative = overdue, 0 = due today.
@@ -58,6 +111,14 @@ const PIPELINE: { stage: string; count: number }[] = [
 ];
 
 /** Upcoming interviews, as minutes from now. The card shows the soonest. */
+const STAGE_SCORE: Record<string, number> = {
+  sourced: 62,
+  screening: 71,
+  submitted: 84,
+  interview: 89,
+  offer: 93,
+};
+
 const INTERVIEWS_IN_MINUTES = [45, 190, 1500, 2900];
 const INTERVIEW_KINDS = ["Client panel", "Screening", "Tech round", "Final round"];
 
@@ -136,6 +197,12 @@ async function clearPreviousSeed(organizationId: string) {
     .where(and(eq(candidate.organizationId, organizationId), like(candidate.id, pattern)));
   await db.delete(job).where(and(eq(job.organizationId, organizationId), like(job.id, pattern)));
   await db
+    .delete(clientInvoice)
+    .where(and(eq(clientInvoice.organizationId, organizationId), like(clientInvoice.id, pattern)));
+  await db
+    .delete(contact)
+    .where(and(eq(contact.organizationId, organizationId), like(contact.id, pattern)));
+  await db
     .delete(client)
     .where(and(eq(client.organizationId, organizationId), like(client.id, pattern)));
   await db
@@ -165,8 +232,47 @@ async function seed() {
     status: entry.status,
     health: entry.health,
     accountLeadId: owner?.id ?? null,
+    feeBasis: "percent" as const,
+    feeValue: String(entry.fee),
+    paymentTerms: String(entry.terms),
+    replacementPeriod: String(entry.replacement),
+    billingEmail: `finance@${entry.name.split(" ")[0]?.toLowerCase()}.com`,
+    taxId: "29ABCDE1234F1Z5",
+    contractRenewsAt: new Date(Date.now() + (730 - entry.sinceDaysAgo) * DAY_MS)
+      .toISOString()
+      .slice(0, 10),
+    contract: [
+      {
+        name: `${entry.name.split(" ")[0]}_MSA_2025.pdf`,
+        url: "https://example.com/msa.pdf",
+        size: 284_000,
+        type: "application/pdf",
+      },
+    ],
+    createdAt: daysAgo(entry.sinceDaysAgo),
+    updatedAt: daysAgo(entry.sinceDaysAgo),
   }));
   await db.insert(client).values(clientRows);
+
+  const contactRows = clientRows.flatMap((row, clientIndex) =>
+    CONTACTS.map((entry, i) => ({
+      id: id(),
+      organizationId,
+      clientId: row.id,
+      firstName: entry.first,
+      lastName: entry.last,
+      title: entry.title,
+      email: `${entry.first.toLowerCase()}.${entry.last.toLowerCase()}@${row.name.split(" ")[0]?.toLowerCase()}.com`,
+      phone: `+91 98${String(40000000 + clientIndex * 137 + i)}`,
+      isPrimary: entry.primary,
+      // A spread of states, so the status chip is exercised.
+      status: ((["active", "active", "inactive", "left"] as const)[(clientIndex + i) % 4] ??
+        "active") as "active" | "inactive" | "left",
+      ownerId: owner?.id ?? null,
+      updatedAt: daysAgo(1 + clientIndex * 3 + i * 5),
+    })),
+  );
+  await db.insert(contact).values(contactRows);
 
   const jobRows = JOBS.map((entry, index) => ({
     id: id(),
@@ -176,6 +282,15 @@ async function seed() {
     status: entry.status,
     dateOpened: daysAgo(entry.openedDaysAgo).toISOString().slice(0, 10),
     targetDate: daysAgo(-entry.targetInDays).toISOString().slice(0, 10),
+    employmentType: index % 4 === 3 ? "Contract" : "Full-time",
+    openings: 1 + (index % 3),
+    profileLeadId: owner?.id ?? null,
+    clientContactId:
+      contactRows.find((row) => row.clientId === clientRows[index % clientRows.length]?.id)?.id ??
+      null,
+    revenuePerPosition: String(180000 + index * 45000),
+    actualRevenue: entry.status === "filled" ? String(240000 + index * 30000) : "0",
+    missedRevenue: entry.status === "closed" ? String(120000 + index * 15000) : "0",
     createdAt: daysAgo(entry.openedDaysAgo),
     updatedAt: daysAgo(entry.openedDaysAgo),
   }));
@@ -198,13 +313,63 @@ async function seed() {
         jobId: openJobs[index % openJobs.length]?.id ?? null,
         startingStage: stage,
         status,
+        matchScore: Math.min(99, (STAGE_SCORE[stage] ?? 70) + ((index * 13) % 11)),
+        // Every other submitted CV has been chased; the rest show "no reminder yet".
+        reminderSentAt:
+          stage === "submitted" && index % 2 === 0
+            ? new Date(Date.now() - (2 + (index % 6)) * 60 * 60 * 1000)
+            : null,
         ownerId: owner?.id ?? null,
         createdAt: daysAgo(age),
-        updatedAt: daysAgo(Math.max(0, age - closedAfter)),
+        updatedAt:
+          stage === "submitted"
+            ? new Date(Date.now() - (5 + ((index * 7) % 38)) * 60 * 60 * 1000)
+            : daysAgo(Math.max(0, age - closedAfter)),
       };
     }),
   );
+  // Placements are what the fee is charged on, so give every client a couple —
+  // round-robin over open jobs alone would leave most clients with none.
+  for (const row of clientRows) {
+    const jobIds = new Set(
+      jobRows.filter((entry) => entry.clientId === row.id).map((entry) => entry.id),
+    );
+    const owned = candidateRows.filter((entry) => entry.jobId && jobIds.has(entry.jobId));
+    for (const [index, entry] of owned.slice(0, 2).entries()) {
+      entry.status = "placed";
+      entry.startingStage = "offer";
+      entry.updatedAt = daysAgo(9 + index * 13);
+    }
+  }
   await db.insert(candidate).values(candidateRows);
+
+  const invoiceRows = clientRows.flatMap((row, clientIndex) => {
+    const jobIds = new Set(
+      jobRows.filter((entry) => entry.clientId === row.id).map((entry) => entry.id),
+    );
+    const placedHere = candidateRows.filter(
+      (entry) => entry.status === "placed" && entry.jobId && jobIds.has(entry.jobId),
+    );
+    return placedHere.map((entry, i) => {
+      const issuedDaysAgo = 12 + i * 21;
+      const state = (clientIndex + i) % 3;
+      return {
+        id: id(),
+        organizationId,
+        clientId: row.id,
+        number: `INV-2026-${String(100 + clientIndex * 7 + i)}`,
+        description: `Placement — ${entry.firstName} ${entry.lastName}`,
+        amount: 180_000 + i * 120_000,
+        status: (state === 0 ? "paid" : state === 1 ? "due" : "overdue") as
+          | "paid"
+          | "due"
+          | "overdue",
+        issuedAt: daysAgo(issuedDaysAgo),
+        dueAt: daysAgo(issuedDaysAgo - 30),
+      };
+    });
+  });
+  if (invoiceRows.length) await db.insert(clientInvoice).values(invoiceRows);
 
   // Roll the seeded jobs/candidates up onto their client, the way the app would.
   for (const row of clientRows) {
@@ -212,6 +377,14 @@ async function seed() {
     const openRoles = clientJobs.filter((job) => job.status === "open").length;
     const jobIds = new Set(clientJobs.map((job) => job.id));
     const owned = candidateRows.filter((c) => c.jobId && jobIds.has(c.jobId));
+    for (const entry of clientJobs) {
+      const placed = owned.filter((c) => c.jobId === entry.id && c.status === "placed").length;
+      await db
+        .update(job)
+        .set({ actualRevenue: String(placed * Number(entry.revenuePerPosition)) })
+        .where(eq(job.id, entry.id));
+    }
+
     await db
       .update(client)
       .set({
@@ -270,7 +443,7 @@ async function seed() {
       organizationId,
       candidateId: person?.id ?? null,
       jobId: person?.jobId ?? null,
-      clientId: clientRows[index % clientRows.length]?.id ?? null,
+      clientId: jobRows.find((job) => job.id === person?.jobId)?.clientId ?? null,
       scheduledAt: new Date(Date.now() + minutes * 60 * 1000),
       durationMinutes: 45,
       kind: INTERVIEW_KINDS[index % INTERVIEW_KINDS.length] ?? "Screening",

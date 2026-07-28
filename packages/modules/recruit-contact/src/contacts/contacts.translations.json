@@ -4,7 +4,9 @@
     "client": "Client",
     "email": "Email",
     "phone": "Phone",
-    "owner": "Owner"
+    "owner": "Owner",
+    "lastTouch": "Last touch",
+    "reach": ""
   },
   "filters": {
     "search": "Search contact, title, email or phone…",
@@ -18,15 +20,39 @@
     "setPrimary": "Set as primary",
     "archive": "Archive contact"
   },
-  "badges": { "primary": "Primary" },
-  "status": { "inactive": "Inactive", "left": "Left company" },
+  "badges": {
+    "primary": "PRIMARY"
+  },
+  "status": {
+    "inactive": "Inactive",
+    "left": "Left company"
+  },
   "export": "Export",
   "exportAs": "Export as",
-  "exportCsv": "Export CSV",
   "empty": "No contacts found",
   "toast": {
     "archived": "{{name}} archived",
     "primary": "{{name}} is now the primary contact",
-    "copied": "Copied"
+    "copied": "Copied",
+    "noEmails": "None of the selected contacts has an email address.",
+    "ownerAssigned": "Owner updated for {{count}} contacts",
+    "statusChanged": "Status updated for {{count}} contacts"
+  },
+  "title": "Contacts",
+  "subtitle": "Everyone you talk to at your clients — hiring managers, HR and finance.",
+  "exportTypes": {
+    "pdf": "PDF (.pdf)",
+    "xlsx": "Excel (.xlsx)",
+    "docx": "Word (.docx)"
+  },
+  "bulk": {
+    "count": "{{count}} selected",
+    "clear": "Clear",
+    "email": "Email",
+    "owner": "Assign owner",
+    "export": "Export",
+    "assign": "Assign",
+    "status": "Change status",
+    "apply": "Apply"
   }
 }

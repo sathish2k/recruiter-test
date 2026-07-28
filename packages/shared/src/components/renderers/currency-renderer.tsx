@@ -10,6 +10,8 @@ export interface CurrencyRendererConfig {
   /** Static currency code, or read it from data via currencyPath. */
   currency?: string;
   currencyPath?: string;
+  /** Abbreviate large values (₹5.9L) — for tiles too narrow for the full figure. */
+  compact?: boolean;
   variant?: TypographyProps["variant"];
   color?: TypographyProps["color"];
   sx?: TypographyProps["sx"];
@@ -29,7 +31,7 @@ export function CurrencyRenderer({
     : (config.currency ?? "USD");
   return (
     <Typography component="span" variant={config.variant} color={config.color} sx={config.sx}>
-      {formatCurrency(value, currency)}
+      {formatCurrency(value, currency, config.compact)}
     </Typography>
   );
 }

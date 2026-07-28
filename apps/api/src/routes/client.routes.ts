@@ -48,6 +48,7 @@ const clientBody = t.Object({
   companySize: t.Optional(t.String({ maxLength: 40 })),
   annualHiringVolume: t.Optional(t.String({ maxLength: 40 })),
   replacementPeriod: t.Optional(t.String({ maxLength: 40 })),
+  contractRenewsAt: t.Optional(t.String({ maxLength: 20 })),
 });
 
 export default new Elysia({ name: "client.routes" })
@@ -66,6 +67,22 @@ export default new Elysia({ name: "client.routes" })
   })
   .get("/clients/stats", (ctx) => clientController.getClientStats(ctx), { isAuth: true })
   .get("/clients/:id", (ctx) => clientController.getClientById(ctx), { isAuth: true })
+  .get("/clients/:id/summary", (ctx) => clientController.getClientSummary(ctx), { isAuth: true })
+  .get("/clients/:id/kpis", (ctx) => clientController.getClientKpis(ctx), { isAuth: true })
+  .get("/clients/:id/submissions", (ctx) => clientController.getClientSubmissions(ctx), {
+    isAuth: true,
+  })
+  .get("/clients/:id/workspace", (ctx) => clientController.getClientWorkspace(ctx), {
+    isAuth: true,
+    query: t.Object({ tab: t.Optional(t.String()) }),
+  })
+  .get("/clients/:id/activity", (ctx) => clientController.getClientActivityFeed(ctx), {
+    isAuth: true,
+    query: t.Object({ filter: t.Optional(t.String()) }),
+  })
+  .get("/clients/:id/contacts", (ctx) => clientController.getClientContactList(ctx), {
+    isAuth: true,
+  })
   .post("/clients", (ctx) => clientController.postClient(ctx), {
     isAuth: true,
     body: t.Optional(clientBody),
