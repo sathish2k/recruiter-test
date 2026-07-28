@@ -8,6 +8,7 @@ import { AttachmentsWidget } from "../attachments/attachments";
 import { CalloutWidget } from "../callout/callout";
 import { CheckboxGroupWidget } from "../checkbox-group/checkbox-group";
 import { ChipsWidget } from "../chips/chips";
+import { ChoiceChipsWidget } from "../choice-chips/choice-chips";
 import { ColorWidget } from "../color/color";
 import { CompletenessWidget } from "../completeness/completeness";
 import { DateWidget } from "../date/date";
@@ -40,6 +41,7 @@ import type {
   Widgets,
 } from "../types";
 import { UploadWidget } from "../upload/upload";
+import { VerificationCodeWidget } from "../verification-code/verification-code";
 import { FieldLabel, FieldOptionalContext, FieldRequiredContext } from "./field-shell";
 
 /**
@@ -80,6 +82,8 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   completeness: CompletenessWidget,
   facts: FactsWidget,
   "generated-doc": GeneratedDocWidget,
+  "verification-code": VerificationCodeWidget,
+  "choice-chips": ChoiceChipsWidget,
 };
 
 /** Picks the widget from an explicit `widget`, then from the schema's shape. */

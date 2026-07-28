@@ -49,6 +49,7 @@ export function GetStarted({
 
   return (
     <Box
+      data-testid="get-started"
       sx={{
         position: "relative",
         zIndex: 1,
@@ -81,7 +82,10 @@ export function GetStarted({
       <Typography sx={{ fontSize: 28, fontWeight: 700, letterSpacing: "-.015em" }}>
         {firstName ? t("title", { name: firstName }) : t("titleNoName")}
       </Typography>
-      <Typography sx={{ fontSize: 14, color: "text.secondary", mt: "8px" }}>
+      <Typography
+        data-testid="get-started-progress"
+        sx={{ fontSize: 14, color: "text.secondary", mt: "8px" }}
+      >
         {t("subtitle")}{" "}
         <Box component="b" sx={{ color: "text.primary" }}>
           {t("progress", { done: doneCount, total })}
@@ -99,6 +103,9 @@ export function GetStarted({
         }}
       >
         <Box
+          data-testid="get-started-bar"
+          data-done={doneCount}
+          data-total={total}
           sx={{
             height: "100%",
             width: `${(doneCount / Math.max(total, 1)) * 100}%`,
@@ -219,6 +226,8 @@ function StepRow({
   return (
     <Card
       variant="base"
+      data-testid={`checklist-${step.key}`}
+      data-done={done}
       sx={{
         display: "flex",
         alignItems: "center",

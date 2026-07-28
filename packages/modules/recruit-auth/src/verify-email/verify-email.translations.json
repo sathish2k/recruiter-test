@@ -1,12 +1,23 @@
 {
   "title": "Verify your email",
   "subtitle": "We sent a 6-digit code and a magic link to {{email}}.",
-  "expiresIn": "Code expires in {{clock}}",
+  "expiresIn": "Code expires in",
   "cta": "Verify email",
-  "resend": "Resend code",
+  "resend": "Didn't get it? Resend code",
+  "resent": "New code sent ✓ ({{count}})",
   "resendIn": "Resend in {{seconds}}s",
   "changeEmail": "Use a different email",
+  "wrongAccount": "Wrong account?",
+  "signInAsSomeoneElse": "Sign in as someone else",
   "why": "Verification is required before you can use the workspace. Everything HirePilotX does sends mail as you — client submissions, candidate invites, weekly reports — so we confirm the address first. It takes one click.",
+  "code": {
+    "label": "Verification code",
+    "placeholder": "Type or paste the 6-digit code",
+    "errors": {
+      "required": "Enter the 6-digit code we sent you",
+      "format": "That code should be 6 digits"
+    }
+  },
   "errors": {
     "invalid": "That code is not right. Check the digits and try again.",
     "expired": "That code has expired. Send yourself a new one.",
@@ -16,9 +27,9 @@
   },
   "expired": {
     "title": "This link has expired",
-    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and we'll pick up where you left off.",
+    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and it'll arrive in a few seconds.",
     "cta": "Send a new link",
-    "note": "The old link and code stop working the moment a new one is issued, so only the most recent email will let you in."
+    "note": "Your workspace and any invites you already sent are untouched — only this link stopped working."
   },
   "done": {
     "title": "Email verified",

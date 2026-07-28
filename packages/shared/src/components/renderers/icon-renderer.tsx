@@ -50,6 +50,7 @@ import FormatItalicRounded from "@mui/icons-material/FormatItalicRounded";
 import FormatListBulletedRounded from "@mui/icons-material/FormatListBulletedRounded";
 import FormatListNumberedRounded from "@mui/icons-material/FormatListNumberedRounded";
 import FormatQuoteRounded from "@mui/icons-material/FormatQuoteRounded";
+import ForwardToInboxRounded from "@mui/icons-material/ForwardToInboxRounded";
 import GroupAddRounded from "@mui/icons-material/GroupAddRounded";
 import GroupRounded from "@mui/icons-material/GroupRounded";
 import HandshakeRounded from "@mui/icons-material/HandshakeRounded";
@@ -63,6 +64,7 @@ import InsightsRounded from "@mui/icons-material/InsightsRounded";
 import KeyRounded from "@mui/icons-material/KeyRounded";
 import LaptopMacRounded from "@mui/icons-material/LaptopMacRounded";
 import LightModeRounded from "@mui/icons-material/LightModeRounded";
+import LinkOffRounded from "@mui/icons-material/LinkOffRounded";
 import LinkRounded from "@mui/icons-material/LinkRounded";
 import LocationOnRounded from "@mui/icons-material/LocationOnRounded";
 import LockOpenRounded from "@mui/icons-material/LockOpenRounded";
@@ -74,6 +76,7 @@ import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import MailRounded from "@mui/icons-material/MailRounded";
 import ManageSearchRounded from "@mui/icons-material/ManageSearchRounded";
 import MarkEmailReadRounded from "@mui/icons-material/MarkEmailReadRounded";
+import MarkEmailUnreadRounded from "@mui/icons-material/MarkEmailUnreadRounded";
 import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
 import MoreVertRounded from "@mui/icons-material/MoreVertRounded";
 import MoveUpRounded from "@mui/icons-material/MoveUpRounded";
@@ -157,6 +160,9 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "lock-open": LockOpenRounded,
   "lock-reset": LockResetRounded,
   "mark-email-read": MarkEmailReadRounded,
+  "mark-email-unread": MarkEmailUnreadRounded,
+  "forward-to-inbox": ForwardToInboxRounded,
+  "link-off": LinkOffRounded,
   "magic-button": AutoAwesomeRounded,
   person: PersonOutlineRounded,
   "person-add": PersonAddAlt1Rounded,

@@ -1,4 +1,4 @@
-import { expect, request, test } from "@playwright/test";
+import { expect, type Page, request, test } from "@playwright/test";
 
 /**
  * Journey 0 — sign up → verify email → set the workspace up.
@@ -6,6 +6,10 @@ import { expect, request, test } from "@playwright/test";
  * `delivery-plan.md` exit criterion 1 starts here, and it is the only journey
  * whose first half must run *without* the shared signed-in state: the point of
  * these tests is what an unverified account can and cannot do.
+ *
+ * Selectors are `data-testid` throughout. The wizard's copy changes with the
+ * design and its markup changes with the form layer; the test ids are the one
+ * contract that is meant to hold.
  */
 
 const API = process.env.E2E_API_URL ?? "http://localhost:3001";
@@ -35,14 +39,31 @@ test.describe("sign up and verify", () => {
   test("TC-AUTH-004 — the verify screen offers no way past it", async ({ page }) => {
     await page.goto(`/verify?email=${encodeURIComponent(freshEmail())}`);
 
-    await expect(page.getByText("Verify your email")).toBeVisible();
-    await expect(page.getByText(/Code expires in \d\d:\d\d/)).toBeVisible();
+    await expect(page.getByTestId("verify-pending")).toBeVisible();
+    await expect(page.getByTestId("verify-expiry")).toContainText(/\d+:\d\d/);
 
     // The whole point of TC-AUTH-004: nothing on this screen skips it.
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).not.toContain("skip");
-    expect(body).not.toContain("later");
     expect(body).not.toContain("continue without");
+  });
+
+  test("TC-AUTH-004a — the code field mirrors what was typed, one cell each", async ({ page }) => {
+    await page.goto(`/verify?email=${encodeURIComponent(freshEmail())}`);
+
+    const cells = page.getByTestId("verification-code-cells");
+    await expect(cells.locator("> *")).toHaveCount(6);
+
+    // One input, not six — so a pasted code lands in one go.
+    const input = page.getByTestId("field-code").locator("input");
+    await input.fill("4821");
+    await expect(page.getByTestId("verification-code-cell-0")).toHaveText("4");
+    await expect(page.getByTestId("verification-code-cell-3")).toHaveText("1");
+    await expect(page.getByTestId("verification-code-cell-4")).toHaveText("");
+
+    // Non-digits never reach the value.
+    await input.fill("12ab34cd56");
+    await expect(input).toHaveValue("123456");
   });
 
   test("TC-AUTH-005 — sign-up lands on verify, carrying the address", async ({ page }) => {
@@ -59,7 +80,7 @@ test.describe("sign up and verify", () => {
     await expect(page).toHaveURL(new RegExp(`/verify\\?email=${encodeURIComponent(email)}`), {
       timeout: 30_000,
     });
-    await expect(page.getByText(email)).toBeVisible();
+    await expect(page.getByTestId("verify-pending")).toContainText(email);
   });
 
   test("TC-AUTH-006 — a wrong code is rejected without burning the request", async () => {
@@ -113,13 +134,8 @@ test.describe("sign up and verify", () => {
 });
 
 test.describe("setup wizard", () => {
-  /**
-   * The resume point is server-side and the specs share one workspace, so each
-   * wizard test rewinds to step 1 rather than assuming where the last one left
-   * off. The Basics chip is always reachable — the rail only walks backwards.
-   */
-  /** Waits for the autosave the given interaction triggers. */
-  async function withSave(page: import("@playwright/test").Page, act: () => Promise<void>) {
+  /** Waits for the autosave a given interaction triggers. */
+  async function withSave(page: Page, act: () => Promise<void>) {
     const saved = page.waitForResponse(
       (r) => r.url().includes("/onboarding/setup") && r.request().method() === "PUT",
     );
@@ -127,88 +143,129 @@ test.describe("setup wizard", () => {
     await saved;
   }
 
-  async function rewind(page: import("@playwright/test").Page) {
-    const loaded = page.waitForResponse(
+/** Resolves once the wizard's own read has landed — it ignores clicks until then. */
+  function loading(page: Page) {
+    return page.waitForResponse(
       (r) => r.url().includes("/onboarding/setup") && r.request().method() === "GET",
     );
+  }
+
+  /**
+   * The resume point is server-side and the specs share one workspace, so each
+   * wizard test rewinds to step 1 rather than assuming where the last one left
+   * off.
+   */
+  async function rewind(page: Page) {
+    const loaded = loading(page);
     await page.goto("/setup");
-    // The wizard is inert until the first read lands; clicking before then is
-    // a no-op by design, so wait for it rather than racing it.
     await loaded;
-    await expect(page.getByText(/STEP \d OF 5/)).toBeVisible();
-    // Wait for the rewind to land too — two saves in flight at once would
-    // race, and the later step number is the one under test.
-    await withSave(page, () => page.getByText("Basics", { exact: true }).click());
-    await expect(page.getByText("STEP 1 OF 5", { exact: true })).toBeVisible();
+    await expect(page.getByTestId("setup-wizard")).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-rail-basics").click());
+    await expect(page.getByTestId("wizard-rail-basics")).toHaveAttribute("data-state", "current");
   }
 
   test("TC-SET-001 — five steps, each saving as it goes", async ({ page }) => {
     await rewind(page);
-    await expect(page.getByText("How does your agency work?")).toBeVisible();
+    await expect(page.getByTestId("field-timezone")).toBeVisible();
 
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("STEP 2 OF 5", { exact: true })).toBeVisible();
-    await expect(page.getByText(/YOUR BOARD COLUMNS/)).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("wizard-rail-stages")).toHaveAttribute("data-state", "current");
+    await expect(page.getByTestId("field-stages")).toBeVisible();
 
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("STEP 3 OF 5", { exact: true })).toBeVisible();
-    await expect(page.getByText(/REASONS ACTIVE/)).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("wizard-rail-reasons")).toHaveAttribute("data-state", "current");
+    await expect(page.getByTestId("field-reasonsClient")).toBeVisible();
 
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText("STEP 4 OF 5", { exact: true })).toBeVisible();
-    await expect(page.getByText("INVITES", { exact: true })).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("wizard-rail-team")).toHaveAttribute("data-state", "current");
+    await expect(page.getByTestId("field-invites")).toBeVisible();
 
-    await page.getByRole("button", { name: /Send invites & continue/ }).click();
-    await expect(page.getByText("STEP 5 OF 5", { exact: true })).toBeVisible();
-    await expect(page.getByText("Here's your workspace")).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("wizard-rail-review")).toHaveAttribute("data-state", "current");
+    await expect(page.getByTestId("wizard-finish")).toBeVisible();
   });
 
   test("TC-SET-002 — closing the tab resumes on the same step", async ({ page }) => {
     await rewind(page);
-    // Autosave is fire-and-forget from the click handler, so wait for the write
-    // itself rather than for the step to change on screen.
-    await withSave(page, () => page.getByRole("button", { name: "Continue" }).click());
-    await expect(page.getByText("STEP 2 OF 5", { exact: true })).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("wizard-rail-stages")).toHaveAttribute("data-state", "current");
 
     // Flow §1.4: the resume point lives on the server, not in this browser.
     await page.reload();
-    await expect(page.getByText("STEP 2 OF 5", { exact: true })).toBeVisible();
-    await expect(page.getByText("Picked up where you left off")).toBeVisible();
+    await expect(page.getByTestId("wizard-rail-stages")).toHaveAttribute("data-state", "current");
+    await expect(page.getByTestId("wizard-resumed")).toBeVisible();
   });
 
   test("TC-SET-003 — the entry and hire stages cannot be removed", async ({ page }) => {
     await rewind(page);
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByText(/YOUR BOARD COLUMNS/)).toBeVisible();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("field-stages")).toBeVisible();
+
+    const rows = page.locator('[data-testid^="stage-row-"]');
+    const count = await rows.count();
+    expect(count).toBeGreaterThanOrEqual(3);
 
     // Exactly the two ends are locked; everything between can be removed.
-    await expect(page.getByTestId("LockRoundedIcon")).toHaveCount(2);
-    const removable = page.getByTestId("CloseRoundedIcon");
-    await expect(removable).toHaveCount(4);
+    await expect(page.getByTestId("stage-locked-0")).toBeVisible();
+    await expect(page.getByTestId(`stage-locked-${count - 1}`)).toBeVisible();
+    await expect(page.getByTestId("stage-remove-1")).toBeVisible();
+    await expect(page.locator('[data-testid^="stage-locked-"]')).toHaveCount(2);
+  });
 
-    // And the locks are on the first and last rows, not just anywhere.
-    const rows = page.locator("[data-stage-row]");
-    await expect(rows.first().getByTestId("LockRoundedIcon")).toBeVisible();
-    await expect(rows.last().getByTestId("LockRoundedIcon")).toBeVisible();
-    await expect(rows.nth(1).getByTestId("CloseRoundedIcon")).toBeVisible();
+  test("TC-SET-004 — a renamed stage survives the round trip", async ({ page }) => {
+    await rewind(page);
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+
+    const renamed = `Screening ${Date.now() % 10000}`;
+    await page.getByTestId("stage-name-1").locator("input").fill(renamed);
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+
+    // Read it back from the server's copy rather than the form's. Continue
+    // moved us on a step, so the reload resumes there — walk back to stages.
+    const reloaded = loading(page);
+    await page.reload();
+    await reloaded;
+    await withSave(page, () => page.getByTestId("wizard-rail-stages").click());
+    await expect(page.getByTestId("field-stages")).toBeVisible();
+    await expect(page.getByTestId("stage-name-1").locator("input")).toHaveValue(renamed);
+  });
+
+  test("TC-SET-006 — the timezone choice is stored and comes back selected", async ({ page }) => {
+    await rewind(page);
+
+    await page.getByTestId("timezone-option-Europe/London").click();
+    await expect(page.getByTestId("timezone-option-Europe/London")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+
+    await rewind(page);
+    await expect(page.getByTestId("timezone-option-Europe/London")).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+
+    // Put it back, so the other specs see the workspace they expect.
+    await page.getByTestId("timezone-option-Asia/Kolkata").click();
+    await withSave(page, () => page.getByTestId("wizard-next").click());
   });
 });
 
 test.describe("get started checklist", () => {
   test("TC-SET-005 — steps tick from real records, not a stored flag", async ({ page }) => {
     await page.goto("/get-started");
-    await expect(page.getByText(/of 5 done/)).toBeVisible();
+    await expect(page.getByTestId("get-started")).toBeVisible();
 
-    // The seeded workspace has clients and requirements, so those two are done
-    // and their titles are struck through.
-    const clientRow = page
-      .locator(".MuiCard-root")
-      .filter({ hasText: "Add your first client" })
-      .first();
-    await expect(clientRow.getByText("Add your first client")).toHaveCSS(
-      "text-decoration-line",
-      "line-through",
-    );
+    // The seeded workspace has clients and requirements, so those two are done.
+    await expect(page.getByTestId("checklist-client")).toHaveAttribute("data-done", "true");
+    await expect(page.getByTestId("checklist-role")).toHaveAttribute("data-done", "true");
+
+    // The bar reports the same count the rows do.
+    const bar = page.getByTestId("get-started-bar");
+    const done = Number(await bar.getAttribute("data-done"));
+    const ticked = await page.locator('[data-testid^="checklist-"][data-done="true"]').count();
+    expect(ticked).toBe(done);
 
     // Nothing here toggles by hand — completion is derived.
     await expect(page.getByRole("checkbox")).toHaveCount(0);

@@ -8,16 +8,24 @@ import type { ReactNode } from "react";
 
 export function AuthCard({
   icon,
+  iconColor = "surface.accentBright",
   title,
   subtitle,
+  subtitleGap = "26px",
   width = 420,
   children,
+  "data-testid": testId,
 }: {
   icon: ReactNode;
+  /** The design tints the tile per state — amber pending, red expired, green done. */
+  iconColor?: string;
   title: ReactNode;
   subtitle: ReactNode;
+  /** Space below the subtitle. Shorter when a second line follows it. */
+  subtitleGap?: string;
   width?: number;
   children: ReactNode;
+  "data-testid"?: string;
 }) {
   return (
     <Box
@@ -33,6 +41,7 @@ export function AuthCard({
     >
       <Card
         variant="accent"
+        data-testid={testId}
         sx={{
           width,
           maxWidth: "100%",
@@ -53,7 +62,7 @@ export function AuthCard({
             background:
               "linear-gradient(180deg,var(--mui-palette-surface-neutral),var(--mui-palette-background-paper))",
             border: "1px solid var(--mui-palette-surface-border)",
-            color: "surface.accentBright",
+            color: iconColor,
             boxShadow: "var(--mui-palette-surface-menuShadow)",
             mb: "20px",
           }}
@@ -78,7 +87,7 @@ export function AuthCard({
             color: "text.secondary",
             textAlign: "center",
             maxWidth: 320,
-            mb: "26px",
+            mb: subtitleGap,
           }}
         >
           {subtitle}

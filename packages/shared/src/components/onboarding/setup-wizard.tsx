@@ -1,30 +1,21 @@
 "use client";
 
-import AddRounded from "@mui/icons-material/AddRounded";
 import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
-import CloseRounded from "@mui/icons-material/CloseRounded";
-import KeyboardArrowDownRounded from "@mui/icons-material/KeyboardArrowDownRounded";
-import KeyboardArrowUpRounded from "@mui/icons-material/KeyboardArrowUpRounded";
-import LockRounded from "@mui/icons-material/LockRounded";
-import PersonAddRounded from "@mui/icons-material/PersonAddRounded";
-import RadioButtonUncheckedRounded from "@mui/icons-material/RadioButtonUncheckedRounded";
 import RocketLaunchRounded from "@mui/icons-material/RocketLaunchRounded";
-import UnfoldMoreRounded from "@mui/icons-material/UnfoldMoreRounded";
-import VisibilityOffRounded from "@mui/icons-material/VisibilityOffRounded";
-import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
-import Divider from "@mui/material/Divider";
-import InputBase from "@mui/material/InputBase";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, usePortalRouter, useTranslation } from "@recruit/sdk";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { FormRenderer } from "../forms";
+import type { FormValues, JsonSchema } from "../forms/types";
 import { IconRenderer } from "../renderers";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
+import { WIZARD_WIDGETS } from "./wizard-widgets";
 
 export interface WizardStage {
   name: string;
@@ -65,35 +56,20 @@ export interface SetupPatch {
   invites?: WizardInvite[];
 }
 
-interface WizardOption {
-  value: string;
-  label: string;
-  /** Right-hand detail — the zone's offset, or the format's sample date. */
-  meta?: string;
-  /** Currency symbol. */
-  symbol?: string;
-}
-
 interface WizardConfig {
-  timezones?: WizardOption[];
-  currencies?: WizardOption[];
-  dateFormats?: WizardOption[];
+  steps?: Record<string, JsonSchema>;
   roles?: string[];
   links?: Record<string, LinkRendererConfig>;
 }
 
 const STEP_KEYS = ["basics", "stages", "reasons", "team", "review"] as const;
-const REASON_CATEGORIES: WizardReason["category"][] = ["client", "candidate", "internal"];
-const CATEGORY_ICON: Record<WizardReason["category"], string> = {
-  client: "domain",
-  candidate: "person",
-  internal: "filter",
-};
-/** The design gives each rejection group its own tone. */
-const CATEGORY_COLOR: Record<WizardReason["category"], string> = {
-  client: "surface.accentBright",
-  candidate: "surface.successFg",
-  internal: "surface.infoFg",
+type StepKey = (typeof STEP_KEYS)[number];
+
+/** Which schema field holds each rejection category's active labels. */
+const REASON_FIELD: Record<WizardReason["category"], string> = {
+  client: "reasonsClient",
+  candidate: "reasonsCandidate",
+  internal: "reasonsInternal",
 };
 
 function offsetOf(zone: string): number | null {
@@ -105,8 +81,7 @@ function offsetOf(zone: string): number | null {
     const name = parts.find((part) => part.type === "timeZoneName")?.value ?? "";
     const match = /GMT([+-])(\d{2}):(\d{2})/.exec(name);
     if (!match) return 0;
-    const sign = match[1] === "-" ? -1 : 1;
-    return sign * (Number(match[2]) * 60 + Number(match[3]));
+    return (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3]));
   } catch {
     return null;
   }
@@ -125,16 +100,20 @@ function sameZone(a: string, b: string): boolean {
 }
 
 /** The stored value, or the first offered one when it isn't on the list. */
-function offered(value: string, options: WizardOption[] | undefined): string {
-  if (!options?.length) return value;
-  if (options.some((option) => option.value === value)) return value;
-  return options[0]?.value ?? value;
+function snap(value: string, choices: { value: string }[] | undefined, zone = false): string {
+  if (!choices?.length) return value;
+  const match = choices.find((c) => (zone ? sameZone(c.value, value) : c.value === value));
+  return match?.value ?? choices[0]?.value ?? value;
 }
 
 /**
- * The five-step workspace setup (flow §1.4). Every step autosaves, including
- * the step number, so closing the tab and coming back resumes exactly here —
- * the resume state lives on the server, not in this browser.
+ * The five-step workspace setup (flow §1.4). Each editable step is a
+ * FormRenderer over a schema from configuration; this component owns only the
+ * rail, the copy and where the buttons sit.
+ *
+ * Every step autosaves, including the step number, so closing the tab and
+ * coming back resumes exactly here — the resume state lives on the server, not
+ * in this browser.
  */
 export function SetupWizard({
   id,
@@ -148,59 +127,26 @@ export function SetupWizard({
   const { t } = useTranslation(id);
   const config = useConfiguration<WizardConfig>(id);
   const router = usePortalRouter();
-  const roles = config.roles ?? ["Admin", "Profile lead", "Sourcer", "Finance"];
+  const steps = config.steps ?? {};
 
   const [step, setStep] = useState(state.setupStep);
-  const [timezone, setTimezone] = useState(state.timezone);
-  const [currency, setCurrency] = useState(state.currency);
-  const [dateFormat, setDateFormat] = useState(state.dateFormat);
-  const [stages, setStages] = useState<WizardStage[]>(state.stages);
-  const [reasons, setReasons] = useState<WizardReason[]>(state.reasons);
-  // The rows collect *new* invites. Invites already out are reported as a count
-  // below — they belong to Settings → Team, and re-listing them here would put
-  // the whole workspace's history into a five-minute setup step.
-  const [invites, setInvites] = useState<WizardInvite[]>([
-    { email: "", role: roles[2] ?? "Sourcer" },
-  ]);
-  const [newReason, setNewReason] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  /** True only when the server said we were mid-setup on arrival. */
   const [resumed, setResumed] = useState(state.setupStep > 0);
+  /** The wizard is inert until the first payload lands. */
+  const [ready, setReady] = useState(state.stages.length > 0);
   const entryStep = useRef(state.setupStep);
   const hydrated = useRef(false);
-  /**
-   * The wizard is inert until the first payload lands. Without this a click
-   * during that window edits an empty list and then gets overwritten when the
-   * real state arrives — the user sees their step silently undone.
-   */
-  const [ready, setReady] = useState(state.stages.length > 0);
   const inFlight = useRef<Promise<unknown>>(Promise.resolve());
 
-  // Seed from the server exactly once, when the first real payload lands. The
-  // wizard owns the edited copy after that — a later revalidation must not
-  // overwrite what the user is part-way through typing.
   useEffect(() => {
     if (hydrated.current || state.stages.length === 0) return;
     hydrated.current = true;
     setReady(true);
     setStep(state.setupStep);
-    // Snap each stored value onto the option this screen actually offers, so
-    // the picker always shows the workspace's current answer as selected.
-    setTimezone(
-      config.timezones?.find((option) => sameZone(option.value, state.timezone))?.value ??
-        offered(state.timezone, config.timezones),
-    );
-    setCurrency(offered(state.currency, config.currencies));
-    setDateFormat(offered(state.dateFormat, config.dateFormats));
-    setStages(state.stages);
-    setReasons(state.reasons);
     entryStep.current = state.setupStep;
     setResumed(state.setupStep > 0);
-  }, [state, config]);
-
-  const activeReasons = reasons.filter((reason) => reason.active).length;
-  const filledInvites = invites.filter((invite) => invite.email.trim());
+  }, [state]);
 
   /**
    * Saves run one at a time. Clicking through two steps faster than a
@@ -219,35 +165,211 @@ export function SetupWizard({
     return next;
   };
 
-  /** Persists the current step's slice, then moves. */
-  const goto = async (next: number) => {
-    const target = Math.max(0, Math.min(STEP_KEYS.length - 1, next));
-    // Once the user has moved, the server's answer is stale by definition —
-    // a payload still in flight must not yank them back to where they were.
+  const stepKey: StepKey = STEP_KEYS[step] ?? "basics";
+  const schema = steps[stepKey];
+
+  /** Seeds the current step's form from the workspace's saved state. */
+  const defaultsFor = (key: StepKey): FormValues => {
+    const props = steps[key]?.properties ?? {};
+    if (key === "basics") {
+      return {
+        timezone: snap(state.timezone, props.timezone?.choices, true),
+        currency: snap(state.currency, props.currency?.choices),
+        dateFormat: snap(state.dateFormat, props.dateFormat?.choices),
+      };
+    }
+    if (key === "stages") {
+      return { stages: state.stages.map(({ name, clientVisible }) => ({ name, clientVisible })) };
+    }
+    if (key === "reasons") {
+      const active = (category: WizardReason["category"]) =>
+        state.reasons.filter((r) => r.category === category && r.active).map((r) => r.label);
+      const known = new Set(
+        Object.values(REASON_FIELD).flatMap((f) => (props[f]?.enum ?? []).map(String)),
+      );
+      return {
+        reasonsClient: active("client"),
+        reasonsCandidate: active("candidate"),
+        reasonsInternal: active("internal"),
+        // Anything the workspace added itself, which no group's enum lists.
+        reasonsCustom: state.reasons.filter((r) => !known.has(r.label)).map((r) => r.label),
+      };
+    }
+    if (key === "team") {
+      // The step collects *new* invites and opens on one blank row. Invites
+      // already out are reported as a count — they belong to Settings → Team,
+      // and re-listing them here would put the whole workspace's history into
+      // a five-minute setup step.
+      const roles = (props.invites?.choices ?? []).map((choice) => choice.value);
+      return { invites: [{ email: "", role: roles[2] ?? "Sourcer" }] };
+    }
+    return {};
+  };
+
+  /** Turns a step's form values into the patch the API takes. */
+  const patchFor = (key: StepKey, values: FormValues): SetupPatch => {
+    if (key === "basics") {
+      return {
+        timezone: String(values.timezone ?? ""),
+        currency: String(values.currency ?? ""),
+        dateFormat: String(values.dateFormat ?? ""),
+      };
+    }
+    if (key === "stages") {
+      const rows = (values.stages ?? []) as { name: string; clientVisible?: boolean }[];
+      return {
+        stages: rows
+          .filter((row) => row.name?.trim())
+          .map((row) => ({ name: row.name.trim(), clientVisible: Boolean(row.clientVisible) })),
+      };
+    }
+    if (key === "reasons") {
+      const props = steps.reasons?.properties ?? {};
+      const reasons: WizardReason[] = [];
+      for (const [category, fieldName] of Object.entries(REASON_FIELD)) {
+        const offered = (props[fieldName]?.enum ?? []).map(String);
+        const on = new Set(((values[fieldName] ?? []) as string[]).map(String));
+        for (const label of offered) {
+          reasons.push({
+            category: category as WizardReason["category"],
+            label,
+            active: on.has(label),
+          });
+        }
+      }
+      for (const label of (values.reasonsCustom ?? []) as string[]) {
+        if (label.trim()) reasons.push({ category: "internal", label: label.trim(), active: true });
+      }
+      return { reasons };
+    }
+    if (key === "team") {
+      const rows = (values.invites ?? []) as WizardInvite[];
+      return {
+        invites: rows
+          .filter((row) => row.email?.trim())
+          .map((row) => ({ email: row.email.trim(), role: row.role || "Sourcer" })),
+      };
+    }
+    return {};
+  };
+
+  const move = async (target: number, values?: FormValues) => {
+    if (!ready) return;
+    const next = Math.max(0, Math.min(STEP_KEYS.length - 1, target));
     hydrated.current = true;
-    setStep(target);
+    setStep(next);
     setResumed(false);
-    const patch: SetupPatch = { setupStep: target };
-    if (step === 0) Object.assign(patch, { timezone, currency, dateFormat });
-    if (step === 1)
-      patch.stages = stages.map(({ name, clientVisible }) => ({ name, clientVisible }));
-    if (step === 2) patch.reasons = reasons;
-    if (step === 3) patch.invites = filledInvites;
-    await save(patch);
+    await save({ setupStep: next, ...(values ? patchFor(stepKey, values) : {}) });
   };
 
   const finish = async () => {
+    if (!ready) return;
     await save({ setupStep: STEP_KEYS.length - 1, completed: true });
     const target = config.links?.dashboard?.routeId;
     if (target) router.push(target);
   };
 
-  const stepKey = STEP_KEYS[step] ?? "basics";
-  // Everything that moves or writes waits for the first read.
-  const move = (target: number) => ready && void goto(target);
+  /** The footer the design puts below the panel, shared by every step. */
+  const footer = (submitLabel: string, submits: boolean) => (
+    <Box sx={{ display: "flex", alignItems: "center", gap: "11px", mt: "20px", flexWrap: "wrap" }}>
+      {step > 0 ? (
+        <Button
+          variant="outlined"
+          disabled={!ready}
+          data-testid="wizard-back"
+          startIcon={<ArrowBackRounded />}
+          onClick={() => void move(step - 1)}
+        >
+          {t("back")}
+        </Button>
+      ) : null}
+      <Box sx={{ flex: 1 }} />
+      {step < STEP_KEYS.length - 1 ? (
+        <>
+          <Button
+            variant="text"
+            disabled={!ready}
+            data-testid="wizard-skip"
+            // The design plays this down deliberately — skipping keeps the
+            // defaults, so it must not compete with Continue.
+            sx={{ color: "text.disabled", "&:hover": { color: "text.primary" } }}
+            onClick={() => {
+              setToast(t("skipped", { label: t(`steps.${stepKey}.label`).toLowerCase() }));
+              void move(step + 1);
+            }}
+          >
+            {t("skip")}
+          </Button>
+          <Button
+            type={submits ? "submit" : "button"}
+            variant="contained"
+            disabled={!ready}
+            data-testid="wizard-next"
+            endIcon={<ArrowForwardRounded />}
+            onClick={submits ? undefined : () => void move(step + 1)}
+          >
+            {t(submitLabel)}
+          </Button>
+        </>
+      ) : (
+        <Button
+          variant="contained"
+          disabled={!ready}
+          data-testid="wizard-finish"
+          startIcon={<RocketLaunchRounded />}
+          onClick={() => void finish()}
+        >
+          {t("finish")}
+        </Button>
+      )}
+    </Box>
+  );
+
+  const roleNotes = (
+    <Box sx={{ mt: "18px", pt: "16px", borderTop: "1px solid", borderColor: "divider" }}>
+      <Typography
+        sx={{
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: ".07em",
+          color: "text.disabled",
+          mb: "9px",
+        }}
+      >
+        {t("team.rolesHeading")}
+      </Typography>
+      {(config.roles ?? []).map((role) => (
+        <Box key={role} sx={{ display: "flex", gap: "9px", fontSize: 11.5, mb: "9px" }}>
+          <Box component="b" sx={{ width: 88, flex: "none", color: "text.primary" }}>
+            {role}
+          </Box>
+          <Box component="span" sx={{ color: "text.disabled", lineHeight: 1.5 }}>
+            {t(`team.roleNotes.${role.toLowerCase().replace(/\s+/g, "-")}`)}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+
+  const panel = (children: ReactNode) => (
+    <Card
+      variant="base"
+      data-testid="wizard-panel"
+      sx={{
+        borderRadius: "18px",
+        p: "22px 24px",
+        boxShadow: "var(--mui-palette-surface-menuShadow)",
+      }}
+    >
+      {children}
+    </Card>
+  );
 
   return (
-    <Box sx={{ position: "relative", zIndex: 1, maxWidth: 720, mx: "auto", p: "92px 24px 72px" }}>
+    <Box
+      data-testid="setup-wizard"
+      sx={{ position: "relative", zIndex: 1, maxWidth: 720, mx: "auto", p: "92px 24px 72px" }}
+    >
       <Box
         sx={{
           position: "absolute",
@@ -259,6 +381,7 @@ export function SetupWizard({
         }}
       >
         <Typography
+          data-testid="wizard-save-state"
           sx={{
             display: "flex",
             alignItems: "center",
@@ -283,6 +406,7 @@ export function SetupWizard({
 
       {resumed ? (
         <Card
+          data-testid="wizard-resumed"
           sx={{
             display: "flex",
             alignItems: "flex-start",
@@ -310,13 +434,20 @@ export function SetupWizard({
               })}
             </Typography>
           </Box>
-          <Button variant="text" size="small" disabled={!ready} onClick={() => move(0)}>
+          <Button
+            variant="text"
+            size="small"
+            disabled={!ready}
+            data-testid="wizard-start-over"
+            onClick={() => void move(0)}
+          >
             {t("resume.startOver")}
           </Button>
         </Card>
       ) : null}
 
       <Typography
+        data-testid="wizard-step-kicker"
         sx={{ fontSize: 11, fontWeight: 700, letterSpacing: ".09em", color: "text.disabled" }}
       >
         {t("stepOf", { step: step + 1, total: STEP_KEYS.length })}
@@ -331,6 +462,7 @@ export function SetupWizard({
       </Typography>
 
       <Box
+        data-testid="wizard-rail"
         sx={{
           display: "flex",
           alignItems: "center",
@@ -342,497 +474,42 @@ export function SetupWizard({
         {STEP_KEYS.map((key, index) => (
           <RailChip
             key={key}
+            stepKey={key}
             label={t(`steps.${key}.label`)}
             index={index}
             current={step}
-            onClick={() => index <= step && move(index)}
+            onClick={() => index <= step && void move(index)}
           />
         ))}
       </Box>
 
-      <Card
-        variant="base"
-        sx={{
-          borderRadius: "18px",
-          p: "22px 24px",
-          boxShadow: "var(--mui-palette-surface-menuShadow)",
-        }}
-      >
-        {stepKey === "basics" ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-            <Section title={t("basics.timezone.title")} hint={t("basics.timezone.hint")}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {(config.timezones ?? []).map((option) => (
-                  <PillOption
-                    key={option.value}
-                    selected={timezone === option.value}
-                    onClick={() => setTimezone(option.value)}
-                  >
-                    <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>{option.label}</Typography>
-                    <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
-                      {option.meta}
-                    </Typography>
-                  </PillOption>
-                ))}
-              </Box>
-              <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "9px" }}>
-                {t("basics.timezone.more")}
-              </Typography>
-            </Section>
-            <Divider />
-            <Section title={t("basics.currency.title")} hint={t("basics.currency.hint")}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {(config.currencies ?? []).map((option) => (
-                  <PillOption
-                    key={option.value}
-                    selected={currency === option.value}
-                    onClick={() => setCurrency(option.value)}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: currency === option.value ? "surface.accentBright" : "text.disabled",
-                      }}
-                    >
-                      {option.symbol}
-                    </Typography>
-                    <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>{option.label}</Typography>
-                  </PillOption>
-                ))}
-              </Box>
-              <Card
-                variant="inset"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "7px",
-                  bgcolor: "surface.warningSoftBg",
-                  borderColor: "surface.warningSoftBorder",
-                  mt: "11px",
-                }}
-              >
-                <Box sx={{ color: "surface.warningSoftFg", display: "flex", flex: "none" }}>
-                  <IconRenderer name="info" size={14} />
-                </Box>
-                <Typography sx={{ fontSize: 11, lineHeight: 1.5, color: "text.secondary" }}>
-                  {t("basics.currency.warning")}
-                </Typography>
-              </Card>
-            </Section>
-            <Divider />
-            <Section title={t("basics.dateFormat.title")}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {(config.dateFormats ?? []).map((option) => (
-                  <PillOption
-                    key={option.value}
-                    selected={dateFormat === option.value}
-                    onClick={() => setDateFormat(option.value)}
-                    sx={{
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "2px",
-                      borderRadius: "12px",
-                      p: "9px 15px",
-                      minWidth: 118,
-                    }}
-                  >
-                    <Typography sx={{ fontSize: 12.5, fontWeight: 600 }}>{option.label}</Typography>
-                    <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
-                      {option.meta}
-                    </Typography>
-                  </PillOption>
-                ))}
-              </Box>
-            </Section>
-          </Box>
-        ) : null}
-
-        {stepKey === "stages" ? <StagesStep stages={stages} setStages={setStages} t={t} /> : null}
-
-        {stepKey === "reasons" ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "12px",
-                flexWrap: "wrap",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: ".07em",
-                  color: "text.disabled",
-                }}
-              >
-                {t("reasons.active", { count: activeReasons })}
-              </Typography>
-              <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
-                {t("reasons.untick")}
-              </Typography>
-            </Box>
-            {REASON_CATEGORIES.map((category) => (
-              <Box key={category}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mb: "9px" }}>
-                  <Box sx={{ display: "flex", color: CATEGORY_COLOR[category] }}>
-                    <IconRenderer name={CATEGORY_ICON[category]} size={16} />
-                  </Box>
-                  <Typography sx={{ fontSize: 12.5, fontWeight: 700 }}>
-                    {t(`reasons.groups.${category}.label`)}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: "text.disabled" }}>
-                    {t(`reasons.groups.${category}.hint`)}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
-                  {reasons
-                    .filter((reason) => reason.category === category)
-                    .map((reason) => (
-                      <Box
-                        key={`${reason.category}-${reason.label}`}
-                        onClick={() =>
-                          setReasons((all) =>
-                            all.map((row) =>
-                              row === reason ? { ...row, active: !row.active } : row,
-                            ),
-                          )
-                        }
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          borderRadius: "999px",
-                          p: "6px 13px",
-                          cursor: "pointer",
-                          bgcolor: reason.active ? "surface.successSoftBg" : "surface.inset",
-                          border: "1px solid",
-                          borderColor: reason.active ? "surface.successSoftBorder" : "divider",
-                          color: reason.active ? "text.primary" : "text.disabled",
-                        }}
-                      >
-                        {reason.active ? (
-                          <CheckCircleRounded sx={{ fontSize: 14, color: "surface.successFg" }} />
-                        ) : (
-                          <RadioButtonUncheckedRounded
-                            sx={{ fontSize: 14, color: "text.disabled" }}
-                          />
-                        )}
-                        <Typography sx={{ fontSize: 12 }}>{reason.label}</Typography>
-                      </Box>
-                    ))}
-                </Box>
-              </Box>
-            ))}
-            <Box>
-              <Typography sx={{ fontSize: 12, fontWeight: 600, mb: "7px" }}>
-                {t("reasons.addOwn")}
-              </Typography>
-              <Box sx={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                <InsetInput
-                  value={newReason}
-                  placeholder={t("reasons.placeholder")}
-                  onChange={setNewReason}
-                  onEnter={() => {
-                    if (!newReason.trim()) return;
-                    setReasons((all) => [
-                      ...all,
-                      { category: "internal", label: newReason.trim(), active: true },
-                    ]);
-                    setToast(t("reasons.added", { label: newReason.trim() }));
-                    setNewReason("");
-                  }}
-                  sx={{ flex: 1, minWidth: 200 }}
-                />
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  disabled={!newReason.trim()}
-                  startIcon={<AddRounded />}
-                  onClick={() => {
-                    setReasons((all) => [
-                      ...all,
-                      { category: "internal", label: newReason.trim(), active: true },
-                    ]);
-                    setToast(t("reasons.added", { label: newReason.trim() }));
-                    setNewReason("");
-                  }}
-                >
-                  {t("reasons.add")}
-                </Button>
-              </Box>
-              <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "8px" }}>
-                {t("reasons.why")}
-              </Typography>
-            </Box>
-          </Box>
-        ) : null}
-
-        {stepKey === "team" ? (
-          <Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "12px",
-                flexWrap: "wrap",
-                mb: "14px",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: ".07em",
-                  color: "text.disabled",
-                }}
-              >
-                {t("team.heading")}
-              </Typography>
-              {state.invites.length > 0 ? (
-                <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
-                  {t("team.alreadyOut", { count: state.invites.length })}
-                </Typography>
-              ) : null}
-            </Box>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {invites.map((invite, index) => (
-                <Card
-                  // Rows are positional and editable, so the index is the identity.
-                  // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-                  key={index}
-                  variant="inset"
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 150px 30px",
-                    gap: "10px",
-                    alignItems: "center",
-                    borderRadius: "12px",
-                    p: "9px 12px",
-                  }}
-                >
-                  <InsetInput
-                    value={invite.email}
-                    placeholder={t("team.emailPlaceholder")}
-                    bare
-                    onChange={(value) =>
-                      setInvites((all) =>
-                        all.map((row, i) => (i === index ? { ...row, email: value } : row)),
-                      )
-                    }
-                  />
-                  <Box
-                    onClick={() =>
-                      setInvites((all) =>
-                        all.map((row, i) =>
-                          i === index
-                            ? {
-                                ...row,
-                                role:
-                                  roles[(roles.indexOf(row.role) + 1) % roles.length] ?? row.role,
-                              }
-                            : row,
-                        ),
-                      )
-                    }
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "6px",
-                      bgcolor: "background.paper",
-                      border: "1px solid",
-                      borderColor: "surface.controlBorder",
-                      borderRadius: "9px",
-                      p: "6px 10px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: 11.5, fontWeight: 600 }}>{invite.role}</Typography>
-                    <UnfoldMoreRounded sx={{ fontSize: 14, color: "text.disabled" }} />
-                  </Box>
-                  <Box
-                    onClick={() => setInvites((all) => all.filter((_, i) => i !== index))}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      color: "text.disabled",
-                      "&:hover": { color: "error.main" },
-                    }}
-                  >
-                    <CloseRounded sx={{ fontSize: 16 }} />
-                  </Box>
-                </Card>
-              ))}
-            </Box>
-            <Button
-              variant="outlined"
-              startIcon={<PersonAddRounded />}
-              sx={{ mt: "12px", borderStyle: "dashed" }}
-              onClick={() =>
-                setInvites((all) => [...all, { email: "", role: roles[2] ?? "Sourcer" }])
-              }
-            >
-              {t("team.addAnother")}
-            </Button>
-            <Box sx={{ mt: "18px", pt: "16px", borderTop: "1px solid", borderColor: "divider" }}>
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: ".07em",
-                  color: "text.disabled",
-                  mb: "9px",
-                }}
-              >
-                {t("team.rolesHeading")}
-              </Typography>
-              {roles.map((role) => (
-                <Box key={role} sx={{ display: "flex", gap: "9px", fontSize: 11.5, mb: "9px" }}>
-                  <Box component="b" sx={{ width: 88, flex: "none", color: "text.primary" }}>
-                    {role}
-                  </Box>
-                  <Box component="span" sx={{ color: "text.disabled", lineHeight: 1.5 }}>
-                    {t(`team.roleNotes.${role.toLowerCase().replace(/\s+/g, "-")}`)}
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        ) : null}
-
-        {stepKey === "review" ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {[
-              {
-                label: t("review.basics"),
-                value: [timezone, currency, dateFormat].filter(Boolean).join(" · "),
-                target: 0,
-              },
-              {
-                label: t("review.stages", { count: stages.length }),
-                value: stages.map((stage) => stage.name).join(" → "),
-                target: 1,
-              },
-              {
-                label: t("review.reasons", { count: activeReasons }),
-                value: t("review.reasonsValue"),
-                target: 2,
-              },
-              {
-                label: filledInvites.length
-                  ? t("review.invites", { count: filledInvites.length })
-                  : t("review.noInvites"),
-                value: filledInvites.length
-                  ? filledInvites
-                      .map((invite) => `${invite.email.split("@")[0]} as ${invite.role}`)
-                      .join(", ")
-                  : t("review.noInvitesValue"),
-                target: 3,
-              },
-            ].map((row) => (
-              <Card
-                key={row.label}
-                variant="inset"
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                  borderRadius: "13px",
-                  p: "13px 15px",
-                }}
-              >
-                <CheckCircleRounded
-                  sx={{ fontSize: 18, color: "surface.successFg", flex: "none" }}
-                />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ fontSize: 12.5, fontWeight: 700 }}>{row.label}</Typography>
-                  <Typography
-                    sx={{ fontSize: 12, lineHeight: 1.55, color: "text.secondary", mt: "3px" }}
-                  >
-                    {row.value}
-                  </Typography>
-                </Box>
-                <Button variant="text" size="small" onClick={() => move(row.target)}>
-                  {t("review.change")}
-                </Button>
-              </Card>
-            ))}
-            <Card
-              variant="inset"
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "9px",
-                bgcolor: "surface.successSoftBg",
-                borderColor: "surface.successSoftBorder",
-                borderRadius: "12px",
-              }}
-            >
-              <Box sx={{ color: "surface.successFg", display: "flex", flex: "none" }}>
-                <IconRenderer name="check-circle" size={16} />
-              </Box>
-              <Typography sx={{ fontSize: 11.5, lineHeight: 1.55, color: "text.secondary" }}>
-                {t("review.note")}
-              </Typography>
-            </Card>
-          </Box>
-        ) : null}
-      </Card>
-
-      <Box
-        sx={{ display: "flex", alignItems: "center", gap: "11px", mt: "20px", flexWrap: "wrap" }}
-      >
-        {step > 0 ? (
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackRounded />}
-            disabled={!ready}
-            onClick={() => move(step - 1)}
-          >
-            {t("back")}
-          </Button>
-        ) : null}
-        <Box sx={{ flex: 1 }} />
-        {step < STEP_KEYS.length - 1 ? (
-          <>
-            <Button
-              variant="text"
-              disabled={!ready}
-              // The design plays this down deliberately — skipping keeps the
-              // defaults, so it must not compete with Continue.
-              sx={{ color: "text.disabled", "&:hover": { color: "text.primary" } }}
-              onClick={() => {
-                setToast(t("skipped", { label: t(`steps.${stepKey}.label`).toLowerCase() }));
-                move(step + 1);
-              }}
-            >
-              {t("skip")}
-            </Button>
-            <Button
-              variant="contained"
-              disabled={!ready}
-              endIcon={<ArrowForwardRounded />}
-              onClick={() => move(step + 1)}
-            >
-              {step === 3 ? t("nextInvites") : t("next")}
-            </Button>
-          </>
-        ) : (
-          <Button
-            variant="contained"
-            startIcon={<RocketLaunchRounded />}
-            onClick={() => void finish()}
-          >
-            {t("finish")}
-          </Button>
-        )}
-      </Box>
+      {schema ? (
+        <FormRenderer
+          // Remounting per step is deliberate: each step is its own form with
+          // its own defaults, and carrying state across them would be wrong.
+          key={stepKey}
+          id={id}
+          schema={schema}
+          defaultValues={defaultsFor(stepKey)}
+          stackContainer={{ spacing: 2.75 }}
+          widgets={WIZARD_WIDGETS}
+          onSubmit={(values) => move(step + 1, values)}
+          wrapFields={(fields) =>
+            panel(
+              <>
+                {fields}
+                {stepKey === "team" ? roleNotes : null}
+              </>,
+            )
+          }
+          actions={() => footer(step === 3 ? "nextInvites" : "next", true)}
+        />
+      ) : (
+        <>
+          {panel(<ReviewStep id={id} state={state} onChange={(target) => void move(target)} />)}
+          {footer("finish", false)}
+        </>
+      )}
 
       <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "14px", textAlign: "center" }}>
         {step === STEP_KEYS.length - 1 ? t("footNote.last") : t("footNote.default")}
@@ -849,301 +526,104 @@ export function SetupWizard({
   );
 }
 
-/** Stage list — rename, reorder, toggle client visibility, add and remove. */
-function StagesStep({
-  stages,
-  setStages,
-  t,
+/** The final step: what the other four saved, each with a way back to it. */
+function ReviewStep({
+  id,
+  state,
+  onChange,
 }: {
-  stages: WizardStage[];
-  setStages: (update: (all: WizardStage[]) => WizardStage[]) => void;
-  t: (key: string, fallback?: string | Record<string, unknown>) => string;
+  id: string;
+  state: SetupState;
+  onChange: (target: number) => void;
 }) {
-  const swap = (from: number, to: number) =>
-    setStages((all) => {
-      const next = all.slice();
-      const moved = next[from];
-      const other = next[to];
-      if (!moved || !other) return all;
-      next[from] = other;
-      next[to] = moved;
-      return next;
-    });
+  const { t } = useTranslation(id);
+  const activeReasons = state.reasons.filter((reason) => reason.active).length;
+  const rows = [
+    {
+      label: t("review.basics"),
+      value: [state.timezone, state.currency, state.dateFormat].filter(Boolean).join(" · "),
+      target: 0,
+    },
+    {
+      label: t("review.stages", { count: state.stages.length }),
+      value: state.stages.map((stage) => stage.name).join(" → "),
+      target: 1,
+    },
+    {
+      label: t("review.reasons", { count: activeReasons }),
+      value: t("review.reasonsValue"),
+      target: 2,
+    },
+    {
+      label: state.invites.length
+        ? t("review.invites", { count: state.invites.length })
+        : t("review.noInvites"),
+      value: state.invites.length
+        ? state.invites
+            .map((invite) => `${invite.email.split("@")[0]} as ${invite.role}`)
+            .join(", ")
+        : t("review.noInvitesValue"),
+      target: 3,
+    },
+  ];
 
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          flexWrap: "wrap",
-          mb: "14px",
-        }}
-      >
-        <Typography
-          sx={{ fontSize: 11, fontWeight: 700, letterSpacing: ".07em", color: "text.disabled" }}
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {rows.map((row) => (
+        <Card
+          key={row.label}
+          variant="inset"
+          data-testid={`review-row-${row.target}`}
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "12px",
+            borderRadius: "13px",
+            p: "13px 15px",
+          }}
         >
-          {t("stages.heading", { count: stages.length })}
-        </Typography>
-        <Typography sx={{ fontSize: 11, color: "text.disabled" }}>{t("stages.eyeHint")}</Typography>
-      </Box>
-
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-        {stages.map((stage, index) => {
-          const fixed = index === 0 || index === stages.length - 1;
-          const canUp = index > 1;
-          const canDown = index > 0 && index < stages.length - 2;
-          return (
-            <Card
-              // Positional, renameable rows — the index is the stable identity.
-              // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-              key={index}
-              variant="inset"
-              data-stage-row={index}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "26px 1fr 96px 62px 30px",
-                gap: "10px",
-                alignItems: "center",
-                borderRadius: "12px",
-                p: "9px 12px",
-              }}
-            >
-              <Typography
-                sx={{ fontSize: 11, fontWeight: 700, color: "text.disabled", textAlign: "center" }}
-              >
-                {index + 1}
-              </Typography>
-              <InsetInput
-                value={stage.name}
-                placeholder={t("stages.namePlaceholder")}
-                bare
-                bold
-                onChange={(value) =>
-                  setStages((all) =>
-                    all.map((row, i) => (i === index ? { ...row, name: value } : row)),
-                  )
-                }
-              />
-              <Box
-                onClick={() =>
-                  setStages((all) =>
-                    all.map((row, i) =>
-                      i === index ? { ...row, clientVisible: !row.clientVisible } : row,
-                    ),
-                  )
-                }
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  fontSize: 10.5,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  color: stage.clientVisible ? "surface.successFg" : "text.disabled",
-                }}
-              >
-                {stage.clientVisible ? (
-                  <VisibilityRounded sx={{ fontSize: 15 }} />
-                ) : (
-                  <VisibilityOffRounded sx={{ fontSize: 15 }} />
-                )}
-                {stage.clientVisible ? t("stages.client") : t("stages.internal")}
-              </Box>
-              <Box sx={{ display: "flex", gap: "2px", justifySelf: "center" }}>
-                <KeyboardArrowUpRounded
-                  onClick={() => canUp && swap(index, index - 1)}
-                  sx={{
-                    fontSize: 16,
-                    color: canUp ? "text.secondary" : "surface.controlOutline",
-                    cursor: canUp ? "pointer" : "default",
-                  }}
-                />
-                <KeyboardArrowDownRounded
-                  onClick={() => canDown && swap(index, index + 1)}
-                  sx={{
-                    fontSize: 16,
-                    color: canDown ? "text.secondary" : "surface.controlOutline",
-                    cursor: canDown ? "pointer" : "default",
-                  }}
-                />
-              </Box>
-              {fixed ? (
-                <LockRounded
-                  titleAccess={t("stages.fixed")}
-                  sx={{ fontSize: 16, color: "surface.controlOutline", justifySelf: "center" }}
-                />
-              ) : (
-                <CloseRounded
-                  onClick={() => setStages((all) => all.filter((_, i) => i !== index))}
-                  sx={{
-                    fontSize: 16,
-                    color: "text.disabled",
-                    cursor: "pointer",
-                    justifySelf: "center",
-                    "&:hover": { color: "error.main" },
-                  }}
-                />
-              )}
-            </Card>
-          );
-        })}
-      </Box>
-
-      <Button
-        variant="outlined"
-        startIcon={<AddRounded />}
-        sx={{ mt: "12px", borderStyle: "dashed" }}
-        onClick={() =>
-          setStages((all) => {
-            const next = all.slice();
-            next.splice(Math.max(next.length - 1, 0), 0, { name: "", clientVisible: false });
-            return next;
-          })
-        }
-      >
-        {t("stages.add")}
-      </Button>
-
+          <CheckCircleRounded sx={{ fontSize: 18, color: "surface.successFg", flex: "none" }} />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography sx={{ fontSize: 12.5, fontWeight: 700 }}>{row.label}</Typography>
+            <Typography sx={{ fontSize: 12, lineHeight: 1.55, color: "text.secondary", mt: "3px" }}>
+              {row.value}
+            </Typography>
+          </Box>
+          <Button variant="text" size="small" onClick={() => onChange(row.target)}>
+            {t("review.change")}
+          </Button>
+        </Card>
+      ))}
       <Card
         variant="inset"
         sx={{
           display: "flex",
           alignItems: "flex-start",
-          gap: "8px",
-          bgcolor: "surface.infoSoftBg",
-          borderColor: "surface.infoSoftBorder",
-          borderRadius: "11px",
-          mt: "16px",
+          gap: "9px",
+          bgcolor: "surface.successSoftBg",
+          borderColor: "surface.successSoftBorder",
+          borderRadius: "12px",
         }}
       >
-        <Box sx={{ color: "surface.infoFg", display: "flex", flex: "none" }}>
-          <IconRenderer name="info" size={15} />
+        <Box sx={{ color: "surface.successFg", display: "flex", flex: "none" }}>
+          <IconRenderer name="check-circle" size={16} />
         </Box>
         <Typography sx={{ fontSize: 11.5, lineHeight: 1.55, color: "text.secondary" }}>
-          {t("stages.fixedNote", {
-            first: stages[0]?.name ?? "",
-            last: stages[stages.length - 1]?.name ?? "",
-          })}
+          {t("review.note")}
         </Typography>
       </Card>
     </Box>
   );
 }
 
-function Section({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Box>
-      <Typography sx={{ fontSize: 12.5, fontWeight: 700, mb: hint ? "4px" : "10px" }}>
-        {title}
-      </Typography>
-      {hint ? (
-        <Typography sx={{ fontSize: 11.5, color: "text.disabled", mb: "10px" }}>{hint}</Typography>
-      ) : null}
-      {children}
-    </Box>
-  );
-}
-
-function PillOption({
-  selected,
-  onClick,
-  children,
-  sx,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  sx?: Record<string, unknown>;
-}) {
-  return (
-    <Box
-      onClick={onClick}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: "7px",
-        borderRadius: "999px",
-        p: "7px 14px",
-        cursor: "pointer",
-        bgcolor: selected ? "surface.primarySoftBg" : "surface.inset",
-        border: "1px solid",
-        borderColor: selected ? "surface.primarySoftBorder" : "divider",
-        color: selected ? "surface.primarySoftFg" : "text.primary",
-        "&:hover": { borderColor: "surface.primarySoftBorder" },
-        ...sx,
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
-
-/** The design's borderless in-row inputs, and its one bordered text field. */
-function InsetInput({
-  value,
-  placeholder,
-  onChange,
-  onEnter,
-  bare,
-  bold,
-  sx,
-}: {
-  value: string;
-  placeholder: string;
-  onChange: (value: string) => void;
-  onEnter?: () => void;
-  bare?: boolean;
-  bold?: boolean;
-  sx?: Record<string, unknown>;
-}) {
-  return (
-    <InputBase
-      value={value}
-      placeholder={placeholder}
-      onChange={(event) => onChange(event.target.value)}
-      onKeyDown={(event) => {
-        if (event.key === "Enter") onEnter?.();
-      }}
-      sx={{
-        fontSize: bare ? 13 : 12.5,
-        fontWeight: bold ? 600 : 400,
-        color: "text.primary",
-        width: "100%",
-        // MUI's default input padding makes an in-row field taller than the
-        // 38px row the design draws; the bare variant reclaims it.
-        "& .MuiInputBase-input": { p: bare ? "2px 0" : 0, height: "auto" },
-        ...(bare
-          ? { p: 0 }
-          : {
-              bgcolor: "surface.inset",
-              border: "1px solid",
-              borderColor: "surface.controlBorder",
-              borderRadius: "11px",
-              p: "10px 13px",
-            }),
-        ...sx,
-      }}
-    />
-  );
-}
-
 function RailChip({
+  stepKey,
   label,
   index,
   current,
   onClick,
 }: {
+  stepKey: string;
   label: string;
   index: number;
   current: number;
@@ -1154,6 +634,8 @@ function RailChip({
   return (
     <Box
       onClick={onClick}
+      data-testid={`wizard-rail-${stepKey}`}
+      data-state={active ? "current" : done ? "done" : "upcoming"}
       sx={{
         display: "flex",
         alignItems: "center",

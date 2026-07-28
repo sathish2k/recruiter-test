@@ -7,7 +7,7 @@ import Stack from "@mui/material/Stack";
 import { useTranslation } from "@recruit/sdk";
 import { isPossiblePhoneNumber } from "libphonenumber-js/max";
 import { useMemo } from "react";
-import { type FieldValues, type Resolver, useForm } from "react-hook-form";
+import { type FieldValues, FormProvider, type Resolver, useForm } from "react-hook-form";
 import { hiddenFields } from "../conditions";
 import { Field } from "../field/field";
 import { useFieldEffects } from "../field/use-field-effects";
@@ -81,12 +81,19 @@ function stripEmptyOptional(_schema: JsonSchema, values: FieldValues): FieldValu
  * value, so those fields would always fail with "must be equal to one of the
  * allowed values". Move it onto `items` for arrays, and drop it for objects,
  * where the widget owns the shape.
+ *
+ * An array of *objects* (a repeater, or any widget with an `itemSchema`) is the
+ * third case: pushing `enum` onto its items would demand every row be one of
+ * those strings, and the form would refuse to submit with no visible error.
+ * Those widgets take their options from `choices`; drop `enum` outright.
  */
 function forValidation(schema: JsonSchema): JsonSchema {
   const properties: JsonSchema["properties"] = {};
   for (const [key, prop] of Object.entries(schema.properties)) {
     if (prop.enum && prop.type === "array") {
-      properties[key] = { ...prop, enum: undefined, items: { ...prop.items, enum: prop.enum } };
+      properties[key] = prop.itemSchema
+        ? { ...prop, enum: undefined }
+        : { ...prop, enum: undefined, items: { ...prop.items, enum: prop.enum } };
     } else if (prop.enum && prop.type === "object") {
       properties[key] = { ...prop, enum: undefined };
     } else {
@@ -138,6 +145,8 @@ export function FormRenderer({
   stackContainer,
   gridContainer,
   widgets,
+  wrapFields,
+  actions,
 }: FormRendererProps) {
   const { t } = useTranslation(id);
   const resolver = useMemo(() => buildResolver(schema), [schema]);
@@ -149,11 +158,12 @@ export function FormRenderer({
     return values;
   }, [schema, defaultValues]);
 
-  const { control, handleSubmit, formState, setValue } = useForm<FieldValues>({
+  const form = useForm<FieldValues>({
     resolver,
     defaultValues: initial,
     mode: "onTouched",
   });
+  const { control, handleSubmit, formState, setValue, reset, getValues } = form;
   const { hiddenSet, disabledSet } = useFieldEffects(schema, control, setValue);
 
   const requiredFields = new Set(schema.required ?? []);
@@ -171,57 +181,76 @@ export function FormRenderer({
     />
   ));
 
+  const body = (
+    <FormContainer
+      stackContainer={stackContainer}
+      gridContainer={gridContainer}
+      grids={visible.map(([, prop]) => prop.grid)}
+    >
+      {fields}
+    </FormContainer>
+  );
+
+  // Widgets that manage their own sub-records (repeater, facts) reach the form
+  // through context rather than props, so both renderers must provide it —
+  // otherwise those widgets only work inside the sections renderer.
   return (
-    <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} noValidate>
-      <FormContainer
-        stackContainer={stackContainer}
-        gridContainer={gridContainer}
-        grids={visible.map(([, prop]) => prop.grid)}
-      >
-        {fields}
-      </FormContainer>
-      <Stack spacing={1.5} sx={{ mt: fields.length ? "12px" : 0 }}>
-        {beforeSubmit}
-        {onCancel ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "8px",
-              borderTop: "1px solid",
-              borderColor: "divider",
-              pt: "16px",
-            }}
-          >
-            <Button variant="outlined" onClick={onCancel} sx={{ px: "18px", fontSize: 12.5 }}>
-              {t(cancelLabel)}
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              loading={loading || formState.isSubmitting}
-              sx={{ px: "20px", fontSize: 12.5, fontWeight: 700 }}
-            >
-              {t(submitLabel)}
-            </Button>
-          </Box>
+    <FormProvider {...form}>
+      <Box component="form" onSubmit={handleSubmit((data) => onSubmit(data))} noValidate>
+        {wrapFields ? wrapFields(body) : body}
+        {actions ? (
+          actions({
+            isDirty: formState.isDirty,
+            isSubmitting: loading || formState.isSubmitting,
+            submit: () => void handleSubmit((data) => onSubmit(data))(),
+            reset: () => reset(initial),
+            values: getValues(),
+          })
         ) : (
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            loading={loading || formState.isSubmitting}
-            sx={{
-              borderRadius: "12px",
-              py: "14px",
-              fontSize: 14,
-              fontWeight: 700,
-            }}
-          >
-            {t(submitLabel)}
-          </Button>
+          <Stack spacing={1.5} sx={{ mt: fields.length ? "12px" : 0 }}>
+            {beforeSubmit}
+            {onCancel ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "8px",
+                  borderTop: "1px solid",
+                  borderColor: "divider",
+                  pt: "16px",
+                }}
+              >
+                <Button variant="outlined" onClick={onCancel} sx={{ px: "18px", fontSize: 12.5 }}>
+                  {t(cancelLabel)}
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  loading={loading || formState.isSubmitting}
+                  sx={{ px: "20px", fontSize: 12.5, fontWeight: 700 }}
+                >
+                  {t(submitLabel)}
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                loading={loading || formState.isSubmitting}
+                sx={{
+                  borderRadius: "12px",
+                  py: "14px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                {t(submitLabel)}
+              </Button>
+            )}
+          </Stack>
         )}
-      </Stack>
-    </Box>
+      </Box>
+    </FormProvider>
   );
 }

@@ -44,7 +44,9 @@ export type BuiltInWidget =
   | "heading"
   | "completeness"
   | "facts"
-  | "generated-doc";
+  | "generated-doc"
+  | "verification-code"
+  | "choice-chips";
 
 /**
  * A widget name a schema may use: a built-in, or any other string resolved from
@@ -85,6 +87,15 @@ export interface FieldCondition {
 export interface SyncFields {
   from: string[];
   to: string[];
+}
+
+/** One option of a `choice-chips` field. `label` is a translation key; `meta`
+ * and `symbol` are literal (an offset, a currency sign). */
+export interface ChoiceOption {
+  value: string;
+  label: string;
+  meta?: string;
+  symbol?: string;
 }
 
 export interface JsonSchemaProperty {
@@ -242,6 +253,21 @@ export interface JsonSchemaProperty {
   /** `repeater`: the fields of one row (a sub-record); stored as an array of
    * objects. Nested field names are `<name>.<index>.<key>`. */
   itemSchema?: Record<string, JsonSchemaProperty>;
+  /** `choice-chips`: the options offered, each able to carry a second line. */
+  choices?: ChoiceOption[];
+  /** `choice-chips`: `"stacked"` puts the detail under the label in a rounded
+   * card (the date-format picker) rather than beside it in a pill. */
+  choiceLayout?: "inline" | "stacked";
+  /** Palette path for `icon` when the default accent is wrong — the design
+   * tones each rejection group differently. */
+  iconColor?: string;
+  /** Dimmed note beside the label, where `help` would sit below it. */
+  labelHint?: string;
+  /** `callout` banner colouring. Defaults to the accent orange. */
+  tone?: "accent" | "info" | "warning";
+  /** Puts `help` under the label instead of under the control — for text that
+   * explains the choice rather than correcting the input. */
+  helpPlacement?: "above" | "below";
   /** `repeater`: translation key for the "add row" button. */
   addLabel?: string;
   /** `days`: the toggles, in order. `value` is what gets stored. */
@@ -358,6 +384,18 @@ export interface FormRendererProps extends FormLayoutProps {
   cancelLabel?: string;
   loading?: boolean;
   beforeSubmit?: import("react").ReactNode;
+  /**
+   * Wraps the rendered fields — a screen whose design puts the fields on their
+   * own surface (a panel card) with the actions outside it. Receives the field
+   * block, returns whatever should stand in for it.
+   */
+  wrapFields?: (fields: import("react").ReactNode) => import("react").ReactNode;
+  /**
+   * Replaces the default submit row. The returned tree is still inside the
+   * `<form>`, so a `type="submit"` button in it submits normally — which is how
+   * a design can place Back/Skip/Continue outside the field surface.
+   */
+  actions?: (state: FormActionsState) => import("react").ReactNode;
   /** One-off widgets for `widget` names the form layer doesn't ship (see Widgets). */
   widgets?: Widgets;
 }

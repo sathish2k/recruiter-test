@@ -47,6 +47,8 @@ export function FieldShell({
   children,
   labelAction,
   labelSuffix,
+  labelIcon,
+  helpPlacement = "below",
 }: {
   label: string;
   hideLabel?: boolean;
@@ -60,6 +62,11 @@ export function FieldShell({
   labelAction?: ReactNode;
   /** Small note rendered immediately after the label text. */
   labelSuffix?: ReactNode;
+  /** Icon drawn before the label — the design's grouped rejection reasons. */
+  labelIcon?: ReactNode;
+  /** Where `help` sits. The design puts a field's explanation under its label
+   * when it explains the *choice* rather than the input. */
+  helpPlacement?: "above" | "below";
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
@@ -78,13 +85,22 @@ export function FieldShell({
           </Box>
           {labelAction}
         </Box>
+      ) : labelIcon || labelSuffix ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {labelIcon}
+          <FieldLabel label={label} hide={hideLabel} />
+          {labelSuffix}
+        </Box>
       ) : (
         <FieldLabel label={label} hide={hideLabel} />
       )}
+      {help && helpPlacement === "above" && !error ? (
+        <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>{help}</Typography>
+      ) : null}
       {children}
       {error ? (
         <Typography sx={{ fontSize: 11, color: "error.main" }}>{error}</Typography>
-      ) : help ? (
+      ) : help && helpPlacement === "below" ? (
         <Typography sx={{ fontSize: 11, color: "text.disabled" }}>{help}</Typography>
       ) : null}
     </Box>
