@@ -169,6 +169,13 @@ export function SetupWizard({
   const [resumed, setResumed] = useState(state.setupStep > 0);
   const entryStep = useRef(state.setupStep);
   const hydrated = useRef(false);
+  /**
+   * The wizard is inert until the first payload lands. Without this a click
+   * during that window edits an empty list and then gets overwritten when the
+   * real state arrives — the user sees their step silently undone.
+   */
+  const [ready, setReady] = useState(state.stages.length > 0);
+  const inFlight = useRef<Promise<unknown>>(Promise.resolve());
 
   // Seed from the server exactly once, when the first real payload lands. The
   // wizard owns the edited copy after that — a later revalidation must not
@@ -176,6 +183,7 @@ export function SetupWizard({
   useEffect(() => {
     if (hydrated.current || state.stages.length === 0) return;
     hydrated.current = true;
+    setReady(true);
     setStep(state.setupStep);
     // Snap each stored value onto the option this screen actually offers, so
     // the picker always shows the workspace's current answer as selected.
@@ -194,18 +202,29 @@ export function SetupWizard({
   const activeReasons = reasons.filter((reason) => reason.active).length;
   const filledInvites = invites.filter((invite) => invite.email.trim());
 
-  const save = async (patch: SetupPatch) => {
+  /**
+   * Saves run one at a time. Clicking through two steps faster than a
+   * round-trip would otherwise leave two writes racing, and the later step
+   * number is not reliably the one that lands last.
+   */
+  const save = (patch: SetupPatch) => {
     setSaving(true);
-    try {
-      await onSave(patch);
-    } finally {
-      setSaving(false);
-    }
+    const next = inFlight.current
+      .catch(() => undefined)
+      .then(() => onSave(patch))
+      .finally(() => {
+        if (inFlight.current === next) setSaving(false);
+      });
+    inFlight.current = next;
+    return next;
   };
 
   /** Persists the current step's slice, then moves. */
   const goto = async (next: number) => {
     const target = Math.max(0, Math.min(STEP_KEYS.length - 1, next));
+    // Once the user has moved, the server's answer is stale by definition —
+    // a payload still in flight must not yank them back to where they were.
+    hydrated.current = true;
     setStep(target);
     setResumed(false);
     const patch: SetupPatch = { setupStep: target };
@@ -224,6 +243,8 @@ export function SetupWizard({
   };
 
   const stepKey = STEP_KEYS[step] ?? "basics";
+  // Everything that moves or writes waits for the first read.
+  const move = (target: number) => ready && void goto(target);
 
   return (
     <Box sx={{ position: "relative", zIndex: 1, maxWidth: 720, mx: "auto", p: "92px 24px 72px" }}>
@@ -289,7 +310,7 @@ export function SetupWizard({
               })}
             </Typography>
           </Box>
-          <Button variant="text" size="small" onClick={() => void goto(0)}>
+          <Button variant="text" size="small" disabled={!ready} onClick={() => move(0)}>
             {t("resume.startOver")}
           </Button>
         </Card>
@@ -324,7 +345,7 @@ export function SetupWizard({
             label={t(`steps.${key}.label`)}
             index={index}
             current={step}
-            onClick={() => index <= step && void goto(index)}
+            onClick={() => index <= step && move(index)}
           />
         ))}
       </Box>
@@ -737,7 +758,7 @@ export function SetupWizard({
                     {row.value}
                   </Typography>
                 </Box>
-                <Button variant="text" size="small" onClick={() => void goto(row.target)}>
+                <Button variant="text" size="small" onClick={() => move(row.target)}>
                   {t("review.change")}
                 </Button>
               </Card>
@@ -771,7 +792,8 @@ export function SetupWizard({
           <Button
             variant="outlined"
             startIcon={<ArrowBackRounded />}
-            onClick={() => void goto(step - 1)}
+            disabled={!ready}
+            onClick={() => move(step - 1)}
           >
             {t("back")}
           </Button>
@@ -781,20 +803,22 @@ export function SetupWizard({
           <>
             <Button
               variant="text"
+              disabled={!ready}
               // The design plays this down deliberately — skipping keeps the
               // defaults, so it must not compete with Continue.
               sx={{ color: "text.disabled", "&:hover": { color: "text.primary" } }}
               onClick={() => {
                 setToast(t("skipped", { label: t(`steps.${stepKey}.label`).toLowerCase() }));
-                void goto(step + 1);
+                move(step + 1);
               }}
             >
               {t("skip")}
             </Button>
             <Button
               variant="contained"
+              disabled={!ready}
               endIcon={<ArrowForwardRounded />}
-              onClick={() => void goto(step + 1)}
+              onClick={() => move(step + 1)}
             >
               {step === 3 ? t("nextInvites") : t("next")}
             </Button>

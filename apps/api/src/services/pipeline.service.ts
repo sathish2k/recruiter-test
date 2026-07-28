@@ -80,14 +80,16 @@ export interface StageInput {
  * yet — once one does, this becomes an upsert keyed on id.
  */
 export async function replaceStages(organizationId: string, stages: StageInput[]) {
-  const cleaned = stages.map((stage) => stage.name.trim()).filter(Boolean);
-  if (cleaned.length < 2) throw new Error("A pipeline needs at least an entry and a hire stage");
+  const named = stages.filter((stage) => stage.name.trim());
+  if (named.length < 2) throw new Error("A pipeline needs at least an entry and a hire stage");
 
-  await db.delete(pipelineStage).where(eq(pipelineStage.organizationId, organizationId));
-  await db.insert(pipelineStage).values(
-    stages
-      .filter((stage) => stage.name.trim())
-      .map((stage, index, all) => ({
+  // Delete and insert in one transaction. Two saves arriving together would
+  // otherwise interleave as delete, delete, insert, insert and leave the
+  // workspace with the list twice over.
+  await db.transaction(async (tx) => {
+    await tx.delete(pipelineStage).where(eq(pipelineStage.organizationId, organizationId));
+    await tx.insert(pipelineStage).values(
+      named.map((stage, index) => ({
         id: randomUUID(),
         organizationId,
         name: stage.name.trim(),
@@ -96,11 +98,12 @@ export async function replaceStages(organizationId: string, stages: StageInput[]
         kind:
           index === 0
             ? ("entry" as const)
-            : index === all.length - 1
+            : index === named.length - 1
               ? ("hire" as const)
               : ("middle" as const),
       })),
-  );
+    );
+  });
   return listStages(organizationId);
 }
 
@@ -134,10 +137,12 @@ export interface ReasonInput {
 }
 
 export async function replaceRejectionReasons(organizationId: string, reasons: ReasonInput[]) {
-  await db.delete(rejectionReason).where(eq(rejectionReason.organizationId, organizationId));
   const rows = reasons.filter((reason) => reason.label.trim());
-  if (rows.length > 0) {
-    await db.insert(rejectionReason).values(
+  // One transaction, for the same reason as replaceStages above.
+  await db.transaction(async (tx) => {
+    await tx.delete(rejectionReason).where(eq(rejectionReason.organizationId, organizationId));
+    if (rows.length === 0) return;
+    await tx.insert(rejectionReason).values(
       rows.map((reason, index) => ({
         id: randomUUID(),
         organizationId,
@@ -147,7 +152,7 @@ export async function replaceRejectionReasons(organizationId: string, reasons: R
         sortOrder: index,
       })),
     );
-  }
+  });
   // Read back directly rather than through the seeding reader — an org that
   // deliberately cleared the list must not have the defaults handed back.
   return db

@@ -128,7 +128,13 @@ test.describe("setup wizard", () => {
   }
 
   async function rewind(page: import("@playwright/test").Page) {
+    const loaded = page.waitForResponse(
+      (r) => r.url().includes("/onboarding/setup") && r.request().method() === "GET",
+    );
     await page.goto("/setup");
+    // The wizard is inert until the first read lands; clicking before then is
+    // a no-op by design, so wait for it rather than racing it.
+    await loaded;
     await expect(page.getByText(/STEP \d OF 5/)).toBeVisible();
     // Wait for the rewind to land too — two saves in flight at once would
     // race, and the later step number is the one under test.
