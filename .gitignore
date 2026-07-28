@@ -40,3 +40,6 @@ npm-debug.log*
 
 # local claude settings
 .claude/settings.local.json
+e2e/.auth/
+e2e/test-results/
+playwright-report/

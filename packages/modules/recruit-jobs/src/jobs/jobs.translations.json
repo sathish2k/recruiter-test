@@ -1,18 +1,22 @@
 {
   "columns": {
-    "title": "Job title",
+    "title": "Requirement",
     "client": "Client",
     "status": "Status",
     "openings": "Openings",
     "updated": "Updated"
   },
-  "filters": { "search": "Search jobs…" },
+  "filters": {
+    "search": "Search requirements…"
+  },
   "actions": {
-    "new": "New job",
+    "new": "New requirement",
     "edit": "Edit",
-    "delete": "Delete"
+    "archive": "Archive"
   },
   "exportCsv": "Export CSV",
-  "empty": "No jobs yet",
-  "toast": { "deleted": "Job \"{{name}}\" deleted" }
+  "empty": "No requirements yet",
+  "toast": {
+    "archived": "{{name}} archived — restore it from Archived."
+  }
 }

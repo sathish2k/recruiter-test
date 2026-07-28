@@ -1,5 +1,6 @@
 import { status } from "elysia";
 import {
+  archiveJob,
   createJob,
   deleteJob,
   getJob,
@@ -46,4 +47,10 @@ export async function removeJob(ctx: { user: Auth; params: { id: string } }) {
   const deleted = await deleteJob(ctx.user.agencyId ?? "", ctx.params.id);
   if (!deleted) return status(404, "Job not found");
   return { data: deleted };
+}
+
+export async function postArchive(ctx: { user: Auth; params: { id: string } }) {
+  const archived = await archiveJob(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!archived) return status(404, "Requirement not found");
+  return { data: archived };
 }

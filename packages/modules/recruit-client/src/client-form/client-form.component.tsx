@@ -52,6 +52,9 @@ interface Client {
   feeBasis: string;
   feeValue: string;
   paymentTerms: string;
+  billingCurrency: string;
+  taxTreatment: string;
+  offLimitsMonths: number;
   taxId: string;
   notes: string;
 }
@@ -280,6 +283,9 @@ export function ClientFormComponent({ id }: { id: string }) {
           feePercent: data.feeBasis === "percent" ? data.feeValue : "",
           feeFlat: data.feeBasis === "flat" ? data.feeValue : "",
           paymentTerms: data.paymentTerms,
+          billingCurrency: data.billingCurrency,
+          taxTreatment: data.taxTreatment,
+          offLimitsMonths: data.offLimitsMonths,
           billingEmail: splitEmails(data.billingEmail),
           taxId: data.taxId,
           notes: data.notes,
@@ -300,6 +306,9 @@ export function ClientFormComponent({ id }: { id: string }) {
       : {
           feeBasis: "percent",
           paymentTerms: "net30",
+          billingCurrency: "INR",
+          taxTreatment: "gst",
+          offLimitsMonths: 12,
           sameAsBilling: true,
           accountLeadId: user?.id ?? "",
         };

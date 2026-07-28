@@ -74,7 +74,12 @@
     "replacementPeriodHelp": "Free replacement if the hire leaves within this period",
     "optional": "optional",
     "billingEmailHint": "Press Enter to add multiple recipients",
-    "contractRenewsAt": "Contract renews"
+    "contractRenewsAt": "Contract renews",
+    "billingCurrency": "Billing currency",
+    "billingCurrencyHint": "Drives fees, offers, invoices and commissions for this client",
+    "taxTreatment": "Tax treatment",
+    "offLimitsMonths": "Off-limits period",
+    "offLimitsMonthsHint": "Months a placed candidate may not be re-approached"
   },
   "source": {
     "added_by_user": "Added by user",
@@ -166,5 +171,11 @@
     "phonePlaceholder": "+1 (206) 555-0138",
     "email": "Work email",
     "emailPlaceholder": "priya.menon@company.com"
+  },
+  "taxTreatments": {
+    "gst": "GST (India)",
+    "vat": "VAT (EU, reverse charge)",
+    "us_sales_tax": "US sales tax",
+    "none": "None"
   }
 }

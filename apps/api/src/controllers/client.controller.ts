@@ -1,5 +1,6 @@
 import { status } from "elysia";
 import {
+  archiveClient,
   type ClientInput,
   clientActivity,
   clientContacts,
@@ -96,4 +97,10 @@ export async function removeClient(ctx: { user: Auth; params: { id: string } }) 
   const deleted = await deleteClient(ctx.user.agencyId ?? "", ctx.params.id);
   if (!deleted) return status(404, "Client not found");
   return { data: deleted };
+}
+
+export async function postArchive(ctx: { user: Auth; params: { id: string } }) {
+  const archived = await archiveClient(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!archived) return status(404, "Client not found");
+  return { data: archived };
 }

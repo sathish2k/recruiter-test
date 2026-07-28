@@ -24,6 +24,9 @@ const jobBody = t.Object({
   requirements: t.Optional(t.String({ maxLength: 20000 })),
   benefits: t.Optional(t.String({ maxLength: 20000 })),
   skills: t.Optional(t.Array(t.String())),
+  roleCategory: t.Optional(t.String({ maxLength: 40 })),
+  workModel: t.Optional(t.String({ maxLength: 20 })),
+  priority: t.Optional(t.String({ maxLength: 20 })),
   niceToHaveSkills: t.Optional(t.Array(t.String())),
   salaryCurrency: t.Optional(t.String({ maxLength: 8 })),
   remote: t.Optional(t.Boolean()),
@@ -74,4 +77,5 @@ export default new Elysia({ name: "job.routes" })
   .get("/jobs/:id", (ctx) => jobController.getJobById(ctx), { isAuth: true })
   .post("/jobs", (ctx) => jobController.postJob(ctx), { isAuth: true, body: t.Optional(jobBody) })
   .put("/jobs/:id", (ctx) => jobController.putJob(ctx), { isAuth: true, body: t.Optional(jobBody) })
+  .post("/jobs/:id/archive", (ctx) => jobController.postArchive(ctx), { isAuth: true })
   .delete("/jobs/:id", (ctx) => jobController.removeJob(ctx), { isAuth: true });

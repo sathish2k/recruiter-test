@@ -1,6 +1,7 @@
 import { status } from "elysia";
 import { record as recordAudit } from "../services/audit-log.service";
 import {
+  archiveCandidate,
   type CandidateInput,
   createCandidate,
   deleteCandidate,
@@ -80,4 +81,10 @@ export async function removeCandidate(ctx: { user: Auth; params: { id: string } 
   const deleted = await deleteCandidate(ctx.user.agencyId ?? "", ctx.params.id);
   if (!deleted) return status(404, "Candidate not found");
   return { data: deleted };
+}
+
+export async function postArchive(ctx: { user: Auth; params: { id: string } }) {
+  const archived = await archiveCandidate(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!archived) return status(404, "Candidate not found");
+  return { data: archived };
 }

@@ -29,7 +29,7 @@ export const JobsConfiguration: TableFilterExportConfig = {
   filters: [{ type: "search", key: "search", placeholder: "filters.search" }],
   actions: [
     { type: "edit", icon: "edit", label: { name: "actions.edit" } },
-    { type: "delete", icon: "delete", label: { name: "actions.delete" } },
+    { type: "archive", icon: "archive", label: { name: "actions.archive" } },
   ],
   ctas: [{ label: { name: "actions.new" }, icon: "add", action: "add" }],
   export: { types: [{ label: "exportCsv", value: "csv", icon: "download" }] },

@@ -53,6 +53,9 @@ function mapClient(row: ClientRow & { accountLeadName?: string | null }) {
     feeBasis: row.feeBasis ?? "percent",
     feeValue: row.feeValue ?? "",
     paymentTerms: row.paymentTerms ?? "",
+    billingCurrency: row.billingCurrency ?? "INR",
+    taxTreatment: row.taxTreatment ?? "",
+    offLimitsMonths: row.offLimitsMonths ?? 12,
     taxId: row.taxId ?? "",
     notes: row.notes ?? "",
     status: row.status,
@@ -97,7 +100,7 @@ export interface ListClientsParams {
 }
 
 export async function listClients(organizationId: string, params: ListClientsParams = {}) {
-  const filters = [eq(client.organizationId, organizationId)];
+  const filters = [eq(client.organizationId, organizationId), eq(client.archived, false)];
 
   if (params.search) {
     const term = `%${params.search}%`;
@@ -239,6 +242,9 @@ export interface ClientInput {
   feeBasis?: string;
   feeValue?: string;
   paymentTerms?: string;
+  billingCurrency?: string;
+  taxTreatment?: string;
+  offLimitsMonths?: number;
   taxId?: string;
   notes?: string;
   status?: string;
@@ -264,6 +270,9 @@ const EDITABLE = [
   "feeBasis",
   "feeValue",
   "paymentTerms",
+  "billingCurrency",
+  "taxTreatment",
+  "offLimitsMonths",
   "taxId",
   "notes",
   "status",
@@ -796,4 +805,14 @@ export async function clientActivity(organizationId: string, filter = "all", lim
     }))
     .filter((row) => filter === "all" || row.group === filter)
     .slice(0, limit);
+}
+
+/** §6.1 — archive, never delete. Reversible, keeps every related record. */
+export async function archiveClient(organizationId: string, id: string) {
+  const [archived] = await db
+    .update(client)
+    .set({ archived: true, updatedAt: new Date() })
+    .where(and(eq(client.id, id), eq(client.organizationId, organizationId)))
+    .returning();
+  return archived ? { id: archived.id } : null;
 }

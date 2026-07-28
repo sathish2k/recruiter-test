@@ -74,6 +74,17 @@ export const candidate = pgTable("candidate", {
   /** Right to work in the hiring country, e.g. "citizen" / "needs_sponsorship". */
   workAuthorization: text("work_authorization"),
   preferredLocation: text("preferred_location"),
+  /** §4 of the flow doc — availability is separate from placement history. */
+  availability: text("availability"),
+  availableFrom: timestamp("available_from"),
+  /** Set from placement + the client's off-limits term (TC-CLI-007). */
+  offLimitsUntil: timestamp("off_limits_until"),
+  tags: jsonb("tags").$type<string[]>(),
+  /** Blocks every outbound channel (TC-CAN-010). */
+  doNotContact: boolean("do_not_contact").notNull().default(false),
+  /** When and how the candidate consented to be held on file. */
+  consentAt: timestamp("consent_at"),
+  consentSource: text("consent_source"),
   salaryCurrency: text("salary_currency"),
   openToRelocate: boolean("open_to_relocate").notNull().default(false),
   openToRemote: boolean("open_to_remote").notNull().default(false),
@@ -93,6 +104,8 @@ export const candidate = pgTable("candidate", {
   ownerId: text("owner_id").references(() => user.id, { onDelete: "set null" }),
   source: text("source"),
   emailOptOut: boolean("email_opt_out").notNull().default(false),
+  /** Hidden from lists and pickers; history retained. Never hard-deleted. */
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

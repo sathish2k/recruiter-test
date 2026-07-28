@@ -49,6 +49,12 @@ export const client = pgTable("client", {
   feeBasis: text("fee_basis").$type<FeeBasis>(),
   feeValue: text("fee_value"),
   paymentTerms: text("payment_terms"),
+  /** D1.1 — every fee, offer, invoice and commission for this client uses it. */
+  billingCurrency: text("billing_currency"),
+  /** GST / VAT / US sales tax, by the client's region. */
+  taxTreatment: text("tax_treatment"),
+  /** Months a placed candidate may not be re-approached (TC-CLI-007). */
+  offLimitsMonths: integer("off_limits_months"),
   taxId: text("tax_id"),
   notes: text("notes"),
   /** The signed MSA / master service agreement — its own labelled slot. */
@@ -71,6 +77,8 @@ export const client = pgTable("client", {
   openRoles: integer("open_roles").notNull().default(0),
   candidates: integer("candidates").notNull().default(0),
   placements: integer("placements").notNull().default(0),
+  /** Hidden from lists and pickers; history retained. Never hard-deleted. */
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

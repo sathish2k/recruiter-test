@@ -69,6 +69,9 @@ interface Candidate {
   noticePeriod: string;
   workAuthorization: string;
   preferredLocation: string;
+  availability: string;
+  tags: string[];
+  doNotContact: boolean;
   salaryCurrency: string;
   openToRelocate: boolean;
   openToRemote: boolean;
@@ -311,6 +314,9 @@ export function CandidateFormComponent({ id }: { id: string }) {
           noticePeriod: data.noticePeriod,
           workAuthorization: data.workAuthorization,
           preferredLocation: data.preferredLocation,
+          availability: data.availability,
+          tags: data.tags ?? [],
+          doNotContact: data.doNotContact,
           salaryCurrency: data.salaryCurrency,
           openToRelocate: data.openToRelocate,
           openToRemote: data.openToRemote,

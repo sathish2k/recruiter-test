@@ -37,6 +37,9 @@ const clientBody = t.Object({
   feeBasis: t.Optional(t.String()),
   feeValue: t.Optional(t.String({ maxLength: 40 })),
   paymentTerms: t.Optional(t.String({ maxLength: 60 })),
+  billingCurrency: t.Optional(t.String({ maxLength: 8 })),
+  taxTreatment: t.Optional(t.String({ maxLength: 24 })),
+  offLimitsMonths: t.Optional(t.Number()),
   taxId: t.Optional(t.String({ maxLength: 40 })),
   notes: t.Optional(t.String({ maxLength: 5000 })),
   status: t.Optional(t.String()),
@@ -91,4 +94,5 @@ export default new Elysia({ name: "client.routes" })
     isAuth: true,
     body: t.Optional(clientBody),
   })
+  .post("/clients/:id/archive", (ctx) => clientController.postArchive(ctx), { isAuth: true })
   .delete("/clients/:id", (ctx) => clientController.removeClient(ctx), { isAuth: true });

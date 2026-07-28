@@ -62,12 +62,19 @@ export const job = pgTable("job", {
   autoAdvance: boolean("auto_advance").notNull().default(true),
   knockoutCount: integer("knockout_count").notNull().default(4),
   dailyDigest: boolean("daily_digest").notNull().default(true),
+  /** System reference shown to the client, e.g. REQ-2041. */
+  reference: text("reference"),
+  roleCategory: text("role_category"),
+  workModel: text("work_model"),
+  priority: text("priority"),
   sourcerId: text("sourcer_id").references(() => user.id, { onDelete: "set null" }),
   profileLeadId: text("profile_lead_id").references(() => user.id, { onDelete: "set null" }),
   dailyInviteTarget: integer("daily_invite_target").notNull().default(0),
   publishChannels: jsonb("publish_channels").$type<string[]>(),
   // Populated once candidates exist; stored so the list card renders.
   candidates: integer("candidates").notNull().default(0),
+  /** Hidden from lists and pickers; history retained. Never hard-deleted. */
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

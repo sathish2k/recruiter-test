@@ -49,6 +49,9 @@ interface Job {
   requirements: string;
   benefits: string;
   skills: string[];
+  roleCategory: string;
+  workModel: string;
+  priority: string;
   niceToHaveSkills: string[];
   salaryCurrency: string;
   remote: boolean;
@@ -248,6 +251,9 @@ export function JobFormComponent({ id }: { id: string }) {
           requirements: data.requirements,
           benefits: data.benefits,
           skills: data.skills ?? [],
+          roleCategory: data.roleCategory,
+          workModel: data.workModel,
+          priority: data.priority,
           niceToHaveSkills: data.niceToHaveSkills ?? [],
           salaryCurrency: data.salaryCurrency,
           remote: data.remote,

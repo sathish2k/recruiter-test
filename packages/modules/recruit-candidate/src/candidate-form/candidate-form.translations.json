@@ -118,7 +118,13 @@
     "autofillOr": "or",
     "autofillBrowseVerb": "browse",
     "formattedResumeEmpty": "No formatted resume yet",
-    "formattedResumeGenerate": "Generate"
+    "formattedResumeGenerate": "Generate",
+    "availability": "Availability",
+    "availableFrom": "Available from",
+    "tags": "Tags",
+    "tagsPlaceholder": "Add tag + Enter",
+    "doNotContact": "Do not contact",
+    "doNotContactHint": "Blocks every outbound channel for this candidate"
   },
   "salutation": {
     "none": "None",
@@ -224,5 +230,11 @@
     "experience": "EXPERIENCE",
     "education": "EDUCATION",
     "skills": "SKILLS"
+  },
+  "availabilities": {
+    "actively_looking": "Actively looking",
+    "open_to_offers": "Open to offers",
+    "not_looking": "Not looking",
+    "placed": "Placed"
   }
 }

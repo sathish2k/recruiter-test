@@ -20,10 +20,10 @@ export function CandidatesComponent({ id }: { id: string }) {
   const { mutation, mutate } = useFetch<Candidate[]>(id);
 
   const mut = mutation as Record<string, ((arg?: unknown) => Promise<unknown>) | undefined>;
-  const remove = async (row: Candidate) => {
-    await mut.remove?.(row.id);
+  const archive = async (row: Candidate) => {
+    await mut.archive?.(row.id);
     await mutate();
-    show(t("toast.deleted", { name: row.name }));
+    show(t("toast.archived", { name: row.name }));
   };
 
   return (
@@ -35,7 +35,7 @@ export function CandidatesComponent({ id }: { id: string }) {
         }}
         actionHandler={{
           edit: (row) => router.push(EDIT_ROUTE, { id: String(row.id ?? "") }),
-          delete: (row) => remove(row as unknown as Candidate),
+          archive: (row) => archive(row as unknown as Candidate),
         }}
       />
     </Box>

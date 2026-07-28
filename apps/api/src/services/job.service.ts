@@ -38,6 +38,10 @@ function mapJob(row: JobRow & JobJoins) {
     requirements: row.requirements ?? "",
     benefits: row.benefits ?? "",
     skills: row.skills ?? [],
+    reference: row.reference ?? "",
+    roleCategory: row.roleCategory ?? "",
+    workModel: row.workModel ?? "",
+    priority: row.priority ?? "normal",
     niceToHaveSkills: row.niceToHaveSkills ?? [],
     salaryCurrency: row.salaryCurrency ?? "INR",
     remote: row.remote,
@@ -109,7 +113,7 @@ function withNames() {
 }
 
 export async function listJobs(organizationId: string, params: ListJobsParams = {}) {
-  const filters = [eq(job.organizationId, organizationId)];
+  const filters = [eq(job.organizationId, organizationId), eq(job.archived, false)];
   if (params.search) {
     const term = `%${params.search}%`;
     const match = or(ilike(job.title, term), ilike(job.industry, term));
@@ -159,6 +163,9 @@ export interface JobInput {
   requirements?: string;
   benefits?: string;
   skills?: string[];
+  roleCategory?: string;
+  workModel?: string;
+  priority?: string;
   niceToHaveSkills?: string[];
   salaryCurrency?: string;
   remote?: boolean;
@@ -197,6 +204,9 @@ const EDITABLE = [
   "requirements",
   "benefits",
   "skills",
+  "roleCategory",
+  "workModel",
+  "priority",
   "niceToHaveSkills",
   "salaryCurrency",
   "remote",
@@ -258,4 +268,15 @@ export async function deleteJob(organizationId: string, id: string) {
     .where(and(eq(job.id, id), eq(job.organizationId, organizationId)))
     .returning();
   return deleted ? { id: deleted.id } : null;
+}
+
+/** §6.1 — archive, never delete. An archived requirement accepts no new
+ * candidates; its existing pipeline stays viewable. */
+export async function archiveJob(organizationId: string, id: string) {
+  const [archived] = await db
+    .update(job)
+    .set({ archived: true, updatedAt: new Date() })
+    .where(and(eq(job.id, id), eq(job.organizationId, organizationId)))
+    .returning();
+  return archived ? { id: archived.id } : null;
 }

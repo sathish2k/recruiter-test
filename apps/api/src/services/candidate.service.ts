@@ -47,6 +47,12 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     noticePeriod: row.noticePeriod ?? "",
     workAuthorization: row.workAuthorization ?? "",
     preferredLocation: row.preferredLocation ?? "",
+    availability: row.availability ?? "open_to_offers",
+    availableFrom: row.availableFrom?.toISOString() ?? "",
+    offLimitsUntil: row.offLimitsUntil?.toISOString() ?? "",
+    tags: row.tags ?? [],
+    doNotContact: row.doNotContact,
+    consentAt: row.consentAt?.toISOString() ?? "",
     salaryCurrency: row.salaryCurrency ?? "INR",
     openToRelocate: row.openToRelocate,
     openToRemote: row.openToRemote,
@@ -102,7 +108,7 @@ function withNames() {
 }
 
 export async function listCandidates(organizationId: string, params: ListCandidatesParams = {}) {
-  const filters = [eq(candidate.organizationId, organizationId)];
+  const filters = [eq(candidate.organizationId, organizationId), eq(candidate.archived, false)];
   if (params.search) {
     const term = `%${params.search}%`;
     const match = or(
@@ -166,6 +172,9 @@ export interface CandidateInput {
   noticePeriod?: string;
   workAuthorization?: string;
   preferredLocation?: string;
+  availability?: string;
+  tags?: string[];
+  doNotContact?: boolean;
   salaryCurrency?: string;
   openToRelocate?: boolean;
   openToRemote?: boolean;
@@ -210,6 +219,9 @@ const EDITABLE = [
   "noticePeriod",
   "workAuthorization",
   "preferredLocation",
+  "availability",
+  "tags",
+  "doNotContact",
   "salaryCurrency",
   "openToRelocate",
   "openToRemote",
@@ -265,4 +277,14 @@ export async function deleteCandidate(organizationId: string, id: string) {
     .where(and(eq(candidate.id, id), eq(candidate.organizationId, organizationId)))
     .returning();
   return deleted ? { id: deleted.id } : null;
+}
+
+/** §6.1 — archive, never delete. Distinct from erasure, which destroys data. */
+export async function archiveCandidate(organizationId: string, id: string) {
+  const [archived] = await db
+    .update(candidate)
+    .set({ archived: true, updatedAt: new Date() })
+    .where(and(eq(candidate.id, id), eq(candidate.organizationId, organizationId)))
+    .returning();
+  return archived ? { id: archived.id } : null;
 }

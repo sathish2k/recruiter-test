@@ -4,18 +4,27 @@
     "email": "Email",
     "job": "Job",
     "status": "Status",
-    "updated": "Updated"
+    "updated": "Updated",
+    "availability": "Availability"
   },
-  "filters": { "search": "Search candidates…" },
+  "filters": {
+    "search": "Search candidates…"
+  },
   "actions": {
     "new": "New candidate",
     "edit": "Edit",
-    "delete": "Delete"
+    "archive": "Archive"
   },
   "exportCsv": "Export CSV",
   "empty": "No candidates yet",
   "toast": {
     "copied": "Copied",
-    "deleted": "Candidate \"{{name}}\" deleted"
+    "archived": "{{name}} archived — restore it from Archived."
+  },
+  "availabilities": {
+    "actively_looking": "Actively looking",
+    "open_to_offers": "Open to offers",
+    "not_looking": "Not looking",
+    "placed": "Placed"
   }
 }

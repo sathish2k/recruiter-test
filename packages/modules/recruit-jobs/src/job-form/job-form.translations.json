@@ -1,9 +1,9 @@
 {
-  "back": "Back to jobs",
+  "back": "Back to requirements",
   "newTitle": "New Requirement",
   "newDescription": "Publish a requirement and let HirePilotX start sourcing and screening.",
-  "editTitle": "Edit job",
-  "editDescription": "Update this requirement's details, forecast and team.",
+  "editTitle": "Edit requirement",
+  "editDescription": "Update this requirement's details and assigned team.",
   "sections": {
     "basics": "Basics",
     "address": "Address",
@@ -20,7 +20,7 @@
     "mustHaveSkills": "Must-have skills"
   },
   "fields": {
-    "title": "Job title",
+    "title": "Requirement title",
     "titlePlaceholder": "e.g. Senior Backend Engineer",
     "titleMax": "Keep the title under 150 characters",
     "titleRequired": "Job title is required",
@@ -88,7 +88,12 @@
     "niceToHaveSkillsHint": "Weighted lower by AI screening",
     "suggestSkills": "Suggest skills",
     "publishLock": "Save a draft to unlock destinations.",
-    "statusNote": "Draft — becomes Active when published."
+    "statusNote": "Draft — becomes Active when published.",
+    "roleCategory": "Role category",
+    "workModel": "Work model",
+    "priority": "Priority",
+    "sourcerRequired": "Assign a sourcer — a requirement cannot be opened unstaffed",
+    "profileLeadRequired": "Assign a profile lead — someone must review and submit"
   },
   "employmentType": {
     "full_time": "Full-time",
@@ -129,7 +134,7 @@
     "remoteHint": "Remote role — no office address needed. Uncheck “Remote job” to add one."
   },
   "actions": {
-    "create": "Publish job",
+    "create": "Publish requirement",
     "save": "Save changes",
     "cancel": "Cancel",
     "saveAnother": "Save & add another",
@@ -172,5 +177,24 @@
       "requirements": "REQUIREMENTS",
       "benefits": "BENEFITS"
     }
+  },
+  "roleCategories": {
+    "engineering": "Engineering",
+    "design": "Design",
+    "data": "Data",
+    "product": "Product",
+    "sales": "Sales",
+    "other": "Other"
+  },
+  "workModels": {
+    "onsite": "Onsite",
+    "hybrid": "Hybrid",
+    "remote": "Remote"
+  },
+  "priorities": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High",
+    "critical": "Critical"
   }
 }

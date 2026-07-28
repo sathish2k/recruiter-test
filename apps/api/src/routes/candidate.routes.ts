@@ -44,6 +44,9 @@ const candidateBody = t.Object({
   noticePeriod: t.Optional(t.String({ maxLength: 255 })),
   workAuthorization: t.Optional(t.String({ maxLength: 255 })),
   preferredLocation: t.Optional(t.String({ maxLength: 255 })),
+  availability: t.Optional(t.String({ maxLength: 24 })),
+  tags: t.Optional(t.Array(t.String())),
+  doNotContact: t.Optional(t.Boolean()),
   salaryCurrency: t.Optional(t.String({ maxLength: 8 })),
   openToRelocate: t.Optional(t.Boolean()),
   openToRemote: t.Optional(t.Boolean()),
@@ -112,4 +115,5 @@ export default new Elysia({ name: "candidate.routes" })
     isAuth: true,
     body: t.Optional(candidateBody),
   })
+  .post("/candidates/:id/archive", (ctx) => candidateController.postArchive(ctx), { isAuth: true })
   .delete("/candidates/:id", (ctx) => candidateController.removeCandidate(ctx), { isAuth: true });

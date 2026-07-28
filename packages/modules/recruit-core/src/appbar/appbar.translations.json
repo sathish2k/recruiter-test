@@ -21,7 +21,7 @@
   },
   "back": {
     "candidates": "Back to candidates",
-    "jobs": "Back to jobs",
+    "jobs": "Back to requirements",
     "clients": "Back to clients",
     "contacts": "Back to contacts"
   },
@@ -34,7 +34,7 @@
     "contacts": "Contacts",
     "contactNew": "New contact",
     "contactEdit": "Edit contact",
-    "jobs": "Jobs",
+    "jobs": "Requirements",
     "candidates": "Candidates",
     "pipeline": "Pipeline",
     "teamActivity": "Team Activity",
