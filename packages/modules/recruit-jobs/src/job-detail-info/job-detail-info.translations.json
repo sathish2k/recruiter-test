@@ -1,0 +1,32 @@
+{
+  "title": "Requirement information",
+  "period": "Hiring period",
+  "dayOf": "Day {{day}} of {{total}}",
+  "daysLeft": "{{count}} days left",
+  "status": {
+    "open": "Active",
+    "on_hold": "On hold",
+    "filled": "Filled",
+    "closed": "Closed"
+  },
+  "facts": {
+    "created": "Created",
+    "openings": "Openings",
+    "workModel": "Work model",
+    "experience": "Experience",
+    "guarantee": "Guarantee",
+    "updated": "Updated"
+  },
+  "workModels": {
+    "onsite": "Onsite",
+    "hybrid": "Hybrid",
+    "remote": "Remote"
+  },
+  "workExperience": {
+    "lt1": "Under 1 year",
+    "1_3": "1 – 3 years",
+    "3_5": "3 – 5 years",
+    "5_8": "5 – 8 years",
+    "8plus": "8+ years"
+  }
+}

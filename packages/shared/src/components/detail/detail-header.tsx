@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Skeleton from "@mui/material/Skeleton";
 import { useTranslation } from "@recruit/sdk";
+import delve from "dlv";
 import type { ReactNode } from "react";
 import { ActionsMenu } from "../renderers/actions-menu";
 import type { ActionItem } from "../renderers/actions-renderer";
@@ -31,6 +32,9 @@ export interface DetailHeaderConfig {
   primaryAction?: DetailHeaderAction;
   /** Rows of the overflow (⋮) menu. */
   menuActions?: ActionItem[];
+  /** A headline figure pinned to the right of the row, where the requirement
+   * screen prints the salary band over its work model. Both are data paths. */
+  aside?: { value: string; caption?: string };
 }
 
 /**
@@ -105,6 +109,18 @@ export function DetailHeaderRenderer({
       <Box
         sx={{ display: "flex", alignItems: "center", gap: "8px", flex: "none", flexWrap: "wrap" }}
       >
+        {config.aside ? (
+          <Box sx={{ textAlign: "right", mr: config.actions?.length ? "6px" : 0 }}>
+            <Box sx={{ fontSize: 21, fontWeight: 700, letterSpacing: "-.01em" }}>
+              {String(delve(data, config.aside.value) ?? "")}
+            </Box>
+            {config.aside.caption ? (
+              <Box sx={{ fontSize: 13, color: "text.secondary", mt: "5px" }}>
+                {String(delve(data, config.aside.caption) ?? "")}
+              </Box>
+            ) : null}
+          </Box>
+        ) : null}
         {config.actions?.map((action) => (
           <LinkRenderer
             key={action.label?.name ?? action.icon}

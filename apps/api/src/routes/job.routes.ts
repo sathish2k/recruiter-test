@@ -85,6 +85,13 @@ export default new Elysia({ name: "job.routes" })
     }),
   })
   .get("/jobs/:id", (ctx) => jobController.getJobById(ctx), { isAuth: true })
+  // The detail screen — one endpoint per card.
+  .get("/jobs/:id/summary", (ctx) => jobController.getJobSummary(ctx), { isAuth: true })
+  .get("/jobs/:id/kpis", (ctx) => jobController.getJobKpis(ctx), { isAuth: true })
+  .get("/jobs/:id/team", (ctx) => jobController.getJobTeam(ctx), { isAuth: true })
+  .get("/jobs/:id/timeline", (ctx) => jobController.getJobTimeline(ctx), { isAuth: true })
+  .get("/jobs/:id/info", (ctx) => jobController.getJobInfo(ctx), { isAuth: true })
+  .get("/jobs/:id/screening", (ctx) => jobController.getJobScreening(ctx), { isAuth: true })
   .post("/jobs", (ctx) => jobController.postJob(ctx), {
     isVerified: true,
     body: t.Optional(jobBody),

@@ -1,0 +1,13 @@
+{
+  "title": "Assigned team",
+  "change": "Change",
+  "empty": "No one is assigned yet.",
+  "roles": {
+    "sourcer": "Sourcer · builds the pipeline",
+    "profileLead": "Profile lead · reviews & submits"
+  },
+  "metrics": {
+    "sourcer": "{{count}} in pipeline",
+    "profileLead": "{{count}} submitted"
+  }
+}

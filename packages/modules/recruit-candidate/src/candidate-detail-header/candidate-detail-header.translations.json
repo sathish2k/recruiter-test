@@ -1,0 +1,26 @@
+{
+  "status": {
+    "new": "New",
+    "active": "In process",
+    "placed": "Placed",
+    "on_hold": "On hold",
+    "rejected": "Rejected"
+  },
+  "chips": {
+    "offLimits": "Off-limits",
+    "doNotContact": "Do not contact"
+  },
+  "meta": {
+    "years": "{{count}} yrs",
+    "owner": "Owner",
+    "client": "Client",
+    "requirement": "Requirement",
+    "lastActivity": "Last activity"
+  },
+  "actions": {
+    "edit": "Edit",
+    "viewRequirement": "View requirement",
+    "scheduleInterview": "Schedule interview",
+    "backToList": "Back to candidates"
+  }
+}

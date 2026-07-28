@@ -1,0 +1,14 @@
+{
+  "title": "Hiring timeline",
+  "day": "Day {{count}} · {{stage}}",
+  "notYet": "—",
+  "milestones": {
+    "created": "Created",
+    "opened": "Opened",
+    "firstCandidate": "First candidate",
+    "firstSubmission": "First submission",
+    "firstInterview": "First interview",
+    "offer": "Offer",
+    "hire": "Hire"
+  }
+}

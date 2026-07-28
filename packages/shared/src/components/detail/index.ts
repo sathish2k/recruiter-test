@@ -1,4 +1,8 @@
 export {
+  type CollapsibleSectionConfig,
+  CollapsibleSectionsRenderer,
+} from "./collapsible-sections";
+export {
   type DetailHeaderAction,
   type DetailHeaderConfig,
   DetailHeaderRenderer,

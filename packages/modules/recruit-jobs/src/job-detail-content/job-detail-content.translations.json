@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "description": "Job description",
+    "qualifications": "Qualifications",
+    "responsibilities": "Responsibilities",
+    "skills": "Must-have skills",
+    "niceToHave": "Nice-to-have skills"
+  },
+  "empty": {
+    "description": "No description yet — add one from Edit.",
+    "qualifications": "No qualifications listed yet.",
+    "responsibilities": "No responsibilities listed yet.",
+    "skills": "No must-have skills yet.",
+    "niceToHave": "No nice-to-have skills yet."
+  }
+}

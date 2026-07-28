@@ -33,6 +33,8 @@ export {
   ClientCardSkeleton,
 } from "./components/client-card";
 export {
+  type CollapsibleSectionConfig,
+  CollapsibleSectionsRenderer,
   type DetailFieldConfig,
   type DetailHeaderAction,
   type DetailHeaderConfig,
@@ -280,6 +282,7 @@ export {
   type UseToastResult,
   useToast,
 } from "./components/toast";
+export { type AvatarSwatch, avatarSwatch, initialsOf } from "./utils/avatar";
 export { cn } from "./utils/cn";
 export { parseCsv } from "./utils/csv";
 export {

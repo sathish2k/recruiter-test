@@ -1,0 +1,14 @@
+{
+  "title": "AI Screening",
+  "on": "On",
+  "off": "Off",
+  "labels": {
+    "screened": "Screened so far",
+    "matched": "Matched at threshold",
+    "threshold": "Match threshold",
+    "knockouts": "Knockout questions"
+  },
+  "values": {
+    "screened": "{{done}} of {{total}}"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "Current assignment",
+  "stage": "Current stage",
+  "stageValue": "{{stage}} · {{days}} days",
+  "slaOver": "SLA +{{count}}d",
+  "owner": "Recruiter",
+  "workModels": {
+    "onsite": "Onsite",
+    "hybrid": "Hybrid",
+    "remote": "Remote"
+  },
+  "employmentType": {
+    "full_time": "Full-time",
+    "contract": "Contract",
+    "part_time": "Part-time"
+  }
+}

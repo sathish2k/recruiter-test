@@ -39,6 +39,7 @@ import ErrorOutlineRounded from "@mui/icons-material/ErrorOutlineRounded";
 import EventAvailableRounded from "@mui/icons-material/EventAvailableRounded";
 import EventBusyRounded from "@mui/icons-material/EventBusyRounded";
 import EventRounded from "@mui/icons-material/EventRounded";
+import ExpandLessRounded from "@mui/icons-material/ExpandLessRounded";
 import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import FactCheckOutlined from "@mui/icons-material/FactCheckOutlined";
 import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
@@ -183,6 +184,7 @@ export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "check-circle": CheckCircleRounded,
   search: SearchRounded,
   "expand-more": ExpandMoreRounded,
+  "expand-less": ExpandLessRounded,
   filter: FilterListRounded,
   bold: FormatBoldRounded,
   italic: FormatItalicRounded,

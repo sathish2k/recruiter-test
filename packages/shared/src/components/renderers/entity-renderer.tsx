@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
 import type { ReactNode } from "react";
+import { IconRenderer } from "./icon-renderer";
 
 export interface EntityRendererConfig {
   type: "entity";
@@ -20,6 +21,11 @@ export interface EntityRendererConfig {
   /** The tile/avatar text (initial or initials) — literal or data path. */
   text?: string;
   textPath?: string;
+  /** ICON_REGISTRY name drawn inside the tile instead of initials — the
+   * requirement header's `work` glyph, where a record has no name to initial. */
+  icon?: string;
+  /** CSS background applied over `bg`, for the design's gradient tiles. */
+  gradient?: string;
   /** When set (and no explicit bg/fg), the avatar colour is picked from a fixed
    * palette by hashing this field — stable per-identity swatches with no data
    * plumbing. */
@@ -94,13 +100,18 @@ export function EntityRenderer({
         width: size,
         height: size,
         bgcolor: bg,
+        background: config.gradient,
         color: fg,
         fontSize: circle ? 12 : 13,
         fontWeight: circle ? 600 : 700,
         ...config.avatarSx,
       }}
     >
-      {avatarText}
+      {config.icon ? (
+        <IconRenderer name={config.icon} size={Math.round(size * 0.47)} />
+      ) : (
+        avatarText
+      )}
     </Avatar>
   );
 

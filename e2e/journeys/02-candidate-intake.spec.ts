@@ -40,9 +40,25 @@ test.describe("Candidate intake", () => {
   test("TC-CAN-005 — a candidate is global, not nested under a requirement", async ({ page }) => {
     await goto(page, "/candidates");
     await row(page, lastName).first().click();
+    await page.waitForURL(/\/candidates\/[^/]+$/);
     // requirements.md §5.6.3 — the Applications panel lists every requirement
     // the person is on, each with its own client, stage and owner.
     await expect(page.getByText(/applications/i).first()).toBeVisible();
+  });
+
+  test("the candidate detail screen shows the pipeline strip and the rail", async ({ page }) => {
+    await goto(page, "/candidates");
+    await row(page, lastName).first().click();
+    await page.waitForURL(/\/candidates\/[^/]+$/);
+
+    await expect(page.getByText(`Sanya ${lastName}`).first()).toBeVisible();
+    // The strip is the workspace's own pipeline, so its first stage is whatever
+    // the setup wizard left in place.
+    await expect(page.getByText("Details").first()).toBeVisible();
+    await expect(page.getByText("Experience").first()).toBeVisible();
+    for (const tab of ["Applications", "Documents", "Activity"]) {
+      await expect(page.getByText(tab, { exact: true }).first()).toBeVisible();
+    }
   });
 
   test("TC-CAN-001 — duplicate detection warns on email blur", async ({ page }) => {
@@ -96,19 +112,27 @@ test.describe("Candidate intake", () => {
 
   // ── Not yet buildable — the feature does not exist ────────────────────────
 
-  test.fixme("TC-CAN-007 — off-limits shield shows the reason", async () => {
-    // Needs candidates.off_limits_until, derived from placement + client term.
+  // TC-CAN-007 and TC-CAN-010 are covered in `08-candidate-flags.spec.ts`, at
+  // the API, because there is still no candidate detail route to show them on.
+  // What remains stubbed below is blocked on features, not on a missing test.
+
+  test.fixme("TC-CAN-007b — the off-limits shield names the placement it came from", async () => {
+    // The flag is derived and asserted already; the *reason* needs a placement
+    // to point at, which arrives with step 16.
   });
 
-  test.fixme("TC-CAN-008 — archive warns about live applications", async () => {
-    // Needs applications before it can count them.
+  test.fixme("TC-CAN-008a — archive warns about live applications", async () => {
+    // Archiving itself is covered. Counting what it would strand needs the
+    // `applications` record from step 8.
   });
 
   test.fixme("TC-CAN-009 — erasure requires typing ERASE", async () => {
-    // requirements.md §5.6.3 / §6.1. Needs the erasure path, distinct from archive.
+    // requirements.md §5.6.3 / §6.1. Archive exists; erasure, which is a
+    // different thing, does not — gap analysis wave 6.
   });
 
-  test.fixme("TC-CAN-010 — do-not-contact suppresses every outbound channel", async () => {
-    // Needs the outbound email path to consult the flag.
+  test.fixme("TC-CAN-010a — do-not-contact suppresses every outbound channel", async () => {
+    // The flag round-trips and is reported. Nothing reads it yet: no outbound
+    // path consults `do_not_contact` anywhere in the API.
   });
 });

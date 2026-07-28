@@ -198,7 +198,7 @@ export const routes: Route[] = [
     page: "Recruit.Jobs.Page",
     guard: [{ type: "authenticationGuard" }],
     access: { resource: "jobs" },
-    children: ["Recruit.JobNew.Route", "Recruit.JobEdit.Route"],
+    children: ["Recruit.JobNew.Route", "Recruit.JobEdit.Route", "Recruit.JobDetail.Route"],
   },
   {
     id: "Recruit.JobNew.Route",
@@ -213,6 +213,12 @@ export const routes: Route[] = [
     children: [],
   },
   {
+    id: "Recruit.JobDetail.Route",
+    path: ":id",
+    page: "Recruit.JobDetail.Page",
+    children: [],
+  },
+  {
     id: "Recruit.Candidates.Route",
     path: "candidates",
     layout: "Recruit.Core.Layout",
@@ -223,6 +229,7 @@ export const routes: Route[] = [
       "Recruit.CandidateNew.Route",
       "Recruit.CandidateImport.Route",
       "Recruit.CandidateEdit.Route",
+      "Recruit.CandidateDetail.Route",
     ],
   },
   {
@@ -241,6 +248,12 @@ export const routes: Route[] = [
     id: "Recruit.CandidateEdit.Route",
     path: ":id/edit",
     page: "Recruit.CandidateForm.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.CandidateDetail.Route",
+    path: ":id",
+    page: "Recruit.CandidateDetail.Page",
     children: [],
   },
   {

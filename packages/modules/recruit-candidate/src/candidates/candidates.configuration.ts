@@ -76,5 +76,5 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
   export: { types: [{ label: "exportCsv", value: "csv", icon: "download" }] },
   pagination: { pageSize: 10 },
   emptyLabel: "empty",
-  rowRouteId: "Recruit.CandidateEdit.Route",
+  rowRouteId: "Recruit.CandidateDetail.Route",
 };

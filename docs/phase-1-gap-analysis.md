@@ -15,7 +15,7 @@ the requirements.
 | | Count |
 |---|---|
 | Design screens | 70 |
-| Routes implemented | 27 |
+| Routes implemented | 29 |
 | Phase 1 modules built | 6 of ~18 |
 | Golden-path stages covered end to end | 3 of 9 |
 
@@ -35,8 +35,8 @@ kanban *inside* Phase 1; that is the single largest remaining item.
 | Dashboard | `/` | §5.2 widgets present |
 | Clients — list, add/edit, detail | `/clients` `/clients/:id` | §5.3. Detail has header, KPIs, submissions, workspace tabs, rail |
 | Contacts — list, add/edit, detail | `/contacts` `/contacts/:id` | §5.4. Detail added this cycle |
-| Requirements — list, add/edit | `/jobs` `/jobs/new` `/jobs/:id/edit` | §5.5.1–5.5.2 |
-| Candidates — list, add/edit | `/candidates` … | §5.6.1–5.6.2 |
+| Requirements — list, add/edit, detail | `/jobs` `/jobs/new` `/jobs/:id` `/jobs/:id/edit` | §5.5.1–5.5.3. Detail added this cycle |
+| Candidates — list, add/edit, import, detail | `/candidates` `/candidates/import` `/candidates/:id` … | §5.6.1–5.6.3. Detail added this cycle |
 | Settings — workspace, members, roles, templates, integrations, billing, security, audit log | `/settings/*` | §5.19, the Done rows |
 | Profile settings | `/account/*` | §5.21 |
 
@@ -313,6 +313,39 @@ anyway / skip. `source` records which path a candidate came in by.
 than skipped — an application arriving from a careers board has nowhere to go
 until the `application` record of step 8 exists. It plugs into the same check
 when it lands.
+
+### Detail screens — requirement and candidate ✅ *(built)*
+
+Both follow the client and contact screens: an 8/4 split with a hairline
+between, one component per card, one endpoint per component.
+
+**Requirement** (`/jobs/:id`, `Job Detail v2`) — the gradient identity row with
+the salary band pinned right; the four progress tiles (submitted / interviews /
+offers / hires), whose "awaiting feedback" figure is the stage SLA from step 6
+applied to how long each submission has sat; the foldable description,
+qualifications, responsibilities and skills; and a rail of assigned team,
+hiring timeline, requirement information and AI screening.
+
+**Candidate** (`/candidates/:id`, `Candidate Detail`) — the hero whose avatar
+ring is the match score, with the stage strip drawn from the workspace's own
+`pipeline_stage` rows rather than a hardcoded list; the AI assessment, scored
+against the requirement's must-have skills; parsed experience, education and
+skills; tabs for applications, documents and activity; and a rail of details,
+current assignment and next actions.
+
+Four things landed in the shared layer rather than in a screen:
+`CollapsibleSectionsRenderer` (a foldable body section is now a config entry),
+an `aside` slot on the detail header for a right-hand headline figure, an
+`icon`/`gradient` tile on `EntityRenderer`, and `textPath` on the link cell so
+a document row can show its name over its URL. The searchable select also
+gained `role="combobox"`/`role="option"` — it had been unreachable to a screen
+reader and to Playwright alike.
+
+**Deliberately not built:** the design's submit-to-client modal, submission
+status, client feedback and "other submissions to this job" all read the
+submission record of step 10; the sourcing-keyword popup needs generated
+booleans; and both screens' activity feeds show the audit trail, which is
+coarser than the per-stage history step 8 will bring.
 
 ### Step 8 · Pipeline ❌ **← the second wall, and the widest**
 

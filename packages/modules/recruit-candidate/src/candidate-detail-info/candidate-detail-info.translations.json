@@ -1,0 +1,27 @@
+{
+  "title": "Details",
+  "groups": {
+    "contact": "CONTACT",
+    "profile": "PROFILE",
+    "system": "SYSTEM"
+  },
+  "values": {
+    "openToRemote": "open to remote",
+    "doNotContact": "Do not contact — every outbound channel is suppressed"
+  },
+  "sources": {
+    "added_by_user": "Added by user",
+    "resume_upload": "CV upload",
+    "csv_import": "CSV import",
+    "referral": "Referral",
+    "inbound": "Inbound enquiry",
+    "outbound": "Outbound",
+    "event": "Marketing event"
+  },
+  "workAuthorizations": {
+    "citizen": "Citizen",
+    "permanent_resident": "Permanent resident",
+    "work_visa": "Work visa",
+    "needs_sponsorship": "Needs sponsorship"
+  }
+}

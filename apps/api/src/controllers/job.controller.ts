@@ -8,6 +8,14 @@ import {
   listJobs,
   updateJob,
 } from "../services/job.service";
+import {
+  jobInfo,
+  jobKpis,
+  jobScreening,
+  jobSummary,
+  jobTeam,
+  jobTimeline,
+} from "../services/job-detail.service";
 
 type Auth = { agencyId?: string | null };
 
@@ -54,3 +62,26 @@ export async function postArchive(ctx: { user: Auth; params: { id: string } }) {
   if (!archived) return status(404, "Requirement not found");
   return { data: archived };
 }
+
+/* ── Detail screen ───────────────────────────────────────────────────────── */
+
+/** Each rail and header card reads its own slice, as the client and contact
+ * detail screens do — one component, one endpoint. */
+async function detail<T>(
+  ctx: { user: Auth; params: { id: string } },
+  read: (organizationId: string, id: string) => Promise<T | null>,
+) {
+  const data = await read(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Requirement not found");
+  return { data };
+}
+
+export const getJobSummary = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, jobSummary);
+export const getJobKpis = (ctx: { user: Auth; params: { id: string } }) => detail(ctx, jobKpis);
+export const getJobTeam = (ctx: { user: Auth; params: { id: string } }) => detail(ctx, jobTeam);
+export const getJobTimeline = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, jobTimeline);
+export const getJobInfo = (ctx: { user: Auth; params: { id: string } }) => detail(ctx, jobInfo);
+export const getJobScreening = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, jobScreening);

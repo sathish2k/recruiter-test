@@ -1,0 +1,11 @@
+{
+  "experience": "Experience",
+  "education": "Education & certifications",
+  "skills": "All skills",
+  "current": "Current",
+  "previous": "PREVIOUS",
+  "present": "Present",
+  "noExperience": "No experience captured yet — parse a CV or add it from Edit.",
+  "noEducation": "No education captured yet.",
+  "noSkills": "No skills captured yet."
+}

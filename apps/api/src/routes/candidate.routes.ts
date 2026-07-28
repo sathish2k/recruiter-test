@@ -119,6 +119,26 @@ export default new Elysia({ name: "candidate.routes" })
     }),
   })
   .get("/candidates/:id", (ctx) => candidateController.getCandidateById(ctx), { isAuth: true })
+  // The detail screen — one endpoint per card.
+  .get("/candidates/:id/summary", (ctx) => candidateController.getCandidateSummary(ctx), {
+    isAuth: true,
+  })
+  .get("/candidates/:id/assessment", (ctx) => candidateController.getCandidateAssessment(ctx), {
+    isAuth: true,
+  })
+  .get("/candidates/:id/details", (ctx) => candidateController.getCandidateDetails(ctx), {
+    isAuth: true,
+  })
+  .get("/candidates/:id/assignment", (ctx) => candidateController.getCandidateAssignment(ctx), {
+    isAuth: true,
+  })
+  .get("/candidates/:id/actions", (ctx) => candidateController.getCandidateActions(ctx), {
+    isAuth: true,
+  })
+  .get("/candidates/:id/workspace", (ctx) => candidateController.getCandidateWorkspace(ctx), {
+    isAuth: true,
+    query: t.Object({ tab: t.Optional(t.String()) }),
+  })
   .post("/candidates", (ctx) => candidateController.postCandidate(ctx), {
     isVerified: true,
     body: t.Optional(candidateBody),

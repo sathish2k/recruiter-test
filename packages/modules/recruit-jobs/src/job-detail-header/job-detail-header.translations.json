@@ -1,0 +1,32 @@
+{
+  "chips": {
+    "open": "Open",
+    "on_hold": "On hold",
+    "filled": "Filled",
+    "closed": "Closed",
+    "high": "High priority",
+    "critical": "Critical"
+  },
+  "roleCategories": {
+    "engineering": "Engineering",
+    "design": "Design",
+    "data": "Data",
+    "product": "Product",
+    "sales": "Sales",
+    "other": "Other"
+  },
+  "employmentType": {
+    "full_time": "Full-time",
+    "contract": "Contract",
+    "part_time": "Part-time"
+  },
+  "locations": {
+    "remote": "Remote"
+  },
+  "actions": {
+    "edit": "Edit",
+    "viewClient": "View client",
+    "addCandidate": "Add candidate",
+    "backToList": "Back to requirements"
+  }
+}

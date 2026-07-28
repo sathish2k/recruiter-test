@@ -86,6 +86,23 @@ test.describe("Client, contact and requirement intake", () => {
     await expect(row(page, requirementTitle).first()).toContainText(/REQ-\d{4}/);
   });
 
+  test("the requirement detail screen opens from the list", async ({ page }) => {
+    await goto(page, "/jobs");
+    await row(page, requirementTitle).first().click();
+    await page.waitForURL(/\/jobs\/[^/]+$/);
+
+    // Header, the four progress tiles, and the rail the design draws.
+    await expect(page.getByText(requirementTitle).first()).toBeVisible();
+    await expect(page.getByText(/REQ-\d{4}/).first()).toBeVisible();
+    for (const tile of ["Submitted", "Interviews", "Offers", "Hires"]) {
+      await expect(page.getByText(tile, { exact: true }).first()).toBeVisible();
+    }
+    await expect(page.getByText("Assigned team")).toBeVisible();
+    await expect(page.getByText("Hiring timeline")).toBeVisible();
+    await expect(page.getByText("Requirement information")).toBeVisible();
+    await expect(page.getByText("AI Screening").first()).toBeVisible();
+  });
+
   test("TC-REQ-005 — knockout questions count on the screening card", async ({ page }) => {
     await goto(page, "/jobs/new");
     const card = page.locator(".MuiCard-root").filter({ hasText: "Knockout questions" }).last();

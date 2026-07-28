@@ -1,0 +1,43 @@
+{
+  "tabs": {
+    "applications": "Applications",
+    "documents": "Documents",
+    "activity": "Activity"
+  },
+  "workspace": {
+    "applications": "Applications",
+    "documents": "Documents",
+    "activity": "Activity"
+  },
+  "applications": {
+    "columns": {
+      "role": "Requirement",
+      "stage": "Stage",
+      "match": "Match",
+      "owner": "Owner",
+      "updated": "Updated"
+    },
+    "empty": "Not on a requirement yet",
+    "emptyHint": "Associate this candidate with a requirement from Edit."
+  },
+  "documents": {
+    "columns": {
+      "name": "File",
+      "slot": "Kind",
+      "updated": "Updated"
+    },
+    "empty": "No documents yet",
+    "emptyHint": "Attach a CV or supporting file from Edit."
+  },
+  "slots": {
+    "resume": "Resume",
+    "formattedResume": "Formatted CV",
+    "coverLetter": "Cover letter",
+    "offer": "Offer",
+    "contracts": "Contract",
+    "other": "Other"
+  },
+  "activity": {
+    "empty": "Nothing has happened on this candidate yet."
+  }
+}

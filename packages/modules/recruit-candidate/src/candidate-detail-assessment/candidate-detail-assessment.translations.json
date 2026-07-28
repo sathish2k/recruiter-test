@@ -1,0 +1,15 @@
+{
+  "title": "AI assessment",
+  "against": "· scored against {{role}}",
+  "recommendation": "RECOMMENDATION",
+  "coverage": "{{matched}} of {{total}} must-have skills",
+  "recommendations": {
+    "proceed": "Proceed — strong skills match",
+    "review": "Review — partial skills match",
+    "gap": "Gap — most must-haves are missing"
+  },
+  "groups": {
+    "matched": "MATCHED",
+    "missing": "MISSING"
+  }
+}

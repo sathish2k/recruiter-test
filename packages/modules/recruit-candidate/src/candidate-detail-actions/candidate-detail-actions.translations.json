@@ -1,0 +1,10 @@
+{
+  "title": "Next actions",
+  "actions": {
+    "slaBreached": "Stage SLA exceeded by {{count}} days — follow up",
+    "noResume": "No CV attached — upload or parse one",
+    "noConsent": "No consent recorded — needed before submitting",
+    "noRequirement": "Not on a requirement yet — associate one",
+    "noContact": "No email or phone on file"
+  }
+}

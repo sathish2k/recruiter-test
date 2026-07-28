@@ -14,6 +14,15 @@ import {
   mergeCandidate,
   updateCandidate,
 } from "../services/candidate.service";
+import {
+  type CandidateWorkspaceTab,
+  candidateActions,
+  candidateAssessment,
+  candidateAssignment,
+  candidateDetails,
+  candidateSummary,
+  candidateWorkspace,
+} from "../services/candidate-detail.service";
 
 type Auth = { agencyId?: string | null; id?: string; name?: string | null };
 
@@ -141,4 +150,37 @@ export async function postArchive(ctx: { user: Auth; params: { id: string } }) {
   const archived = await archiveCandidate(ctx.user.agencyId ?? "", ctx.params.id);
   if (!archived) return status(404, "Candidate not found");
   return { data: archived };
+}
+
+/* ── Detail screen ───────────────────────────────────────────────────────── */
+
+/** One endpoint per card, as the client and contact detail screens do. */
+async function detail<T>(
+  ctx: { user: Auth; params: { id: string } },
+  read: (organizationId: string, id: string) => Promise<T | null>,
+) {
+  const data = await read(ctx.user.agencyId ?? "", ctx.params.id);
+  if (!data) return status(404, "Candidate not found");
+  return { data };
+}
+
+export const getCandidateSummary = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, candidateSummary);
+export const getCandidateAssessment = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, candidateAssessment);
+export const getCandidateDetails = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, candidateDetails);
+export const getCandidateAssignment = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, candidateAssignment);
+export const getCandidateActions = (ctx: { user: Auth; params: { id: string } }) =>
+  detail(ctx, candidateActions);
+
+export async function getCandidateWorkspace(ctx: {
+  user: Auth;
+  params: { id: string };
+  query: Record<string, string | undefined>;
+}) {
+  const tab = (ctx.query.tab ?? "applications") as CandidateWorkspaceTab;
+  const data = await candidateWorkspace(ctx.user.agencyId ?? "", ctx.params.id, tab);
+  return { data };
 }

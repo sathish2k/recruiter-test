@@ -24,6 +24,9 @@ export interface LinkRendererConfig {
   /** Translation key for the link text (`{ name }`); takes priority over `text`. */
   label?: { name: string };
   text?: string;
+  /** Data path for the link text, when the label lives in a different field
+   * from the target — a document row shows its name, not its URL. */
+  textPath?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   variant?: LinkProps["variant"];
   color?: LinkProps["color"];
@@ -68,7 +71,10 @@ export function LinkRenderer({
   } = config;
 
   const value = path ? (delve(data, path) as string | undefined) : undefined;
-  const displayText = (label ? t(label.name) : text) || value || "";
+  const fromPath = config.textPath
+    ? (delve(data, config.textPath) as string | undefined)
+    : undefined;
+  const displayText = (label ? t(label.name) : text) || fromPath || value || "";
   const content = children ?? displayText;
   const underline = config.underline ?? (children ? "none" : "hover");
   const color = config.color ?? (children ? "inherit" : "primary");
