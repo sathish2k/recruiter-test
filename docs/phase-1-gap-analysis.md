@@ -15,15 +15,16 @@ the requirements.
 | | Count |
 |---|---|
 | Design screens | 70 |
-| Routes implemented | 29 |
-| Phase 1 modules built | 6 of ~18 |
-| Golden-path stages covered end to end | 3 of 9 |
+| Routes implemented | 30 |
+| Phase 1 modules built | 7 of ~18 |
+| Golden-path stages covered end to end | 4 of 9 |
 
-The built half is **intake**: auth, clients, contacts, requirements, candidates,
-settings. The unbuilt half is **the cycle** — pipeline, review, submission,
-interviews, offers, placement, invoicing, commissions — plus all three portals
-and billing. `ats-app-flow.md` §13 puts applications with manual stage moves on a
-kanban *inside* Phase 1; that is the single largest remaining item.
+The built half is **intake plus the board**: auth, clients, contacts,
+requirements, candidates, settings, and now the application record with its
+pipeline. What remains of **the cycle** is review, submission, interviews,
+offers, placement, invoicing and commissions — plus all three portals and
+billing. Every one of them reads the application record, so they are unblocked
+rather than merely next.
 
 ---
 
@@ -48,7 +49,7 @@ Ordered by `requirements.md` §7.2 ranking, with the exit criterion each blocks.
 
 | # | Item | Design | Blocks |
 |---|---|---|---|
-| 1 | **Pipeline / kanban + application record** | `Pipeline`, `Pipeline First Run` | Exit 1 — there is no application entity, so no cycle exists |
+| ~~1~~ | ~~**Pipeline / kanban + application record**~~ | `Pipeline` | **Done** — see step 8. `Pipeline First Run` still to build |
 | 2 | **CV review queue with send-back** | `CV Review` | Exit 1 · TC-CVR-001 |
 | 3 | **Submission with consent, anonymise, snapshot** | in `Pipeline` | Exit 1 · REG-03, REG-04 |
 | 4 | **Interviews, scheduling, scorecards** | `Interviews`, `Schedule Interview`, `Interview Scorecard` | Exit 1 |
@@ -125,7 +126,7 @@ e2e/auth.setup.ts                       one sign-in, reused by every project
 e2e/fixtures/app.ts                     navigation + config-driven form helpers
 e2e/journeys/01-client-contact-requirement.spec.ts   runs today
 e2e/journeys/02-candidate-intake.spec.ts             runs today, 4 stubs
-e2e/journeys/03-golden-path.spec.ts                  all stubs — section 3 above
+e2e/journeys/03-golden-path.spec.ts                  4 run (pipeline), the rest stubs
 e2e/journeys/04-tenancy-rbac.spec.ts                 2 run, 4 stubs
 e2e/journeys/05-mobile.spec.ts                       2 run, 3 stubs
 ```
@@ -347,21 +348,67 @@ submission record of step 10; the sourcing-keyword popup needs generated
 booleans; and both screens' activity feeds show the audit trail, which is
 coarser than the per-stage history step 8 will bring.
 
-### Step 8 · Pipeline ❌ **← the second wall, and the widest**
+### Step 8 · Pipeline ✅ *(built)*
 
-There is no `application` record, so there is nothing to put on a board.
+The application record exists, and it is now the only thing the cycle hangs
+off.
 
-Build in this order inside the step:
-1. `applications` — candidate × requirement, with `stage`, `status`,
-   `owner_id`, `consent_at`, `rejection_reason`; unique on `(candidate_id, job_id)`
-2. `application_stage_history` — **same commit**; it cannot be backfilled and
-   every metric the product sells reads from it
-3. one transition function that writes history, activity, notification and task
-   together (flow §5 — do not scatter these across UI handlers)
-4. the board itself, then rejection-with-reason, advisory WIP (D4), and the
-   off-limits / offer-elsewhere guards
+**`application`** — one row per (candidate, requirement), unique on the pair, so
+the same person can be on several roles and each carries its own stage, owner,
+consent and rejection reason. The stage is referenced **by id**, so renaming or
+reordering a stage in the wizard moves the board with it instead of orphaning
+it. Re-applying to a role someone was closed out of reopens the same row rather
+than making a second one — the history stays continuous.
 
-**Size:** L. This is the single largest item in Phase 1.
+**`application_stage_history`** — written in the same commit, as the plan
+insisted. Each row keeps the stage names as they read at the time, the reason
+and note, who moved it, and how many days it had spent in the stage it left.
+That last figure cannot be reconstructed later, which is the whole argument for
+writing it now.
+
+**One transition function.** `moveApplication` is the only code in the
+repository that writes `application.stage_id`: it runs the guards, updates the
+row, appends history and records activity in one call. Notifications and tasks
+belong in the same place (flow §5) — neither model exists yet, so the function
+is where they will land rather than a screen.
+
+| Guard | Behaviour |
+|---|---|
+| Rejection without a reason | Hard. The catalogue is the workspace's own `rejection_reason` rows |
+| Candidate off-limits | Hard, while `off_limits_until` is in the future |
+| Offer accepted elsewhere | Advisory — 409 with a code, and the board offers "Move anyway" |
+| Column over its limit (D4) | Advisory only: the column is tinted, nothing is blocked |
+
+**The board** (`/candidates/board`, from the `Pipeline` design) — columns are
+the workspace's stages plus a closed-out column drawn last; drag a card or use
+its move control, and either way the move dialog captures the note and, on a
+rejection, the reason. Search, client and requirement filters, an owner strip,
+an SLA banner and per-column avg / oldest / capacity all read the same rows the
+cards come from, so a header can never disagree with what is under it. The
+toast carries Undo, which moves the application back.
+
+Everything else now reads the record: the candidate detail's applications tab
+lists every requirement a person is on, its stage strip and assignment follow
+the live application, and the requirement's KPIs and timeline count
+applications rather than candidate rows. Adding a candidate to a requirement —
+on the form, on import — creates the application; workspaces that predate the
+table are backfilled from `candidate.job_id` the first time the board is read.
+
+| Piece | Where |
+|---|---|
+| Both tables | `models/application.model.ts` |
+| The transition function, guards, board read model, backfill | `services/application.service.ts` |
+| `GET /applications` · `/board` · `/:id/history` · `POST /applications` · `/:id/move` | `routes/application.routes.ts` |
+| The board | `packages/modules/recruit-pipeline/` |
+| Smoke test against a real database | `apps/api/src/db/smoke-applications.ts` |
+
+**Not built:** the design's per-stage sub-status list ("In Review", "Qualified",
+"Awaiting client"…) is hardcoded per stage name there, which cannot survive a
+workspace renaming its stages; stage plus rejection reason carries the same
+information and is configurable, so that is what the move dialog captures. The
+card's AI-recommendation block needs the screener, and bulk selection is not
+built. Off-limits blocks every move rather than only submissions to the client
+the candidate was placed at — that needs the placement record of step 16.
 
 ### Step 9 · CV review ❌
 
@@ -433,14 +480,15 @@ tasks.
 
 ### The answer to "what first"
 
-~~**Step 2, verify email.**~~ Done, with steps 3, 6 and 7 — see those sections
-for what landed and what was deliberately left out.
+~~**Step 2, verify email.**~~ Done, with steps 3, 6, 7 and 8 — see those
+sections for what landed and what was deliberately left out.
 
-**Step 8, the application record.** It is now both the first broken thing a real
-user hits *and* the widest item on the list, and it blocks steps 9 through 17.
-Start with `applications` and `application_stage_history` in one commit: the
-history table is the only thing here that cannot be backfilled.
+~~**Step 8, the application record.**~~ Done — see that section. Both tables
+landed in one commit, and `moveApplication` is the only writer of
+`application.stage_id`.
 
-The stage model it needs already exists — `pipeline_stage` came out of the setup
-wizard, with the entry and hire ends marked — so the board can reference stages
-by id from the first commit rather than hardcoding names and being rebuilt.
+**Step 9, CV review, then step 10, submission.** The queue and the submission
+are the next two walls, and they are the first things the new record makes
+buildable: consent already has its column on `application`, and the submission
+snapshot is what the client portal (item 8) reads. Steps 12–17 follow the same
+record.

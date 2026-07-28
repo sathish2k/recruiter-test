@@ -1,0 +1,70 @@
+{
+  "title": "Candidates",
+  "hint": "drag cards between stages",
+  "closed": "Closed",
+  "wip": "Over the advisory limit for this stage",
+  "views": {
+    "table": "Table",
+    "board": "Board"
+  },
+  "filters": {
+    "search": "Search candidate, requirement…",
+    "client": "All clients",
+    "requirement": "All requirements",
+    "focus": "Needs action · {{count}}",
+    "clear": "Clear all"
+  },
+  "owners": {
+    "label": "Assigned to",
+    "all": "All · {{count}}"
+  },
+  "sla": {
+    "headline": "{{count}} past their stage limit",
+    "reason": "{{days}} days in {{stage}} · {{over}} over"
+  },
+  "flags": {
+    "offLimits": "Off-limits",
+    "doNotContact": "Do not contact"
+  },
+  "card": {
+    "match": "{{score}}% match",
+    "inStage": "{{count}}d in stage",
+    "overSla": "{{count}}d over SLA",
+    "move": "Move {{name}} to another stage"
+  },
+  "stats": {
+    "avg": "AVG",
+    "oldest": "OLDEST",
+    "capacity": "CAPACITY",
+    "days": "{{count}}d"
+  },
+  "empty": {
+    "title": "Nothing in {{stage}}",
+    "hint": "Drag a card here, or add a candidate to this requirement."
+  },
+  "actions": {
+    "add": "Add"
+  },
+  "move": {
+    "title": "Update status",
+    "confirm": "Move to {{stage}}",
+    "reject": "Reject",
+    "rejected": "Closed",
+    "anyway": "Move anyway",
+    "cancel": "Cancel",
+    "reasonPlaceholder": "Choose a reason…",
+    "reasonHelp": "A rejection is always on the record with its reason.",
+    "notePlaceholder": "Why is this moving? e.g. client confirmed the panel",
+    "noteHelp": "Saved to the application's history.",
+    "pick": "Choose a stage…"
+  },
+  "toast": {
+    "moved": "{{name}} moved to {{stage}}",
+    "rejected": "{{name}} closed out",
+    "sub": "was in {{from}}",
+    "undo": "Undo"
+  },
+  "errors": {
+    "generic": "That move could not be saved."
+  }
+}

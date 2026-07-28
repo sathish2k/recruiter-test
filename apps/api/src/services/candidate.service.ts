@@ -23,6 +23,7 @@ import {
   type Experience,
 } from "../models/candidate.model";
 import { job } from "../models/job.model";
+import { createApplication } from "./application.service";
 import { workspaceSettings } from "./organization.service";
 
 type CandidateRow = typeof candidate.$inferSelect;
@@ -441,6 +442,7 @@ export async function importCandidates(
   organizationId: string,
   rows: ImportRow[],
   defaults: CandidateInput = {},
+  actor: { id?: string; name?: string | null } = {},
 ): Promise<ImportOutcome[]> {
   const outcomes: ImportOutcome[] = [];
 
@@ -482,6 +484,16 @@ export async function importCandidates(
     }
 
     const created = await createCandidate(organizationId, values);
+    // An imported candidate that names a requirement joins the board with the
+    // rest — one intake path, one application record.
+    if (created?.jobId) {
+      await createApplication(organizationId, actor, {
+        candidateId: created.id,
+        jobId: created.jobId,
+        ownerId: created.ownerId || undefined,
+        source: "import",
+      });
+    }
     outcomes.push(
       created
         ? { index, status: "created", candidateId: created.id }

@@ -1,5 +1,6 @@
 export {
   Toast,
+  type ToastAction,
   type ToastKind,
   ToastProvider,
   type ToastState,

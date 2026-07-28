@@ -227,6 +227,7 @@ export const routes: Route[] = [
     access: { resource: "candidates" },
     children: [
       "Recruit.CandidateNew.Route",
+      "Recruit.CandidateBoard.Route",
       "Recruit.CandidateImport.Route",
       "Recruit.CandidateEdit.Route",
       "Recruit.CandidateDetail.Route",
@@ -236,6 +237,12 @@ export const routes: Route[] = [
     id: "Recruit.CandidateNew.Route",
     path: "new",
     page: "Recruit.CandidateForm.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.CandidateBoard.Route",
+    path: "board",
+    page: "Recruit.CandidateBoard.Page",
     children: [],
   },
   {

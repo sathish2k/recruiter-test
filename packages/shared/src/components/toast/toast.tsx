@@ -15,24 +15,31 @@ import {
 
 export type ToastKind = "success" | "warning" | "error";
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 export interface ToastState {
   /** Bumps per show so the card remounts and replays its animations. */
   id: number;
   title: string;
   sub?: string;
   kind: ToastKind;
+  /** One inline control — the board's "Undo" on a stage move. */
+  action?: ToastAction;
 }
 
 export interface UseToastResult {
   toast: ToastState | null;
-  show: (title: string, sub?: string, kind?: ToastKind) => void;
+  show: (title: string, sub?: string, kind?: ToastKind, action?: ToastAction) => void;
   clear: () => void;
 }
 
 let seq = 0;
 
 interface ToastTrigger {
-  show: (title: string, sub?: string, kind?: ToastKind) => void;
+  show: (title: string, sub?: string, kind?: ToastKind, action?: ToastAction) => void;
   clear: () => void;
 }
 
@@ -44,10 +51,13 @@ const ToastContext = createContext<ToastTrigger | null>(null);
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastState | null>(null);
-  const show = useCallback((title: string, sub?: string, kind: ToastKind = "success") => {
-    seq += 1;
-    setToast({ id: seq, title, sub, kind });
-  }, []);
+  const show = useCallback(
+    (title: string, sub?: string, kind: ToastKind = "success", action?: ToastAction) => {
+      seq += 1;
+      setToast({ id: seq, title, sub, kind, action });
+    },
+    [],
+  );
   const clear = useCallback(() => setToast(null), []);
   const value = useMemo<ToastTrigger>(() => ({ show, clear }), [show, clear]);
   return (
@@ -67,10 +77,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 export function useToast(): UseToastResult {
   const trigger = useContext(ToastContext);
   const [toast, setToast] = useState<ToastState | null>(null);
-  const localShow = useCallback((title: string, sub?: string, kind: ToastKind = "success") => {
-    seq += 1;
-    setToast({ id: seq, title, sub, kind });
-  }, []);
+  const localShow = useCallback(
+    (title: string, sub?: string, kind: ToastKind = "success", action?: ToastAction) => {
+      seq += 1;
+      setToast({ id: seq, title, sub, kind, action });
+    },
+    [],
+  );
   const localClear = useCallback(() => setToast(null), []);
   if (trigger) return { toast: null, show: trigger.show, clear: trigger.clear };
   return { toast, show: localShow, clear: localClear };
@@ -249,6 +262,33 @@ function ToastCard({ toast, onClose }: { toast: ToastState; onClose: () => void 
           </Box>
         ) : null}
       </Box>
+      {toast.action ? (
+        <Box
+          component="button"
+          type="button"
+          onClick={() => {
+            toast.action?.onClick();
+            onClose();
+          }}
+          sx={{
+            flex: "none",
+            ml: "4px",
+            px: "10px",
+            py: "5px",
+            borderRadius: "8px",
+            border: 0,
+            background: "none",
+            cursor: "pointer",
+            fontSize: 12,
+            fontWeight: 700,
+            fontFamily: "inherit",
+            color: "surface.primarySoftFg",
+            "&:hover": { bgcolor: "surface.primarySoftBg" },
+          }}
+        >
+          {toast.action.label}
+        </Box>
+      ) : null}
     </Box>
   );
 }

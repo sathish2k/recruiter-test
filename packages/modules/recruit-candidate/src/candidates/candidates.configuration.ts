@@ -66,6 +66,12 @@ export const CandidatesConfiguration: TableFilterExportConfig = {
   ],
   ctas: [
     {
+      label: { name: "actions.board" },
+      icon: "kanban",
+      variant: "secondary",
+      routeId: "Recruit.CandidateBoard.Route",
+    },
+    {
       label: { name: "actions.import" },
       icon: "upload-file",
       variant: "secondary",

@@ -14,7 +14,8 @@
     "new": "New candidate",
     "edit": "Edit",
     "archive": "Archive",
-    "import": "Import"
+    "import": "Import",
+    "board": "Board"
   },
   "exportCsv": "Export CSV",
   "empty": "No candidates yet",

@@ -6,6 +6,7 @@ import { candidate } from "../models/candidate.model";
 import { client } from "../models/client.model";
 import { interview } from "../models/interview.model";
 import { job } from "../models/job.model";
+import { listApplications } from "./application.service";
 import { listStages } from "./pipeline.service";
 
 /**
@@ -72,10 +73,14 @@ export async function candidateSummary(organizationId: string, id: string) {
   const row = await detailBase(organizationId, id);
   if (!row) return null;
 
-  const stages = await listStages(organizationId);
-  const currentIndex = stages.findIndex(
-    (stage) => stage.name.toLowerCase() === (row.startingStage ?? "").toLowerCase(),
-  );
+  const [stages, applications] = await Promise.all([
+    listStages(organizationId),
+    listApplications(organizationId, { candidateId: id }),
+  ]);
+  // The strip follows the live application; a candidate with none sits at the
+  // entry stage, which is where adding them to a requirement would put them.
+  const live = applications[0];
+  const currentIndex = stages.findIndex((stage) => stage.id === live?.stageId);
 
   return {
     id: row.id,
@@ -90,11 +95,12 @@ export async function candidateSummary(organizationId: string, id: string) {
     doNotContact: row.doNotContact,
     offLimits: Boolean(row.offLimitsUntil && row.offLimitsUntil.getTime() > Date.now()),
     matchScore: row.matchScore ?? 0,
-    jobId: row.jobId ?? "",
-    jobTitle: row.jobTitle ?? "",
-    clientName: row.clientName ?? "",
-    ownerName: row.ownerName ?? "",
-    stage: row.startingStage ?? "",
+    jobId: live?.jobId ?? row.jobId ?? "",
+    jobTitle: live?.jobTitle ?? row.jobTitle ?? "",
+    clientName: live?.clientName ?? row.clientName ?? "",
+    ownerName: live?.ownerName ?? row.ownerName ?? "",
+    stage: live?.stageName ?? "",
+    liveApplications: applications.length,
     lastActivity: relativeDays(row.updatedAt),
     /** The strip: every stage, with the one the candidate sits in marked. */
     stages: stages.map((stage, index) => ({
@@ -123,7 +129,15 @@ export async function candidateAssessment(organizationId: string, id: string) {
   const row = await detailBase(organizationId, id);
   if (!row) return null;
 
-  const wanted = (row.jobSkills ?? []).map((skill) => skill.toLowerCase());
+  // Scored against the requirement the live application is on, so the card
+  // follows the board rather than the candidate's original association.
+  const [live] = await listApplications(organizationId, { candidateId: id });
+  const wantedSkills = live
+    ? ((await db.select({ skills: job.skills }).from(job).where(eq(job.id, live.jobId)).limit(1))[0]
+        ?.skills ?? [])
+    : (row.jobSkills ?? []);
+
+  const wanted = wantedSkills.map((skill) => skill.toLowerCase());
   const held = new Set((row.skillSet ?? []).map((skill) => skill.toLowerCase()));
   const matched = wanted.filter((skill) => held.has(skill));
   const missing = wanted.filter((skill) => !held.has(skill));
@@ -132,11 +146,11 @@ export async function candidateAssessment(organizationId: string, id: string) {
   return {
     score: row.matchScore ?? 0,
     hasScore: row.matchScore !== null,
-    jobId: row.jobId ?? "",
-    jobTitle: row.jobTitle ?? "",
+    jobId: live?.jobId ?? row.jobId ?? "",
+    jobTitle: live?.jobTitle ?? row.jobTitle ?? "",
     coverage,
-    matched: (row.jobSkills ?? []).filter((skill) => held.has(skill.toLowerCase())),
-    missing: (row.jobSkills ?? []).filter((skill) => !held.has(skill.toLowerCase())),
+    matched: wantedSkills.filter((skill) => held.has(skill.toLowerCase())),
+    missing: wantedSkills.filter((skill) => !held.has(skill.toLowerCase())),
     missingCount: missing.length,
     /** Named from the coverage, never invented prose. */
     recommendation: coverage >= 80 ? "proceed" : coverage >= 50 ? "review" : "gap",
@@ -173,31 +187,32 @@ export async function candidateDetails(organizationId: string, id: string) {
   };
 }
 
-/** The rail's "current assignment" card: the requirement this person is on. */
+/**
+ * The rail's "current assignment" card. The live application is the source of
+ * truth for stage and its clock; the requirement's own fields fill in the rest.
+ */
 export async function candidateAssignment(organizationId: string, id: string) {
   const row = await detailBase(organizationId, id);
   if (!row) return null;
-  if (!row.jobId) return { jobId: "" };
 
-  const stages = await listStages(organizationId);
-  const stage = stages.find(
-    (entry) => entry.name.toLowerCase() === (row.startingStage ?? "").toLowerCase(),
-  );
-  const inStage = days(row.updatedAt);
-  const sla = stage?.slaDays ?? 0;
+  const applications = await listApplications(organizationId, { candidateId: id });
+  const live = applications[0];
+  if (!live) return { jobId: "" };
 
   return {
-    jobId: row.jobId,
-    jobTitle: row.jobTitle ?? "",
-    clientId: row.clientId ?? "",
-    clientName: row.clientName ?? "",
+    applicationId: live.id,
+    jobId: live.jobId,
+    jobTitle: live.jobTitle,
+    clientId: live.clientId,
+    clientName: live.clientName,
     workModel: row.jobWorkModel ?? "",
     employmentType: row.jobEmploymentType ?? "",
-    stage: row.startingStage ?? "",
-    stageDays: inStage,
-    slaDays: sla,
-    slaOverBy: sla && inStage > sla ? inStage - sla : 0,
-    ownerName: row.ownerName ?? "",
+    stage: live.stageName,
+    stageDays: live.daysInStage,
+    slaDays: live.slaDays,
+    slaOverBy: live.slaOverBy,
+    ownerName: live.ownerName,
+    liveCount: applications.length,
   };
 }
 
@@ -210,19 +225,19 @@ export async function candidateActions(organizationId: string, id: string) {
   const row = await detailBase(organizationId, id);
   if (!row) return null;
 
-  const stages = await listStages(organizationId);
-  const stage = stages.find(
-    (entry) => entry.name.toLowerCase() === (row.startingStage ?? "").toLowerCase(),
-  );
-  const inStage = days(row.updatedAt);
+  const applications = await listApplications(organizationId, { candidateId: id });
   const actions: { key: string; tone: "urgent" | "warn" | "info"; value?: string }[] = [];
 
-  if (stage?.slaDays && inStage > stage.slaDays) {
-    actions.push({ key: "slaBreached", tone: "urgent", value: String(inStage - stage.slaDays) });
+  const breached = applications.find((entry) => entry.slaOverBy > 0);
+  if (breached) {
+    actions.push({ key: "slaBreached", tone: "urgent", value: String(breached.slaOverBy) });
   }
   if (!(row.resume ?? []).length) actions.push({ key: "noResume", tone: "warn" });
-  if (!row.consentAt) actions.push({ key: "noConsent", tone: "warn" });
-  if (!row.jobId) actions.push({ key: "noRequirement", tone: "info" });
+  // Consent is per client, so it is the application that carries it (TC-SUB-002).
+  if (applications.some((entry) => !entry.consentAt)) {
+    actions.push({ key: "noConsent", tone: "warn" });
+  }
+  if (!applications.length) actions.push({ key: "noRequirement", tone: "info" });
   if (!row.email && !row.mobile && !row.phone) actions.push({ key: "noContact", tone: "warn" });
 
   return { actions };
@@ -240,24 +255,23 @@ export async function candidateWorkspace(
   if (!row) return [];
 
   if (tab === "applications") {
-    // One row until the application record exists (gap analysis, step 8): a
-    // candidate carries a single requirement association today.
-    if (!row.jobId) return [];
-    const stages = await listStages(organizationId);
-    const stage = stages.find(
-      (entry) => entry.name.toLowerCase() === (row.startingStage ?? "").toLowerCase(),
-    );
-    return [
-      {
-        id: row.jobId,
-        role: row.jobTitle ?? "",
-        clientName: row.clientName ?? "",
-        stage: stage?.name ?? row.startingStage ?? "",
-        owner: row.ownerName ?? "",
-        matchScore: row.matchScore ?? 0,
-        updated: relativeDays(row.updatedAt),
-      },
-    ];
+    // Every requirement this person is on, live or closed — the record that
+    // makes a candidate global rather than nested under one role.
+    const applications = await listApplications(organizationId, {
+      candidateId: id,
+      includeClosed: true,
+    });
+    return applications.map((entry) => ({
+      id: entry.id,
+      jobId: entry.jobId,
+      role: entry.jobTitle,
+      clientName: entry.clientName,
+      stage: entry.status === "active" ? entry.stageName : entry.rejectionReason || entry.status,
+      status: entry.status,
+      owner: entry.ownerName,
+      matchScore: entry.matchScore,
+      updated: relativeDays(new Date(entry.updatedAt)),
+    }));
   }
 
   if (tab === "documents") {

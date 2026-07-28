@@ -276,6 +276,7 @@ export {
 } from "./components/tabs/sliding-pill-tabs";
 export {
   Toast,
+  type ToastAction,
   type ToastKind,
   ToastProvider,
   type ToastState,

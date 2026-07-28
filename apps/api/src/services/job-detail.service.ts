@@ -1,11 +1,13 @@
 import { and, asc, eq, getTableColumns } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "../db";
+import { application } from "../models/application.model";
 import { user } from "../models/auth.model";
 import { candidate } from "../models/candidate.model";
 import { client } from "../models/client.model";
 import { interview } from "../models/interview.model";
 import { job } from "../models/job.model";
+import { pipelineStage } from "../models/pipeline.model";
 import { listStages } from "./pipeline.service";
 
 /**
@@ -53,19 +55,27 @@ async function detailBase(organizationId: string, id: string) {
   return row ?? null;
 }
 
-/** Every candidate attached to this requirement — the scope of every count. */
+/**
+ * Every application on this requirement — the scope of every count on the
+ * screen. Reads the application record, not the candidate's own fields, so the
+ * board and this screen can never disagree.
+ */
 async function pipelineRows(id: string) {
   return db
     .select({
-      id: candidate.id,
-      stage: candidate.startingStage,
-      status: candidate.status,
+      id: application.id,
+      stageId: application.stageId,
+      stageName: pipelineStage.name,
+      status: application.status,
       matchScore: candidate.matchScore,
-      createdAt: candidate.createdAt,
-      updatedAt: candidate.updatedAt,
+      createdAt: application.createdAt,
+      stageEnteredAt: application.stageEnteredAt,
+      updatedAt: application.updatedAt,
     })
-    .from(candidate)
-    .where(and(eq(candidate.jobId, id), eq(candidate.archived, false)));
+    .from(application)
+    .leftJoin(candidate, eq(application.candidateId, candidate.id))
+    .leftJoin(pipelineStage, eq(application.stageId, pipelineStage.id))
+    .where(eq(application.jobId, id));
 }
 
 function money(currency: string, min?: string | null, max?: string | null) {
@@ -129,22 +139,25 @@ export async function jobKpis(organizationId: string, id: string) {
       .orderBy(asc(interview.scheduledAt)),
   ]);
 
-  const at = (stage: string) => rows.filter((entry) => entry.stage === stage);
+  const live = rows.filter((entry) => entry.status === "active" || entry.status === "hired");
+  const at = (name: string) =>
+    live.filter((entry) => (entry.stageName ?? "").toLowerCase() === name);
   const submitted = at(SUBMITTED);
   const offers = at(OFFER);
-  const hires = rows.filter((entry) => entry.status === "placed");
+  const hires = rows.filter((entry) => entry.status === "hired");
 
   const submittedStage = stages.find((stage) => stage.name.toLowerCase() === SUBMITTED);
   const slaDays = submittedStage
     ? (row.stageSlas?.[submittedStage.id] ?? submittedStage.slaDays)
     : 0;
+  // "Awaiting feedback" is a submission whose stage clock has run out.
   const awaiting = slaDays
-    ? submitted.filter((entry) => days(entry.updatedAt) > slaDays).length
+    ? submitted.filter((entry) => days(entry.stageEnteredAt) > slaDays).length
     : 0;
 
   const upcoming = interviews.find((entry) => entry.scheduledAt.getTime() >= Date.now());
   const oldestOffer = offers.reduce<number>(
-    (oldest, entry) => Math.max(oldest, days(entry.updatedAt)),
+    (oldest, entry) => Math.max(oldest, days(entry.stageEnteredAt)),
     0,
   );
 
@@ -157,7 +170,7 @@ export async function jobKpis(organizationId: string, id: string) {
     offerWaitingDays: oldestOffer,
     hires: hires.length,
     openingsRemaining: Math.max(0, row.openings - hires.length),
-    inPipeline: rows.length,
+    inPipeline: live.length,
     interviewing: at(INTERVIEW).length,
   };
 }
@@ -168,7 +181,9 @@ export async function jobTeam(organizationId: string, id: string) {
   const row = await detailBase(organizationId, id);
   if (!row) return null;
   const rows = await pipelineRows(id);
-  const submitted = rows.filter((entry) => entry.stage === SUBMITTED).length;
+  const submitted = rows.filter(
+    (entry) => (entry.stageName ?? "").toLowerCase() === SUBMITTED,
+  ).length;
 
   return {
     jobId: row.id,
@@ -216,11 +231,13 @@ export async function jobTimeline(organizationId: string, id: string) {
       null,
     );
 
+  const stageIs = (name: string) => (entry: { stageName: string | null }) =>
+    (entry.stageName ?? "").toLowerCase() === name;
   const firstCandidate = earliest(rows);
-  const firstSubmission = earliest(rows.filter((entry) => entry.stage === SUBMITTED));
+  const firstSubmission = earliest(rows.filter(stageIs(SUBMITTED)));
   const firstInterview = interviews[0]?.scheduledAt ?? null;
-  const firstOffer = earliest(rows.filter((entry) => entry.stage === OFFER));
-  const hires = rows.filter((entry) => entry.status === "placed").length;
+  const firstOffer = earliest(rows.filter(stageIs(OFFER)));
+  const hires = rows.filter((entry) => entry.status === "hired").length;
 
   const raw: { key: string; at: Date | null; note?: string }[] = [
     { key: "created", at: row.createdAt },
@@ -288,7 +305,9 @@ export async function jobScreening(organizationId: string, id: string) {
   if (!row) return null;
 
   const rows = await pipelineRows(id);
-  const scored = rows.filter((entry) => entry.matchScore !== null);
+  const scored = rows.filter(
+    (entry) => entry.matchScore !== null && entry.matchScore !== undefined,
+  );
 
   return {
     enabled: row.aiScreening,

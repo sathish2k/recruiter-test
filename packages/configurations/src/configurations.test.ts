@@ -70,6 +70,7 @@ describe("configurations", () => {
     [["jobs", "abc"], "Recruit.JobDetail.Route"],
     [["jobs", "abc", "edit"], "Recruit.JobEdit.Route"],
     [["candidates", "import"], "Recruit.CandidateImport.Route"],
+    [["candidates", "board"], "Recruit.CandidateBoard.Route"],
     [["candidates", "abc"], "Recruit.CandidateDetail.Route"],
     [["candidates", "abc", "edit"], "Recruit.CandidateEdit.Route"],
   ])("%p resolves to %s", (slug, expected) => {

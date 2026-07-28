@@ -1,4 +1,5 @@
 import { status } from "elysia";
+import { createApplication } from "../services/application.service";
 import { record as recordAudit } from "../services/audit-log.service";
 import {
   archiveCandidate,
@@ -103,7 +104,10 @@ export async function postImport(ctx: {
 }) {
   const rows = ctx.body?.rows ?? [];
   if (!rows.length) return status(422, "Nothing to import");
-  const results = await importCandidates(ctx.user.agencyId ?? "", rows, ctx.body?.defaults ?? {});
+  const results = await importCandidates(ctx.user.agencyId ?? "", rows, ctx.body?.defaults ?? {}, {
+    id: ctx.user.id,
+    name: ctx.user.name,
+  });
   const tally = (outcome: string) => results.filter((row) => row.status === outcome).length;
   return {
     data: results,
@@ -119,6 +123,19 @@ export async function postImport(ctx: {
 export async function postCandidate(ctx: { user: Auth; body?: CandidateInput | null }) {
   const created = await createCandidate(ctx.user.agencyId ?? "", ctx.body ?? {});
   if (!created) return status(422, "Could not create candidate");
+  // Naming a requirement on the form *is* putting the person on the board.
+  if (created.jobId) {
+    await createApplication(
+      ctx.user.agencyId ?? "",
+      { id: ctx.user.id, name: ctx.user.name },
+      {
+        candidateId: created.id,
+        jobId: created.jobId,
+        ownerId: created.ownerId || undefined,
+        source: "manual",
+      },
+    );
+  }
   if (created.startingStage) await recordStage(ctx, created, created.startingStage);
   return status(201, { data: created });
 }
@@ -131,6 +148,18 @@ export async function putCandidate(ctx: {
   const before = await getCandidate(ctx.user.agencyId ?? "", ctx.params.id);
   const updated = await updateCandidate(ctx.user.agencyId ?? "", ctx.params.id, ctx.body ?? {});
   if (!updated) return status(404, "Candidate not found");
+  if (updated.jobId && updated.jobId !== before?.jobId) {
+    await createApplication(
+      ctx.user.agencyId ?? "",
+      { id: ctx.user.id, name: ctx.user.name },
+      {
+        candidateId: updated.id,
+        jobId: updated.jobId,
+        ownerId: updated.ownerId || undefined,
+        source: "manual",
+      },
+    );
+  }
   if (updated.startingStage && updated.startingStage !== before?.startingStage) {
     await recordStage(ctx, updated, updated.startingStage);
   }

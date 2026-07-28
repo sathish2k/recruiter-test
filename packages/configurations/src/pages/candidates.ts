@@ -7,6 +7,12 @@ export const CandidatePages: Record<string, Configuration> = {
       { id: "candidates", type: "component", componentType: "Recruit.Candidates.Component" },
     ],
   },
+  "Recruit.CandidateBoard.Page": {
+    id: "Recruit.CandidateBoard.Page",
+    elements: [
+      { id: "pipeline-board", type: "component", componentType: "Recruit.PipelineBoard.Component" },
+    ],
+  },
   "Recruit.CandidateImport.Page": {
     id: "Recruit.CandidateImport.Page",
     elements: [
