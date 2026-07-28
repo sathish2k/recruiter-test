@@ -48,20 +48,18 @@
   "basics": {
     "timezone": {
       "title": "Time zone",
-      "hint": "Interview slots, SLA clocks and \"today\" all follow this.",
-      "more": "Need a zone that isn't here? The full list lives in Settings → Workspace."
+      "hint": "Interview slots, SLA clocks and \"today\" all follow this."
     },
     "currency": {
       "title": "Currency",
       "hint": "Salaries, fees and commission splits are all stored in this currency.",
-      "warning": "Changing this later doesn't convert existing figures — pick the one your fee agreements are written in.",
-      "inr": "Indian rupee",
-      "usd": "US dollar",
-      "gbp": "Pound",
-      "aed": "Dirham"
+      "warning": "Changing this later doesn't convert existing figures — pick the one your fee agreements are written in."
     },
     "dateFormat": {
       "title": "Date format"
+    },
+    "timeFormat": {
+      "title": "Time format"
     }
   },
   "stages": {
@@ -91,7 +89,9 @@
         "label": "We screened out",
         "hint": "your own quality bar"
       }
-    }
+    },
+    "active": "{{count}} REASONS ACTIVE",
+    "untick": "Untick anything your agency doesn't use"
   },
   "team": {
     "heading": "INVITES",

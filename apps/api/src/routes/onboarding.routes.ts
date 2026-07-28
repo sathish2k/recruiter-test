@@ -17,6 +17,7 @@ export default new Elysia({ name: "onboarding.routes" })
       timezone: t.Optional(t.String()),
       currency: t.Optional(t.String()),
       dateFormat: t.Optional(t.String()),
+      timeFormat: t.Optional(t.String()),
       setupStep: t.Optional(t.Number()),
       completed: t.Optional(t.Boolean()),
       stages: t.Optional(

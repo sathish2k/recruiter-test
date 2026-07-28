@@ -265,6 +265,9 @@ export interface JsonSchemaProperty {
   labelHint?: string;
   /** `callout` banner colouring. Defaults to the accent orange. */
   tone?: "accent" | "info" | "warning";
+  /** Array fields a display-only counter sums — see the wizard's
+   * `selection-count`, which totals the ticked rejection reasons. */
+  countFields?: string[];
   /** Puts `help` under the label instead of under the control — for text that
    * explains the choice rather than correcting the input. */
   helpPlacement?: "above" | "below";

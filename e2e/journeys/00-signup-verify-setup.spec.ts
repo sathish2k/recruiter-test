@@ -64,6 +64,18 @@ test.describe("sign up and verify", () => {
     // Non-digits never reach the value.
     await input.fill("12ab34cd56");
     await expect(input).toHaveValue("123456");
+
+    // Three states must be distinguishable: entered, next-to-land, untouched.
+    await input.fill("482");
+    const borderOf = (index: number) =>
+      page
+        .getByTestId(`verification-code-cell-${index}`)
+        .evaluate((el) => getComputedStyle(el).borderColor);
+    const entered = await borderOf(0);
+    const next = await borderOf(3);
+    const untouched = await borderOf(4);
+    expect(entered).not.toBe(next);
+    expect(next).not.toBe(untouched);
   });
 
   test("TC-AUTH-005 — sign-up lands on verify, carrying the address", async ({ page }) => {
@@ -143,7 +155,7 @@ test.describe("setup wizard", () => {
     await saved;
   }
 
-/** Resolves once the wizard's own read has landed — it ignores clicks until then. */
+  /** Resolves once the wizard's own read has landed — it ignores clicks until then. */
   function loading(page: Page) {
     return page.waitForResponse(
       (r) => r.url().includes("/onboarding/setup") && r.request().method() === "GET",
@@ -230,24 +242,47 @@ test.describe("setup wizard", () => {
     await expect(page.getByTestId("stage-name-1").locator("input")).toHaveValue(renamed);
   });
 
-  test("TC-SET-006 — the timezone choice is stored and comes back selected", async ({ page }) => {
+  test("TC-SET-007 — the reason tally tracks what is ticked", async ({ page }) => {
+    await rewind(page);
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await withSave(page, () => page.getByTestId("wizard-next").click());
+    await expect(page.getByTestId("field-reasonsCount")).toBeVisible();
+
+    const tally = page.getByTestId("field-reasonsCount");
+    const before = Number(await tally.getAttribute("data-count"));
+    expect(before).toBeGreaterThan(0);
+
+    // Unticking one takes the count down, and re-ticking puts it back — so the
+    // number is read from the fields rather than snapshotted on load.
+    await page.getByTestId("reasonsClient-option-Skills gap").click();
+    await expect(tally).toHaveAttribute("data-count", String(before - 1));
+    await page.getByTestId("reasonsClient-option-Skills gap").click();
+    await expect(tally).toHaveAttribute("data-count", String(before));
+  });
+
+  test("TC-SET-006 — the basics use the same catalogues as Settings", async ({ page }) => {
     await rewind(page);
 
-    await page.getByTestId("timezone-option-Europe/London").click();
-    await expect(page.getByTestId("timezone-option-Europe/London")).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
+    // Timezone and currency source their options from /reference, exactly as
+    // Settings → Workspace does, so a value chosen here is one that screen can
+    // show. A shorter bespoke list would let the wizard store values Settings
+    // could not display.
+    await expect(page.getByTestId("field-timezone")).toContainText(/GMT[+-]\d{2}:\d{2}/);
+    await expect(page.getByTestId("field-currency")).toContainText(/[A-Z]{3}/);
+    await expect(page.getByTestId("field-dateFormat")).toBeVisible();
+    await expect(page.getByTestId("field-timeFormat")).toBeVisible();
+
+    // A changed format has to survive the round trip.
+    await page.getByTestId("field-dateFormat").locator('[role="combobox"]').click();
+    await page.getByRole("option", { name: "YYYY-MM-DD" }).click();
     await withSave(page, () => page.getByTestId("wizard-next").click());
 
     await rewind(page);
-    await expect(page.getByTestId("timezone-option-Europe/London")).toHaveAttribute(
-      "aria-checked",
-      "true",
-    );
+    await expect(page.getByTestId("field-dateFormat")).toContainText("YYYY-MM-DD");
 
     // Put it back, so the other specs see the workspace they expect.
-    await page.getByTestId("timezone-option-Asia/Kolkata").click();
+    await page.getByTestId("field-dateFormat").locator('[role="combobox"]').click();
+    await page.getByRole("option", { name: "DD/MM/YYYY" }).click();
     await withSave(page, () => page.getByTestId("wizard-next").click());
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import Box from "@mui/material/Box";
 import { useEffect } from "react";
 import { useWatch } from "react-hook-form";
 import { evalCondition } from "../conditions";
@@ -14,6 +15,7 @@ import { SelectField } from "./select-field";
  * a handful of choices.
  */
 export function SelectWidget({
+  name,
   prop,
   field,
   fieldState,
@@ -81,34 +83,36 @@ export function SelectWidget({
       help={prop.help ? t(prop.help) : undefined}
       error={error}
     >
-      {prop.optionSource || prop.searchable ? (
-        <SearchableSelectField
-          value={current}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          source={prop.optionSource}
-          options={options}
-          avatar={prop.avatar}
-          disabled={disabled}
-          icon={prop.icon}
-          placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
-          error={!!fieldState.error}
-          emptyOption={prop.emptyOption ? { label: t(prop.emptyOption) } : undefined}
-          createOption={createOption}
-          noOptionsText={t("form.noOptions", "No match")}
-          loadingText={t("form.loading", "Loading…")}
-        />
-      ) : (
-        <SelectField
-          value={current}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          options={options}
-          disabled={disabled}
-          look={prop.selectVariant}
-          error={!!fieldState.error}
-        />
-      )}
+      <Box data-testid={`field-${name}`}>
+        {prop.optionSource || prop.searchable ? (
+          <SearchableSelectField
+            value={current}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            source={prop.optionSource}
+            options={options}
+            avatar={prop.avatar}
+            disabled={disabled}
+            icon={prop.icon}
+            placeholder={prop.placeholder ? t(prop.placeholder) : undefined}
+            error={!!fieldState.error}
+            emptyOption={prop.emptyOption ? { label: t(prop.emptyOption) } : undefined}
+            createOption={createOption}
+            noOptionsText={t("form.noOptions", "No match")}
+            loadingText={t("form.loading", "Loading…")}
+          />
+        ) : (
+          <SelectField
+            value={current}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            options={options}
+            disabled={disabled}
+            look={prop.selectVariant}
+            error={!!fieldState.error}
+          />
+        )}
+      </Box>
     </FieldShell>
   );
 }

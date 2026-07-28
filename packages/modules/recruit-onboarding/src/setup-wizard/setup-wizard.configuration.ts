@@ -10,41 +10,25 @@ import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 const steps: Record<string, JsonSchema> = {
   basics: {
     type: "object",
+    // Same controls, same catalogues as Settings → Workspace. Anything the
+    // wizard offers here has to round-trip through that screen afterwards, so
+    // a shorter bespoke list would only invent values Settings cannot show.
     properties: {
       timezone: {
         type: "string",
-        widget: "choice-chips",
+        widget: "select",
         title: "basics.timezone.title",
         help: "basics.timezone.hint",
         helpPlacement: "above",
-        choices: [
-          { value: "Asia/Kolkata", label: "Asia/Kolkata", meta: "IST · UTC+5:30" },
-          { value: "Asia/Dubai", label: "Asia/Dubai", meta: "UTC+4" },
-          { value: "Europe/London", label: "Europe/London", meta: "UTC+1" },
-          { value: "America/New_York", label: "New York", meta: "UTC−4" },
-          { value: "Asia/Singapore", label: "Singapore", meta: "UTC+8" },
-        ],
-      },
-      timezoneNote: {
-        type: "string",
-        widget: "callout",
-        variant: "banner",
-        hideLabel: true,
-        tone: "info",
-        help: "basics.timezone.more",
+        optionSource: { url: "/reference", path: "data.timezones" },
       },
       currency: {
         type: "string",
-        widget: "choice-chips",
+        widget: "select",
         title: "basics.currency.title",
         help: "basics.currency.hint",
         helpPlacement: "above",
-        choices: [
-          { value: "INR", label: "basics.currency.inr", symbol: "₹" },
-          { value: "USD", label: "basics.currency.usd", symbol: "$" },
-          { value: "GBP", label: "basics.currency.gbp", symbol: "£" },
-          { value: "AED", label: "basics.currency.aed", symbol: "د.إ" },
-        ],
+        optionSource: { url: "/reference", path: "data.currencies" },
       },
       currencyNote: {
         type: "string",
@@ -57,14 +41,15 @@ const steps: Record<string, JsonSchema> = {
       },
       dateFormat: {
         type: "string",
-        widget: "choice-chips",
-        choiceLayout: "stacked",
         title: "basics.dateFormat.title",
-        choices: [
-          { value: "DD/MM/YYYY", label: "DD/MM/YYYY", meta: "22/06/2026" },
-          { value: "MM/DD/YYYY", label: "MM/DD/YYYY", meta: "06/22/2026" },
-          { value: "YYYY-MM-DD", label: "YYYY-MM-DD", meta: "2026-06-22" },
-        ],
+        enum: ["DD MMM YYYY", "DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"],
+        grid: { size: { xs: 12, md: 6 } },
+      },
+      timeFormat: {
+        type: "string",
+        title: "basics.timeFormat.title",
+        enum: ["12-hour (2:30 PM)", "24-hour (14:30)"],
+        grid: { size: { xs: 12, md: 6 } },
       },
     },
   },
@@ -95,6 +80,13 @@ const steps: Record<string, JsonSchema> = {
   reasons: {
     type: "object",
     properties: {
+      reasonsCount: {
+        type: "string",
+        widget: "selection-count",
+        title: "reasons.active",
+        labelHint: "reasons.untick",
+        countFields: ["reasonsClient", "reasonsCandidate", "reasonsInternal", "reasonsCustom"],
+      },
       reasonsClient: {
         type: "array",
         widget: "choice-chips",

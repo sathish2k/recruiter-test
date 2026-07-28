@@ -38,7 +38,7 @@ export function VerificationCodeWidget({ name, prop, field, fieldState, t }: Wid
             const borderColor = char
               ? "surface.focusRing"
               : index === code.length
-                ? "surface.borderStrong"
+                ? "surface.controlOutline"
                 : "surface.controlBorder";
             return (
               <Box

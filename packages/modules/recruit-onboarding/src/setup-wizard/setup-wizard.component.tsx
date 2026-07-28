@@ -8,6 +8,7 @@ const EMPTY: SetupState = {
   timezone: "",
   currency: "",
   dateFormat: "",
+  timeFormat: "",
   setupStep: 0,
   setupCompletedAt: null,
   stages: [],

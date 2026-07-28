@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import InputBase from "@mui/material/InputBase";
 import Typography from "@mui/material/Typography";
+import { useWatch } from "react-hook-form";
 import { FieldShell } from "../forms/field/field-shell";
 import type { WidgetProps, Widgets } from "../forms/types";
 
@@ -330,7 +331,46 @@ function InviteListWidget({ name, prop, field, t }: WidgetProps) {
   );
 }
 
+/**
+ * A live tally across several array fields — the design's "14 REASONS ACTIVE"
+ * above the rejection groups, with its own note on the right.
+ *
+ * Display only: it writes nothing, it just reads what the other fields hold.
+ */
+function SelectionCountWidget({ name, prop, t }: WidgetProps) {
+  const fields = prop.countFields ?? [];
+  const values = useWatch({ name: fields }) as unknown[];
+  const count = (Array.isArray(values) ? values : []).reduce<number>(
+    (total, value) => total + (Array.isArray(value) ? value.length : 0),
+    0,
+  );
+
+  return (
+    <Box
+      data-testid={`field-${name}`}
+      data-count={count}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "12px",
+        flexWrap: "wrap",
+      }}
+    >
+      <Typography
+        sx={{ fontSize: 11, fontWeight: 700, letterSpacing: ".07em", color: "text.disabled" }}
+      >
+        {t(prop.title ?? name, { count })}
+      </Typography>
+      {prop.labelHint ? (
+        <Typography sx={{ fontSize: 11, color: "text.disabled" }}>{t(prop.labelHint)}</Typography>
+      ) : null}
+    </Box>
+  );
+}
+
 export const WIZARD_WIDGETS: Widgets = {
+  "selection-count": SelectionCountWidget,
   "stage-list": StageListWidget,
   "invite-list": InviteListWidget,
 };

@@ -7,6 +7,7 @@ import RocketLaunchRounded from "@mui/icons-material/RocketLaunchRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import Skeleton from "@mui/material/Skeleton";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, usePortalRouter, useTranslation } from "@recruit/sdk";
@@ -38,6 +39,7 @@ export interface SetupState {
   timezone: string;
   currency: string;
   dateFormat: string;
+  timeFormat: string;
   setupStep: number;
   setupCompletedAt: string | null;
   stages: WizardStage[];
@@ -49,6 +51,7 @@ export interface SetupPatch {
   timezone?: string;
   currency?: string;
   dateFormat?: string;
+  timeFormat?: string;
   setupStep?: number;
   completed?: boolean;
   stages?: { name: string; clientVisible: boolean }[];
@@ -71,40 +74,6 @@ const REASON_FIELD: Record<WizardReason["category"], string> = {
   candidate: "reasonsCandidate",
   internal: "reasonsInternal",
 };
-
-function offsetOf(zone: string): number | null {
-  try {
-    const parts = new Intl.DateTimeFormat("en-US", {
-      timeZone: zone,
-      timeZoneName: "longOffset",
-    }).formatToParts(new Date());
-    const name = parts.find((part) => part.type === "timeZoneName")?.value ?? "";
-    const match = /GMT([+-])(\d{2}):(\d{2})/.exec(name);
-    if (!match) return 0;
-    return (match[1] === "-" ? -1 : 1) * (Number(match[2]) * 60 + Number(match[3]));
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Zone ids are not unique — the runtime may store `Asia/Calcutta` where the
- * picker offers `Asia/Kolkata`, and which spelling is canonical depends on the
- * host's ICU data. Comparing current offsets matches either way.
- */
-function sameZone(a: string, b: string): boolean {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  const left = offsetOf(a);
-  return left !== null && left === offsetOf(b);
-}
-
-/** The stored value, or the first offered one when it isn't on the list. */
-function snap(value: string, choices: { value: string }[] | undefined, zone = false): string {
-  if (!choices?.length) return value;
-  const match = choices.find((c) => (zone ? sameZone(c.value, value) : c.value === value));
-  return match?.value ?? choices[0]?.value ?? value;
-}
 
 /**
  * The five-step workspace setup (flow §1.4). Each editable step is a
@@ -173,9 +142,10 @@ export function SetupWizard({
     const props = steps[key]?.properties ?? {};
     if (key === "basics") {
       return {
-        timezone: snap(state.timezone, props.timezone?.choices, true),
-        currency: snap(state.currency, props.currency?.choices),
-        dateFormat: snap(state.dateFormat, props.dateFormat?.choices),
+        timezone: state.timezone,
+        currency: state.currency,
+        dateFormat: state.dateFormat,
+        timeFormat: state.timeFormat,
       };
     }
     if (key === "stages") {
@@ -213,6 +183,7 @@ export function SetupWizard({
         timezone: String(values.timezone ?? ""),
         currency: String(values.currency ?? ""),
         dateFormat: String(values.dateFormat ?? ""),
+        timeFormat: String(values.timeFormat ?? ""),
       };
     }
     if (key === "stages") {
@@ -483,15 +454,31 @@ export function SetupWizard({
         ))}
       </Box>
 
-      {schema ? (
+      {schema && !ready ? (
+        <>
+          {panel(
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+              {[0, 1, 2].map((row) => (
+                <Skeleton key={row} variant="rounded" height={56} />
+              ))}
+            </Box>,
+          )}
+          {footer("next", false)}
+        </>
+      ) : schema ? (
         <FormRenderer
           // Remounting per step is deliberate: each step is its own form with
           // its own defaults, and carrying state across them would be wrong.
+          // react-hook-form reads defaultValues once, so the form must not
+          // mount before the workspace's own values have arrived — hence the
+          // `ready` gate above rather than a key that changes under it.
           key={stepKey}
           id={id}
           schema={schema}
           defaultValues={defaultsFor(stepKey)}
-          stackContainer={{ spacing: 2.75 }}
+          // A grid, not a stack, so a schema can put two short fields on one
+          // row (date and time format) — everything else defaults to full width.
+          gridContainer={{ columns: 12, spacing: 2.75 }}
           widgets={WIZARD_WIDGETS}
           onSubmit={(values) => move(step + 1, values)}
           wrapFields={(fields) =>
@@ -541,7 +528,9 @@ function ReviewStep({
   const rows = [
     {
       label: t("review.basics"),
-      value: [state.timezone, state.currency, state.dateFormat].filter(Boolean).join(" · "),
+      value: [state.timezone, state.currency, state.dateFormat, state.timeFormat]
+        .filter(Boolean)
+        .join(" · "),
       target: 0,
     },
     {

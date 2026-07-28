@@ -98,6 +98,7 @@ export async function setupState(organizationId: string) {
       timezone: settings.timezone ?? "",
       currency: settings.currency ?? "",
       dateFormat: settings.dateFormat ?? "",
+      timeFormat: settings.timeFormat ?? "",
       setupCompletedAt: settings.setupCompletedAt ?? null,
       /** The step the user was last on, so a reopened wizard resumes (flow §1.4). */
       setupStep: typeof settings.setupStep === "number" ? settings.setupStep : 0,
@@ -120,6 +121,7 @@ export interface SetupPatch {
   timezone?: string;
   currency?: string;
   dateFormat?: string;
+  timeFormat?: string;
   stages?: StageInput[];
   reasons?: ReasonInput[];
   /** Which step to resume on. Saved on every step so closing the tab is safe. */
@@ -140,6 +142,7 @@ export async function saveSetup(organizationId: string, userId: string, patch: S
   if (patch.timezone) settings.timezone = patch.timezone;
   if (patch.currency) settings.currency = patch.currency;
   if (patch.dateFormat) settings.dateFormat = patch.dateFormat;
+  if (patch.timeFormat) settings.timeFormat = patch.timeFormat;
   if (typeof patch.setupStep === "number") settings.setupStep = patch.setupStep;
   if (patch.completed) settings.setupCompletedAt = new Date().toISOString();
   if (Object.keys(settings).length > 0) await updateOrganization(organizationId, settings);
