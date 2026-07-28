@@ -5,5 +5,6 @@ export { ContactPages } from "./contacts";
 export { CorePages } from "./core";
 export { DashboardPages } from "./dashboard";
 export { JobPages } from "./jobs";
+export { OnboardingPages } from "./onboarding";
 export { ProfilePages } from "./profile";
 export { SettingsPages } from "./settings";

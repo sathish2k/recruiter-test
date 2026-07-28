@@ -8,6 +8,8 @@ export {
   type SignInValues,
   SignUp,
   type SignUpValues,
+  VerifyEmail,
+  type VerifyEmailHandlers,
 } from "./components/auth";
 export { BrandLogo } from "./components/brand/logo";
 export { BrandWordmark } from "./components/brand/wordmark";
@@ -172,6 +174,17 @@ export {
   type UseModalResult,
   useModal,
 } from "./components/modal";
+export {
+  type ChecklistStep,
+  GetStarted,
+  type OnboardingChecklist,
+  type SetupPatch,
+  type SetupState,
+  SetupWizard,
+  type WizardInvite,
+  type WizardReason,
+  type WizardStage,
+} from "./components/onboarding";
 export {
   type ActionHandler,
   type ActionItem,

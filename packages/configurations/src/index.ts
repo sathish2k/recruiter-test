@@ -8,6 +8,7 @@ import {
   CorePages,
   DashboardPages,
   JobPages,
+  OnboardingPages,
   ProfilePages,
   SettingsPages,
 } from "./pages";
@@ -21,6 +22,7 @@ export const allConfigurations: Configuration[] = [
   ...Object.values(AuthPages),
   ...Object.values(CorePages),
   ...Object.values(DashboardPages),
+  ...Object.values(OnboardingPages),
   ...Object.values(ProfilePages),
   ...Object.values(SettingsPages),
   ...Object.values(ContactPages),

@@ -12,7 +12,7 @@ export async function goto(page: Page, path: string) {
   await page.goto(path);
   // The engine resolves dependencies client-side; the sidenav is the first
   // thing that exists once the tree is mounted.
-  await expect(page.getByRole("link", { name: "Dashboard" })).toBeVisible();
+  await expect(page.getByRole("complementary")).toBeVisible();
 }
 
 /** A row in any TableRenderer list, matched on its visible text. */

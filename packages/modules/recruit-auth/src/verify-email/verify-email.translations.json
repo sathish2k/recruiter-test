@@ -1,0 +1,28 @@
+{
+  "title": "Verify your email",
+  "subtitle": "We sent a 6-digit code and a magic link to {{email}}.",
+  "expiresIn": "Code expires in {{clock}}",
+  "cta": "Verify email",
+  "resend": "Resend code",
+  "resendIn": "Resend in {{seconds}}s",
+  "changeEmail": "Use a different email",
+  "why": "Verification is required before you can use the workspace. Everything HirePilotX does sends mail as you — client submissions, candidate invites, weekly reports — so we confirm the address first. It takes one click.",
+  "errors": {
+    "invalid": "That code is not right. Check the digits and try again.",
+    "expired": "That code has expired. Send yourself a new one.",
+    "too-many-attempts": "Too many attempts. Request a new code to continue.",
+    "cooldown": "Hang on a moment before requesting another code.",
+    "hourly-cap": "Too many codes requested this hour. Try again later."
+  },
+  "expired": {
+    "title": "This link has expired",
+    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and we'll pick up where you left off.",
+    "cta": "Send a new link",
+    "note": "The old link and code stop working the moment a new one is issued, so only the most recent email will let you in."
+  },
+  "done": {
+    "title": "Email verified",
+    "subtitle": "You're in. Your workspace is ready — start by adding your first client.",
+    "cta": "Continue to setup"
+  }
+}

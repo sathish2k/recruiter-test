@@ -108,7 +108,7 @@ export default new Elysia({ name: "candidate.routes" })
   })
   .get("/candidates/:id", (ctx) => candidateController.getCandidateById(ctx), { isAuth: true })
   .post("/candidates", (ctx) => candidateController.postCandidate(ctx), {
-    isAuth: true,
+    isVerified: true,
     body: t.Optional(candidateBody),
   })
   .put("/candidates/:id", (ctx) => candidateController.putCandidate(ctx), {

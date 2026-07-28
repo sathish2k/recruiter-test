@@ -31,6 +31,16 @@ export const AuthPages: Record<string, Configuration> = {
       },
     ],
   },
+  "Auth.VerifyEmail.Configuration": {
+    id: "Auth.VerifyEmail.Configuration",
+    elements: [
+      {
+        id: "auth-verify-email",
+        type: "component",
+        componentType: "Auth.VerifyEmail.Component",
+      },
+    ],
+  },
   "Auth.ResetPassword.Configuration": {
     id: "Auth.ResetPassword.Configuration",
     elements: [

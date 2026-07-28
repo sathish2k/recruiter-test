@@ -19,13 +19,18 @@ setup("authenticate", async ({ page }) => {
   }
 
   await page.goto("/login");
-  await page.getByLabel(/email/i).fill(email);
-  await page.getByLabel(/password/i).fill(password);
+  // The auth forms hide their labels and lean on placeholders (`hideLabel` in
+  // the sign-in configuration), so getByLabel finds nothing here.
+  await page.getByPlaceholder("Email").fill(email);
+  await page.getByPlaceholder("Password").first().fill(password);
   await page.getByRole("button", { name: /sign in|log in/i }).click();
 
   // TC-AUTH-009 — login lands on the dashboard, not a list view.
   await page.waitForURL((url) => !url.pathname.startsWith("/login"));
-  await expect(page.getByRole("link", { name: "Dashboard" })).toBeVisible();
+  // The sidenav only exists inside the core layout, so it is the signal that
+  // the engine has rendered a signed-in screen.
+  await expect(page.getByRole("complementary")).toBeVisible();
+  await expect(page.getByText("Dashboard").first()).toBeVisible();
 
   await page.context().storageState({ path: AUTH_FILE });
 });

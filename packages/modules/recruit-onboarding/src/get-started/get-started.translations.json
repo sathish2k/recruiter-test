@@ -1,0 +1,44 @@
+{
+  "title": "Welcome, {{name}} — let's set up HirePilotX",
+  "titleNoName": "Let's set up HirePilotX",
+  "subtitle": "Five steps to your first placement. Your workspace fills up as you go —",
+  "progress": "{{done}} of {{total}} done",
+  "skip": "Skip — explore a sample workspace →",
+  "tip": "Tip: press ⌘K anywhere to jump to any screen, candidate, job or client.",
+  "steps": {
+    "client": {
+      "title": "Add your first client",
+      "subtitle": "Company, contacts and the fee agreement",
+      "cta": "Add client"
+    },
+    "role": {
+      "title": "Create a role & assign the team",
+      "subtitle": "JD, must-have skills, sourcer + profile lead — AI keywords generate on save",
+      "cta": "Create role"
+    },
+    "team": {
+      "title": "Invite your team",
+      "subtitle": "Employees source, profile leads review — permissions apply instantly",
+      "cta": "Invite"
+    },
+    "extension": {
+      "title": "Install the HirePilotX Sourcer extension",
+      "subtitle": "LinkedIn invites log themselves against daily targets",
+      "cta": "See how"
+    },
+    "calendar": {
+      "title": "Connect your calendar",
+      "subtitle": "Google or Outlook — interviews sync both ways",
+      "cta": "Connect"
+    }
+  },
+  "ready": {
+    "title": "Workspace ready!",
+    "subtitle": "Your team can start sourcing — invites will show up on the dashboard live.",
+    "cta": "Go to dashboard"
+  },
+  "configure": {
+    "title": "Configure your workspace first",
+    "subtitle": "Time zone, currency, pipeline stages and rejection reasons — about two minutes"
+  }
+}

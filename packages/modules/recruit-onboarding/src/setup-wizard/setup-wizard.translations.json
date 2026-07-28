@@ -1,0 +1,109 @@
+{
+  "saved": "Saved automatically",
+  "saving": "Saving…",
+  "later": "Finish setup later →",
+  "stepOf": "STEP {{step}} OF {{total}}",
+  "back": "Back",
+  "skip": "Skip this step",
+  "skipped": "Skipped — defaults kept for {{label}}",
+  "next": "Continue",
+  "nextInvites": "Send invites & continue",
+  "finish": "Finish setup",
+  "footNote": {
+    "default": "Close this any time — you'll come back to exactly this step.",
+    "last": "Finishing takes you to your dashboard with everything above applied."
+  },
+  "resume": {
+    "title": "Picked up where you left off",
+    "body": "Your answers so far are saved. You were on step {{step}} of {{total}} — {{label}}.",
+    "startOver": "Start over"
+  },
+  "steps": {
+    "basics": {
+      "label": "Basics",
+      "title": "How does your agency work?",
+      "blurb": "Three answers that shape every date, every salary figure and every SLA clock in HirePilotX."
+    },
+    "stages": {
+      "label": "Pipeline",
+      "title": "Name your pipeline stages",
+      "blurb": "These become the columns on your board. Most agencies start with the defaults and rename one or two."
+    },
+    "reasons": {
+      "label": "Rejections",
+      "title": "Why do candidates fall out?",
+      "blurb": "Recruiters pick one of these when closing a candidate out. Keep the list short enough that nobody reaches for \"Other\"."
+    },
+    "team": {
+      "label": "Team",
+      "title": "Who else is joining?",
+      "blurb": "Invite the recruiters you work with. They land straight in the right role — no permissions to configure."
+    },
+    "review": {
+      "label": "Review",
+      "title": "Here's your workspace",
+      "blurb": "Everything below is set. Change any of it now, or later from Settings."
+    }
+  },
+  "basics": {
+    "timezone": {
+      "title": "Time zone",
+      "hint": "Interview slots, SLA clocks and \"today\" all follow this.",
+      "more": "Need a zone that isn't here? The full list lives in Settings → Workspace."
+    },
+    "currency": {
+      "title": "Currency",
+      "hint": "Salaries, fees and commission splits are all stored in this currency.",
+      "warning": "Changing this later doesn't convert existing figures — pick the one your fee agreements are written in."
+    },
+    "dateFormat": { "title": "Date format" }
+  },
+  "stages": {
+    "heading": "YOUR BOARD COLUMNS · {{count}}",
+    "eyeHint": "The eye marks stages your clients can see in their portal",
+    "namePlaceholder": "Stage name",
+    "client": "Client",
+    "internal": "Internal",
+    "add": "Add a stage",
+    "fixed": "Entry and hire stages cannot be removed",
+    "fixedNote": "First and last stages are fixed — every candidate enters at {{first}} and a hire ends at {{last}}. Everything between is yours to shape."
+  },
+  "reasons": {
+    "active": "{{count}} REASONS ACTIVE",
+    "untick": "Untick anything your agency doesn't use",
+    "addOwn": "Add your own",
+    "placeholder": "e.g. Failed background check",
+    "add": "Add",
+    "added": "Added \"{{label}}\"",
+    "why": "Recruiters pick one of these when they close a candidate out — it's what makes the rejection report worth reading.",
+    "groups": {
+      "client": { "label": "Client declined", "hint": "feeds your client-feedback report" },
+      "candidate": { "label": "Candidate withdrew", "hint": "the ones you can sometimes save" },
+      "internal": { "label": "We screened out", "hint": "your own quality bar" }
+    }
+  },
+  "team": {
+    "heading": "INVITES",
+    "alreadyOut": "{{count}} invites already sent — manage them in Settings → Team",
+    "emailPlaceholder": "name@youragency.com",
+    "addAnother": "Add another",
+    "rolesHeading": "WHAT EACH ROLE SEES",
+    "roleNotes": {
+      "admin": "everything, including billing, fee terms and the audit log",
+      "profile-lead": "their own clients end to end — reviews CVs, submits, runs offers",
+      "sourcer": "assigned requirements only; can shortlist but not submit to clients",
+      "finance": "placements, invoices and commission splits — no candidate data"
+    }
+  },
+  "review": {
+    "basics": "Workspace basics",
+    "stages": "{{count}} pipeline stages",
+    "reasons": "{{count}} rejection reasons",
+    "reasonsValue": "Across client declined, candidate withdrew and screened out by us",
+    "invites": "{{count}} invites ready",
+    "noInvites": "No invites yet",
+    "noInvitesValue": "You can invite recruiters any time from Settings → Team",
+    "change": "Change",
+    "note": "Nothing here is permanent — every one of these lives in Settings and can change as the agency does."
+  }
+}

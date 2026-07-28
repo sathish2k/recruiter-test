@@ -11,7 +11,10 @@ export function AuthCreateAccountComponent({ id }: { id: string }) {
       id={id}
       onSubmit={async (values: SignUpValues) => {
         await mutation.create(values);
-        router.push("Auth.Login.Route");
+        // §5.1.2 — verification, not the login screen, is what follows sign-up.
+        router.pushPath(
+          `${router.getPathFromRouteId("Auth.VerifyEmail.Route")}?email=${encodeURIComponent(values.email)}`,
+        );
       }}
     />
   );

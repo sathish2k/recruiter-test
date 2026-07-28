@@ -161,37 +161,64 @@ Legend — ✅ works · ⚠️ exists with a gap · ❌ wall.
 
 The form, the workspace and the owner user are created.
 
-### Step 2 · Verify email ❌ **← the first blocker**
+### Step 2 · Verify email ✅ *(built)*
 
-**What happens today:** signup redirects to `/login`. There is no verify screen
-and no verify route. `user.emailVerified` exists as a column, defaults `false`,
-and is referenced **nowhere else in the codebase** — nothing sets it, nothing
-reads it. A brand-new account logs straight in with full access.
+Sign-up now lands on `/verify?email=…` instead of `/login`. A 6-digit code and a
+magic link go out together, both expiring in 30 minutes; a resend is capped at
+one a minute and five an hour, and five wrong codes burn the row.
 
-**What §5.1.2 and TC-AUTH-004 require:** a 6-digit code plus a magic-link
-alternative, both expiring in 30 minutes; resend rate-limited to 1/60s and
-5/hour; **no skip control anywhere on the screen**; and until verified the user
-may look around but may not create a client, submit a candidate, or send any
-email.
+The part that mattered most is the **server-side gate**: `isVerified` in
+`apps/api/src/plugins/auth-guard.ts` returns `403 {code:"email-unverified"}`,
+and the create routes for clients, contacts, requirements and candidates use it
+instead of `isAuth`. An unverified account can look around and cannot write.
+There is no skip control on the screen, and TC-AUTH-004 asserts its absence.
 
-**Build:** the verify screen, the send/confirm/resend endpoints, and — the part
-that is easy to forget — the server-side gate on the restricted actions. A
-screen that can be walked past is not verification.
+| Piece | Where |
+|---|---|
+| Table (code, token, attempts, resend counters) | `models/email-verification.model.ts` |
+| TTL, cooldown, hourly cap, attempt cap | `services/email-verification.service.ts` |
+| `POST /auth/verify/send` · `/confirm` · `GET /verify/link` | `routes/auth.routes.ts` |
+| Screen (countdown, resend, magic link, expired, verified) | `packages/shared/src/components/auth/verify-email.tsx` |
+| Route `Auth.VerifyEmail.Route` at `/verify` | `packages/configurations/src/routes.ts` |
 
-**Size:** M. Design exists (`Verify Email`). The `verification` table already
-exists from Better Auth, so the plumbing is half there.
+**Not done:** an unknown address returns success rather than an error, which is
+correct, but it means a mistyped address gives no feedback at all — worth a
+"didn't get it?" path later. Mail delivery itself is Mailjet's, unchanged.
 
-### Step 3 · Setup wizard ❌
+### Step 3 · Setup wizard ✅ *(built)*
 
-`Get Started` in the design; nothing in code. Timezone, currency, date format,
-pipeline stages, rejection reasons, invite the team. Skippable and resumable
-(flow §1.4).
+Both screens from the design exist: `/get-started` (the five-step checklist) and
+`/setup` (the five-step wizard — basics, pipeline, rejections, team, review).
 
-Worth building *with* step 2 — it is the same session and the same screen
-family, and its pipeline-stage step is where the stage model from step 8 gets
-its defaults.
+Every wizard step autosaves its own slice **including the step number**, so
+flow §1.4's resumability is server-side rather than a `localStorage` key: close
+the tab, come back, and the screen returns to the step you left with a "picked
+up where you left off" banner.
 
-**Size:** M.
+Two models came out of this that step 8 needs anyway:
+`pipeline_stage` (name, position, `client_visible`, and a `kind` marking the
+fixed entry and hire ends) and `rejection_reason` (category, label, active).
+Both seed their defaults on first read, so workspaces created before they
+existed get them too.
+
+The checklist derives completion from **real records** — a client exists, a
+requirement exists, an invite is out or a second member joined, the extension
+and calendar integrations are connected. Nothing is a stored flag and nothing is
+tickable by hand, so a step completed elsewhere in the app ticks itself.
+
+| Piece | Where |
+|---|---|
+| Stage + rejection-reason tables | `models/pipeline.model.ts` |
+| Seeding, reorder, replace | `services/pipeline.service.ts` |
+| Checklist derivation, wizard state, save | `services/onboarding.service.ts` |
+| `GET /onboarding/checklist` · `GET`/`PUT /onboarding/setup` | `routes/onboarding.routes.ts` |
+| Screens | `packages/shared/src/components/onboarding/` |
+| Module, routes, pages | `packages/modules/recruit-onboarding/`, `configurations/` |
+
+**Deliberately not built:** the design's seat counter ("5 of 10 seats used on
+Growth") needs the entitlement data that billing limit states will bring, and
+faking a plan name would be worse than omitting it. The design's "FLOW:
+Fresh start / Resumed" pill tabs are a prototype state-switcher, not product UI.
 
 ### Step 4 · Dashboard ✅
 
@@ -300,8 +327,14 @@ tasks.
 
 ### The answer to "what first"
 
-**Step 2, verify email.** It is the first thing a real user hits that is broken,
-it is a P0, the design exists, and the auth plumbing is already in place. Then
-step 3 in the same pass.
+~~**Step 2, verify email.**~~ Done, together with step 3 — see those sections
+for what landed and what was deliberately left out.
 
-**Then step 8**, which is the widest item and blocks steps 9 through 17.
+**Step 8, the application record.** It is now both the first broken thing a real
+user hits *and* the widest item on the list, and it blocks steps 9 through 17.
+Start with `applications` and `application_stage_history` in one commit: the
+history table is the only thing here that cannot be backfilled.
+
+The stage model it needs already exists — `pipeline_stage` came out of the setup
+wizard, with the entry and hire ends marked — so the board can reference stages
+by id from the first commit rather than hardcoding names and being rebuilt.

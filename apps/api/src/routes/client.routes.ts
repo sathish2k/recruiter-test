@@ -87,7 +87,7 @@ export default new Elysia({ name: "client.routes" })
     isAuth: true,
   })
   .post("/clients", (ctx) => clientController.postClient(ctx), {
-    isAuth: true,
+    isVerified: true,
     body: t.Optional(clientBody),
   })
   .put("/clients/:id", (ctx) => clientController.putClient(ctx), {

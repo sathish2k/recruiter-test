@@ -84,7 +84,7 @@ export default new Elysia({ name: "contact.routes" })
     isAuth: true,
   })
   .post("/contacts", (ctx) => contactController.postContact(ctx), {
-    isAuth: true,
+    isVerified: true,
     body: t.Optional(contactBody),
   })
   .put("/contacts/:id", (ctx) => contactController.putContact(ctx), {

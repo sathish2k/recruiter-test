@@ -5,6 +5,7 @@ import { ContactModule } from "@recruit/module-contact";
 import { CoreModule } from "@recruit/module-core";
 import { DashboardModule } from "@recruit/module-dashboard";
 import { JobModule } from "@recruit/module-jobs";
+import { OnboardingModule } from "@recruit/module-onboarding";
 import { ProfileModule } from "@recruit/module-profile";
 import { SettingsModule } from "@recruit/module-settings";
 import type { Module } from "@recruit/sdk";
@@ -13,6 +14,7 @@ export const AllModules: Module[] = [
   AuthModule,
   CoreModule,
   DashboardModule,
+  OnboardingModule,
   ProfileModule,
   SettingsModule,
   ContactModule,

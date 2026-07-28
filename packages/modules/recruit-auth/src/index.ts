@@ -4,6 +4,7 @@ import { FORGOT_PASSWORD_COMPONENT } from "./forgot-password/bootstrap";
 import { RESET_PASSWORD_COMPONENT } from "./reset-password/bootstrap";
 import { SIGN_IN_COMPONENT } from "./sign-in/bootstrap";
 import { SIGN_UP_COMPONENT } from "./sign-up/bootstrap";
+import { VERIFY_EMAIL_COMPONENT } from "./verify-email/bootstrap";
 
 export const AuthModule: Module = {
   id: "Auth.Module",
@@ -13,5 +14,6 @@ export const AuthModule: Module = {
     SIGN_UP_COMPONENT,
     FORGOT_PASSWORD_COMPONENT,
     RESET_PASSWORD_COMPONENT,
+    VERIFY_EMAIL_COMPONENT,
   ],
 };

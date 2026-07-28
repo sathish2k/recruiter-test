@@ -75,7 +75,10 @@ export default new Elysia({ name: "job.routes" })
     }),
   })
   .get("/jobs/:id", (ctx) => jobController.getJobById(ctx), { isAuth: true })
-  .post("/jobs", (ctx) => jobController.postJob(ctx), { isAuth: true, body: t.Optional(jobBody) })
+  .post("/jobs", (ctx) => jobController.postJob(ctx), {
+    isVerified: true,
+    body: t.Optional(jobBody),
+  })
   .put("/jobs/:id", (ctx) => jobController.putJob(ctx), { isAuth: true, body: t.Optional(jobBody) })
   .post("/jobs/:id/archive", (ctx) => jobController.postArchive(ctx), { isAuth: true })
   .delete("/jobs/:id", (ctx) => jobController.removeJob(ctx), { isAuth: true });

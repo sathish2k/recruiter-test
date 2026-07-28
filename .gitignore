@@ -42,4 +42,5 @@ npm-debug.log*
 .claude/settings.local.json
 e2e/.auth/
 e2e/test-results/
+test-results/
 playwright-report/
