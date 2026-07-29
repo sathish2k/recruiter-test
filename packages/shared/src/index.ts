@@ -190,6 +190,13 @@ export {
   type WizardStage,
 } from "./components/onboarding";
 export {
+  PipelineCard,
+  type PipelineCardData,
+  type PipelineCardHandlers,
+  type PipelineCardLabels,
+  PipelineCardSkeleton,
+} from "./components/pipeline-card";
+export {
   type ActionHandler,
   type ActionItem,
   ActionsMenu,

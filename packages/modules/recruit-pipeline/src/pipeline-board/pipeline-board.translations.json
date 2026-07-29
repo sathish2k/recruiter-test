@@ -47,16 +47,20 @@
   },
   "move": {
     "title": "Update status",
-    "confirm": "Move to {{stage}}",
-    "reject": "Reject",
-    "rejected": "Closed",
+    "confirm": "Save",
     "anyway": "Move anyway",
     "cancel": "Cancel",
     "reasonPlaceholder": "Choose a reason…",
     "reasonHelp": "A rejection is always on the record with its reason.",
     "notePlaceholder": "Why is this moving? e.g. client confirmed the panel",
     "noteHelp": "Saved to the application's history.",
-    "pick": "Choose a stage…"
+    "pick": "Choose a stage…",
+    "outcome": "What is happening",
+    "target": "Move to",
+    "reason": "Reason",
+    "note": "Comment",
+    "targetRequired": "Choose the stage to move to",
+    "reasonRequired": "A rejection is always recorded with its reason"
   },
   "toast": {
     "moved": "{{name}} moved to {{stage}}",
@@ -66,5 +70,9 @@
   },
   "errors": {
     "generic": "That move could not be saved."
+  },
+  "outcomes": {
+    "move": "Move stage",
+    "reject": "Close out"
   }
 }

@@ -32,11 +32,11 @@ test.describe("Golden path — pipeline", () => {
     const name = await card.getAttribute("data-card-name");
     await card.getByRole("button", { name: /move .* to another stage/i }).click();
 
-    // Pick any stage other than the one it is in, then confirm with a note.
+    // The dialog is the shared FormModal: pick a stage, add the note, save.
     await page.getByRole("combobox").first().click();
-    await page.getByRole("option").nth(1).click();
+    await page.getByRole("option").first().click();
     await page.getByPlaceholder(/why is this moving/i).fill("e2e move");
-    await page.getByRole("button", { name: /^move to/i }).click();
+    await page.getByRole("button", { name: /^save$/i }).click();
 
     // The toast names the move; the history is what actually proves it.
     await expect(page.getByText(new RegExp(`${name} moved to`, "i"))).toBeVisible();
@@ -47,11 +47,13 @@ test.describe("Golden path — pipeline", () => {
     await firstCard(page)
       .getByRole("button", { name: /move .* to another stage/i })
       .click();
-    await page.getByRole("combobox").first().click();
-    await page.getByRole("option", { name: /closed/i }).click();
+    // Switch the dialog to "Close out" and save without choosing a reason.
+    await page.getByRole("button", { name: /close out/i }).click();
+    await page.getByRole("button", { name: /^save$/i }).click();
 
-    // No reason chosen — the confirm stays disabled.
-    await expect(page.getByRole("button", { name: /^reject$/i })).toBeDisabled();
+    // The schema makes the reason conditionally required, so nothing is written.
+    await expect(page.getByText(/reason/i).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /^save$/i })).toBeVisible();
   });
 
   test("TC-PIP-003 — WIP capacity is advisory: flagged, never blocked", async ({ page }) => {

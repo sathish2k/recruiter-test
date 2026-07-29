@@ -9,11 +9,13 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useFetch, usePortalRouter, useTranslation } from "@recruit/sdk";
 import {
-  avatarSwatch,
+  FormModal,
+  type FormValues,
   fetchOptions,
   IconRenderer,
-  initialsOf,
-  Modal,
+  PipelineCard,
+  type PipelineCardData,
+  PipelineCardSkeleton,
   SearchField,
   type SelectOption,
   SlidingPillTabs,
@@ -25,26 +27,10 @@ import type { PipelineBoardConfiguration } from "./pipeline-board.configuration"
 
 const CLOSED = "__closed__";
 
-interface BoardCard {
-  id: string;
-  candidateId: string;
-  candidateName: string;
-  candidateTitle: string;
-  matchScore: number;
-  offLimits: boolean;
-  doNotContact: boolean;
+interface BoardCard extends PipelineCardData {
   jobId: string;
-  jobTitle: string;
-  clientName: string;
   stageId: string;
   stageName: string;
-  status: string;
-  ownerId: string;
-  ownerName: string;
-  rejectionReason: string;
-  daysInStage: number;
-  slaDays: number;
-  slaOverBy: number;
 }
 
 interface Column {
@@ -73,25 +59,20 @@ interface Board {
   total: number;
 }
 
-interface Reason {
-  id: string;
-  label: string;
-  category: string;
-}
-
+/** What the move dialog opens with — the card, and the target when a drop has
+ * already chosen one. */
 interface Move {
   card: BoardCard;
   toId: string;
-  toName: string;
-  /** Set when the target is the closed column — the reason becomes required. */
   rejecting: boolean;
 }
 
 /**
  * The pipeline board. Columns are the workspace's own stages, so a rename or a
  * reorder in Settings moves the board with it; the closed-out column is drawn
- * last and is not a stage. Every drop goes through the move dialog, because
- * the note and (on a rejection) the reason are part of the record.
+ * last and is not a stage. Every move — dropped or picked — goes through the
+ * same schema-driven dialog, because the note and (on a rejection) the reason
+ * are part of the record.
  */
 export function PipelineBoardComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
@@ -106,11 +87,8 @@ export function PipelineBoardComponent({ id }: { id: string }) {
   const [dragging, setDragging] = useState<BoardCard | null>(null);
   const [over, setOver] = useState("");
   const [options, setOptions] = useState<Record<string, SelectOption[]>>({});
-  const [reasons, setReasons] = useState<Reason[]>([]);
-  const [reasonId, setReasonId] = useState("");
-  const [note, setNote] = useState("");
   const [blocked, setBlocked] = useState<{ message: string; code: string } | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [pending, setPending] = useState<FormValues | null>(null);
   const moveModal = useModal<Move>();
 
   const { data, isLoading, mutate, mutation } = useFetch<Board>(id, {
@@ -118,8 +96,7 @@ export function PipelineBoardComponent({ id }: { id: string }) {
   });
   const mut = mutation as Record<string, ((body?: unknown) => Promise<unknown>) | undefined>;
 
-  // Filter options and the rejection catalogue are workspace data, fetched
-  // once rather than per render.
+  // Toolbar options are workspace data — fetched once, not per render.
   useEffect(() => {
     for (const filter of config?.filters ?? []) {
       fetchOptions({
@@ -131,11 +108,7 @@ export function PipelineBoardComponent({ id }: { id: string }) {
         .then((list) => setOptions((current) => ({ ...current, [filter.key]: list })))
         .catch(() => undefined);
     }
-    (mutation as Record<string, (() => Promise<unknown>) | undefined>)
-      .rejectionReasons?.()
-      .then((list) => setReasons((list as Reason[]) ?? []))
-      .catch(() => undefined);
-  }, [config?.filters, mutation]);
+  }, [config?.filters]);
 
   const columns = useMemo(() => {
     const list = data?.columns ?? [];
@@ -143,43 +116,46 @@ export function PipelineBoardComponent({ id }: { id: string }) {
     // "Needs action" — anything past its stage SLA, or with a flag on it.
     return list.map((column) => ({
       ...column,
-      cards: column.cards.filter((card) => card.slaOverBy > 0 || card.offLimits),
+      cards: column.cards.filter((card) => (card.slaOverBy ?? 0) > 0 || card.offLimits),
     }));
   }, [data?.columns, focus]);
 
   const openMove = useCallback(
-    (card: BoardCard, toId: string, toName: string) => {
-      setReasonId("");
-      setNote("");
+    (card: BoardCard, toId = "") => {
       setBlocked(null);
-      moveModal.open({ card, toId, toName, rejecting: toId === CLOSED });
+      setPending(null);
+      moveModal.open({ card, toId, rejecting: toId === CLOSED });
     },
     [moveModal],
   );
 
-  const confirm = async (force?: boolean) => {
+  /** The one write. `force` repeats a move the advisory guard stopped. */
+  const submitMove = async (values: FormValues, force?: boolean) => {
     const move = moveModal.data;
     if (!move) return;
-    setSaving(true);
+    const rejecting = values.outcome === "reject";
     setBlocked(null);
+    setPending(values);
     try {
       await mut.move?.({
         id: move.card.id,
-        ...(move.rejecting
-          ? { status: "rejected", reasonId }
-          : { toStageId: move.toId, status: "active" }),
-        note,
+        ...(rejecting
+          ? { status: "rejected", reasonId: String(values.reasonId ?? "") }
+          : { toStageId: String(values.toStageId ?? ""), status: "active" }),
+        note: String(values.note ?? ""),
         force,
       });
+      const toName =
+        (data?.columns ?? []).find((column) => column.id === values.toStageId)?.name ?? "";
       moveModal.close();
       await mutate();
       show(
-        t(move.rejecting ? "toast.rejected" : "toast.moved", {
+        t(rejecting ? "toast.rejected" : "toast.moved", {
           name: move.card.candidateName,
-          stage: move.toName,
+          stage: toName,
         }),
         t("toast.sub", { from: move.card.stageName }),
-        move.rejecting ? "warning" : "success",
+        rejecting ? "warning" : "success",
         {
           label: t("toast.undo"),
           onClick: () => {
@@ -201,14 +177,20 @@ export function PipelineBoardComponent({ id }: { id: string }) {
         message: response?.data?.error ?? t("errors.generic"),
         code: response?.data?.code ?? "unknown",
       });
-    } finally {
-      setSaving(false);
     }
   };
 
   if (!config?.filters) return null;
 
   const activeFilters = Object.values(filters).filter(Boolean).length + (ownerId ? 1 : 0);
+  const cardLabels = (card: BoardCard) => ({
+    match: t("card.match", { score: card.matchScore ?? 0 }),
+    inStage: t("card.inStage", { count: card.daysInStage ?? 0 }),
+    overSla: t("card.overSla", { count: card.slaOverBy ?? 0 }),
+    offLimits: t("flags.offLimits"),
+    doNotContact: t("flags.doNotContact"),
+    move: t("card.move", { name: card.candidateName }),
+  });
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "18px", minWidth: 0 }}>
@@ -287,7 +269,7 @@ export function PipelineBoardComponent({ id }: { id: string }) {
           {t("owners.label")}
         </Typography>
         <Chip
-          variant={ownerId ? "soft" : "soft"}
+          variant="soft"
           color={ownerId ? "default" : "primary"}
           label={t("owners.all", { count: data?.total ?? 0 })}
           onClick={() => setOwnerId("")}
@@ -340,7 +322,11 @@ export function PipelineBoardComponent({ id }: { id: string }) {
               <Typography sx={{ flex: 1, minWidth: 0, fontSize: 12.5, fontWeight: 600 }}>
                 {breach.candidateName}
                 <Box component="span" sx={{ fontWeight: 400, color: "text.secondary" }}>
-                  {` — ${t("sla.reason", { days: breach.daysInStage, stage: breach.stageName, over: breach.slaOverBy })}`}
+                  {` — ${t("sla.reason", {
+                    days: breach.daysInStage,
+                    stage: breach.stageName,
+                    over: breach.slaOverBy,
+                  })}`}
                 </Box>
               </Typography>
             </Box>
@@ -352,7 +338,14 @@ export function PipelineBoardComponent({ id }: { id: string }) {
       {isLoading && !data ? (
         <Box sx={{ display: "flex", gap: "11px" }}>
           {[0, 1, 2, 3].map((column) => (
-            <Skeleton key={column} variant="rounded" height={380} sx={{ flex: 1 }} />
+            <Box
+              key={column}
+              sx={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}
+            >
+              <Skeleton variant="text" width="50%" height={18} />
+              <PipelineCardSkeleton />
+              <PipelineCardSkeleton />
+            </Box>
           ))}
         </Box>
       ) : (
@@ -380,9 +373,7 @@ export function PipelineBoardComponent({ id }: { id: string }) {
               onDrop={(event) => {
                 event.preventDefault();
                 setOver("");
-                if (dragging && dragging.stageId !== column.id) {
-                  openMove(dragging, column.id, column.name);
-                }
+                if (dragging && dragging.stageId !== column.id) openMove(dragging, column.id);
                 setDragging(null);
               }}
               sx={{
@@ -438,197 +429,16 @@ export function PipelineBoardComponent({ id }: { id: string }) {
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {column.cards.map((card) => (
-                  <Box
+                  <PipelineCard
                     key={card.id}
-                    data-card-id={card.id}
-                    data-card-name={card.candidateName}
+                    card={card}
+                    labels={cardLabels(card)}
                     draggable={column.id !== CLOSED}
+                    onOpen={() => router.push(config.candidateRouteId, { id: card.candidateId })}
+                    onMove={column.id === CLOSED ? undefined : () => openMove(card)}
                     onDragStart={() => setDragging(card)}
                     onDragEnd={() => setDragging(null)}
-                    onClick={() => router.push(config.candidateRouteId, { id: card.candidateId })}
-                    sx={{
-                      bgcolor: "surface.elevated",
-                      border: "1px solid",
-                      borderColor: card.slaOverBy ? "surface.warningSoftBorder" : "divider",
-                      borderRadius: "12px",
-                      p: "13px 14px",
-                      cursor: column.id === CLOSED ? "pointer" : "grab",
-                      "&:hover": { borderColor: "surface.primarySoftBorder" },
-                    }}
-                  >
-                    {card.offLimits || card.doNotContact ? (
-                      <Box sx={{ display: "flex", gap: "6px", mb: "9px" }}>
-                        {card.offLimits ? (
-                          <Chip
-                            variant="soft"
-                            color="error"
-                            size="small"
-                            label={t("flags.offLimits")}
-                          />
-                        ) : null}
-                        {card.doNotContact ? (
-                          <Chip
-                            variant="soft"
-                            color="warning"
-                            size="small"
-                            label={t("flags.doNotContact")}
-                          />
-                        ) : null}
-                      </Box>
-                    ) : null}
-
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "8px" }}>
-                      <Box
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          flex: "none",
-                          borderRadius: "999px",
-                          display: "grid",
-                          placeItems: "center",
-                          fontSize: 11,
-                          fontWeight: 600,
-                          bgcolor: avatarSwatch(card.candidateName).bg,
-                          color: avatarSwatch(card.candidateName).fg,
-                        }}
-                      >
-                        {initialsOf(card.candidateName)}
-                      </Box>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                          sx={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {card.candidateName}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: "text.secondary",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {card.jobTitle}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontSize: 11,
-                            color: "text.disabled",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {card.clientName}
-                        </Typography>
-                      </Box>
-                      {column.id === CLOSED ? null : (
-                        <Box
-                          component="button"
-                          type="button"
-                          aria-label={t("card.move", { name: card.candidateName })}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            openMove(card, "", "");
-                          }}
-                          sx={{
-                            flex: "none",
-                            alignSelf: "flex-start",
-                            display: "flex",
-                            background: "none",
-                            border: 0,
-                            p: 0,
-                            cursor: "pointer",
-                            color: "text.disabled",
-                            "&:hover": { color: "text.primary" },
-                          }}
-                        >
-                          <IconRenderer name="move-up" size={16} />
-                        </Box>
-                      )}
-                    </Box>
-
-                    {card.matchScore ? (
-                      <Box sx={{ display: "flex", pb: "9px" }}>
-                        <Chip
-                          variant="soft"
-                          size="small"
-                          color="primary"
-                          label={t("card.match", { score: card.matchScore })}
-                        />
-                      </Box>
-                    ) : null}
-
-                    {card.status === "rejected" && card.rejectionReason ? (
-                      <Typography sx={{ fontSize: 11, color: "surface.errorFg", pb: "9px" }}>
-                        {card.rejectionReason}
-                      </Typography>
-                    ) : null}
-
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        fontSize: 11,
-                        color: "text.disabled",
-                        borderTop: "1px solid",
-                        borderColor: "divider",
-                        pt: "9px",
-                        minWidth: 0,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          minWidth: 0,
-                          color: card.slaOverBy ? "surface.errorFg" : "text.disabled",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "999px",
-                            flex: "none",
-                            bgcolor: card.slaOverBy ? "surface.errorFg" : "surface.textDisabled",
-                          }}
-                        />
-                        {card.slaOverBy
-                          ? t("card.overSla", { count: card.slaOverBy })
-                          : t("card.inStage", { count: card.daysInStage })}
-                      </Box>
-                      <Box sx={{ flex: 1 }} />
-                      {card.ownerName ? (
-                        <Box
-                          title={card.ownerName}
-                          sx={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: "999px",
-                            display: "grid",
-                            placeItems: "center",
-                            fontSize: 8.5,
-                            fontWeight: 700,
-                            bgcolor: avatarSwatch(card.ownerName).bg,
-                            color: avatarSwatch(card.ownerName).fg,
-                          }}
-                        >
-                          {initialsOf(card.ownerName)}
-                        </Box>
-                      ) : null}
-                    </Box>
-                  </Box>
+                  />
                 ))}
 
                 {column.cards.length === 0 ? (
@@ -710,116 +520,32 @@ export function PipelineBoardComponent({ id }: { id: string }) {
         </Box>
       )}
 
-      {/* The move dialog — where the note, and a rejection's reason, are captured. */}
-      <Modal
-        open={moveModal.isOpen}
-        onClose={moveModal.close}
-        width={470}
-        title={t("move.title")}
-        description={
-          moveModal.data
-            ? `${moveModal.data.card.candidateName} · ${moveModal.data.card.jobTitle}`
-            : ""
-        }
-        footer={
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px", mt: "20px" }}>
-            <Button variant="outlined" onClick={moveModal.close} disabled={saving}>
-              {t("move.cancel")}
-            </Button>
-            {blocked?.code === "hired-elsewhere" ? (
-              <Button variant="outlined" onClick={() => confirm(true)} loading={saving}>
-                {t("move.anyway")}
-              </Button>
-            ) : null}
-            <Button
-              variant="contained"
-              loading={saving}
-              disabled={!moveModal.data?.toId || (moveModal.data?.rejecting ? !reasonId : false)}
-              onClick={() => confirm()}
-              startIcon={<IconRenderer name="check" size={15} />}
-            >
-              {moveModal.data?.rejecting
-                ? t("move.reject")
-                : t("move.confirm", { stage: moveModal.data?.toName ?? "" })}
-            </Button>
-          </Box>
-        }
-      >
-        {moveModal.data ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "9px" }}>
-              <Chip variant="soft" size="small" label={moveModal.data.card.stageName} />
-              <Box sx={{ color: "surface.accentBright", display: "flex" }}>
-                <IconRenderer name="arrow-forward" size={16} />
-              </Box>
-              {moveModal.data.toId ? (
-                <Chip
-                  variant="soft"
-                  color="primary"
-                  size="small"
-                  label={moveModal.data.rejecting ? t("move.rejected") : moveModal.data.toName}
-                />
-              ) : (
-                <TextField
-                  select
-                  hiddenLabel
-                  size="small"
-                  sx={{ minWidth: 200 }}
-                  value=""
-                  onChange={(event) => {
-                    const target = event.target.value;
-                    const column = (data?.columns ?? []).find((entry) => entry.id === target);
-                    moveModal.open({
-                      card: moveModal.data?.card as BoardCard,
-                      toId: target,
-                      toName: column?.name ?? "",
-                      rejecting: target === CLOSED,
-                    });
-                  }}
-                >
-                  <MenuItem value="">{t("move.pick")}</MenuItem>
-                  {(data?.columns ?? [])
-                    .filter((entry) => entry.id !== moveModal.data?.card.stageId)
-                    .map((entry) => (
-                      <MenuItem key={entry.id} value={entry.id}>
-                        {entry.id === CLOSED ? t("move.rejected") : entry.name}
-                      </MenuItem>
-                    ))}
-                </TextField>
-              )}
-            </Box>
-
-            {moveModal.data.rejecting ? (
-              <TextField
-                select
-                hiddenLabel
-                size="small"
-                fullWidth
-                value={reasonId}
-                onChange={(event) => setReasonId(event.target.value)}
-                helperText={t("move.reasonHelp")}
-              >
-                <MenuItem value="">{t("move.reasonPlaceholder")}</MenuItem>
-                {reasons.map((reason) => (
-                  <MenuItem key={reason.id} value={reason.id}>
-                    {reason.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            ) : null}
-
-            <TextField
-              hiddenLabel
-              multiline
-              minRows={3}
-              fullWidth
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              placeholder={t("move.notePlaceholder")}
-              helperText={t("move.noteHelp")}
-            />
-
-            {blocked ? (
+      {/* The move dialog is the shared form modal: the schema decides what is
+          asked for, including that a rejection cannot save without a reason. */}
+      {moveModal.data ? (
+        <FormModal
+          key={`${moveModal.data.card.id}-${moveModal.data.toId}`}
+          open={moveModal.isOpen}
+          onClose={moveModal.close}
+          width={470}
+          id={id}
+          title={t("move.title")}
+          description={`${moveModal.data.card.candidateName} · ${moveModal.data.card.jobTitle ?? ""}`}
+          schema={config.moveSchema}
+          defaultValues={{
+            outcome: moveModal.data.rejecting ? "reject" : "move",
+            toStageId: moveModal.data.rejecting ? "" : moveModal.data.toId,
+            reasonId: "",
+            note: "",
+          }}
+          submitLabel="move.confirm"
+          cancelLabel="move.cancel"
+          // The dialog stays open when a guard refuses, so the warning is read
+          // where the decision is being made.
+          closeOnSubmit={false}
+          onSubmit={(values) => submitMove(values)}
+          beforeSubmit={
+            blocked ? (
               <Box
                 sx={{
                   display: "flex",
@@ -830,19 +556,30 @@ export function PipelineBoardComponent({ id }: { id: string }) {
                   borderColor: "surface.warningSoftBorder",
                   borderRadius: "10px",
                   p: "9px 12px",
+                  mb: "12px",
                 }}
               >
                 <Box sx={{ color: "surface.warningFg", display: "flex", flex: "none" }}>
                   <IconRenderer name="warning" size={15} />
                 </Box>
-                <Typography sx={{ fontSize: 11.5, color: "surface.warningFg" }}>
+                <Typography sx={{ flex: 1, fontSize: 11.5, color: "surface.warningFg" }}>
                   {blocked.message}
                 </Typography>
+                {blocked.code === "hired-elsewhere" && pending ? (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{ flex: "none" }}
+                    onClick={() => void submitMove(pending, true)}
+                  >
+                    {t("move.anyway")}
+                  </Button>
+                ) : null}
               </Box>
-            ) : null}
-          </Box>
-        ) : null}
-      </Modal>
+            ) : null
+          }
+        />
+      ) : null}
     </Box>
   );
 }
