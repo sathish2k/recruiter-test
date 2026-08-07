@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { useConfiguration, useFetch, usePortalRouter, useTranslation } from "@recruit/sdk";
+import delve from "dlv";
 import type { ReactNode } from "react";
 import { Export } from "../export";
 import { type FilterConfig, Filters, useFilters } from "../filters";
@@ -48,16 +49,26 @@ export function TableFilterExportRenderer({
   const router = usePortalRouter();
   const { filters } = useFilters();
 
-  const { data } = useFetch<Row[]>(id, { filters });
+  const { data, meta } = useFetch<Row[]>(id, { filters });
   const exportRows = data ?? [];
 
   const filterOptions: FilterConfig[] = (config?.filters ?? []).map((f) => {
     const label = f.label ? { name: t(f.label.name) } : undefined;
     if ("options" in f && f.options) {
+      // Tab counts come from the response envelope, so they count the whole
+      // workspace rather than the page currently on screen.
+      const counts =
+        f.type === "segmented" && f.countsPath
+          ? (delve(meta ?? {}, f.countsPath) as Record<string, number> | undefined)
+          : undefined;
       return {
         ...f,
         label,
-        options: f.options.map((o) => ({ ...o, label: t(o.label) })),
+        options: f.options.map((o) => ({
+          ...o,
+          label: t(o.label),
+          count: counts?.[o.value] ?? o.count,
+        })),
       };
     }
     if (f.type === "search") {

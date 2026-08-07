@@ -1,0 +1,20 @@
+{
+  "title": "Team performance",
+  "subtitle": "This quarter, by recruiter",
+  "viewAll": "Team activity",
+  "columns": {
+    "recruiter": "Recruiter",
+    "jobs": "Jobs",
+    "cands": "Cands",
+    "subs": "Subs",
+    "intvs": "Intvs",
+    "offers": "Offers",
+    "placed": "Placed",
+    "conv": "Conv",
+    "sla": "SLA"
+  },
+  "empty": {
+    "title": "No team activity yet",
+    "description": "Once recruiters start submitting, their numbers appear here."
+  }
+}

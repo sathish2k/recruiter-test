@@ -2,9 +2,9 @@ import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
 const accentSx = {
   fontWeight: 600,
-  color: "surface.primarySoftFg",
+  color: "surface.linkFg",
   textDecoration: "none",
-  "&:hover": { color: "primary.light" },
+  "&:hover": { textDecoration: "underline" },
 };
 
 const schema: JsonSchema = {
@@ -16,7 +16,6 @@ const schema: JsonSchema = {
       type: "string",
       format: "email",
       icon: "mail",
-      hideLabel: true,
       title: "email.label",
       placeholder: "email.placeholder",
       errorMessage: { format: "email.errors.format" },

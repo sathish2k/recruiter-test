@@ -1,0 +1,27 @@
+{
+  "title": "Needs a decision",
+  "subtitle": "Everything waiting on you, most urgent first",
+  "viewAll": "View all",
+  "empty": {
+    "title": "Nothing is waiting on you",
+    "description": "Every item on your desk has moved. New work lands here as it arrives."
+  },
+  "queue": {
+    "slaOverdue": "SLAs already breached",
+    "slaOverdueSub": "Clients have waited longer than you promised",
+    "awaitingReview": "Profiles awaiting your approval",
+    "awaitingReviewSub": "Nothing reaches a client until you sign it off",
+    "resumes": "CVs to screen",
+    "resumesSub": "From sourcing and the browser extension",
+    "clientsAtRisk": "Clients marked at risk",
+    "clientsAtRiskSub": "Health dropped on these accounts",
+    "dueToday": "Roles due today",
+    "dueTodaySub": "The SLA clock runs out at close of business",
+    "tagLate": "Late",
+    "tagToday": "Today",
+    "tagNew": "New",
+    "tagRisk": "At risk",
+    "ctaOpen": "Open",
+    "ctaReview": "Review"
+  }
+}

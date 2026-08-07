@@ -6,13 +6,17 @@ import {
   desc,
   eq,
   getTableColumns,
+  gte,
   ilike,
   inArray,
+  isNotNull,
+  isNull,
   ne,
   or,
   sql,
 } from "drizzle-orm";
 import { db } from "../db";
+import { application } from "../models/application.model";
 import { user } from "../models/auth.model";
 import {
   type CandidateAddress,
@@ -22,15 +26,26 @@ import {
   type Education,
   type Experience,
 } from "../models/candidate.model";
+import { client } from "../models/client.model";
 import { job } from "../models/job.model";
+import { pipelineStage } from "../models/pipeline.model";
 import { createApplication } from "./application.service";
 import { workspaceSettings } from "./organization.service";
 
 type CandidateRow = typeof candidate.$inferSelect;
-type CandidateJoins = { jobTitle?: string | null; ownerName?: string | null };
+type CandidateJoins = {
+  jobTitle?: string | null;
+  ownerName?: string | null;
+  clientName?: string | null;
+  stageName?: string | null;
+};
 
 function fullName(first: string, last?: string | null) {
   return [first, last].filter(Boolean).join(" ").trim();
+}
+
+function stageKey(value?: string | null) {
+  return (value ?? "").trim().toLowerCase().replace(/\s+/g, "_");
 }
 
 function mapCandidate(row: CandidateRow & CandidateJoins) {
@@ -81,6 +96,14 @@ function mapCandidate(row: CandidateRow & CandidateJoins) {
     mergedIntoId: row.mergedIntoId ?? "",
     jobId: row.jobId ?? "",
     jobTitle: row.jobTitle ?? "",
+    clientName: row.clientName ?? "",
+    /** The live application's stage, falling back to the intake stage the
+     * candidate was created with. Normalised to a lowercase key because the two
+     * sources differ in case (pipeline stages are named "Screening", the intake
+     * field stores "screening") and the list maps the key to a translated
+     * label. */
+    stage: stageKey(row.stageName ?? row.startingStage),
+    matchScore: row.matchScore ?? null,
     startingStage: row.startingStage ?? "",
     status: row.status,
     ownerId: row.ownerId ?? "",
@@ -95,6 +118,10 @@ const SORT_FIELDS = {
   name: candidate.firstName,
   status: candidate.status,
   createdAt: candidate.createdAt,
+  role: job.title,
+  stage: pipelineStage.position,
+  match: candidate.matchScore,
+  owner: user.name,
 } as const;
 
 function split(value?: string) {
@@ -108,19 +135,93 @@ export interface ListCandidatesParams {
   search?: string;
   status?: string;
   jobId?: string;
+  client?: string;
+  stage?: string;
+  owner?: string;
+  source?: string;
+  /** One of QUICK_KEYS — the design's chip row. */
+  quick?: string;
+  /** The viewer, for the "My candidates" chip. */
+  userId?: string;
   page?: number;
   pageSize?: number;
   sortKey?: string;
   sortDir?: string;
 }
 
+/**
+ * The list's row shape needs four joins: the requirement and its client for
+ * ROLE & REQUISITION, the live application's stage for STAGE, and the owner.
+ */
 function withNames() {
+  return (
+    db
+      .select({
+        ...getTableColumns(candidate),
+        jobTitle: job.title,
+        clientName: client.name,
+        ownerName: user.name,
+        stageName: pipelineStage.name,
+      })
+      .from(candidate)
+      .leftJoin(job, eq(candidate.jobId, job.id))
+      .leftJoin(client, eq(job.clientId, client.id))
+      .leftJoin(user, eq(candidate.ownerId, user.id))
+      // Scoped to the associated requirement, not "any active application":
+      // `application_candidate_job_unique` then guarantees at most one row, so a
+      // candidate on several requirements cannot duplicate itself in the list.
+      .leftJoin(
+        application,
+        and(eq(application.candidateId, candidate.id), eq(application.jobId, candidate.jobId)),
+      )
+      .leftJoin(pipelineStage, eq(application.stageId, pipelineStage.id))
+  );
+}
+
+/** `withNames()`'s joins without the columns — the paged count runs against the
+ * same shape so joined filters resolve. */
+function countCandidates() {
   return db
-    .select({ ...getTableColumns(candidate), jobTitle: job.title, ownerName: user.name })
+    .select({ total: count() })
     .from(candidate)
     .leftJoin(job, eq(candidate.jobId, job.id))
-    .leftJoin(user, eq(candidate.ownerId, user.id));
+    .leftJoin(client, eq(job.clientId, client.id))
+    .leftJoin(user, eq(candidate.ownerId, user.id))
+    .leftJoin(
+      application,
+      and(eq(application.candidateId, candidate.id), eq(application.jobId, candidate.jobId)),
+    )
+    .leftJoin(pipelineStage, eq(application.stageId, pipelineStage.id));
 }
+
+const NORMALISED_STAGE = sql`lower(replace(coalesce(${pipelineStage.name}, ${candidate.startingStage}), ' ', '_'))`;
+
+/**
+ * The design's quick-filter chips, as conditions. "mine" needs the viewer, so
+ * it resolves to nothing when there is no session user rather than silently
+ * matching every row.
+ */
+function quickCondition(quick?: string, userId?: string) {
+  switch (quick) {
+    case "mine":
+      return userId ? eq(candidate.ownerId, userId) : sql`false`;
+    // The talent pool is everyone not attached to a requirement.
+    case "pool":
+      return isNull(candidate.jobId);
+    case "interviewing":
+      return eq(NORMALISED_STAGE, "interview");
+    case "offers":
+      return eq(NORMALISED_STAGE, "offer");
+    case "joined":
+      return eq(candidate.status, "placed");
+    case "rejected":
+      return eq(candidate.status, "rejected");
+    default:
+      return undefined;
+  }
+}
+
+const QUICK_KEYS = ["all", "mine", "pool", "interviewing", "offers", "joined", "rejected"] as const;
 
 export async function listCandidates(organizationId: string, params: ListCandidatesParams = {}) {
   const filters = [eq(candidate.organizationId, organizationId), eq(candidate.archived, false)];
@@ -130,6 +231,10 @@ export async function listCandidates(organizationId: string, params: ListCandida
       ilike(candidate.firstName, term),
       ilike(candidate.lastName, term),
       ilike(candidate.email, term),
+      ilike(candidate.currentJobTitle, term),
+      ilike(candidate.currentEmployer, term),
+      ilike(job.title, term),
+      ilike(client.name, term),
     );
     if (match) filters.push(match);
   }
@@ -137,22 +242,53 @@ export async function listCandidates(organizationId: string, params: ListCandida
   if (statuses.length) filters.push(inArray(candidate.status, statuses as CandidateStatus[]));
   const jobIds = split(params.jobId);
   if (jobIds.length) filters.push(inArray(candidate.jobId, jobIds));
+  const clients = split(params.client);
+  if (clients.length) filters.push(inArray(client.name, clients));
+  // Matched against the same normalised key the row exposes, so filtering by
+  // "Screening" also finds candidates whose stage is still the intake value.
+  const stages = split(params.stage).map(stageKey);
+  if (stages.length) filters.push(inArray(NORMALISED_STAGE, stages));
+  const owners = split(params.owner);
+  if (owners.length) filters.push(inArray(user.name, owners));
+  const sources = split(params.source);
+  if (sources.length) filters.push(inArray(candidate.source, sources));
 
-  const where = and(...filters);
+  // The design's quick-filter chips. Kept separate from `where` so the chip
+  // counts can be tallied against everything else the user has narrowed to.
+  const base = and(...filters);
+  const quick = quickCondition(params.quick, params.userId);
+  const where = quick ? and(base, quick) : base;
   const page = Math.max(1, params.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, params.pageSize ?? 12));
   const column = SORT_FIELDS[params.sortKey as keyof typeof SORT_FIELDS] ?? candidate.createdAt;
   const order = params.sortDir === "asc" ? asc(column) : desc(column);
 
-  const [rows, countRows] = await Promise.all([
+  const [rows, countRows, ...quickRows] = await Promise.all([
     withNames()
       .where(where)
       .orderBy(order)
       .limit(pageSize)
       .offset((page - 1) * pageSize),
-    db.select({ total: count() }).from(candidate).where(where),
+    // Same joins as the row query — the filters and the search now reference
+    // the requirement, client, owner and stage, so a bare count would not
+    // resolve those columns.
+    countCandidates().where(where),
+    // Each chip counts against `base`, so the numbers describe what clicking it
+    // would actually show given the filters already applied.
+    ...QUICK_KEYS.map((key) => {
+      const condition = quickCondition(key, params.userId);
+      return countCandidates().where(condition ? and(base, condition) : base);
+    }),
   ]);
-  return { data: rows.map(mapCandidate), totalCount: countRows[0]?.total ?? 0 };
+
+  const quickCounts = Object.fromEntries(
+    QUICK_KEYS.map((key, index) => [key, quickRows[index]?.[0]?.total ?? 0]),
+  );
+  return {
+    data: rows.map(mapCandidate),
+    totalCount: countRows[0]?.total ?? 0,
+    quickCounts,
+  };
 }
 
 export async function getCandidate(organizationId: string, id: string) {
@@ -504,6 +640,82 @@ export async function importCandidates(
 }
 
 /** §6.1 — archive, never delete. Distinct from erasure, which destroys data. */
+const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+/** The match band the design's third tile counts. */
+const STRONG_MATCH = 80;
+
+/**
+ * The four tiles above the Candidates list. Archived candidates are excluded
+ * everywhere, the same way the list excludes them — a tile must never count a
+ * row the table cannot show.
+ */
+export async function candidateStats(organizationId: string) {
+  const where = and(eq(candidate.organizationId, organizationId), eq(candidate.archived, false));
+  const monthAgo = new Date(Date.now() - MONTH_MS);
+  const yearStart = new Date(new Date().getFullYear(), 0, 1);
+
+  const [[pool], [addedThisMonth], [submitted], [strong], [unviewed], [joined], [joinedYtd]] =
+    await Promise.all([
+      db.select({ total: count() }).from(candidate).where(where),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, gte(candidate.createdAt, monthAgo))),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, eq(candidate.status, "active"))),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, gte(candidate.matchScore, STRONG_MATCH))),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, gte(candidate.matchScore, STRONG_MATCH), eq(candidate.status, "new"))),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, eq(candidate.status, "placed"))),
+      db
+        .select({ total: count() })
+        .from(candidate)
+        .where(and(where, eq(candidate.status, "placed"), gte(candidate.updatedAt, yearStart))),
+    ]);
+
+  // "Across N clients" — distinct clients the submitted candidates sit under.
+  const clientRows = await db
+    .selectDistinct({ name: client.name })
+    .from(candidate)
+    .leftJoin(job, eq(candidate.jobId, job.id))
+    .leftJoin(client, eq(job.clientId, client.id))
+    .where(and(where, eq(candidate.status, "active"), isNotNull(client.name)));
+
+  // "N waiting" — sitting in a stage the client can see, i.e. the ball is in
+  // their court rather than ours.
+  const [waiting] = await db
+    .select({ total: count() })
+    .from(candidate)
+    .innerJoin(
+      application,
+      and(eq(application.candidateId, candidate.id), eq(application.jobId, candidate.jobId)),
+    )
+    .innerJoin(pipelineStage, eq(application.stageId, pipelineStage.id))
+    .where(and(where, eq(pipelineStage.clientVisible, true), eq(application.status, "active")));
+
+  return {
+    inPool: pool?.total ?? 0,
+    addedThisMonth: addedThisMonth?.total ?? 0,
+    submitted: submitted?.total ?? 0,
+    submittedWaiting: waiting?.total ?? 0,
+    submittedClients: clientRows.length,
+    strongMatch: strong?.total ?? 0,
+    strongMatchUnviewed: unviewed?.total ?? 0,
+    joined: joined?.total ?? 0,
+    joinedThisYear: joinedYtd?.total ?? 0,
+  };
+}
+
 export async function archiveCandidate(organizationId: string, id: string) {
   const [archived] = await db
     .update(candidate)

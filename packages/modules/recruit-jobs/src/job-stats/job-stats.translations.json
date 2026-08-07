@@ -1,0 +1,16 @@
+{
+  "stats": {
+    "open": "Open requirements",
+    "openDelta": "across {value} clients",
+    "openedThisWeek": "{{openedThisWeek}} opened this week",
+    "waiting": "Awaiting client decision",
+    "waitingDelta": "{value} past SLA",
+    "oldest": "Oldest {{oldest}} days",
+    "ageing": "Ageing over 30 days",
+    "ageingDelta": "of {value}",
+    "ageingNote": "Worth a client conversation",
+    "filled": "Filled this quarter",
+    "filledDelta": "{value}%",
+    "avgTimeToHire": "Avg {{avgTimeToHire}} days to hire"
+  }
+}

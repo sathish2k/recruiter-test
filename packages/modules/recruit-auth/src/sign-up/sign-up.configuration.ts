@@ -1,47 +1,81 @@
 import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
+// The design links in the action colour at 13/600, underline on hover only.
 const accentSx = {
+  fontSize: 13,
   fontWeight: 600,
-  color: "surface.primarySoftFg",
+  color: "surface.linkFg",
   textDecoration: "none",
-  "&:hover": { color: "primary.light" },
+  "&:hover": { textDecoration: "underline" },
 };
-const mutedSx = { color: "text.secondary", textDecoration: "none" };
+// Links inside a sentence take the sentence's own size.
+const inlineSx = {
+  fontSize: "inherit",
+  fontWeight: 700,
+  color: "surface.linkFg",
+  textDecoration: "none",
+  "&:hover": { textDecoration: "underline" },
+};
 
 const schema: JsonSchema = {
   type: "object",
-  required: ["fullName", "email", "password"],
+  required: ["firstName", "lastName", "agency", "email", "password"],
   errorMessage: {
     required: {
-      fullName: "fullName.errors.required",
+      firstName: "firstName.errors.required",
+      lastName: "lastName.errors.required",
+      agency: "agency.errors.required",
       email: "email.errors.required",
       password: "password.errors.required",
     },
   },
   properties: {
-    fullName: {
+    firstName: {
       type: "string",
       minLength: 2,
+      maxLength: 50,
       icon: "person",
-      hideLabel: true,
-      title: "fullName.label",
-      placeholder: "fullName.placeholder",
-      errorMessage: { minLength: "fullName.errors.minLength" },
+      title: "firstName.label",
+      placeholder: "firstName.placeholder",
+      grid: { size: { xs: 12, sm: 6 } },
+      errorMessage: {
+        minLength: "firstName.errors.minLength",
+        maxLength: "firstName.errors.maxLength",
+      },
+    },
+    lastName: {
+      type: "string",
+      minLength: 2,
+      maxLength: 50,
+      icon: "person",
+      title: "lastName.label",
+      placeholder: "lastName.placeholder",
+      grid: { size: { xs: 12, sm: 6 } },
+      errorMessage: {
+        minLength: "lastName.errors.minLength",
+        maxLength: "lastName.errors.maxLength",
+      },
     },
     agency: {
       type: "string",
+      minLength: 2,
+      maxLength: 50,
       icon: "domain",
-      hideLabel: true,
       title: "agency.label",
       placeholder: "agency.placeholder",
+      grid: { size: 12 },
+      errorMessage: {
+        minLength: "agency.errors.minLength",
+        maxLength: "agency.errors.maxLength",
+      },
     },
     email: {
       type: "string",
       format: "email",
       icon: "mail",
-      hideLabel: true,
       title: "email.label",
       placeholder: "email.placeholder",
+      grid: { size: 12 },
       errorMessage: { format: "email.errors.format" },
     },
     password: {
@@ -49,18 +83,18 @@ const schema: JsonSchema = {
       format: "password",
       minLength: 8,
       icon: "lock",
-      hideLabel: true,
       strengthMeter: true,
       title: "password.label",
       placeholder: "password.placeholder",
+      grid: { size: 12 },
       errorMessage: { minLength: "password.errors.minLength" },
     },
   },
 };
 
 const links: Record<string, LinkRendererConfig> = {
-  tos: { href: "#", text: "terms.tos", sx: mutedSx },
-  privacy: { href: "#", text: "terms.privacy", sx: mutedSx },
+  tos: { routeId: "Recruit.Terms.Route", text: "terms.tos", sx: inlineSx },
+  privacy: { routeId: "Recruit.Privacy.Route", text: "terms.privacy", sx: inlineSx },
   signIn: {
     routeId: "Auth.Login.Route",
     text: "footerLink",
@@ -69,4 +103,8 @@ const links: Record<string, LinkRendererConfig> = {
   },
 };
 
-export const SignUpConfiguration = { schema, links };
+// The design pairs the two name fields on one row; everything below runs full
+// width. A field's `grid.size` counts in these 12 columns.
+const gridContainer = { columns: 12, spacing: "16px" } as const;
+
+export const SignUpConfiguration = { schema, links, gridContainer };

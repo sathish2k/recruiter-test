@@ -1,15 +1,19 @@
 "use client";
 
-import PersonAddAlt1Rounded from "@mui/icons-material/PersonAddAlt1Rounded";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
+import { useState } from "react";
 import { FormRenderer } from "../forms";
-import type { FormValues, JsonSchema } from "../forms/types";
+import type { FormRendererProps, FormValues, JsonSchema } from "../forms/types";
+import { IconRenderer } from "../renderers/icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
 
 export interface SignUpValues {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   agency: string;
   email: string;
   password: string;
@@ -18,17 +22,29 @@ export interface SignUpValues {
 interface SignUpConfig {
   schema?: JsonSchema;
   links?: Record<string, LinkRendererConfig>;
+  /** Column model for the field grid — the design's paired name row. */
+  gridContainer?: FormRendererProps["gridContainer"];
 }
 
 export function SignUp({
   id,
   onSubmit,
+  error,
+  onClearError,
 }: {
   id: string;
   onSubmit: (values: SignUpValues) => void | Promise<void>;
+  /** Shown as an error alert above the form, e.g. the address is taken. */
+  error?: string;
+  /** Called when the user edits a field while an error is shown — dismiss it. */
+  onClearError?: () => void;
 }) {
-  const { schema, links } = useConfiguration<SignUpConfig>(id);
+  const { schema, links, gridContainer } = useConfiguration<SignUpConfig>(id);
   const { t } = useTranslation(id);
+  // Consent is a decision, not a value the account carries, so it stays out of
+  // the schema and gates the submit here — the same shape as "remember me".
+  const [accepted, setAccepted] = useState(false);
+  const [showConsentError, setShowConsentError] = useState(false);
   const link = (config?: LinkRendererConfig) =>
     config ? { ...config, text: t(config.text ?? "") } : undefined;
   const tos = link(links?.tos);
@@ -37,34 +53,116 @@ export function SignUp({
 
   return (
     <AuthCard
-      icon={<PersonAddAlt1Rounded sx={{ fontSize: 26 }} />}
       title={t("title")}
       subtitle={t("subtitle")}
-      width={440}
+      slab={{
+        kicker: t("slab.kicker"),
+        title: t("slab.title"),
+        blurb: t("slab.blurb"),
+        footer: t("slab.footer"),
+      }}
+      footer={
+        <>
+          {t("footerText")} {signIn ? <LinkRenderer config={signIn} /> : null}
+        </>
+      }
     >
+      {error ? (
+        <Alert severity="error" sx={{ mb: "16px" }}>
+          {error}
+        </Alert>
+      ) : null}
       {schema ? (
-        <FormRenderer
-          id={id}
-          schema={schema}
-          onSubmit={(v: FormValues) => onSubmit(v as unknown as SignUpValues)}
-        />
+        <Box onInput={() => error && onClearError?.()}>
+          <FormRenderer
+            id={id}
+            schema={schema}
+            gridContainer={gridContainer}
+            submitIcon="arrow-forward"
+            onSubmit={(v: FormValues) => {
+              if (!accepted) {
+                setShowConsentError(true);
+                return;
+              }
+              return onSubmit(v as unknown as SignUpValues);
+            }}
+            beforeSubmit={
+              <Box sx={{ display: "flex", flexDirection: "column", gap: "8px", mt: "8px" }}>
+                <Box
+                  component="button"
+                  type="button"
+                  onClick={() => {
+                    setAccepted((value) => !value);
+                    setShowConsentError(false);
+                  }}
+                  aria-pressed={accepted}
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "11px",
+                    border: "none",
+                    background: "none",
+                    p: 0,
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      mt: "1px",
+                      flex: "none",
+                      borderRadius: "5px",
+                      border: "1.5px solid",
+                      borderColor: accepted
+                        ? "primary.main"
+                        : showConsentError
+                          ? "surface.errorFg"
+                          : "surface.controlOutline",
+                      bgcolor: accepted ? "primary.main" : "transparent",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "primary.contrastText",
+                      transition: "var(--recruit-motion-state)",
+                    }}
+                  >
+                    {accepted ? <IconRenderer name="check" size={14} color="inherit" /> : null}
+                  </Box>
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: 12.5, lineHeight: 1.6, color: "surface.textMuted" }}
+                  >
+                    {t("terms.consent")} {tos ? <LinkRenderer config={tos} /> : null}{" "}
+                    {t("terms.and")} {privacy ? <LinkRenderer config={privacy} /> : null}
+                    {t("terms.authorised")}
+                  </Typography>
+                </Box>
+                {showConsentError ? (
+                  <Typography
+                    role="alert"
+                    sx={{
+                      display: "flex",
+                      gap: "5px",
+                      fontSize: 11.5,
+                      lineHeight: 1.5,
+                      color: "surface.errorFg",
+                    }}
+                  >
+                    <IconRenderer name="error" size={14} color="inherit" />
+                    {t("terms.required")}
+                  </Typography>
+                ) : null}
+              </Box>
+            }
+          />
+        </Box>
       ) : null}
 
-      <Typography
-        sx={{
-          mt: "16px",
-          fontSize: 11.5,
-          lineHeight: 1.5,
-          color: "text.disabled",
-          textAlign: "center",
-        }}
-      >
+      <Typography sx={{ mt: "14px", fontSize: 11.5, lineHeight: 1.6, color: "text.secondary" }}>
         {t("terms.text")} {tos ? <LinkRenderer config={tos} /> : null} {t("terms.and")}{" "}
         {privacy ? <LinkRenderer config={privacy} /> : null}.
-      </Typography>
-
-      <Typography sx={{ mt: "20px", fontSize: 13, color: "text.secondary", textAlign: "center" }}>
-        {t("footerText")} {signIn ? <LinkRenderer config={signIn} /> : null}
       </Typography>
     </AuthCard>
   );

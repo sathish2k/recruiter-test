@@ -187,7 +187,7 @@ export function TableRenderer({
           },
           "& .MuiTableBody-root .MuiTableCell-root": {
             padding: "13px 10px",
-            borderTop: "1px solid",
+            borderTop: "1px dashed",
             borderColor: "surface.divider",
             "&:first-of-type": { paddingLeft: "20px" },
             "&:last-of-type": { paddingRight: "20px" },
@@ -195,26 +195,68 @@ export function TableRenderer({
         }
       : undefined;
 
+  // The `list` card is full-bleed for the rows only; everything above them
+  // keeps the gutter the panel variant gets from the theme.
+  const listGutter = config?.variant === "list" ? { px: "20px", pt: "20px" } : undefined;
+
+  // Pinning needs an opaque ground on the frozen cells, or the scrolled columns
+  // show through them. The head cell also has to outrank both the sticky header
+  // (z 2, from the theme) and the pinned body cells.
+  const pinIndex = selectable ? 2 : 1;
+  const pinSx = config?.pinFirstColumn
+    ? {
+        [`& .MuiTableCell-root:nth-of-type(-n+${pinIndex})`]: {
+          position: "sticky" as const,
+          left: 0,
+          zIndex: 1,
+          background: "var(--mui-palette-surface-paper)",
+        },
+        ...(selectable
+          ? { "& .MuiTableCell-root:nth-of-type(2)": { left: "var(--recruit-pin-offset, 46px)" } }
+          : {}),
+        [`& .MuiTableCell-head:nth-of-type(-n+${pinIndex})`]: {
+          zIndex: 3,
+          background: "var(--mui-palette-surface-headBg)",
+        },
+      }
+    : undefined;
+
+  // The header can only stick to something that scrolls, so it is bound to
+  // `maxHeight` rather than set globally — a sticky head with no scroll parent
+  // latches onto the page and floats over the app bar.
+  const scrollSx =
+    config?.maxHeight !== undefined
+      ? {
+          maxHeight: config.maxHeight,
+          overflow: "auto" as const,
+          "& .MuiTableCell-head": { position: "sticky" as const, top: 0, zIndex: 2 },
+        }
+      : undefined;
+
   return (
-    <TableContainer sx={listSx}>
+    <TableContainer sx={{ ...listSx, ...scrollSx, ...pinSx }}>
       {config?.header ? (
-        <TableTitle
-          config={config.header}
-          meta={meta}
-          t={t}
-          extra={headerExtra}
-          action={headerAction}
-        />
+        <Box sx={listGutter}>
+          <TableTitle
+            config={config.header}
+            meta={meta}
+            t={t}
+            extra={headerExtra}
+            action={headerAction}
+          />
+        </Box>
       ) : null}
       {selectable && selected.size > 0 ? (
-        <TableBulkBar
-          count={selected.size}
-          actions={config?.bulkActions ?? []}
-          rows={selectedRows}
-          bulkHandler={bulkHandler}
-          onClear={() => setSelected(new Set())}
-          t={t}
-        />
+        <Box sx={config?.variant === "list" ? { px: "20px" } : undefined}>
+          <TableBulkBar
+            count={selected.size}
+            actions={config?.bulkActions ?? []}
+            rows={selectedRows}
+            bulkHandler={bulkHandler}
+            onClear={() => setSelected(new Set())}
+            t={t}
+          />
+        </Box>
       ) : null}
       {/* Declared column widths only bind under a fixed layout; tables that
           don't set any keep the browser's content-driven sizing. */}

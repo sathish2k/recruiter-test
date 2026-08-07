@@ -3,7 +3,13 @@ import type { Configuration } from "@recruit/sdk";
 export const CandidatePages: Record<string, Configuration> = {
   "Recruit.Candidates.Page": {
     id: "Recruit.Candidates.Page",
+    stackContainer: { spacing: 2.5 },
     elements: [
+      {
+        id: "candidate-stats",
+        type: "component",
+        componentType: "Recruit.CandidateStats.Component",
+      },
       { id: "candidates", type: "component", componentType: "Recruit.Candidates.Component" },
     ],
   },

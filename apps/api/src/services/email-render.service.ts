@@ -35,7 +35,7 @@ const PALETTE = {
   muted: "#8B8880",
   faint: "#A39E94",
   rule: "#EDE7DC",
-  accent: "#E4560F",
+  accent: "#0E2E5C",
   accentText: "#B4530C",
   brandAccent: "#F59E0B",
   panel: "#F7F5F2",
@@ -124,7 +124,7 @@ export function renderTemplate(
 
   const ctaHtml = hasAction
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px">
-      <tr><td align="center" bgcolor="${PALETTE.accent}" style="background:${PALETTE.accent};border-radius:999px;box-shadow:0 5px 14px rgba(228,86,15,.26)">
+      <tr><td align="center" bgcolor="${PALETTE.accent}" style="background:${PALETTE.accent};border-radius:999px;box-shadow:0 5px 14px rgba(14,46,92,.26)">
         <a href="${escapeHtml(actionUrl)}" style="display:inline-block;padding:13px 28px;font-family:${FONT};font-size:13.5px;font-weight:700;line-height:1;color:#FFFFFF;text-decoration:none;border-radius:999px">${escapeHtml(fill(template.cta))}</a>
       </td></tr>
     </table>

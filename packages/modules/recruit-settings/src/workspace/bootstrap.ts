@@ -1,14 +1,13 @@
 import type { ComponentDefinition, ComponentDependency } from "@recruit/sdk";
 import { SettingsWorkspaceComponent } from "./workspace.component";
-import { WorkspaceConfiguration } from "./workspace.configuration";
+import {
+  BrandingConfiguration,
+  EmailSettingsConfiguration,
+  GeneralConfiguration,
+  LocalizationConfiguration,
+} from "./workspace.configuration";
 import { organizationDatasource } from "./workspace.datasource";
 import fallbackTranslation from "./workspace.translations.json";
-
-const CONFIGURATION: ComponentDependency = {
-  id: "Recruit.SettingsWorkspace.Configuration",
-  type: "CONFIGURATION",
-  value: WorkspaceConfiguration,
-};
 
 const TRANSLATION: ComponentDependency = {
   id: "Recruit.SettingsWorkspace.Translation",
@@ -22,12 +21,64 @@ const DATASOURCE: ComponentDependency = {
   value: organizationDatasource,
 };
 
-export const SETTINGS_WORKSPACE_COMPONENT: ComponentDefinition = {
-  id: "Recruit.SettingsWorkspace.Component",
+// The four workspace tabs are one form component over one record, differing
+// only in which fields their configuration exposes. `updateOrganization` merges
+// the patch, so a tab never writes a field it doesn't show.
+export const SETTINGS_GENERAL_COMPONENT: ComponentDefinition = {
+  id: "Recruit.SettingsGeneral.Component",
   type: "COMPONENT",
   value: SettingsWorkspaceComponent,
   default: {
-    configuration: CONFIGURATION,
+    configuration: {
+      id: "Recruit.SettingsGeneral.Configuration",
+      type: "CONFIGURATION",
+      value: GeneralConfiguration,
+    },
+    translation: TRANSLATION,
+    datasource: DATASOURCE,
+  },
+};
+
+export const SETTINGS_BRANDING_COMPONENT: ComponentDefinition = {
+  id: "Recruit.SettingsBranding.Component",
+  type: "COMPONENT",
+  value: SettingsWorkspaceComponent,
+  default: {
+    configuration: {
+      id: "Recruit.SettingsBranding.Configuration",
+      type: "CONFIGURATION",
+      value: BrandingConfiguration,
+    },
+    translation: TRANSLATION,
+    datasource: DATASOURCE,
+  },
+};
+
+export const SETTINGS_LOCALIZATION_COMPONENT: ComponentDefinition = {
+  id: "Recruit.SettingsLocalization.Component",
+  type: "COMPONENT",
+  value: SettingsWorkspaceComponent,
+  default: {
+    configuration: {
+      id: "Recruit.SettingsLocalization.Configuration",
+      type: "CONFIGURATION",
+      value: LocalizationConfiguration,
+    },
+    translation: TRANSLATION,
+    datasource: DATASOURCE,
+  },
+};
+
+export const SETTINGS_EMAIL_COMPONENT: ComponentDefinition = {
+  id: "Recruit.SettingsEmail.Component",
+  type: "COMPONENT",
+  value: SettingsWorkspaceComponent,
+  default: {
+    configuration: {
+      id: "Recruit.SettingsEmail.Configuration",
+      type: "CONFIGURATION",
+      value: EmailSettingsConfiguration,
+    },
     translation: TRANSLATION,
     datasource: DATASOURCE,
   },

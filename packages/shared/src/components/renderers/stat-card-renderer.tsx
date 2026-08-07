@@ -14,6 +14,7 @@ import { useToast } from "../toast/toast";
 import { GenericRenderer, type GenericRendererConfig } from "./generic-renderer";
 import { IconRenderer } from "./icon-renderer";
 import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
+import { TONE_BG_VAR as TONE_BG, TONE_FG_VAR as TONE_FG } from "./tones";
 
 export interface StatCardRendererConfig {
   /** `name` is a translation key resolved via useTranslation(id). */
@@ -38,8 +39,13 @@ export interface StatCardRendererConfig {
   /** Theme Card variant override (e.g. "accent" for the gradient hero card).
    * Defaults to "interactive" when `link` is set, else "base". */
   variant?: CardProps["variant"];
-  /** Leading icon rendered top-right in the card header row. */
-  icon?: { name: string; size?: number; color?: string };
+  /** Tints the whole card, not just the icon tile. The design colours a KPI by
+   * what it measures — revenue green, money owed red — so the row reads as a
+   * status line before any number is parsed. */
+  tone?: StatTone;
+  /** Leading icon. In KPI mode the design draws it in a 32px tinted tile to
+   * the left of the label; `tone` picks the tint. */
+  icon?: { name: string; size?: number; color?: string; tone?: StatTone };
   /** Sub-metric line below the value. `name` is a translation key interpolated
    * against the full data row (i18next `{{token}}` style). */
   sub?: { name: string; sx?: TypographyProps["sx"] };
@@ -70,6 +76,17 @@ export interface StatCardRendererConfig {
 
 export type StatCardSize = "compact" | "sm" | "md";
 
+/** The tints a KPI tile may carry. Semantic, never decorative — `primary` is
+ * the action colour, `secondary` the amber "one thing in motion". */
+export type StatTone =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "error"
+  | "info"
+  | "violet";
+
 const DELTA_COLOR = "var(--mui-palette-surface-primarySoftFg)";
 
 /** Every metric the design varies between the two tile scales. */
@@ -78,7 +95,7 @@ const SIZES = {
     padding: "18px 20px",
     label: 13,
     labelGap: "10px",
-    value: 27,
+    value: 26,
     sub: 10.5,
     subGap: "6px",
     delta: 12,
@@ -107,10 +124,11 @@ const SIZES = {
   },
 } as const;
 
-const VALUE_SX = { fontWeight: 700, letterSpacing: "-.01em" };
-
-const ICON_COLOR = "var(--mui-palette-surface-primarySoftFg)";
-const ICON_SIZE = 17;
+const VALUE_SX = {
+  fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+  fontWeight: 700,
+  letterSpacing: "-.01em",
+};
 
 type T = (key: string, vars?: string | Record<string, unknown>) => string;
 
@@ -242,41 +260,63 @@ function StatCard({
   if (config.delta) {
     const template = t(config.delta.name);
     const dynamic = config.delta.value != null ? delve(data, config.delta.value) : undefined;
-    deltaText =
-      dynamic == null
-        ? template
-        : template.includes("{value}")
-          ? template.replace(/\{value\}/g, String(dynamic))
-          : `${template} ${dynamic}`;
+    // A template that interpolates but has nothing to interpolate is worse than
+    // no delta at all — it renders the literal "{value}" on the card.
+    if (dynamic == null || dynamic === "") {
+      deltaText = template.includes("{value}") ? "" : template;
+    } else {
+      deltaText = template.includes("{value}")
+        ? template.replace(/\{value\}/g, String(dynamic))
+        : `${template} ${dynamic}`;
+    }
   }
 
   const deltaColor = config.delta?.color ?? DELTA_COLOR;
 
   const cardSx = kpiMode
-    ? { color: "text.primary", height: "100%" }
+    ? {
+        color: "text.primary",
+        height: "100%",
+        // The design's KPI tile is 18/20, not the theme's uniform 20 — the
+        // shorter top and bottom is what keeps the row from looking loose.
+        padding: size.padding,
+        ...(config.tone ? { bgcolor: TONE_BG[config.tone], boxShadow: "none" } : {}),
+      }
     : { color: "text.primary", height: "100%", borderRadius: "14px", padding: size.padding };
 
   const card = (
     <Card variant={variant} sx={cardSx}>
       {kpiMode ? (
+        // A KPI tile carrying a third line tightens the gap under the label so
+        // label/value/sub still fit the same card height the design draws.
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            mb: "14px",
+            gap: "10px",
+            mb: config.sub ? "8px" : "12px",
           }}
         >
-          <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+          {config.icon ? (
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                flex: "none",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: config.tone ? "background.paper" : TONE_BG[config.icon.tone ?? "primary"],
+                color: config.icon.color ?? TONE_FG[config.icon.tone ?? "primary"],
+              }}
+            >
+              <IconRenderer name={config.icon.name} size={config.icon.size ?? 18} color="inherit" />
+            </Box>
+          ) : null}
+          <Typography sx={{ fontSize: 12.5, color: "surface.textMuted" }}>
             {config.label ? t(config.label.name) : ""}
           </Typography>
-          {config.icon ? (
-            <IconRenderer
-              name={config.icon.name}
-              size={config.icon.size ?? ICON_SIZE}
-              color={config.icon.color ?? ICON_COLOR}
-            />
-          ) : null}
         </Box>
       ) : (
         <Typography sx={{ fontSize: size.label, color: "text.secondary", mb: size.labelGap }}>
@@ -288,7 +328,14 @@ function StatCard({
         <ProgressStatBody config={config} data={data} t={t} />
       ) : kpiMode ? (
         <>
-          {config.value ? <GenericRenderer config={valueConfig} data={data} /> : null}
+          <Box sx={{ display: "flex", alignItems: "baseline", gap: "9px" }}>
+            {config.value ? <GenericRenderer config={valueConfig} data={data} /> : null}
+            {deltaText && !isZero ? (
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: deltaColor }}>
+                {deltaText}
+              </Typography>
+            ) : null}
+          </Box>
           {isZero && config.zeroSub ? (
             <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "8px" }}>
               {t(config.zeroSub.name)}
@@ -296,9 +343,9 @@ function StatCard({
           ) : config.sub ? (
             <Typography
               sx={{
-                fontSize: 12,
-                color: "text.secondary",
-                mt: "8px",
+                fontSize: 11.5,
+                color: "surface.textMuted",
+                mt: "4px",
                 ...config.sub.sx,
               }}
             >

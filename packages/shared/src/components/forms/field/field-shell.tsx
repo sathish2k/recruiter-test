@@ -3,6 +3,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createContext, type ReactNode, useContext } from "react";
+import { IconRenderer } from "../../renderers/icon-renderer";
 
 /** Set by `Field` from the schema's `required` list so any label — whichever
  * widget renders it — shows the asterisk without every widget threading a flag. */
@@ -17,7 +18,9 @@ export function FieldLabel({ label, hide }: { label: string; hide?: boolean }) {
   const optional = useContext(FieldOptionalContext);
   if (hide) return null;
   return (
-    <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: "surface.textMuted" }}>
+    <Typography
+      sx={{ fontSize: 12, lineHeight: "20px", fontWeight: 700, color: "surface.textMuted" }}
+    >
       {label}
       {required ? (
         <Box component="span" sx={{ color: "error.main", ml: "3px" }}>
@@ -69,7 +72,7 @@ export function FieldShell({
   helpPlacement?: "above" | "below";
 }) {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "6px" }}>
       {labelAction ? (
         <Box
           sx={{
@@ -95,13 +98,31 @@ export function FieldShell({
         <FieldLabel label={label} hide={hideLabel} />
       )}
       {help && helpPlacement === "above" && !error ? (
-        <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>{help}</Typography>
+        <Typography sx={{ fontSize: 12, lineHeight: 1.5, color: "text.secondary" }}>
+          {help}
+        </Typography>
       ) : null}
       {children}
+      {/* The design pairs an error with its glyph so the line reads as a state,
+          not as more helper text. */}
       {error ? (
-        <Typography sx={{ fontSize: 11, color: "error.main" }}>{error}</Typography>
+        <Typography
+          role="alert"
+          sx={{
+            display: "flex",
+            gap: "5px",
+            fontSize: 11.5,
+            lineHeight: 1.5,
+            color: "surface.errorFg",
+          }}
+        >
+          <IconRenderer name="error" size={14} color="inherit" />
+          {error}
+        </Typography>
       ) : help && helpPlacement === "below" ? (
-        <Typography sx={{ fontSize: 11, color: "text.disabled" }}>{help}</Typography>
+        <Typography sx={{ fontSize: 11.5, lineHeight: 1.5, color: "text.secondary" }}>
+          {help}
+        </Typography>
       ) : null}
     </Box>
   );

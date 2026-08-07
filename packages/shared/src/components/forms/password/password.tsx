@@ -31,8 +31,8 @@ export function PasswordWidget({ prop, field, fieldState, t }: WidgetProps) {
         slotProps={{
           input: {
             startAdornment: prop.icon ? (
-              <InputAdornment position="start" sx={{ color: "text.disabled" }}>
-                <IconRenderer name={prop.icon} size={18} />
+              <InputAdornment position="start" sx={{ color: "text.secondary" }}>
+                <IconRenderer name={prop.icon} size={20} />
               </InputAdornment>
             ) : undefined,
             endAdornment: (
@@ -41,9 +41,9 @@ export function PasswordWidget({ prop, field, fieldState, t }: WidgetProps) {
                 edge="end"
                 onClick={() => setReveal((value) => !value)}
                 aria-label={t("form.togglePassword", "Show or hide password")}
-                sx={{ color: "text.disabled" }}
+                sx={{ color: "text.secondary" }}
               >
-                <IconRenderer name={reveal ? "visibility-off" : "visibility"} size={18} />
+                <IconRenderer name={reveal ? "visibility-off" : "visibility"} size={19} />
               </IconButton>
             ),
           },

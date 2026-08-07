@@ -95,5 +95,5 @@ export const DARK_INPUT_STYLE: React.CSSProperties = {
   color: "text.primary",
   fontFamily: "inherit",
   outline: "none",
-  colorScheme: "dark",
+  colorScheme: "light dark",
 };

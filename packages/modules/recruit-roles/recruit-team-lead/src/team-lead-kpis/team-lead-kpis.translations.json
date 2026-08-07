@@ -1,0 +1,14 @@
+{
+  "greeting": "Your review queue",
+  "subtitle": "Nothing reaches a client until you sign it off.",
+  "kpis": {
+    "pendingApproval": "Pending your approval",
+    "pendingApprovalDelta": "{value}",
+    "teamSubmissions": "Team submissions",
+    "teamSubmissionsDelta": "{value}",
+    "interviewConversion": "Interview conversion",
+    "interviewConversionDelta": "{value}",
+    "slaBreaches": "SLA breaches",
+    "slaBreachesDelta": "{value}"
+  }
+}

@@ -474,7 +474,7 @@ export function FormWithSectionsRenderer({
           ...(section.iconBadge
             ? {
                 background:
-                  "linear-gradient(120deg,rgba(242,106,27,.18),rgba(28,28,27,0) 55%),#1C1C1B",
+                  "linear-gradient(120deg,var(--mui-palette-surface-heroTint),transparent 55%),var(--mui-palette-surface-paper)",
               }
             : section.variant === "filled"
               ? { bgcolor: "surface.inset" }
@@ -507,7 +507,7 @@ export function FormWithSectionsRenderer({
                   width: 34,
                   height: 34,
                   borderRadius: "10px",
-                  background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+                  background: "var(--mui-palette-primary-main)",
                   color: "#fff",
                   display: "flex",
                   alignItems: "center",
@@ -650,7 +650,7 @@ export function FormWithSectionsRenderer({
               component="span"
               sx={{
                 display: "inline-flex",
-                animation: `${savePop} .45s cubic-bezier(.3,1.4,.4,1)`,
+                animation: `${savePop} 250ms cubic-bezier(0,0,.2,1)`,
               }}
             >
               <IconRenderer name="check" size={16} />

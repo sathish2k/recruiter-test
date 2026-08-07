@@ -27,7 +27,7 @@ const EMAIL = {
   heading: "#211E1B",
   text: "#3D3A34",
   rule: "#EDE7DC",
-  accent: "#E4560F",
+  accent: "#0E2E5C",
   accentText: "#B4530C",
   panelBorder: "#D3C9B8",
   footerText: "#6E6B64",
@@ -277,7 +277,7 @@ export function EmailPreview({
                     fontWeight: 700,
                     p: "13px 28px",
                     borderRadius: "999px",
-                    boxShadow: "0 5px 14px rgba(228,86,15,.26)",
+                    boxShadow: "0 5px 14px rgba(14,46,92,.26)",
                     mt: "22px",
                   }}
                 >

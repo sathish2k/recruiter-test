@@ -7,7 +7,13 @@ export interface RouteGuard {
 
 export type RouteGuardFn = () => void | Promise<void>;
 
-export type AccessAction = "read" | "create" | "edit" | "update" | "delete";
+/**
+ * The verb half of a permission key. Deliberately open: `canAccess` does plain
+ * set-membership on these strings, and the vocabulary belongs to the app
+ * (`@recruit/types`), not to the engine. Keeping it closed here would mean
+ * every new domain verb had to be declared twice.
+ */
+export type AccessAction = string;
 
 /** Declarative access rule attachable to routes, page/layout elements and
  * component configs. `action` defaults to ["read"]; `attributes` adds
@@ -54,7 +60,12 @@ export interface Configuration {
   id: string;
   template?: "core" | "auth" | "custom";
   elements: LayoutElement[];
-  gridContainer?: Pick<GridProps, "spacing" | "direction">;
+  gridContainer?: Pick<GridProps, "spacing" | "direction"> & {
+    /** Explicit CSS grid tracks, for a layout a 12-column ratio cannot state —
+     * the design pins the dashboard's context column at exactly 380px. Children
+     * fall into the tracks in source order and their `gridItem` is ignored. */
+    templateColumns?: string;
+  };
   stackContainer?: { spacing?: number; direction?: "column" | "row" };
 }
 

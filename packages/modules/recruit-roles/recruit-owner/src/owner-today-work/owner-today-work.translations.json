@@ -1,0 +1,17 @@
+{
+  "title": "Today's work",
+  "subtitle": "Across the whole desk — yours to unblock, not to do",
+  "cta": "View work",
+  "feedbackOverdue": "Feedback overdue",
+  "feedbackOverdueDetail": "Clients holding submissions past the SLA",
+  "offersAwaiting": "Offers awaiting a decision",
+  "offersAwaitingDetail": "Candidates yet to accept or decline",
+  "invoicePastDue": "Invoice past due",
+  "invoicePastDueDetail": "Money owed beyond terms",
+  "interviewsToday": "Interviews today",
+  "interviewsTodayDetail": "Scheduled across every desk",
+  "resumesToScreen": "CVs to screen",
+  "resumesToScreenDetail": "From sourcing and the extension",
+  "clientsAtRisk": "Clients at risk",
+  "clientsAtRiskDetail": "Health dropped this week"
+}

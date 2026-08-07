@@ -1,14 +1,50 @@
 {
   "columns": {
-    "name": "Candidate",
-    "email": "Email",
-    "job": "Job",
-    "status": "Status",
-    "updated": "Updated",
-    "availability": "Availability"
+    "candidate": "Candidate",
+    "role": "Role & requisition",
+    "stage": "Stage",
+    "match": "AI match",
+    "owner": "Owner"
+  },
+  "meta": {
+    "notice": "notice {value}"
+  },
+  "quick": {
+    "all": "All",
+    "mine": "My candidates",
+    "pool": "Talent pool",
+    "interviewing": "Interviewing",
+    "offers": "Offers",
+    "joined": "Joined",
+    "rejected": "Rejected"
   },
   "filters": {
-    "search": "Search candidates…"
+    "search": "Name, email, skills, company or résumé text…",
+    "client": "Client",
+    "stage": "Stage",
+    "owner": "Owner",
+    "source": "Source"
+  },
+  "sources": {
+    "added_by_user": "Added by hand",
+    "resume_upload": "Résumé upload",
+    "csv_import": "CSV import",
+    "referral": "Referral",
+    "inbound": "Inbound",
+    "outbound": "Outbound",
+    "event": "Event"
+  },
+  "stages": {
+    "sourced": "Sourced",
+    "new": "New",
+    "qualified": "Qualified",
+    "screening": "Screening",
+    "submitted": "Submitted",
+    "interview": "Interview",
+    "offer": "Offer",
+    "placed": "Placed",
+    "joined": "Joined",
+    "rejected": "Rejected"
   },
   "actions": {
     "new": "New candidate",
@@ -17,16 +53,14 @@
     "import": "Import",
     "board": "Board"
   },
+  "export": "Export",
+  "exportAs": "EXPORT AS",
   "exportCsv": "Export CSV",
   "empty": "No candidates yet",
+  "moreFilters": "Filters",
+  "clearAll": "Clear all",
   "toast": {
     "copied": "Copied",
     "archived": "{{name}} archived — restore it from Archived."
-  },
-  "availabilities": {
-    "actively_looking": "Actively looking",
-    "open_to_offers": "Open to offers",
-    "not_looking": "Not looking",
-    "placed": "Placed"
   }
 }

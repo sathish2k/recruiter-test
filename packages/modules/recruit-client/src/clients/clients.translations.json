@@ -1,6 +1,6 @@
 {
   "searchPlaceholder": "Search clients…",
-  "addClient": "+ Add Client",
+  "addClient": "Add client",
   "export": "Export",
   "empty": "No clients yet. Add your first client to start sourcing.",
   "pageInfo": "{{count}} of {{total}} clients · page {{page}} of {{pages}}",
@@ -24,7 +24,7 @@
     "dormant": "Dormant"
   },
   "card": {
-    "requirements": "roles",
+    "requirements": "open",
     "candidates": "Candidates",
     "placements": "placed",
     "open": "Open client",
@@ -32,22 +32,19 @@
     "contacts": "View contacts",
     "more": "More",
     "edit": "Edit client",
-    "delete": "Delete",
+    "archive": "Archive",
     "candidateFlow": "CANDIDATE FLOW",
     "inPipeline": "in pipeline",
-    "accountManager": "ACCOUNT MANAGER",
+    "lastActivity": "LAST ACTIVITY",
     "flow": {
       "sourced": "sourced",
       "screening": "screening",
       "interviewing": "interviewing"
     }
   },
-  "deleteTitle": "Delete client",
-  "deleteBody": "Remove {{name}} from your workspace? This can't be undone.",
   "cancel": "Cancel",
-  "confirmDelete": "Delete client",
   "toast": {
-    "deleted": "{{name}} removed from your workspace",
+    "archived": "{{name}} archived",
     "exportSoon": "Export is coming soon"
   },
   "filters": {
@@ -56,10 +53,10 @@
   "moreFilters": "Filters",
   "clearAll": "Clear all",
   "showing": "{{shown}} of {{total}} clients · page {{page}} of {{pages}}",
-  "delete": {
-    "title": "Delete client",
-    "body": "Remove {{name}} from your workspace? This can't be undone.",
-    "confirm": "Delete client",
+  "archive": {
+    "title": "Archive client",
+    "body": "Hide {{name}} from lists and pickers? Their requirements, submissions and placements are kept, and you can restore them later.",
+    "confirm": "Archive client",
     "cancel": "Cancel"
   },
   "exportAs": "EXPORT AS",

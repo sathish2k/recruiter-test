@@ -21,7 +21,7 @@ export const AppearanceConfiguration: AppearanceConfiguration = {
     { value: "light", icon: "light-mode", label: "theme.light" },
     { value: "dark", icon: "dark-mode", label: "theme.dark" },
   ],
-  accents: ["#E4560F", "#D69B3C", "#3C7DD6", "#2F9E6B"],
+  accents: ["#0E2E5C", "#F59E0B", "#00B8D9", "#22C55E"],
   uiPrefs: [
     { key: "compact", label: "prefs.compact.label", description: "prefs.compact.description" },
     { key: "sidebar", label: "prefs.sidebar.label", description: "prefs.sidebar.description" },

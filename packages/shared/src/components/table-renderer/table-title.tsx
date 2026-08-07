@@ -27,13 +27,15 @@ export function TableTitle({
     <Box
       sx={{
         display: "flex",
-        alignItems: "center",
+        // A tall `extra` (a meter, a banner) tops out against the action rather
+        // than centring the whole row on it.
+        alignItems: extra ? "flex-start" : "center",
         justifyContent: "space-between",
         gap: "12px",
         mb: "16px",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: "11px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "11px", flex: 1, minWidth: 0 }}>
         {config.icon ? (
           <Avatar
             variant="rounded"
@@ -48,7 +50,7 @@ export function TableTitle({
             <IconRenderer name={config.icon} size={18} />
           </Avatar>
         ) : null}
-        <Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           {config.title ? (
             <Box sx={{ fontSize: 15, fontWeight: 700, lineHeight: 1.2 }}>{t(config.title)}</Box>
           ) : null}
@@ -60,23 +62,25 @@ export function TableTitle({
           {extra}
         </Box>
       </Box>
-      {action ??
-        (config.action ? (
-          <LinkRenderer config={config.action}>
-            <Chip
-              variant="soft"
-              color="primary"
-              clickable
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  {config.action.label ? t(config.action.label.name) : ""}
-                  {config.actionIcon ? <IconRenderer name={config.actionIcon} size={15} /> : null}
-                </Box>
-              }
-              sx={{ px: "4px", py: "16px" }}
-            />
-          </LinkRenderer>
-        ) : null)}
+      <Box sx={{ flex: "none" }}>
+        {action ??
+          (config.action ? (
+            <LinkRenderer config={config.action}>
+              <Chip
+                variant="soft"
+                color="primary"
+                clickable
+                label={
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    {config.action.label ? t(config.action.label.name) : ""}
+                    {config.actionIcon ? <IconRenderer name={config.actionIcon} size={15} /> : null}
+                  </Box>
+                }
+                sx={{ px: "4px", py: "16px" }}
+              />
+            </LinkRenderer>
+          ) : null)}
+      </Box>
     </Box>
   );
 }

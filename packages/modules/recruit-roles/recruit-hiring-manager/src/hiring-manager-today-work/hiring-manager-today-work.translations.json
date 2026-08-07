@@ -1,0 +1,17 @@
+{
+  "title": "Today's work",
+  "cta": "View work",
+  "feedbackOverdue": "Feedback overdue",
+  "feedbackOverdueDetail": "Clients holding submissions past the SLA",
+  "offersAwaiting": "Awaiting your approval",
+  "offersAwaitingDetail": "Nothing reaches a client until you sign it off",
+  "invoicePastDue": "Roles due today",
+  "invoicePastDueDetail": "The SLA clock runs out at close of business",
+  "interviewsToday": "Interviews today",
+  "interviewsTodayDetail": "Scheduled across every desk",
+  "resumesToScreen": "CVs to screen",
+  "resumesToScreenDetail": "From sourcing and the extension",
+  "clientsAtRisk": "Clients at risk",
+  "clientsAtRiskDetail": "Health dropped this week",
+  "subtitle": "This month, by reason"
+}

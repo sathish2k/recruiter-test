@@ -1,0 +1,14 @@
+{
+  "title": "Fees by quarter",
+  "subtitle": "Submitted value against booked, across your portfolio",
+  "seriesA": "Submitted value",
+  "seriesB": "Booked",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "revenue": "Revenue",
+    "placements": "Placements"
+  }
+}

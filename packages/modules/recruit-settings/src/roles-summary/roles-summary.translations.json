@@ -1,0 +1,20 @@
+{
+  "title": "Roles",
+  "action": "Open roles & permissions",
+  "members": "{{count}} member",
+  "members_other": "{{count}} members",
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "profileLead": "Profile Lead",
+    "recruiter": "Recruiter",
+    "sourcer": "Sourcer"
+  },
+  "roleDetail": {
+    "owner": "Full control including billing, plan and ownership transfer.",
+    "admin": "Manages people, teams and workspace configuration. Cannot change billing.",
+    "profileLead": "Owns their clients end to end — submits, approves and invoices.",
+    "recruiter": "Works assigned requisitions. Sends submissions up for approval.",
+    "sourcer": "Sourcing only. Cannot submit, reject, or see fees."
+  }
+}

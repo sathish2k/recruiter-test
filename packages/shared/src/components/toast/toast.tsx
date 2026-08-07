@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 
-export type ToastKind = "success" | "warning" | "error";
+export type ToastKind = "info" | "success" | "warning" | "error";
 
 export interface ToastAction {
   label: string;
@@ -32,15 +32,21 @@ export interface ToastState {
 
 export interface UseToastResult {
   toast: ToastState | null;
+  /** Every live toast, newest last. `toast` is the newest, for back-compat. */
+  toasts: ToastState[];
   show: (title: string, sub?: string, kind?: ToastKind, action?: ToastAction) => void;
-  clear: () => void;
+  /** Dismiss one toast, or all of them when called with no id. */
+  clear: (id?: number) => void;
 }
 
 let seq = 0;
 
+/** More than this on screen and the stack is the notification, not the news. */
+const MAX_STACK = 3;
+
 interface ToastTrigger {
   show: (title: string, sub?: string, kind?: ToastKind, action?: ToastAction) => void;
-  clear: () => void;
+  clear: (id?: number) => void;
 }
 
 const ToastContext = createContext<ToastTrigger | null>(null);
@@ -50,20 +56,27 @@ const ToastContext = createContext<ToastTrigger | null>(null);
  * fire it via `useToast().show(...)`. No per-screen `<Toast>` needed.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toast, setToast] = useState<ToastState | null>(null);
+  const [toasts, setToasts] = useState<ToastState[]>([]);
   const show = useCallback(
     (title: string, sub?: string, kind: ToastKind = "success", action?: ToastAction) => {
       seq += 1;
-      setToast({ id: seq, title, sub, kind, action });
+      const next: ToastState = { id: seq, title, sub, kind, action };
+      // A second event stacks under the first rather than replacing it — a
+      // toast the recruiter never saw is a toast that did not happen.
+      setToasts((current) => [...current, next].slice(-MAX_STACK));
     },
     [],
   );
-  const clear = useCallback(() => setToast(null), []);
+  const clear = useCallback(
+    (id?: number) =>
+      setToasts((current) => (id === undefined ? [] : current.filter((t) => t.id !== id))),
+    [],
+  );
   const value = useMemo<ToastTrigger>(() => ({ show, clear }), [show, clear]);
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <Toast toast={toast} onClose={clear} />
+      <Toast toasts={toasts} onClose={clear} />
     </ToastContext.Provider>
   );
 }
@@ -76,17 +89,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
  */
 export function useToast(): UseToastResult {
   const trigger = useContext(ToastContext);
-  const [toast, setToast] = useState<ToastState | null>(null);
+  const [toasts, setToasts] = useState<ToastState[]>([]);
   const localShow = useCallback(
     (title: string, sub?: string, kind: ToastKind = "success", action?: ToastAction) => {
       seq += 1;
-      setToast({ id: seq, title, sub, kind, action });
+      setToasts((current) => [...current, { id: seq, title, sub, kind, action }].slice(-MAX_STACK));
     },
     [],
   );
-  const localClear = useCallback(() => setToast(null), []);
-  if (trigger) return { toast: null, show: trigger.show, clear: trigger.clear };
-  return { toast, show: localShow, clear: localClear };
+  const localClear = useCallback(
+    (id?: number) =>
+      setToasts((current) => (id === undefined ? [] : current.filter((t) => t.id !== id))),
+    [],
+  );
+  if (trigger) return { toast: null, toasts: [], show: trigger.show, clear: trigger.clear };
+  return { toast: toasts.at(-1) ?? null, toasts, show: localShow, clear: localClear };
 }
 
 const RING_R = 16.5;
@@ -95,7 +112,10 @@ const VISIBLE_MS = 2600;
 
 // The "orbit" toast: a 3D flip-in card, a self-drawing glyph, an orbiting
 // satellite dot and a conic-style countdown ring that drains over its lifetime.
-const flip = keyframes`0%{transform:perspective(700px) rotateX(-72deg) translateY(-6px);opacity:0}55%{transform:perspective(700px) rotateX(7deg);opacity:1}80%{transform:perspective(700px) rotateX(-3deg)}100%{transform:perspective(700px) rotateX(0)}`;
+// A plain decelerating entrance. The overshoot steps this used to carry
+// (rotateX 7deg → -3deg) were a spring, and the kit has none: "no bounce, no
+// spring, no scale on press".
+const flip = keyframes`0%{transform:perspective(700px) rotateX(-72deg) translateY(-6px);opacity:0}100%{transform:perspective(700px) rotateX(0) translateY(0);opacity:1}`;
 const rise = keyframes`0%{transform:translateY(9px);opacity:0;filter:blur(3px)}100%{transform:translateY(0);opacity:1;filter:blur(0)}`;
 const orbit = keyframes`0%{transform:rotate(0deg) translateX(21px) rotate(0deg);opacity:1}85%{opacity:1}100%{transform:rotate(390deg) translateX(21px) rotate(-390deg);opacity:0}`;
 
@@ -108,6 +128,11 @@ const svgKeyframes = {
 };
 
 const KIND: Record<ToastKind, { main: string; fg: string; path: string }> = {
+  info: {
+    main: "var(--mui-palette-info-main)",
+    fg: "var(--mui-palette-info-light)",
+    path: "M8 7.2 L8 12.5 M8 4.2 L8 4.3",
+  },
   success: {
     main: "var(--mui-palette-success-main)",
     fg: "var(--mui-palette-success-light)",
@@ -125,20 +150,37 @@ const KIND: Record<ToastKind, { main: string; fg: string; path: string }> = {
   },
 };
 
-export function Toast({ toast, onClose }: { toast: ToastState | null; onClose: () => void }) {
+export function Toast({
+  toast,
+  toasts,
+  onClose,
+}: {
+  /** Single-toast form, kept for callers holding their own local state. */
+  toast?: ToastState | null;
+  /** Stacked form — what `ToastProvider` uses. */
+  toasts?: ToastState[];
+  onClose: (id?: number) => void;
+}) {
+  const list = toasts ?? (toast ? [toast] : []);
   return (
     <Box
+      // Live region, so a toast is announced rather than only seen.
+      role="status"
+      aria-live="polite"
       sx={{
         position: "fixed",
         top: "20px",
         right: "26px",
-        zIndex: 9990,
+        // F06: the layer scale is MUI's, kept identical on purpose.
+        zIndex: (theme) => theme.zIndex.snackbar,
         display: "flex",
         flexDirection: "column",
         gap: "10px",
       }}
     >
-      {toast ? <ToastCard key={toast.id} toast={toast} onClose={onClose} /> : null}
+      {list.map((item) => (
+        <ToastCard key={item.id} toast={item} onClose={() => onClose(item.id)} />
+      ))}
     </Box>
   );
 }
@@ -146,15 +188,20 @@ export function Toast({ toast, onClose }: { toast: ToastState | null; onClose: (
 function ToastCard({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
   const kind = KIND[toast.kind] ?? KIND.success;
   const soft = `color-mix(in srgb, ${kind.main} 16%, transparent)`;
+  const [paused, setPaused] = useState(false);
 
+  // Hovering holds the toast open — reading it should not race its own timer.
   useEffect(() => {
+    if (paused) return;
     const timer = setTimeout(onClose, VISIBLE_MS);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, paused]);
 
   return (
     <Box
       onClick={onClose}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
       sx={{
         position: "relative",
         display: "flex",
@@ -167,7 +214,7 @@ function ToastCard({ toast, onClose }: { toast: ToastState; onClose: () => void 
         p: "12px 20px 12px 12px",
         maxWidth: 400,
         transformOrigin: "top center",
-        animation: `${flip} .6s cubic-bezier(.3,1.3,.4,1)`,
+        animation: `${flip} 250ms cubic-bezier(0,0,.2,1)`,
         boxShadow: `0 20px 55px var(--mui-palette-surface-backdrop), 0 0 26px color-mix(in srgb, ${kind.main} 26%, transparent)`,
         cursor: "pointer",
       }}

@@ -1,9 +1,16 @@
 import axios from "axios";
 
 let authToken: string | undefined;
+let onSessionLost: (() => void) | undefined;
 
 export function setAuthToken(token?: string) {
   authToken = token;
+}
+
+/** Registered by AuthProvider. Called once when the API rejects a request the
+ * session was supposed to authorise. */
+export function setSessionLostHandler(handler?: () => void) {
+  onSessionLost = handler;
 }
 
 export const httpClient = axios.create({
@@ -18,3 +25,15 @@ httpClient.interceptors.request.use((config) => {
   // boundaried multipart/form-data for FormData on its own.
   return config;
 });
+
+httpClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Only a 401 against a request we *did* authorise means the session died
+    // under the user. A 401 with no token is an ordinary unauthenticated call
+    // (a public screen, or a race before the session resolves) and must not
+    // throw the user out.
+    if (error?.response?.status === 401 && authToken) onSessionLost?.();
+    return Promise.reject(error);
+  },
+);

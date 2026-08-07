@@ -32,7 +32,7 @@ export function TableFooterRenderer({
         gap: "12px",
         flexWrap: "wrap",
         ...(list
-          ? { p: "12px 20px", borderTop: "1px solid", borderColor: "surface.divider" }
+          ? { p: "12px 20px", borderTop: "1px dashed", borderColor: "surface.divider" }
           : { pt: "14px", px: "14px" }),
         fontSize: 12.5,
         color: "text.disabled",

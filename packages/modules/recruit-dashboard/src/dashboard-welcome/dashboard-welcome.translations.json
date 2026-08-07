@@ -4,12 +4,6 @@
     "afternoon": "Good afternoon",
     "evening": "Good evening"
   },
-  "lead": "You have",
-  "emptyLead": "Nothing needs your attention right now.",
-  "highlights": {
-    "interviews": "{{value}} interviews",
-    "submissions": "{{value}} submissions",
-    "resumes": "{{value}} resumes",
-    "clientsAtRisk": "{{value}} clients at risk"
-  }
+  "subtitle": "{{clients}} clients · {{openRoles}} open roles · {{candidates}} candidates",
+  "emptySubtitle": "Nothing set up yet"
 }

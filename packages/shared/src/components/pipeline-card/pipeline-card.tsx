@@ -202,7 +202,7 @@ export function PipelineCard({
           gap: "8px",
           fontSize: 11,
           color: "text.disabled",
-          borderTop: "1px solid",
+          borderTop: "1px dashed",
           borderColor: "divider",
           pt: "9px",
           minWidth: 0,

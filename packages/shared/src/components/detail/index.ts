@@ -1,3 +1,4 @@
+export { type BreadcrumbConfig, type BreadcrumbCrumb, BreadcrumbRenderer } from "./breadcrumb";
 export {
   type CollapsibleSectionConfig,
   CollapsibleSectionsRenderer,

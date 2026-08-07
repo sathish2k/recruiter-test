@@ -9,7 +9,7 @@ import {
   LocaleProvider,
   PortalRouterProvider,
 } from "@recruit/sdk";
-import { ToastProvider } from "@recruit/shared";
+import { SnackbarProvider, ToastProvider } from "@recruit/shared";
 import { ThemeModeProvider } from "@recruit/ui";
 import type { ReactNode } from "react";
 
@@ -24,13 +24,15 @@ export function Providers({
     <AppRouterCacheProvider options={{ key: "mui" }}>
       <ThemeModeProvider>
         <ToastProvider>
-          <LocaleProvider defaultLanguage="en" initialPreferences={initialLocale}>
-            <PortalRouterProvider routes={routes}>
-              <DatasourceProvider modules={AllModules}>
-                <AuthProvider>{children}</AuthProvider>
-              </DatasourceProvider>
-            </PortalRouterProvider>
-          </LocaleProvider>
+          <SnackbarProvider>
+            <LocaleProvider defaultLanguage="en" initialPreferences={initialLocale}>
+              <PortalRouterProvider routes={routes}>
+                <DatasourceProvider modules={AllModules}>
+                  <AuthProvider>{children}</AuthProvider>
+                </DatasourceProvider>
+              </PortalRouterProvider>
+            </LocaleProvider>
+          </SnackbarProvider>
         </ToastProvider>
       </ThemeModeProvider>
     </AppRouterCacheProvider>

@@ -1,0 +1,14 @@
+{
+  "greeting": "Good morning",
+  "subtitle": "Searches, follow-ups and replies waiting on you.",
+  "kpis": {
+    "candidatesAdded": "Candidates added",
+    "candidatesAddedDelta": "{value}",
+    "profilesContacted": "Profiles contacted",
+    "profilesContactedDelta": "{value}",
+    "connectionRequests": "Connection requests",
+    "connectionRequestsDelta": "{value}",
+    "responseRate": "Response rate",
+    "responseRateDelta": "{value}"
+  }
+}

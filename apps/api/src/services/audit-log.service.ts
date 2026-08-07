@@ -6,7 +6,10 @@ import { type AuditCategory, type AuditSeverity, auditLog } from "../models/audi
 type AuditRow = typeof auditLog.$inferSelect;
 
 export interface RecordAuditInput {
-  organizationId: string;
+  /** Nullable because some hooks fire on an unauthenticated request (a
+   * password reset) where the agency may not be resolvable. `record` drops
+   * those writes rather than inventing an organization. */
+  organizationId: string | null | undefined;
   userId?: string | null;
   actorName?: string;
   event: string;

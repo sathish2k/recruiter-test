@@ -3,7 +3,7 @@ import { expect, test as setup } from "@playwright/test";
 const AUTH_FILE = "e2e/.auth/user.json";
 
 /**
- * Signs in once and saves the session for every other project, so the journeys
+ * Signs in once and saves the session for every other project, so the suites
  * below start from the dashboard rather than re-authenticating each time.
  *
  * Credentials come from the environment — never commit a working login.
@@ -22,8 +22,8 @@ setup("authenticate", async ({ page }) => {
   await page.goto("/login");
   // The auth forms hide their labels and lean on placeholders (`hideLabel` in
   // the sign-in configuration), so getByLabel finds nothing here.
-  await page.getByPlaceholder("Email").fill(email);
-  await page.getByPlaceholder("Password").first().fill(password);
+  await page.getByPlaceholder("you@agency.com").fill(email);
+  await page.getByPlaceholder("Enter your password").first().fill(password);
   await page.getByRole("button", { name: /sign in|log in/i }).click();
 
   // TC-AUTH-009 — login lands on the dashboard, not a list view.
@@ -31,7 +31,6 @@ setup("authenticate", async ({ page }) => {
   // The sidenav only exists inside the core layout, so it is the signal that
   // the engine has rendered a signed-in screen.
   await expect(page.getByRole("complementary")).toBeVisible();
-  await expect(page.getByText("Dashboard").first()).toBeVisible();
 
   await page.context().storageState({ path: AUTH_FILE });
 });

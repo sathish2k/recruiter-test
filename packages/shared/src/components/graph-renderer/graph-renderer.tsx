@@ -4,7 +4,8 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Skeleton from "@mui/material/Skeleton";
 import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
-import type { ReactNode } from "react";
+import { useColorMode } from "@recruit/ui";
+import { type ReactNode, useState } from "react";
 import { seedRows } from "../../utils/seed-data";
 import { EmptyStateRenderer } from "../renderers";
 import { Chart } from "./chart";
@@ -23,6 +24,8 @@ export function GraphRenderer({
   toolbar?: ReactNode;
 }) {
   const { t } = useTranslation(id);
+  const [metric, setMetric] = useState(0);
+  const { mode } = useColorMode();
   const configFromId = useConfiguration<GraphRendererConfig>(id);
   const config = configProp ?? configFromId;
   const { data, isLoading } = useFetch<GraphRow[]>(id, { data: seedRows<GraphRow>(dataProp) });
@@ -30,8 +33,16 @@ export function GraphRenderer({
 
   if (!config) return null;
 
-  const series = buildSeries(config, rows, t);
-  const options = buildOptions(config, rows, t);
+  // A picked metric replaces the series the chart plots; everything else about
+  // the card — axis, empty state, height — is unchanged.
+  const metrics = config.metrics ?? [];
+  const picked = metrics[metric];
+  const active = picked
+    ? { ...config, series: picked.series, valueType: picked.valueType ?? config.valueType }
+    : config;
+
+  const series = buildSeries(active, rows, t);
+  const options = buildOptions(active, rows, t, mode);
   const overlay =
     rows.length === 0 && config.emptyOverlay ? (
       <EmptyStateRenderer
@@ -48,7 +59,7 @@ export function GraphRenderer({
 
   return (
     <Card variant="base">
-      {config.header || toolbar ? (
+      {config.header || toolbar || metrics.length > 1 ? (
         <Box
           sx={{
             display: "flex",
@@ -68,6 +79,44 @@ export function GraphRenderer({
               </Box>
             ) : null}
           </Box>
+          {metrics.length > 1 ? (
+            <Box
+              sx={{
+                display: "flex",
+                gap: "3px",
+                p: "3px",
+                borderRadius: "9px",
+                bgcolor: "surface.inset",
+                flex: "none",
+              }}
+            >
+              {metrics.map((entry, index) => (
+                <Box
+                  component="button"
+                  type="button"
+                  key={entry.label}
+                  onClick={() => setMetric(index)}
+                  aria-pressed={index === metric}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    height: 30,
+                    px: "11px",
+                    border: "none",
+                    borderRadius: "7px",
+                    bgcolor: index === metric ? "background.paper" : "transparent",
+                    color: index === metric ? "text.primary" : "text.secondary",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "var(--recruit-motion-state)",
+                  }}
+                >
+                  {t(entry.label)}
+                </Box>
+              ))}
+            </Box>
+          ) : null}
           {toolbar ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>{toolbar}</Box>
           ) : null}

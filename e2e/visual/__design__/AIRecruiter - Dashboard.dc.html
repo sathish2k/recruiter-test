@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#000000;--surface:#17181B;--rail:#0B0C0E;--inset:#1F2024;--field:#101113;
+  --fg:#E6E8EB;--fg-2:#B8C0C9;--muted:#97A2AD;--faint:#808C99;--disabled:#637381;
+  --line:rgba(145,158,171,.24);--hair:rgba(145,158,171,.16);--hover:rgba(255,255,255,.08);
+  --primary:#4372AF;--primary-2:#4C7AB8;--primary-hover:#4776B2;--primary-tint:rgba(101,146,204,.22);--nav-fg:#6592CC;
+  --submit-bg:#FFFFFF;--submit-fg:#1C252E;--submit-hover:#E9F0F9;--submit-shadow:0 8px 16px rgba(0,0,0,.24);
+  --brand-amber:#F59E0B;--amber:#F59E0B;
+  --ok:#77ED8B;--ok-bg:rgba(34,197,94,.22);--warn:#FFD666;--warn-bg:rgba(255,171,0,.22);--err:#FF8A80;--err-bg:rgba(255,86,48,.22);--info:#61F3F3;--info-bg:rgba(0,184,217,.22);--violet:#C684FF;--violet-bg:rgba(142,51,255,.24);
+  --card-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 12px 30px rgba(0,0,0,.6);
+  --pop-shadow:0 20px 50px rgba(0,0,0,.7);--scrim:rgba(0,0,0,.68);
+  --navy:#0E2E5C;--slab-fg-2:#A9C0DE;--slab-line:rgba(255,255,255,.16);
+}
+html.hpx-light{
+  --canvas:#F4F6F8;--surface:#FFFFFF;--rail:#FFFFFF;--inset:#F4F6F8;--field:#FFFFFF;
+  --fg:#1C252E;--fg-2:#353F4A;--muted:#495667;--faint:#62707E;--disabled:#919EAB;
+  --line:rgba(145,158,171,.24);--hair:rgba(145,158,171,.20);--hover:rgba(99,115,129,.09);
+  --primary:#0E2E5C;--primary-2:#4C7AB8;--primary-hover:#0A2244;--primary-tint:rgba(14,46,92,.10);--nav-fg:#0E2E5C;
+  --submit-bg:#1C252E;--submit-fg:#FFFFFF;--submit-hover:#141A21;--submit-shadow:0 8px 16px rgba(28,37,46,.24);
+  --brand-amber:#F59E0B;--amber:#B45309;
+  --ok:#065E49;--ok-bg:rgba(34,197,94,.16);--warn:#7A4100;--warn-bg:rgba(255,171,0,.16);--err:#B71D18;--err-bg:rgba(255,86,48,.16);--info:#006C9C;--info-bg:rgba(0,184,217,.16);--violet:#5B21B6;--violet-bg:rgba(142,51,255,.13);
+  --card-shadow:0 0 2px rgba(145,158,171,.2),0 12px 24px -4px rgba(145,158,171,.16);
+  --pop-shadow:-20px 20px 40px -4px rgba(145,158,171,.28);--scrim:rgba(28,37,46,.55);
+}
+body{margin:0;background:var(--canvas);font-family:'Manrope',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--primary);text-decoration:none}a:hover{color:var(--primary-hover)}
+html:not(.hpx-light) a{color:#6592CC}html:not(.hpx-light) a:hover{color:#D3E0F2}
+a:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+@keyframes dlgIn{from{transform:scale(.97) translateY(-6px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+<script>try{document.documentElement.classList.toggle('hpx-light',(localStorage.getItem('hpx-theme')||'light')!=='dark')}catch(e){}</script>
+</helmet>
+
+<div data-screen-label="Dashboard" style="display:grid;grid-template-columns:248px minmax(0,1fr);min-width:1360px;min-height:100vh;background:var(--canvas);color:var(--fg)">
+
+  <aside style="display:flex;flex-direction:column;background:var(--rail);border-right:1px solid var(--hair);padding:20px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;box-sizing:border-box;align-self:start">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:24px">
+      <a href="AIRecruiter - Landing.dc.html" style="display:flex;align-items:center;gap:10px;color:var(--fg);min-width:0" style-hover="color:var(--fg)">
+        <svg width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex:none"><defs><mask id="dbm"><rect width="48" height="48" fill="white"></rect><path d="M2 31 H46" stroke="black" stroke-width="3.5"></path><path d="M18 31 L44 13" stroke="black" stroke-width="3.5"></path></mask></defs><circle cx="24" cy="24" r="19" fill="var(--fg)" mask="url(#dbm)"></circle><circle cx="45" cy="11" r="2.6" fill="#F59E0B"></circle></svg>
+        <div style="font-weight:700;font-size:16px;letter-spacing:-.02em">HirePilot<span style="color:var(--brand-amber)">X</span></div>
+      </a>
+      <div title="Collapse" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;flex:none" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">chevron_left</span></div>
+    </div>
+
+    <sc-for list="{{ navGroups }}" as="ng" hint-placeholder-count="3">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--muted);margin:0 0 8px 12px">{{ ng.title }}</div>
+      <nav style="display:flex;flex-direction:column;gap:2px;margin-bottom:18px">
+        <sc-for list="{{ ng.items }}" as="it" hint-placeholder-count="4">
+        <a href="{{ it.href }}" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;background:{{ it.bg }};color:{{ it.fg }};font-size:13.5px;font-weight:{{ it.weight }};transition:background .2s cubic-bezier(.4,0,.2,1),color .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover);color:{{ it.hoverFg }}"><span style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">{{ it.icon }}</span><span style="flex:1;min-width:0">{{ it.label }}</span></a>
+        </sc-for>
+      </nav>
+    </div>
+    </sc-for>
+
+    <div style="flex:1;min-height:24px"></div>
+
+    <div style="display:flex;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--hair)">
+      <a href="AIRecruiter - Settings.dc.html" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:6px;margin:-6px;border-radius:9px;color:var(--fg)" style-hover="background:var(--hover);color:var(--fg)">
+        <span style="width:34px;height:34px;border-radius:999px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none">{{ userIn }}</span>
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ userName }}</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">{{ roleIcon }}</span>{{ role }} · Troy Consulting</span>
+        </span>
+      </a>
+    </div>
+  </aside>
+
+  <main style="padding:18px 28px 32px;display:flex;flex-direction:column;gap:14px;min-width:0">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+      <div style="min-width:0">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.01em">{{ greeting }}</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:3px">{{ subtitle }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex:none">
+        <div onClick="{{ toggleEmpty }}" title="Preview the new-workspace state" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:999px;border:1px solid {{ emptyChipBorder }};background:{{ emptyChipBg }};font-size:12px;font-weight:700;color:{{ emptyChipFg }};cursor:pointer;box-sizing:border-box" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">rocket_launch</span>{{ emptyChipLabel }}</div>
+        <div onClick="{{ openSearch }}" title="Search everything — press ⌘K" style="display:flex;align-items:center;gap:9px;width:200px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;box-sizing:border-box" style-hover="background:var(--hover)">
+          <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:var(--muted);flex:none">search</span>
+          <span style="flex:1;font-size:12.5px;color:var(--muted);white-space:nowrap">Search anything</span>
+          <span style="font-size:10.5px;font-weight:700;color:var(--muted);background:var(--inset);padding:3px 6px;border-radius:5px;flex:none">⌘K</span>
+        </div>
+        <div style="position:relative">
+          <div onClick="{{ toggleRoleMenu }}" title="Preview another role" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--fg);cursor:pointer;box-sizing:border-box" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:var(--muted)">switch_account</span>{{ role }}<span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:var(--muted)">expand_more</span></div>
+          <sc-if value="{{ roleMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 8px);right:0;z-index:60;width:240px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:var(--pop-shadow)">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);padding:8px 11px 6px">VIEW DASHBOARD AS</div>
+            <sc-for list="{{ roleOptions }}" as="ro" hint-placeholder-count="6">
+            <div onClick="{{ ro.pick }}" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;font-size:13px;font-weight:600;color:var(--fg);cursor:pointer;background:{{ ro.bg }}" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:{{ ro.iconFg }}">{{ ro.icon }}</span>{{ ro.label }}</div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+        <div onClick="{{ toggleTheme }}" title="Switch theme" style="width:36px;height:36px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">{{ themeIcon }}</span></div>
+        <a href="AIRecruiter - Notifications.dc.html" title="Notifications" style="position:relative;width:36px;height:36px;border-radius:999px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted)" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">notifications</span><span style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:999px;background:var(--err);border:2px solid var(--canvas)"></span></a>
+        <div style="position:relative">
+          <div onClick="{{ toggleProfile }}" style="display:flex;align-items:center;gap:9px;height:36px;padding:3px 10px 3px 3px;border-radius:999px;border:1px solid var(--line);cursor:pointer;box-sizing:border-box" style-hover="background:var(--hover)">
+            <span style="width:28px;height:28px;border-radius:999px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:none">{{ userIn }}</span>
+            <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:var(--muted)">expand_more</span>
+          </div>
+          <sc-if value="{{ profileOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 8px);right:0;z-index:60;width:262px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:var(--pop-shadow)">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 12px 14px">
+              <span style="width:40px;height:40px;border-radius:999px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex:none">{{ userIn }}</span>
+              <div style="min-width:0"><div style="font-size:13.5px;font-weight:700">{{ userName }}</div><div style="font-size:11.5px;color:var(--muted)">{{ role }} · Troy Consulting</div></div>
+            </div>
+            <a href="AIRecruiter - Profile Settings.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--fg)" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:var(--muted)">person</span>Your profile</a>
+            <a href="AIRecruiter - Settings.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--fg)" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:var(--muted)">settings</span>Workspace settings</a>
+            <div style="height:1px;background:var(--hair);margin:6px 4px"></div>
+            <a href="AIRecruiter - Login.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--err)" style-hover="background:var(--err-bg);color:var(--err)"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1">logout</span>Sign out</a>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ notEmptyWorkspace }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+
+    <sc-if value="{{ hasWsAlerts }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:18px 20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="font-size:15px;font-weight:700">Workspace alerts</div>
+        <span style="font-size:11px;font-weight:700;color:var(--err);background:var(--err-bg);padding:3px 9px;border-radius:6px">{{ wsAlertCount }} need attention</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px">
+        <sc-for list="{{ wsAlerts }}" as="al" hint-placeholder-count="4">
+        <a href="{{ al.href }}" style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:10px;background:{{ al.bg }};color:var(--fg)" style-hover="color:var(--fg);filter:brightness(1.04)">
+          <span style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:{{ al.fg }};flex:none">{{ al.icon }}</span>
+          <div style="min-width:0">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;line-height:1.1">{{ al.n }}</div>
+            <div style="font-size:11.5px;color:var(--fg-2);margin-top:3px;line-height:1.4">{{ al.label }}</div>
+          </div>
+        </a>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ showKpis }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+      <div style="background:{{ k.cardBg }};border-radius:16px;box-shadow:var(--card-shadow);padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:8px;background:{{ k.tileBg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:{{ k.fg }}">{{ k.icon }}</span></span><span style="font-size:12.5px;color:var(--fg-2)">{{ k.label }}</span></div>
+        <div style="display:flex;align-items:baseline;gap:9px;margin-top:12px"><span style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700">{{ k.value }}</span><span style="font-size:12px;font-weight:700;color:{{ k.deltaFg }}">{{ k.delta }}</span></div>
+        
+      </div>
+      </sc-for>
+    </div>
+
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0">
+        <sc-for list="{{ statusChips }}" as="sc2" hint-placeholder-count="4">
+        <span style="display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 12px;border-radius:999px;background:{{ sc2.bg }};font-size:11.5px;font-weight:700;color:{{ sc2.fg }}"><span style="width:7px;height:7px;border-radius:999px;background:{{ sc2.fg }};flex:none"></span>{{ sc2.label }}</span>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showSystem }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:14px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;flex:none">
+        <div style="display:flex;align-items:center;gap:9px;flex:none">
+          <span style="width:28px;height:28px;border-radius:8px;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">monitor_heart</span></span>
+          <span style="font-size:13px;font-weight:700">System status</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;flex:1;min-width:0">
+          <sc-for list="{{ systemRows }}" as="sy" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="width:8px;height:8px;border-radius:999px;background:{{ sy.fg }};flex:none"></span>
+            <span style="font-size:12px;color:var(--muted)">{{ sy.label }}</span>
+            <span style="font-size:12px;font-weight:700;color:{{ sy.fg }}">{{ sy.value }}</span>
+            <span style="font-size:11px;color:var(--faint)">{{ sy.note }}</span>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showTeamHealth }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:14px;align-items:stretch">
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--info-bg)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--info);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">groups</span></span>
+              <div style="font-size:14px;font-weight:700">Team health</div>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:6px;flex:none">
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;color:{{ capacityFg }};font-variant-numeric:tabular-nums">{{ capacity }}</span>
+              <span style="font-size:11px;color:var(--fg-2)">capacity</span>
+            </div>
+          </div>
+          <div style="flex:1;padding:14px 18px 16px;display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;height:7px;border-radius:999px;overflow:hidden;background:var(--hover)">
+              <sc-for list="{{ healthBands }}" as="hb" hint-placeholder-count="3">
+              <span style="display:block;height:100%;width:{{ hb.pct }};background:{{ hb.fg }}"></span>
+              </sc-for>
+            </div>
+            <sc-for list="{{ healthBands }}" as="hb2" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:9px;height:9px;border-radius:999px;background:{{ hb2.fg }};flex:none"></span>
+              <span style="font-size:12.5px;font-weight:700;color:{{ hb2.fg }};font-variant-numeric:tabular-nums;flex:none">{{ hb2.n }}</span>
+              <span style="flex:1;min-width:0;font-size:12px;color:var(--fg-2)">{{ hb2.label }}</span>
+              <span style="font-size:11px;color:var(--muted);flex:none">{{ hb2.who }}</span>
+            </div>
+            </sc-for>
+            <div style="font-size:11px;line-height:1.55;color:var(--muted);margin-top:auto;padding-top:6px">{{ capacityNote }}</div>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--warn-bg)">
+            <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--warn);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">psychology</span></span>
+            <div style="min-width:0">
+              <div style="font-size:14px;font-weight:700">Needs coaching</div>
+              <div style="font-size:11.5px;color:var(--fg-2);margin-top:1px">{{ coachSub }}</div>
+            </div>
+          </div>
+          <div style="flex:1;padding:4px 18px 14px">
+            <sc-for list="{{ coaching }}" as="co" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed var(--hair)">
+              <span style="width:34px;height:34px;border-radius:999px;background:{{ co.avBg }};color:{{ co.avFg }};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex:none">{{ co.badge }}</span>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:13px;font-weight:700">{{ co.name }}</span>
+                  <span style="font-size:10.5px;font-weight:700;color:{{ co.tagFg }};background:{{ co.tagBg }};padding:2px 7px;border-radius:5px">{{ co.tag }}</span>
+                </div>
+                <div style="font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:2px;text-wrap:pretty">{{ co.detail }}</div>
+              </div>
+              <a href="{{ co.href }}" style="display:flex;align-items:center;gap:5px;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--fg);flex:none" style-hover="background:var(--hover);color:var(--fg)">{{ co.cta }}<span style="font-family:'Material Symbols Rounded';font-size:15px;line-height:1">arrow_forward</span></a>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showMyDesk }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:stretch">
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--primary-tint)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--primary);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ deskIcon }}</span></span>
+              <div style="font-size:14px;font-weight:700">{{ deskTitle }}</div>
+            </div>
+            <a href="{{ deskHref }}" style="font-size:12px;font-weight:700;flex:none">{{ deskCta }}</a>
+          </div>
+          <div style="flex:1;padding:6px 18px 14px">
+            <sc-for list="{{ myPipeline }}" as="mp" hint-placeholder-count="5">
+            <a href="{{ mp.href }}" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--hair);color:var(--fg)" style-hover="color:var(--fg)">
+              <span style="width:7px;height:7px;border-radius:999px;background:{{ mp.fg }};flex:none"></span>
+              <span style="flex:1;min-width:0;display:flex;align-items:center;gap:7px"><span style="font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mp.stage }}</span><sc-if value="{{ mp.hasFlag }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:5px;background:var(--err-bg);font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--err);flex:none"><span style="font-family:'Material Symbols Rounded';font-size:12px;line-height:1">warning</span>{{ mp.flag }}</span></sc-if></span>
+              <span style="width:96px;height:5px;border-radius:999px;background:var(--hover);overflow:hidden;flex:none"><span style="display:block;height:100%;width:{{ mp.pct }};background:{{ mp.fg }};border-radius:999px"></span></span>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;min-width:30px;text-align:right;flex:none">{{ mp.n }}</span>
+            </a>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--ok-bg)">
+            <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--ok);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">flag</span></span>
+            <div style="min-width:0">
+              <div style="font-size:14px;font-weight:700">{{ goalTitle }}</div>
+              <div style="font-size:11.5px;color:var(--fg-2);margin-top:1px">{{ weekSub }}</div>
+            </div>
+          </div>
+          <div style="flex:1;padding:14px 18px 16px;display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ weekGoals }}" as="wg" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                <span style="font-size:12.5px;font-weight:600;color:var(--fg-2)">{{ wg.label }}</span>
+                <span style="font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:{{ wg.fg }}">{{ wg.count }}</span>
+              </div>
+              <div style="height:7px;border-radius:999px;background:var(--hover);overflow:hidden;margin-top:6px"><span style="display:block;height:100%;width:{{ wg.pct }};background:{{ wg.fg }};border-radius:999px"></span></div>
+            </div>
+            </sc-for>
+            <div style="font-size:11px;line-height:1.55;color:var(--muted);margin-top:auto;padding-top:4px">{{ weekNote }}</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showSearches }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:var(--violet-bg)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--violet);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">bookmark</span></span>
+            <div style="font-size:14px;font-weight:700">Saved searches</div>
+          </div>
+          <a href="AIRecruiter - Candidates.dc.html" style="font-size:12px;font-weight:700;flex:none">Manage</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;padding:14px 18px 16px">
+          <sc-for list="{{ savedSearches }}" as="ss" hint-placeholder-count="4">
+          <a href="AIRecruiter - Candidates.dc.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:11px;background:var(--inset);color:var(--fg);transition:background .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover);color:var(--fg)">
+            <span style="min-width:38px;height:30px;padding:0 8px;border-radius:8px;background:{{ ss.bg }};color:{{ ss.fg }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">{{ ss.n }}</span>
+            <span style="flex:1;min-width:0">
+              <span style="display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ss.name }}</span>
+              <span style="display:block;font-size:11px;color:var(--muted);margin-top:1px">new · {{ ss.age }}</span>
+            </span>
+          </a>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;flex:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 20px;background:var(--warn-bg);flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:11px;min-width:0">
+              <span style="width:34px;height:34px;border-radius:10px;background:var(--surface);color:var(--warn);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:19px;line-height:1">bolt</span></span>
+              <div style="min-width:0">
+                <div style="display:flex;align-items:center;gap:8px"><span style="font-size:15px;font-weight:700">{{ workTitle }}</span><span style="font-size:11.5px;font-weight:800;color:var(--warn);background:var(--surface);padding:2px 8px;border-radius:6px;font-variant-numeric:tabular-nums">{{ workCount }}</span></div>
+                <div style="font-size:11.5px;color:var(--fg-2);margin-top:1px">{{ workSub }}</div>
+              </div>
+            </div>
+            <a href="{{ workHref }}" style="display:flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:8px;background:var(--surface);font-size:12.5px;font-weight:700;color:var(--fg);flex:none" style-hover="color:var(--fg)">View work<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">arrow_forward</span></a>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;padding:8px 14px 12px">
+            <sc-for list="{{ todayWork }}" as="tw" hint-placeholder-count="6">
+            <a href="{{ tw.href }}" style="display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:9px;color:var(--fg);transition:background .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover);color:var(--fg)">
+              <span style="width:28px;height:28px;border-radius:8px;background:{{ tw.bg }};color:{{ tw.fg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ tw.icon }}</span></span>
+              <span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:{{ tw.fg }};flex:none;min-width:22px">{{ tw.n }}</span>
+              <span style="flex:1;min-width:0">
+                <span style="display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tw.label }}</span>
+                <span style="display:block;font-size:11px;color:var(--muted);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tw.detail }}</span>
+              </span>
+              <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:var(--muted);flex:none">chevron_right</span>
+            </a>
+            </sc-for>
+          </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
+    <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;flex:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px 14px">
+        <div><div style="font-size:15px;font-weight:700">Team performance</div><div style="font-size:12px;color:var(--muted);margin-top:2px">This quarter, by recruiter</div></div>
+        <a href="AIRecruiter - Dashboard.dc.html" style="font-size:12.5px;font-weight:700">Team activity</a>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(150px,1.3fr) 62px 78px 78px 82px 62px 78px 92px 74px 66px;gap:10px;padding:14px 20px;border-bottom:1px solid var(--hair);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted)">
+        <div>RECRUITER</div><div style="text-align:right">JOBS</div><div style="text-align:right">CANDS</div><div style="text-align:right">SUBS</div><div style="text-align:right">INTVS</div><div style="text-align:right">OFFERS</div><div style="text-align:right">PLACED</div><div style="text-align:right">REVENUE</div><div style="text-align:right">CONV</div><div style="text-align:right">SLA</div>
+      </div>
+      <sc-for list="{{ teamPerf }}" as="tp" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:minmax(150px,1.3fr) 62px 78px 78px 82px 62px 78px 92px 74px 66px;gap:10px;padding:12px 20px;border-bottom:1px dashed var(--hair);align-items:center;font-size:12.5px" style-hover="background:var(--hover)">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <span style="width:28px;height:28px;border-radius:999px;background:{{ tp.avBg }};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:{{ tp.avFg }};flex:none">{{ tp.in }}</span>
+          <div style="min-width:0"><div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tp.name }}</div><div style="font-size:10.5px;color:var(--muted)">{{ tp.role }}</div></div>
+        </div>
+        <div style="text-align:right;color:var(--fg-2)">{{ tp.jobs }}</div>
+        <div style="text-align:right;color:var(--fg-2)">{{ tp.cands }}</div>
+        <div style="text-align:right;color:var(--fg-2)">{{ tp.subs }}</div>
+        <div style="text-align:right;color:var(--fg-2)">{{ tp.ints }}</div>
+        <div style="text-align:right;color:var(--fg-2)">{{ tp.offers }}</div>
+        <div style="text-align:right;font-weight:700">{{ tp.placed }}</div>
+        <div style="text-align:right;font-weight:700;font-family:'Space Grotesk',sans-serif">{{ tp.revenue }}</div>
+        <div style="text-align:right;font-weight:700;color:{{ tp.convFg }}">{{ tp.conv }}</div>
+        <div style="text-align:right;font-weight:700;color:{{ tp.slaFg }}">{{ tp.sla }}</div>
+      </div>
+      </sc-for>
+    <sc-if value="{{ teamMore }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ expandTeam }}" style="margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-top:1px dashed var(--hair);font-size:12.5px;font-weight:700;color:var(--primary);cursor:pointer" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">expand_more</span>{{ teamMoreLabel }}</div>
+    </sc-if>
+    </div>
+
+    <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;flex:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px 14px">
+        <div><div style="font-size:15px;font-weight:700">Client health</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Risk score weights SLA, feedback lag and payment behaviour</div></div>
+        <a href="AIRecruiter - Clients.dc.html" style="font-size:12.5px;font-weight:700">All clients</a>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(140px,1.2fr) 78px 78px 96px 118px minmax(110px,1fr) 96px;gap:12px;padding:14px 20px;border-bottom:1px solid var(--hair);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted)">
+        <div>CLIENT</div><div style="text-align:right">JOBS</div><div style="text-align:right">PLACED</div><div style="text-align:right">REVENUE</div><div>LAST ACTIVITY</div><div>ACCOUNT MANAGER</div><div style="text-align:right">RISK</div>
+      </div>
+      <sc-for list="{{ clientHealth }}" as="ch" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:minmax(140px,1.2fr) 78px 78px 96px 118px minmax(110px,1fr) 96px;gap:12px;padding:12px 20px;border-bottom:1px dashed var(--hair);align-items:center;font-size:12.5px" style-hover="background:var(--hover)">
+        <a href="AIRecruiter - Client Detail.dc.html" style="display:flex;align-items:center;gap:10px;min-width:0;color:var(--fg)" style-hover="color:var(--primary)">
+          <span style="width:28px;height:28px;border-radius:8px;background:{{ ch.avBg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:{{ ch.avFg }};flex:none">{{ ch.in }}</span>
+          <span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.name }}</span>
+        </a>
+        <div style="text-align:right;color:var(--fg-2)">{{ ch.jobs }}</div>
+        <div style="text-align:right;color:var(--fg-2)">{{ ch.placed }}</div>
+        <div style="text-align:right;font-weight:700;font-family:'Space Grotesk',sans-serif">{{ ch.revenue }}</div>
+        <div style="color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.last }}</div>
+        <div style="color:var(--fg-2);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.am }}</div>
+        <div style="display:flex;justify-content:flex-end"><span style="font-size:11px;font-weight:700;color:{{ ch.riskFg }};background:{{ ch.riskBg }};padding:3px 9px;border-radius:6px">{{ ch.risk }}</span></div>
+      </div>
+      </sc-for>
+    <sc-if value="{{ clientsMore }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ expandClients }}" style="margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-top:1px dashed var(--hair);font-size:12.5px;font-weight:700;color:var(--primary);cursor:pointer" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">expand_more</span>{{ clientsMoreLabel }}</div>
+    </sc-if>
+    </div>
+    </sc-if>
+
+    
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:stretch">
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px 14px">
+            <div>
+              <div style="font-size:15px;font-weight:700">{{ queueTitle }}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ queueSub }}</div>
+            </div>
+            <a href="{{ queueHref }}" style="font-size:12.5px;font-weight:700">View all</a>
+          </div>
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 20px 14px 17px;border-top:1px dashed var(--hair);border-left:3px solid {{ q.stripe }};transition:background .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover)">
+            <span style="width:36px;height:36px;border-radius:{{ q.radius }};background:{{ q.avBg }};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:{{ q.avFg }};flex:none">{{ q.badge }}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.title }}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.sub }}</div>
+              <sc-if value="{{ q.hasMeta }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px">
+                <sc-for list="{{ q.meta }}" as="qm" hint-placeholder-count="3">
+                <span style="display:inline-flex;align-items:center;gap:5px;height:21px;padding:0 8px;border-radius:6px;background:{{ qm.bg }};font-size:10.5px;font-weight:700;color:{{ qm.fg }}"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">{{ qm.icon }}</span>{{ qm.label }}</span>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:{{ q.tagFg }};background:{{ q.tagBg }};padding:3px 9px;border-radius:6px;flex:none">{{ q.tag }}</span>
+            <div onClick="{{ q.act }}" style="display:flex;align-items:center;height:32px;padding:0 13px;border-radius:8px;border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--fg);cursor:pointer;flex:none" style-hover="background:var(--hover)">{{ q.cta }}</div>
+          </div>
+          </sc-for>
+        </div>
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:20px;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+          <div style="font-size:15px;font-weight:700">{{ sideTitle }}</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:2px">{{ sideSub }}</div>
+          <div style="display:flex;flex-direction:column;margin-top:12px">
+            <sc-for list="{{ sideRows }}" as="sr" hint-placeholder-count="4">
+            <div style="padding:11px 0;border-bottom:1px dashed var(--hair)">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="width:32px;height:32px;border-radius:{{ sr.radius }};background:{{ sr.bg }};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:{{ sr.fg }};flex:none">{{ sr.badge }}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sr.title }}</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sr.sub }}</div>
+                </div>
+                <div style="font-size:12px;font-weight:700;color:{{ sr.valFg }};flex:none">{{ sr.value }}</div>
+              </div>
+              <sc-if value="{{ sr.hasMeta }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:7px 0 0 44px">
+                <span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:6px;background:var(--hover);font-size:10.5px;font-weight:700;color:var(--fg-2)">{{ sr.jobs }}</span>
+                <span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:6px;background:{{ sr.riskBg }};font-size:10.5px;font-weight:700;color:{{ sr.riskFg }}">{{ sr.risk }}</span>
+                <span style="font-size:10.5px;color:{{ sr.outFg }};font-variant-numeric:tabular-nums">{{ sr.out }}</span>
+              </div>
+              </sc-if>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:stretch">
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:20px;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div style="min-width:0">
+              <div style="font-size:15px;font-weight:700">{{ chartTitleLive }}</div>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">{{ chartNote }}</div>
+            </div>
+            <div style="display:flex;gap:3px;padding:3px;border-radius:9px;background:var(--inset);flex:none">
+              <sc-for list="{{ chartMetrics }}" as="cm" hint-placeholder-count="4">
+              <div onClick="{{ cm.pick }}" style="display:flex;align-items:center;height:30px;padding:0 11px;border-radius:7px;background:{{ cm.bg }};font-size:12px;font-weight:700;color:{{ cm.fg }};cursor:pointer;transition:background .2s cubic-bezier(.4,0,.2,1)">{{ cm.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:16px;margin-top:10px">
+            <div style="display:flex;gap:12px;font-size:11px;color:var(--muted)">
+              <sc-for list="{{ chartLegend }}" as="cl" hint-placeholder-count="2">
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:2px;background:{{ cl.c }}"></span>{{ cl.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:12px;height:150px;margin-top:20px">
+            <sc-for list="{{ chart }}" as="cb" hint-placeholder-count="8">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%">
+              <div style="flex:1;width:100%;display:flex;align-items:flex-end;gap:3px">
+                <div style="flex:1;height:{{ cb.aH }};border-radius:4px 4px 0 0;background:var(--primary-tint)"></div>
+                <div style="flex:1;height:{{ cb.bH }};border-radius:4px 4px 0 0;background:var(--primary)"></div>
+              </div>
+              <div style="font-size:10.5px;color:var(--muted)">{{ cb.label }}</div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--violet-bg)">
+            <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--violet);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">bolt</span></span>
+            <div style="font-size:15px;font-weight:700">Quick actions</div>
+          </div>
+          <div style="padding:6px 20px 20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <sc-for list="{{ actions }}" as="ac" hint-placeholder-count="4">
+            <a href="{{ ac.href }}" style="display:flex;flex-direction:column;gap:9px;padding:14px;border-radius:10px;background:var(--inset);color:var(--fg);transition:background .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover);color:var(--fg)">
+              <span style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:{{ ac.fg }}">{{ ac.icon }}</span>
+              <span style="font-size:12.5px;font-weight:700;line-height:1.4">{{ ac.label }}</span>
+            </a>
+            </sc-for>
+          </div>
+          <sc-if value="{{ hasAdminActions }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--hair)">
+            <div style="font-size:9.5px;font-weight:800;letter-spacing:.09em;color:var(--faint);margin-bottom:8px">RUNNING THE BUSINESS</div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ adminActions }}" as="aa" hint-placeholder-count="3">
+              <a href="{{ aa.href }}" style="display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--fg-2)" style-hover="background:var(--hover);color:var(--fg)"><span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:var(--muted)">{{ aa.icon }}</span>{{ aa.label }}</a>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+
+        
+        </div>
+      </div>
+
+      <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:20px 22px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;flex:none">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:11px;min-width:0">
+            <span style="width:36px;height:36px;border-radius:10px;background:var(--violet-bg);color:var(--violet);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1">auto_awesome</span></span>
+            <div style="min-width:0">
+              <div style="font-size:15px;font-weight:700">What the AI found overnight</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:1px">{{ aiSub }}</div>
+            </div>
+          </div>
+          <a href="AIRecruiter - Automation.dc.html" style="display:flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--fg);flex:none" style-hover="background:var(--hover);color:var(--fg)">Open AI workspace<span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">arrow_forward</span></a>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <sc-for list="{{ aiFindings }}" as="ai" hint-placeholder-count="4">
+          <a href="{{ ai.href }}" title="{{ ai.detail }}" style="display:flex;align-items:center;gap:9px;height:38px;padding:0 13px 0 9px;border-radius:9px;background:var(--inset);color:var(--fg);transition:background .2s cubic-bezier(.4,0,.2,1)" style-hover="background:var(--hover);color:var(--fg)">
+            <span style="width:24px;height:24px;border-radius:7px;background:{{ ai.bg }};color:{{ ai.fg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1">{{ ai.icon }}</span></span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none;color:{{ ai.fg }}">{{ ai.n }}</span>
+            <span style="flex:none">
+              <span style="display:block;font-size:12.5px;font-weight:700;white-space:nowrap">{{ ai.title }}</span>
+            </span>
+            <span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1;color:var(--muted);flex:none">chevron_right</span>
+          </a>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:stretch">
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:flex;flex-direction:column;height:100%;box-sizing:border-box">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--info-bg)">
+            <span style="width:28px;height:28px;border-radius:8px;background:var(--surface);color:var(--info);display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">history</span></span>
+            <div style="font-size:15px;font-weight:700">Recent activity</div>
+          </div>
+          <div style="padding:6px 20px 20px">
+          <div style="display:flex;flex-direction:column;margin-top:12px">
+            <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed var(--hair)">
+              <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1.3;color:{{ a.fg }};flex:none">{{ a.icon }}</span>
+              <div style="min-width:0"><div style="font-size:12.5px;font-weight:600">{{ a.text }}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">{{ a.when }}</div></div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+        <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:20px 22px;height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:15px;font-weight:700">Recently viewed</div>
+          <span style="font-size:11.5px;color:var(--muted)">Yours only</span>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ recentItems }}" as="ri" hint-placeholder-count="5">
+          <a href="{{ ri.href }}" style="display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px dashed var(--hair);color:var(--fg)" style-hover="color:var(--fg)">
+            <span style="width:30px;height:30px;border-radius:9px;background:{{ ri.bg }};color:{{ ri.fg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ ri.icon }}</span></span>
+            <span style="flex:1;min-width:0">
+              <span style="display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ri.name }}</span>
+              <span style="display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ri.kind }}</span>
+            </span>
+            <span style="font-size:11px;color:var(--faint);flex:none;font-variant-numeric:tabular-nums">{{ ri.when }}</span>
+          </a>
+          </sc-for>
+          <sc-if value="{{ recentsMore }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ expandRecents }}" style="margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-top:1px dashed var(--hair);font-size:12.5px;font-weight:700;color:var(--primary);cursor:pointer" style-hover="background:var(--hover)"><span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1">expand_more</span>Show more</div>
+          </sc-if>
+        </div>
+      </div>
+      </div>
+
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ notEmptyWorkspace }}" hint-placeholder-val="{{ true }}">
+    
+    </sc-if>
+
+    <sc-if value="{{ emptyWorkspace }}" hint-placeholder-val="{{ false }}">
+    <div style="background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);padding:44px 32px;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <span style="width:64px;height:64px;border-radius:999px;background:var(--primary-tint);color:var(--primary);display:flex;align-items:center;justify-content:center"><span style="font-family:'Material Symbols Rounded';font-size:32px;line-height:1">rocket_launch</span></span>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-top:18px">Nothing to measure yet</div>
+      <p style="font-size:13px;line-height:1.65;color:var(--muted);margin:8px 0 0;max-width:52ch;text-wrap:pretty">This dashboard fills itself as work moves through the pipeline. Add your first client and a requisition under it, and the revenue, SLA and risk figures start counting from there.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:12px;margin-top:26px;width:100%;max-width:720px;text-align:left">
+        <sc-for list="{{ emptySteps }}" as="es" hint-placeholder-count="3">
+        <a href="{{ es.href }}" style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:12px;background:var(--inset);border:1px solid transparent;color:var(--fg);transition:border-color .2s cubic-bezier(.4,0,.2,1)" style-hover="border-color:var(--primary);color:var(--fg)">
+          <span style="display:flex;align-items:center;gap:9px">
+            <span style="width:22px;height:22px;border-radius:999px;background:{{ es.numBg }};color:{{ es.numFg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none">{{ es.n }}</span>
+            <span style="font-family:'Material Symbols Rounded';font-size:18px;line-height:1;color:{{ es.numFg }}">{{ es.icon }}</span>
+          </span>
+          <span style="font-size:13.5px;font-weight:700">{{ es.title }}</span>
+          <span style="font-size:11.5px;line-height:1.6;color:var(--muted)">{{ es.detail }}</span>
+        </a>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+  <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:90;display:flex;align-items:flex-start;justify-content:center;padding:12vh 24px 24px">
+    <div onClick="{{ closeSearch }}" style="position:absolute;inset:0;background:var(--scrim)"></div>
+    <div role="dialog" aria-modal="true" aria-label="Search" style="position:relative;width:640px;max-width:94vw;max-height:70vh;display:flex;flex-direction:column;background:var(--surface);border-radius:16px;box-shadow:var(--pop-shadow);overflow:hidden;animation:dlgIn .16s cubic-bezier(.4,0,.2,1)">
+      <div style="display:flex;align-items:center;gap:11px;padding:16px 18px;border-bottom:1px dashed var(--hair)">
+        <span style="font-family:'Material Symbols Rounded';font-size:20px;line-height:1;color:var(--muted);flex:none">search</span>
+        <input type="text" placeholder="Search jobs, candidates, clients — or type a command" value="{{ searchQuery }}" onChange="{{ onSearchQuery }}" aria-label="Search" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--fg);font-size:15px;font-family:inherit">
+        <span style="font-size:10.5px;font-weight:700;color:var(--muted);background:var(--inset);padding:4px 7px;border-radius:5px;flex:none">ESC</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:8px">
+        <sc-for list="{{ searchGroups }}" as="sg" hint-placeholder-count="3">
+        <div style="padding:6px 4px 2px">
+          <div style="font-size:10px;font-weight:800;letter-spacing:.09em;color:var(--faint);padding:6px 10px">{{ sg.title }}</div>
+          <sc-for list="{{ sg.items }}" as="si" hint-placeholder-count="3">
+          <a href="{{ si.href }}" style="display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:9px;color:var(--fg)" style-hover="background:var(--hover);color:var(--fg)">
+            <span style="width:30px;height:30px;border-radius:9px;background:{{ si.bg }};color:{{ si.fg }};display:flex;align-items:center;justify-content:center;flex:none"><span style="font-family:'Material Symbols Rounded';font-size:16px;line-height:1">{{ si.icon }}</span></span>
+            <span style="flex:1;min-width:0">
+              <span style="display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ si.label }}</span>
+              <span style="display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ si.sub }}</span>
+            </span>
+            <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;color:var(--faint);flex:none">{{ si.chev }}</span>
+          </a>
+          </sc-for>
+        </div>
+        </sc-for>
+        <sc-if value="{{ searchNone }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:44px 24px">
+          <span style="font-family:'Material Symbols Rounded';font-size:32px;line-height:1;color:var(--faint)">search_off</span>
+          <div style="font-size:14px;font-weight:700;margin-top:12px">Nothing matches "{{ searchQuery }}"</div>
+          <p style="font-size:12px;line-height:1.6;color:var(--muted);margin:5px 0 0;max-width:38ch">Search covers jobs, candidates, clients and contacts you have access to, plus commands.</p>
+        </div>
+        </sc-if>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;padding:11px 18px;border-top:1px dashed var(--hair);font-size:11px;color:var(--muted)">
+        <span style="display:flex;align-items:center;gap:6px"><b style="font-weight:700;background:var(--inset);padding:2px 6px;border-radius:4px">↑↓</b>Move</span>
+        <span style="display:flex;align-items:center;gap:6px"><b style="font-weight:700;background:var(--inset);padding:2px 6px;border-radius:4px">↵</b>Open</span>
+        <span style="display:flex;align-items:center;gap:6px"><b style="font-weight:700;background:var(--inset);padding:2px 6px;border-radius:4px">&gt;</b>Commands only</span>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Owner&quot;,&quot;options&quot;:[&quot;Owner&quot;,&quot;Admin&quot;,&quot;Account Manager&quot;,&quot;Team Lead&quot;,&quot;Recruiter&quot;,&quot;Sourcer&quot;,&quot;Hiring Manager&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Role&quot;},&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Light&quot;,&quot;options&quot;:[&quot;Light&quot;,&quot;Dark&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
+const NAV = {
+  main: { title: 'MAIN', items: [{ icon: 'space_dashboard', label: 'Dashboard', href: 'AIRecruiter - Dashboard.dc.html', key: 'dash' }] },
+  recruiting: { title: 'RECRUITING', items: [
+    { icon: 'work', label: 'Jobs', href: 'AIRecruiter - Requisitions.dc.html' },
+    { icon: 'group', label: 'Candidates', href: 'AIRecruiter - Candidates.dc.html' },
+    { icon: 'view_kanban', label: 'Pipeline', href: 'AIRecruiter - Pipeline.dc.html' },
+    { icon: 'event', label: 'Interviews', href: 'AIRecruiter - Interviews.dc.html' },
+    { icon: 'contract', label: 'Offers', href: 'AIRecruiter - Offers.dc.html' },
+    { icon: 'handshake', label: 'Placements', href: 'AIRecruiter - Placements.dc.html' }
+  ] },
+  sourcing: { title: 'RECRUITING', items: [
+    { icon: 'work', label: 'Jobs', href: 'AIRecruiter - Requisitions.dc.html' },
+    { icon: 'group', label: 'Candidates', href: 'AIRecruiter - Candidates.dc.html' },
+    { icon: 'view_kanban', label: 'Pipeline', href: 'AIRecruiter - Pipeline.dc.html' }
+  ] },
+  reviews: { title: 'RECRUITING', items: [
+    { icon: 'work', label: 'Jobs', href: 'AIRecruiter - Requisitions.dc.html' },
+    { icon: 'group', label: 'Candidates', href: 'AIRecruiter - Candidates.dc.html' },
+    { icon: 'event', label: 'Interviews', href: 'AIRecruiter - Interviews.dc.html' }
+  ] },
+  crm: { title: 'CRM', items: [
+    { icon: 'domain', label: 'Clients', href: 'AIRecruiter - Clients.dc.html' },
+    { icon: 'contacts', label: 'Contacts', href: 'AIRecruiter - Contacts.dc.html' }
+  ] },
+  administration: { title: 'ADMINISTRATION', items: [
+    { icon: 'manage_accounts', label: 'User Management', href: 'AIRecruiter - Users.dc.html' },
+    { icon: 'admin_panel_settings', label: 'Roles & permissions', href: 'AIRecruiter - Roles.dc.html' },
+    { icon: 'settings', label: 'Settings', href: 'AIRecruiter - Settings.dc.html' }
+  ] }
+};
+
+const T = {
+  primary: { bg: 'var(--primary-tint)', fg: 'var(--primary)' },
+  info: { bg: 'var(--info-bg)', fg: 'var(--info)' },
+  violet: { bg: 'var(--violet-bg)', fg: '#5119B7' },
+  ok: { bg: 'var(--ok-bg)', fg: 'var(--ok)' },
+  warn: { bg: 'var(--warn-bg)', fg: 'var(--warn)' },
+  err: { bg: 'var(--err-bg)', fg: 'var(--err)' }
+};
+
+const TODAY_WORK = {
+  Owner: { sub: 'Across the whole desk — yours to unblock, not to do', href: 'AIRecruiter - Pipeline.dc.html', items: [
+    { n: 3, label: 'Feedback overdue', detail: 'Aldermere 4 days · Nortech 2 · Vantor 1', tone: 'err', icon: 'gavel', href: 'AIRecruiter - Requisitions.dc.html' },
+    { n: 2, label: 'Offers awaiting a decision', detail: 'Both expire this week', tone: 'warn', icon: 'draft', href: 'AIRecruiter - Offers.dc.html' },
+    { n: 1, label: 'Invoice past due', detail: '₹4,60,000 at Mistvale, 31 days', tone: 'err', icon: 'receipt_long', href: 'AIRecruiter - Invoice Tracker.dc.html' },
+    { n: 4, label: 'Interviews today', detail: 'First at 11:00, last at 16:30', tone: 'info', icon: 'event', href: 'AIRecruiter - Interviews.dc.html' },
+    { n: 1, label: 'Replacement case open', detail: 'Nortech · left on day 41 of 90', tone: 'violet', icon: 'swap_horiz', href: 'AIRecruiter - Replacement Tracker.dc.html' },
+    { n: 2, label: 'Guarantees expiring', detail: 'Mistvale in 6 days · Zephyr in 28', tone: 'warn', icon: 'shield', href: 'AIRecruiter - Guarantee Tracker.dc.html' }
+  ] },
+  Admin: { sub: 'Workspace housekeeping waiting on you', href: 'AIRecruiter - Users.dc.html', items: [
+    { n: 3, label: 'Invitations expiring', detail: 'One expires today', tone: 'warn', icon: 'mail', href: 'AIRecruiter - Users.dc.html' },
+    { n: 2, label: 'Integrations need attention', detail: 'Outlook consent revoked', tone: 'err', icon: 'sync_problem', href: 'AIRecruiter - Integrations.dc.html' },
+    { n: 5, label: 'Members inactive 90 days', detail: 'Each still holds a seat', tone: 'info', icon: 'person_off', href: 'AIRecruiter - Users.dc.html' },
+    { n: 1, label: 'Role change awaiting review', detail: 'Recruiter → Profile Lead', tone: 'violet', icon: 'admin_panel_settings', href: 'AIRecruiter - Roles.dc.html' }
+  ] },
+  Recruiter: { sub: 'Your desk, in the order it will bite you', href: 'AIRecruiter - Pipeline.dc.html', items: [
+    { n: 3, label: 'Feedback overdue', detail: 'Chase Aldermere first — 4 days', tone: 'err', icon: 'gavel', href: 'AIRecruiter - Requisitions.dc.html' },
+    { n: 4, label: 'Interviews today', detail: 'Savannah Nguyen at 14:00', tone: 'info', icon: 'event', href: 'AIRecruiter - Interviews.dc.html' },
+    { n: 2, label: 'Offers awaiting a decision', detail: 'One expires Friday', tone: 'warn', icon: 'draft', href: 'AIRecruiter - Offers.dc.html' },
+    { n: 7, label: 'Candidates ready to submit', detail: 'Screened and approved by your lead', tone: 'ok', icon: 'send', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 6, label: 'CVs to screen', detail: 'Parsed overnight, unread', tone: 'primary', icon: 'description', href: 'AIRecruiter - Candidates.dc.html' }
+  ] },
+  'Account Manager': { sub: 'Your four accounts — nobody else covers these', href: 'AIRecruiter - Clients.dc.html', items: [
+    { n: 1, label: 'Client invoice overdue', detail: '€24,300 at Nortech, 31 days', tone: 'err', icon: 'receipt_long', href: 'AIRecruiter - Clients.dc.html' },
+    { n: 2, label: 'Renewals inside 30 days', detail: 'Fablio 12 Mar · Corely 28 Mar', tone: 'warn', icon: 'event_repeat', href: 'AIRecruiter - Clients.dc.html' },
+    { n: 3, label: 'Feedback overdue on your accounts', detail: 'Aldermere 4 days · Vantor 1', tone: 'err', icon: 'gavel', href: 'AIRecruiter - Requisitions.dc.html' },
+    { n: 2, label: 'Quarterly reviews unbooked', detail: 'Nortech and Fablio, both due this month', tone: 'info', icon: 'insert_chart', href: 'AIRecruiter - Clients.dc.html' }
+  ] },
+  'Team Lead': { sub: 'Your desk — what your recruiters are waiting on', href: 'AIRecruiter - Pipeline.dc.html', items: [
+    { n: 6, label: 'Submissions awaiting your approval', detail: 'Oldest waiting 2 days', tone: 'warn', icon: 'fact_check', href: 'AIRecruiter - Pipeline.dc.html' },
+    { n: 2, label: 'Recruiters behind target', detail: 'Lena 62% · Dev 48% of month', tone: 'err', icon: 'trending_down', href: 'AIRecruiter - Dashboard.dc.html' },
+    { n: 3, label: 'Feedback overdue', detail: 'Chase Aldermere first — 4 days', tone: 'err', icon: 'gavel', href: 'AIRecruiter - Requisitions.dc.html' },
+    { n: 11, label: 'Interviews this week', detail: 'Four today, three unconfirmed', tone: 'info', icon: 'event', href: 'AIRecruiter - Interviews.dc.html' }
+  ] },
+  'Hiring Manager': { sub: 'Your three open roles — nothing moves until you decide', href: 'AIRecruiter - Requisitions.dc.html', items: [
+    { n: 5, label: 'Candidates awaiting your review', detail: 'Two submitted over 3 days ago', tone: 'warn', icon: 'fact_check', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 1, label: 'Offer needs your approval', detail: 'Savannah Nguyen · Senior Engineer', tone: 'err', icon: 'draft', href: 'AIRecruiter - Offers.dc.html' },
+    { n: 2, label: 'Interviews today', detail: 'You are on both panels', tone: 'info', icon: 'event', href: 'AIRecruiter - Interviews.dc.html' },
+    { n: 3, label: 'Scorecards not filled in', detail: 'From last week — blocking two decisions', tone: 'violet', icon: 'grading', href: 'AIRecruiter - Interviews.dc.html' }
+  ] },
+  Sourcer: { title: 'Priority queue', sub: 'Your sourcing funnel, oldest first', href: 'AIRecruiter - Candidates.dc.html', items: [
+    { n: 4, label: 'Replies waiting on you', detail: 'Interested — oldest sat 2 days, they go cold fast', tone: 'err', icon: 'forum', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 7, label: 'Connections with no follow-up', detail: 'Accepted but never sent the JD', tone: 'warn', icon: 'connect_without_contact', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 12, label: 'Profiles to review', detail: 'Above 80% match · oldest search 3 days stale', tone: 'primary', icon: 'travel_explore', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 4, label: 'Shortlists awaiting lead review', detail: 'Oldest waiting 2 days with Dev Shah', tone: 'info', icon: 'fact_check', href: 'AIRecruiter - Pipeline.dc.html' },
+    { n: 6, label: 'Invites left to hit target', detail: '34 of 40 sent — five-day streak on the line', tone: 'violet', icon: 'flag', href: 'AIRecruiter - Candidates.dc.html' }
+  ] }
+};
+const DESK = {
+  Recruiter: {
+    title: 'My pipeline', icon: 'view_kanban', href: 'AIRecruiter - Pipeline.dc.html', cta: 'Open board',
+    goalTitle: 'This week', goalSub: 'Wednesday · 2 working days left',
+    goalNote: 'Targets reset Monday. Submissions is the one that drives the rest — at your 12.5% conversion, 20 submissions is roughly 2.5 placements.',
+    goals: [
+      { label: 'Submissions', done: 14, target: 20 },
+      { label: 'Interviews booked', done: 6, target: 8 },
+      { label: 'New candidates', done: 11, target: 10 }
+    ],
+    rows: [
+      { stage: 'Applied', n: 84, tone: 'muted', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Screening', n: 32, tone: 'primary', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Submitted', n: 19, tone: 'info', href: 'AIRecruiter - Pipeline.dc.html' },
+      { stage: 'Interview', n: 14, tone: 'warn', href: 'AIRecruiter - Interviews.dc.html' },
+      { stage: 'Offer', n: 3, tone: 'violet', href: 'AIRecruiter - Offers.dc.html' },
+      { stage: 'Placed', n: 2, tone: 'ok', href: 'AIRecruiter - Pipeline.dc.html' }
+    ]
+  },
+  'Hiring Manager': {
+    title: 'Hiring funnel', icon: 'filter_alt', href: 'AIRecruiter - Pipeline.dc.html', cta: 'Open board',
+    goalTitle: 'My open roles', goalSub: 'Three live requisitions on your team',
+    goalNote: 'Hiring manager review is the bottleneck — 14 profiles sit with you against 9 submitted today. Every day here is a day a candidate can be lost.',
+    goals: [
+      { label: 'Senior Java · 2 awaiting review', done: 2, target: 3 },
+      { label: 'Platform Engineer · 1 interviewing', done: 1, target: 2 },
+      { label: 'QA Lead · offer pending', done: 1, target: 1 }
+    ],
+    rows: [
+      { stage: 'Applied', n: 128, tone: 'muted', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Recruiter approved', n: 46, tone: 'primary', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Your review', n: 14, tone: 'err', href: 'AIRecruiter - Candidates.dc.html', flag: 'Bottleneck' },
+      { stage: 'Interview', n: 11, tone: 'warn', href: 'AIRecruiter - Interviews.dc.html' },
+      { stage: 'Offer', n: 3, tone: 'violet', href: 'AIRecruiter - Offers.dc.html' },
+      { stage: 'Hired', n: 2, tone: 'ok', href: 'AIRecruiter - Pipeline.dc.html' }
+    ]
+  },
+  Sourcer: {
+    title: 'Outreach funnel', icon: 'filter_alt', href: 'AIRecruiter - Candidates.dc.html', cta: 'Open sourcing',
+    goalTitle: "Today's goal", goalSub: 'Five-day streak on the line',
+    goalNote: 'Invites reset at midnight. Two of your four replies are still unanswered — clearing those matters more than the last six invites.',
+    goals: [
+      { label: 'Invites sent', done: 34, target: 40 },
+      { label: 'Replies handled', done: 2, target: 4 },
+      { label: 'Profiles reviewed', done: 22, target: 25 }
+    ],
+    rows: [
+      { stage: 'Invited', n: 40, tone: 'muted', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Accepted', n: 18, tone: 'primary', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Interested', n: 7, tone: 'info', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'CV received', n: 5, tone: 'warn', href: 'AIRecruiter - Candidates.dc.html' },
+      { stage: 'Submitted to lead', n: 3, tone: 'ok', href: 'AIRecruiter - Pipeline.dc.html' }
+    ]
+  }
+};
+const SAVED_SEARCHES = [
+  { name: 'Java Backend · Amsterdam', n: 18, tone: 'primary', age: 'run 2h ago' },
+  { name: 'React / TypeScript', n: 12, tone: 'info', age: 'run 6h ago' },
+  { name: 'QA Automation', n: 3, tone: 'muted', age: 'run 3 days ago' },
+  { name: 'Platform / SRE', n: 9, tone: 'warn', age: 'run yesterday' }
+];
+
+
+const TEAM_HEALTH = {
+  capacity: '82%',
+  note: 'Capacity is open requisitions weighted by stage against each recruiter\u2019s historic throughput. Above 90% is where quality starts slipping.',
+  bands: [
+    { n: 3, label: 'On target', who: 'Dev, Mira, Ines', tone: 'ok', pct: '60%' },
+    { n: 1, label: 'Needs coaching', who: 'Lucas', tone: 'warn', pct: '20%' },
+    { n: 1, label: 'Overloaded', who: 'Sara \u00b7 11 reqs', tone: 'err', pct: '20%' }
+  ]
+};
+const COACHING = [
+  { badge: 'LM', name: 'Lucas Meyer', tag: 'Conversion', tone: 'warn',
+    detail: '25% CV-to-interview against a 41% desk average. Four of his submissions are waiting on you \u2014 review them together.',
+    cta: 'Review 4', href: 'AIRecruiter - Pipeline.dc.html' },
+  { badge: 'MJ', name: 'Mira Joshi', tag: 'Late feedback', tone: 'err',
+    detail: 'Two client SLAs breached on her requisitions this week. Both were chased late rather than escalated.',
+    cta: 'See 2', href: 'AIRecruiter - Requisitions.dc.html' },
+  { badge: 'SA', name: 'Sara Ahmed', tag: 'Overloaded', tone: 'err',
+    detail: 'Carrying 11 open requisitions \u2014 three more than anyone else. Her time-to-submit has doubled since January.',
+    cta: 'Rebalance', href: 'AIRecruiter - Requisitions.dc.html' }
+];
+
+const SYSTEM = [
+  { label: 'API', value: 'Healthy', note: '82ms p95', tone: 'ok' },
+  { label: 'Job queue', value: 'Healthy', note: '0 stuck', tone: 'ok' },
+  { label: 'CV parser', value: 'Degraded', note: '4 retrying', tone: 'warn' },
+  { label: 'Email', value: 'Healthy', note: '99.2% delivered', tone: 'ok' },
+  { label: 'Storage', value: '99.98%', note: '31-day backups', tone: 'ok' }
+];
+const TEAM_PERF = [
+        { name: 'Riya Kapoor', role: 'Team Lead', jobs: 12, cands: 148, subs: 42, ints: 18, offers: 6, placed: 24, revenue: '€412k', conv: '43%', sla: '96%' },
+        { name: 'Dev Shah', role: 'Recruiter', jobs: 9, cands: 121, subs: 31, ints: 14, offers: 4, placed: 19, revenue: '€288k', conv: '45%', sla: '92%' },
+        { name: 'Ana Novak', role: 'Team Lead', jobs: 7, cands: 96, subs: 24, ints: 9, offers: 3, placed: 14, revenue: '€196k', conv: '38%', sla: '88%' },
+        { name: 'Mira Joshi', role: 'Sourcer', jobs: 4, cands: 184, subs: 12, ints: 4, offers: 1, placed: 9, revenue: '€118k', conv: '33%', sla: '81%' },
+        { name: 'Tomas Weber', role: 'Profile Lead', jobs: 6, cands: 74, subs: 21, ints: 11, offers: 3, placed: 8, revenue: '€164k', conv: '38%', sla: '94%' },
+        { name: 'Lena Fischer', role: 'Recruiter', jobs: 5, cands: 88, subs: 18, ints: 7, offers: 2, placed: 6, revenue: '€92k', conv: '33%', sla: '86%' },
+        { name: 'Priya Nair', role: 'Profile Lead', jobs: 8, cands: 112, subs: 27, ints: 12, offers: 4, placed: 11, revenue: '€208k', conv: '41%', sla: '90%' },
+        { name: 'Dev Sharma', role: 'Sourcer', jobs: 3, cands: 196, subs: 9, ints: 3, offers: 1, placed: 4, revenue: '€61k', conv: '28%', sla: '78%' }
+      ];
+const CLIENT_HEALTH = [
+        { name: 'Nortech', jobs: 8, placed: 28, revenue: '€148k', last: '2 hours ago', am: 'Riya Kapoor', risk: 'Low', tone: 'ok' },
+        { name: 'Vantor', jobs: 5, placed: 14, revenue: '€74k', last: '1 day ago', am: 'Dev Shah', risk: 'High', tone: 'err' },
+        { name: 'Fablio', jobs: 6, placed: 11, revenue: '€96k', last: '4 hours ago', am: 'Riya Kapoor', risk: 'Medium', tone: 'warn' },
+        { name: 'Corely', jobs: 3, placed: 8, revenue: '€41k', last: '1 day ago', am: 'Dev Shah', risk: 'Low', tone: 'ok' },
+        { name: 'Mistvale', jobs: 2, placed: 6, revenue: '€38k', last: '6 days ago', am: 'Ana Novak', risk: 'Medium', tone: 'warn' }
+      ];
+
+const CHART_METRICS = {
+  Owner: ['Revenue', 'Placements', 'Submissions', 'Interviews'],
+  Admin: ['Active users', 'Seats', 'AI credits', 'CVs parsed'],
+  Recruiter: ['Submissions', 'Placements', 'Interviews'],
+  Sourcer: ['Submissions', 'Interviews'],
+  'Account Manager': ['Revenue', 'Placements', 'Submissions'],
+  'Team Lead': ['Submissions', 'Placements', 'Interviews'],
+  'Hiring Manager': ['Interviews', 'Offers', 'Reviewed']
+};
+const CHART_DATA = {
+  'Active users': { bars: [58, 64, 61, 72, 78, 81, 88, 92], unit: '', note: '92 of 18 members active daily this quarter' },
+  Seats: { bars: [40, 44, 48, 52, 56, 64, 68, 72], unit: '', note: '18 of 25 seats used · 7 left before renewal on 14 Mar' },
+  'AI credits': { bars: [22, 31, 38, 44, 51, 58, 62, 43], unit: '', note: '1,284 of 3,000 used · resets 1 Aug' },
+  'CVs parsed': { bars: [48, 62, 55, 71, 68, 84, 79, 91], unit: '', note: '4,180 CVs parsed · parser degraded, 4 retrying' },
+  Offers: { bars: [30, 44, 38, 52, 47, 61, 55, 68], unit: '', note: '18 offers on your requisitions, 14 accepted' },
+  Reviewed: { bars: [52, 61, 58, 70, 66, 79, 74, 86], unit: '', note: '96 submissions reviewed · median 1.8 days to decide' },
+  Revenue: { bars: [42, 58, 51, 70, 63, 82, 74, 94], unit: '€', note: '€1.36M booked across eight quarters' },
+  Placements: { bars: [55, 48, 62, 58, 71, 66, 84, 79], unit: '', note: '87 placements year to date' },
+  Submissions: { bars: [68, 74, 61, 88, 79, 92, 85, 97], unit: '', note: '1,204 submissions, 6.3% converting' },
+  Interviews: { bars: [38, 52, 45, 60, 57, 73, 68, 81], unit: '', note: '412 interviews booked this year' }
+};
+
+const STATUS_STRIP = {
+  Owner: [
+    { label: 'Revenue on plan', tone: 'ok' }, { label: '3 SLAs breached', tone: 'err' },
+    { label: '1 invoice overdue', tone: 'warn' }, { label: 'Pipeline healthy', tone: 'ok' }
+  ],
+  Admin: [
+    { label: 'Security healthy', tone: 'ok' }, { label: 'Seats low · 7 left', tone: 'warn' },
+    { label: '1 integration failing', tone: 'err' }, { label: 'Backup complete', tone: 'ok' }
+  ],
+  Recruiter: [
+    { label: '4 interviews today', tone: 'info' }, { label: '3 feedbacks overdue', tone: 'err' },
+    { label: '7 ready to submit', tone: 'ok' }, { label: 'Target 80% met', tone: 'warn' }
+  ],
+  Sourcer: [
+    { label: '12 profiles waiting', tone: 'info' }, { label: '7 with no follow-up', tone: 'warn' },
+    { label: 'Funnel healthy', tone: 'ok' }, { label: 'Searches running', tone: 'ok' }
+  ],
+  'Account Manager': [
+    { label: '4 accounts on plan', tone: 'ok' }, { label: '2 renewals in 30 days', tone: 'warn' },
+    { label: '1 client overdue', tone: 'err' }, { label: 'No escalations', tone: 'ok' }
+  ],
+  'Team Lead': [
+    { label: '6 awaiting your approval', tone: 'warn' }, { label: '2 recruiters behind target', tone: 'err' },
+    { label: '11 interviews this week', tone: 'info' }, { label: 'Desk on plan', tone: 'ok' }
+  ],
+  'Hiring Manager': [
+    { label: '5 awaiting your review', tone: 'warn' }, { label: '2 interviews today', tone: 'info' },
+    { label: '1 offer to approve', tone: 'err' }, { label: '3 roles open', tone: 'ok' }
+  ]
+};
+
+const SEARCH_INDEX = [
+  { kind: 'Jobs', icon: 'work', tone: 'primary', items: [
+    { label: 'Senior Java Developer', sub: 'REQ-2448 · Nortech · 3 in interview', href: 'AIRecruiter - Requisition Detail.dc.html' },
+    { label: 'Platform Engineer', sub: 'REQ-2451 · Aldermere · feedback overdue 4 days', href: 'AIRecruiter - Requisition Detail.dc.html' },
+    { label: 'Head of Data', sub: 'REQ-2439 · Fablio · offer out', href: 'AIRecruiter - Requisition Detail.dc.html' } ] },
+  { kind: 'Interviews', icon: 'event', tone: 'warn', items: [
+    { label: 'Savannah Nguyen · R2 technical', sub: 'INT-1042 · today 11:00 · Nortech · 1 of 2 scorecards in', href: 'AIRecruiter - Interview Detail.dc.html' },
+    { label: 'Awaiting feedback', sub: '6 scorecards open · 3 past the 48h SLA', href: 'AIRecruiter - Interviews.dc.html' },
+    { label: 'Arjun Mehta · unconfirmed', sub: 'INT-1039 · invite lapsed twice · send slots instead', href: 'AIRecruiter - Slot Invite.dc.html' } ] },
+  { kind: 'Offers', icon: 'contract', tone: 'violet', items: [
+    { label: 'OFF-2031 · Savannah Nguyen', sub: '€78,000 + 10% · expires in 2 days · out for signature', href: 'AIRecruiter - Offer Detail.dc.html' },
+    { label: 'OFF-2029 · Daniel Okoro', sub: '¥11,400,000 · expires in 14 hours', href: 'AIRecruiter - Offer Detail.dc.html' },
+    { label: 'Awaiting approval', sub: '2 offers with the client · ₹8.7L of fee', href: 'AIRecruiter - Offers.dc.html' } ] },
+  { kind: 'Placements', icon: 'handshake', tone: 'ok', items: [
+    { label: 'PLC-882 · Priya Iyer', sub: 'Joins today · ₹3,85,000 · joining letter missing', href: 'AIRecruiter - Placement Detail.dc.html' },
+    { label: 'INV-0994 · Mistvale', sub: '₹4,60,000 overdue 31 days', href: 'AIRecruiter - Invoice Tracker.dc.html' },
+    { label: 'Guarantee closing', sub: 'Hanna Berg · 6 days left of 90', href: 'AIRecruiter - Guarantee Tracker.dc.html' } ] },
+  { kind: 'Candidates', icon: 'person', tone: 'info', items: [
+    { label: 'Savannah Nguyen', sub: 'Submitted to Nortech · interviews 14:00', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { label: 'Owen Blake', sub: 'Placed at Fablio · inside guarantee', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { label: 'Mira Solberg', sub: 'CV received · not yet screened', href: 'AIRecruiter - Candidate Detail.dc.html' } ] },
+  { kind: 'Clients', icon: 'domain', tone: 'ok', items: [
+    { label: 'Nortech Industries', sub: '6 open requisitions · €24,300 overdue', href: 'AIRecruiter - Client Detail.dc.html' },
+    { label: 'Aldermere Group', sub: '4 open requisitions · SLA at risk', href: 'AIRecruiter - Client Detail.dc.html' } ] },
+  { kind: 'Contacts', icon: 'contacts', tone: 'violet', items: [
+    { label: 'Ana Kelmendi', sub: 'Head of Engineering · Nortech', href: 'AIRecruiter - Contact Detail.dc.html' } ] }
+];
+const COMMANDS = [
+  { label: 'New job', sub: 'Open a requisition against a client', icon: 'add_box', href: 'AIRecruiter - Add Requisition.dc.html' },
+  { label: 'Add candidate', sub: 'Create a record or upload a CV', icon: 'person_add', href: 'AIRecruiter - Add Candidate.dc.html' },
+  { label: 'Add client', sub: 'New account with fee terms', icon: 'domain_add', href: 'AIRecruiter - Add Client.dc.html' },
+  { label: 'Invite user', sub: 'Send a workspace invitation', icon: 'group_add', href: 'AIRecruiter - Users.dc.html' },
+  { label: 'Open pipeline', sub: 'The board across every requisition', icon: 'view_kanban', href: 'AIRecruiter - Pipeline.dc.html' },
+  { label: 'Switch theme', sub: 'Light and dark', icon: 'dark_mode', href: 'AIRecruiter - Dashboard.dc.html' }
+];
+const AI_FINDINGS = {
+  Owner: [
+    { n: 12, title: 'Duplicate candidate records', detail: 'Same email across two owners — merging keeps the older audit trail.', icon: 'content_copy', tone: 'warn', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 8, title: 'Rejected candidates worth revisiting', detail: 'Turned down for seniority, now matching three open roles.', icon: 'restore', tone: 'ok', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 5, title: 'Clients with no activity in 30 days', detail: 'Nortech and four others have had no submission since June.', icon: 'domain_disabled', tone: 'err', href: 'AIRecruiter - Clients.dc.html' },
+    { n: 3, title: 'Requisitions missing a salary band', detail: 'Match scoring is degraded without one.', icon: 'payments', tone: 'info', href: 'AIRecruiter - Requisitions.dc.html' } ],
+  Recruiter: [
+    { n: 9, title: 'Candidates matching your open roles', detail: 'Scored above 80% against REQ-2448 and REQ-2451.', icon: 'target', tone: 'ok', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 6, title: 'CVs parsed and ready to screen', detail: 'Uploaded overnight, skills already extracted.', icon: 'description', tone: 'info', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 4, title: 'Candidates gone quiet', detail: 'No reply for 7 days — a nudge usually recovers half.', icon: 'notifications_paused', tone: 'warn', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 2, title: 'Interview notes not written up', detail: 'Scorecards from last week are still empty.', icon: 'edit_note', tone: 'err', href: 'AIRecruiter - Interviews.dc.html' } ],
+  Sourcer: [
+    { n: 6, title: 'Open to work since last week', detail: 'Signalled availability on profiles already in your shortlist.', icon: 'work_history', tone: 'ok', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 9, title: 'Changed jobs in the last 90 days', detail: 'Fresh in role — worth a note now, a call in six months.', icon: 'swap_horiz', tone: 'info', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 4, title: 'Layoffs announced at target companies', detail: 'Fablio and Corely cut engineering. 31 profiles affected.', icon: 'trending_down', tone: 'err', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 14, title: 'New profiles matching your searches', detail: 'Found overnight, above 80% against your assigned roles.', icon: 'travel_explore', tone: 'primary', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 11, title: 'Likely to reply', detail: 'Replied to a recruiter within 48h in the last year.', icon: 'quickreply', tone: 'violet', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 5, title: 'Duplicate profiles in your shortlist', detail: 'Already in the workspace under another owner.', icon: 'content_copy', tone: 'warn', href: 'AIRecruiter - Candidates.dc.html' } ],
+  'Hiring Manager': [
+    { n: 4, title: 'Submissions waiting on your decision', detail: 'Oldest has been open 4 days against a 48h SLA.', icon: 'how_to_reg', tone: 'err', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 2, title: 'Panel disagreement detected', detail: 'Arjun Mehta split 3–2. The two no votes both cite system design.', icon: 'balance', tone: 'warn', href: 'AIRecruiter - Interviews.dc.html' },
+    { n: 3, title: 'Likely to accept an offer', detail: 'Salary aligned, notice under 30 days, no competing process flagged.', icon: 'thumb_up', tone: 'ok', href: 'AIRecruiter - Candidates.dc.html' },
+    { n: 1, title: 'Internal referral in your queue', detail: 'Elin Sørensen was referred by Priya Nair — referrals convert 3× here.', icon: 'diversity_3', tone: 'violet', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { n: 2, title: 'Near-identical interview feedback', detail: 'Two scorecards on Savannah Nguyen share phrasing — possible copy-paste.', icon: 'content_copy', tone: 'info', href: 'AIRecruiter - Interviews.dc.html' },
+    { n: 3, title: 'Scorecards not completed', detail: 'Interviews you attended last week.', icon: 'fact_check', tone: 'warn', href: 'AIRecruiter - Interviews.dc.html' } ],
+  Finance: [
+    { n: 6, title: 'Invoices past their due date', detail: '€24,300 at Nortech is the largest.', icon: 'receipt_long', tone: 'err', href: 'AIRecruiter - Clients.dc.html' },
+    { n: 3, title: 'Placements not yet invoiced', detail: 'Started more than 14 days ago.', icon: 'request_quote', tone: 'warn', href: 'AIRecruiter - Clients.dc.html' },
+    { n: 2, title: 'Fee agreements expiring this quarter', detail: 'Renew before the next requisition is opened.', icon: 'gavel', tone: 'info', href: 'AIRecruiter - Clients.dc.html' } ]
+};
+const RECENTS = {
+  Owner: [
+    { name: 'Nortech Industries', kind: 'Client', icon: 'domain', tone: 'ok', when: '10 min', href: 'AIRecruiter - Client Detail.dc.html' },
+    { name: 'Savannah Nguyen', kind: 'Candidate · submitted', icon: 'person', tone: 'info', when: '1 h', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { name: 'REQ-2448 Senior Java Developer', kind: 'Job', icon: 'work', tone: 'primary', when: '2 h', href: 'AIRecruiter - Requisition Detail.dc.html' },
+    { name: 'Ana Kelmendi', kind: 'Contact · Nortech', icon: 'contacts', tone: 'violet', when: 'Yesterday', href: 'AIRecruiter - Contact Detail.dc.html' },
+    { name: 'Aldermere Group', kind: 'Client', icon: 'domain', tone: 'ok', when: 'Yesterday', href: 'AIRecruiter - Client Detail.dc.html' } ],
+  Recruiter: [
+    { name: 'Savannah Nguyen', kind: 'Candidate · interviews 14:00', icon: 'person', tone: 'info', when: '5 min', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { name: 'REQ-2448 Senior Java Developer', kind: 'Job', icon: 'work', tone: 'primary', when: '20 min', href: 'AIRecruiter - Requisition Detail.dc.html' },
+    { name: 'Mira Solberg', kind: 'Candidate · CV received', icon: 'person', tone: 'info', when: '1 h', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    { name: 'REQ-2451 Platform Engineer', kind: 'Job · feedback overdue', icon: 'work', tone: 'primary', when: '3 h', href: 'AIRecruiter - Requisition Detail.dc.html' } ]
+};
+const EMPTY_STEPS = [
+  { n: '1', title: 'Add your first client', detail: 'Fee terms and contacts live here. Everything else hangs off a client.', icon: 'domain_add', href: 'AIRecruiter - Add Client.dc.html' },
+  { n: '2', title: 'Open a requisition', detail: 'The role you are hired to fill, with its salary band and SLA.', icon: 'work', href: 'AIRecruiter - Add Requisition.dc.html' },
+  { n: '3', title: 'Add candidates', detail: 'Upload CVs or create records. The AI screens them as they land.', icon: 'person_add', href: 'AIRecruiter - Add Candidate.dc.html' }
+];
+
+const ROLES = {
+  Owner: {
+    icon: 'workspace_premium', user: 'Riya Kapoor',
+    greeting: 'Good morning, Riya',
+    subtitle: 'Troy Consulting · 9 clients · 18 of 25 seats · €412k outstanding',
+    nav: ['main', 'recruiting', 'crm', 'administration'],
+    rail: { icon: 'trending_up', title: '€1.36M booked', body: '68% of the annual target with five months to run.' },
+    alert: { tone: 'warn', icon: 'gavel', title: 'Four commercial risks need a decision', body: 'One replacement case, €24,300 overdue at Nortech, a guarantee ending in 9 days and two offers expiring this week.', cta: 'Open finance', href: 'AIRecruiter - Dashboard.dc.html' },
+    kpis: [
+      { icon: 'payments', label: 'Revenue this month', value: '€184k', delta: '+22%', tone: 'ok' },
+      { icon: 'handshake', label: 'Placements', value: '9', delta: 'this month', tone: 'violet' },
+      { icon: 'receipt_long', label: 'Outstanding', value: '€96k', delta: '€24k overdue', tone: 'err' },
+      { icon: 'event', label: 'Interviews today', value: '3', delta: '5 offers pending', tone: 'primary' }
+    ],
+    queue: { title: 'Risks needing a decision', sub: 'Replacements, payments, guarantees and expiring offers', href: 'AIRecruiter - Dashboard.dc.html', rows: [
+      { badge: '!', title: 'Replacement case · Fablio', sub: 'Owen Blake left inside the 90-day guarantee', tag: 'Replace free', tone: 'err', cta: 'Open', radius: '8px' },
+      { badge: '€', title: 'INV-2026-021 overdue 6 days', sub: 'Nortech · €24,300 · Finance chased twice', tag: 'Overdue', tone: 'err', cta: 'Chase', radius: '8px' },
+      { badge: 'G', title: 'Guarantee ends in 9 days', sub: 'Rohan Gupta · Nortech · €24,300 secured after', tag: '9 days', tone: 'warn', cta: 'Track', radius: '8px' },
+      { badge: 'O', title: '2 offers expire this week', sub: 'Daniel Okoro and Elin Sørensen', tag: 'Expiring', tone: 'warn', cta: 'Review', radius: '8px' }
+    ] },
+    chart: { title: 'Revenue by quarter', legend: [['var(--primary-tint)', 'Submitted value'], ['var(--primary)', 'Revenue booked']] },
+    side: { title: 'Top clients', sub: 'By revenue booked this year', rows: [
+      { badge: 'N', title: 'Nortech', sub: '28 placements · 18% fee', value: '€148k', tone: 'ok', radius: '10px',
+        jobs: '6 open', risk: 'Overdue', riskTone: 'err', out: '€24.3k outstanding' },
+      { badge: 'V', title: 'Vantor', sub: '14 placements · 20% fee', value: '€74k', tone: 'err', radius: '10px',
+        jobs: '4 open', risk: 'SLA at risk', riskTone: 'warn', out: 'Nothing outstanding' },
+      { badge: 'F', title: 'Fablio', sub: '11 placements · 18% fee', value: '€96k', tone: 'warn', radius: '10px',
+        jobs: '3 open', risk: 'Replacement', riskTone: 'violet', out: '€12.0k outstanding' },
+      { badge: 'C', title: 'Corely', sub: '8 placements · 15% fee', value: '€41k', tone: 'primary', radius: '10px',
+        jobs: '2 open', risk: 'Healthy', riskTone: 'ok', out: 'Nothing outstanding' }
+    ] },
+    actions: [
+      { icon: 'add_box', label: 'New job', href: 'AIRecruiter - Add Requisition.dc.html', tone: 'primary' },
+      { icon: 'person_add', label: 'Add candidate', href: 'AIRecruiter - Add Candidate.dc.html', tone: 'info' },
+      { icon: 'domain_add', label: 'Add client', href: 'AIRecruiter - Add Client.dc.html', tone: 'ok' },
+      { icon: 'event_available', label: 'Schedule interview', href: 'AIRecruiter - Interviews.dc.html', tone: 'violet' }
+    ],
+    adminActions: [
+      { icon: 'leaderboard', label: 'Recruiter leaderboard', href: 'AIRecruiter - Dashboard.dc.html' },
+      { icon: 'account_balance', label: 'Finance', href: 'AIRecruiter - Clients.dc.html' },
+      { icon: 'group_add', label: 'Invite team', href: 'AIRecruiter - Users.dc.html' }
+    ]
+  },
+  Admin: {
+    icon: 'admin_panel_settings', user: 'Ana Novak',
+    greeting: 'Workspace health',
+    subtitle: 'Troy Consulting · 18 members · SOC 2 controls green',
+    nav: ['main', 'crm', 'administration'],
+    rail: { icon: 'shield', title: 'All controls green', body: 'Two-factor enforced on every seat. Last audit export 3 days ago.' },
+    alert: { tone: 'warn', icon: 'group', title: '7 seats left before your renewal', body: 'Two invitations have been pending for over a week — reclaim those seats or add more before 14 Mar.', cta: 'Manage seats', href: 'AIRecruiter - Settings.dc.html' },
+    kpis: [
+      { icon: 'group', label: 'Seats used', value: '18 / 25', delta: '72%', tone: 'primary' },
+      { icon: 'shield', label: 'Security score', value: '96', delta: 'Good', tone: 'ok' },
+      { icon: 'hub', label: 'Integrations', value: '6', delta: '1 warning', tone: 'warn' },
+      { icon: 'auto_awesome', label: 'AI credits', value: '1,284', delta: 'of 3,000', tone: 'violet' }
+    ],
+    queue: { title: 'Needs an admin decision', sub: 'Access, tokens and data requests', href: 'AIRecruiter - Settings.dc.html', rows: [
+      { badge: 'LM', title: 'Lucas Meyer · access review', sub: 'Sourcer seat idle for 32 days', tag: 'Reclaim?', tone: 'warn', cta: 'Review', radius: '999px' },
+      { badge: '!', title: 'Outlook token expires in 4 days', sub: 'Interview sync will stop for 6 members', tag: 'Action', tone: 'err', cta: 'Renew', radius: '8px' },
+      { badge: 'DS', title: 'Dev Shah requested export', sub: 'Full candidate CSV · needs approval', tag: 'Pending', tone: 'info', cta: 'Approve', radius: '999px' },
+      { badge: '2', title: '2 invitations unaccepted', sub: 'Sent 9 days ago to Nortech contractors', tag: 'Stale', tone: 'muted', cta: 'Resend', radius: '8px' }
+    ] },
+    chart: { title: 'Seat usage by month', legend: [['var(--primary-tint)', 'Licensed'], ['var(--primary)', 'Active']] },
+    side: { title: 'Recent security events', rows: [
+      { badge: '✓', title: 'Two-factor enforced', sub: 'Applied to all 18 seats', value: '2w', tone: 'ok', radius: '8px' },
+      { badge: '!', title: 'Blocked sign-in', sub: 'Unrecognised device · Lisbon', value: '3d', tone: 'err', radius: '8px' },
+      { badge: 'K', title: 'Password reset', sub: 'Mira Joshi', value: '1d', tone: 'warn', radius: '8px' },
+      { badge: '↓', title: 'Audit log exported', sub: 'By Riya Kapoor', value: '3d', tone: 'info', radius: '8px' }
+    ] },
+    actions: [
+      { icon: 'person_add', label: 'Invite member', href: 'AIRecruiter - Users.dc.html', tone: 'primary' },
+      { icon: 'hub', label: 'Integrations', href: 'AIRecruiter - Integrations.dc.html', tone: 'info' },
+      { icon: 'admin_panel_settings', label: 'Roles & permissions', href: 'AIRecruiter - Roles.dc.html', tone: 'violet' },
+      { icon: 'receipt_long', label: 'Audit logs', href: 'AIRecruiter - Settings.dc.html', tone: 'ok' }
+    ],
+    adminActions: [
+      { icon: 'shield', label: 'Security policy', href: 'AIRecruiter - Settings.dc.html' },
+      { icon: 'download', label: 'Export audit log', href: 'AIRecruiter - Settings.dc.html' }
+    ]
+  },
+  'Account Manager': {
+    icon: 'handshake', user: 'Dev Shah',
+    greeting: 'Your portfolio, Dev',
+    subtitle: '4 accounts · €412k booked this year · 2 renewals inside 30 days',
+    nav: ['main', 'recruiting', 'crm'],
+    rail: { icon: 'payments', title: '€412k booked', body: 'Nortech and Vantor carry 71% of your portfolio.' },
+    alert: { tone: 'warn', icon: 'event_repeat', title: 'Mistvale renews in 12 days', body: 'Fee terms are still at 15% while the desk average is 18%. Renewal is the moment to reprice.', cta: 'Open account', href: 'AIRecruiter - Client Detail.dc.html' },
+    kpis: [
+      { icon: 'payments', label: 'Portfolio value', value: '€412k', delta: '+22%', tone: 'ok' },
+      { icon: 'domain', label: 'Active accounts', value: '4', delta: '1 prospect', tone: 'primary' },
+      { icon: 'event_repeat', label: 'Renewals due', value: '2', delta: 'in 30 days', tone: 'warn' },
+      { icon: 'trending_up', label: 'Account health', value: '76', delta: '1 at risk', tone: 'info' }
+    ],
+    queue: { title: 'Accounts needing you', sub: 'Renewals, risk and growth across your portfolio', href: 'AIRecruiter - Clients.dc.html', rows: [
+      { badge: 'M', title: 'Mistvale · renewal', sub: 'Renews 12 Aug · still on 15% · €41k last year', tag: '12 days', tone: 'warn', cta: 'Prepare', radius: '10px' },
+      { badge: 'V', title: 'Vantor · at risk', sub: 'Two SLA breaches this week · €74k exposed', tag: 'At risk', tone: 'err', cta: 'Call', radius: '10px' },
+      { badge: 'N', title: 'Nortech · growth', sub: 'Asked about a second desk for platform roles', tag: 'Upsell', tone: 'ok', cta: 'Propose', radius: '10px' },
+      { badge: 'A', title: 'Aureli Health · prospect', sub: 'Proposal sent 2 days ago · no reply yet', tag: 'Chase', tone: 'info', cta: 'Follow up', radius: '10px' }
+    ] },
+    chart: { title: 'Fees by account, per quarter', legend: [['var(--primary-tint)', 'Submitted value'], ['var(--primary)', 'Booked']] },
+    side: { title: 'Accounts by fee', rows: [
+      { badge: 'N', title: 'Nortech', sub: '8 open · 6 placed · 18% fee', value: '€148k', tone: 'ok', radius: '10px' },
+      { badge: 'V', title: 'Vantor', sub: '5 open · 3 placed · SLA at risk', value: '€74k', tone: 'err', radius: '10px' },
+      { badge: 'C', title: 'Corely', sub: '3 open · 2 placed · renews Sep', value: '€41k', tone: 'primary', radius: '10px' },
+      { badge: 'M', title: 'Mistvale', sub: 'Paused · renewal in 12 days', value: '€38k', tone: 'warn', radius: '10px' }
+    ] },
+    actions: [
+      { icon: 'domain_add', label: 'Add client', href: 'AIRecruiter - Add Client.dc.html', tone: 'primary' },
+      { icon: 'summarize', label: 'Send client report', href: 'AIRecruiter - Client Detail.dc.html', tone: 'violet' },
+      { icon: 'event_repeat', label: 'Renewal review', href: 'AIRecruiter - Client Detail.dc.html', tone: 'warn' },
+      { icon: 'receipt_long', label: 'Raise invoice', href: 'AIRecruiter - Dashboard.dc.html', tone: 'ok' }
+    ]
+  },
+
+  'Team Lead': {
+    icon: 'verified', user: 'Riya Kapoor',
+    greeting: 'Your review queue, Riya',
+    subtitle: '3 recruiters · 12 CVs and 2 offers waiting on you',
+    nav: ['main', 'recruiting', 'crm'],
+    rail: { icon: 'today', title: "Today's desk", stats: [[2, 'SLAs breach today'], [18, 'awaiting your approval'], [11, 'interviews this week']], body: 'REQ-2448 has been held 4 days, REQ-2451 one.' },
+    alert: { tone: 'err', icon: 'schedule', title: 'Two client SLAs breach today', body: 'Nortech has held REQ-2448 for 4 days and REQ-2451 for 1. Chase Ana Kelmendi or escalate to Tom Weaver.', cta: 'Chase now', href: 'AIRecruiter - Client Detail.dc.html' },
+    kpis: [
+      { icon: 'rate_review', label: 'Pending your approval', value: '18', delta: '12 CV · 4 lead · 2 offer', tone: 'warn' },
+      { icon: 'send', label: 'Team submissions', value: '32', delta: 'this week', tone: 'primary' },
+      { icon: 'percent', label: 'Interview conversion', value: '41%', delta: '+6pts', tone: 'ok' },
+      { icon: 'timer', label: 'SLA breaches', value: '2', delta: 'today', tone: 'err' }
+    ],
+    queue: { title: 'Waiting on your approval', sub: 'Nothing reaches a client until you sign it off', href: 'AIRecruiter - Requisitions.dc.html', rows: [
+      { badge: 'SN', title: 'Savannah Nguyen · CV review', sub: 'Senior Java Developer · Nortech · from Dev Shah', tag: 'AI 94%', tone: 'ok', cta: 'Approve', radius: '999px' },
+      { badge: 'AM', title: 'Arjun Mehta · lead review', sub: 'Platform Engineer · Nortech · from Dev Shah', tag: 'Borderline', tone: 'warn', cta: 'Review', radius: '999px' },
+      { badge: 'DO', title: 'Daniel Okoro · offer review', sub: 'SRE · TrueNorth · €96k, 10% above band', tag: 'Off band', tone: 'err', cta: 'Review', radius: '999px' },
+      { badge: 'EL', title: 'Elin Sørensen · CV review', sub: 'QA Automation Lead · Fablio · from Mira Joshi', tag: 'New', tone: 'info', cta: 'Approve', radius: '999px' }
+    ] },
+    chart: { title: 'Team submissions vs decisions', legend: [['var(--primary-tint)', 'Submitted'], ['var(--primary)', 'Decided']] },
+    side: { title: 'Team performance', rows: [
+      { badge: 'DS', title: 'Dev Shah', sub: '19 submitted · 4 placed · 44% conv', value: '4', tone: 'ok', radius: '999px' },
+      { badge: 'MJ', title: 'Mira Joshi', sub: '12 submitted · 2 placed · 33% conv', value: '2', tone: 'primary', radius: '999px' },
+      { badge: 'LM', title: 'Lucas Meyer', sub: '8 submitted · 1 placed · 25% conv', value: '1', tone: 'warn', radius: '999px' },
+      { badge: '3', title: 'Returned to recruiter', sub: 'Below the quality bar this week', value: '3', tone: 'err', radius: '8px' }
+    ] },
+    actions: [
+      { icon: 'rate_review', label: 'Review queue', href: 'AIRecruiter - Candidate Detail.dc.html', tone: 'warn' },
+      { icon: 'send', label: 'Submit shortlist', href: 'AIRecruiter - Requisition Detail.dc.html', tone: 'primary' },
+      { icon: 'undo', label: 'Return to recruiter', href: 'AIRecruiter - Candidates.dc.html', tone: 'err' },
+      { icon: 'monitoring', label: 'Team activity', href: 'AIRecruiter - Dashboard.dc.html', tone: 'violet' }
+    ]
+  },
+  Recruiter: {
+    icon: 'work', user: 'Dev Shah',
+    greeting: 'Good morning, Dev',
+    subtitle: '5 requisitions · 34 candidates · 3 interviews today',
+    nav: ['main', 'recruiting'],
+    rail: { icon: 'target', title: '€6.4k of €12k', body: '53% of your monthly target with 11 days left.' },
+    alert: { tone: 'primary', icon: 'event', title: 'Savannah Nguyen interviews at 14:00', body: 'Nortech · Senior Java Developer. Panel is Ana Kelmendi plus two engineers — brief her on the Kubernetes questions.', cta: 'Open candidate', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    kpis: [
+      { icon: 'work', label: 'Open jobs', value: '5', delta: '11 seats', tone: 'primary' },
+      { icon: 'event', label: "Today's interviews", value: '3', delta: '8 this week', tone: 'info' },
+      { icon: 'draft', label: 'Offers pending', value: '2', delta: '1 expiring', tone: 'warn' },
+      { icon: 'payments', label: 'Revenue this month', value: '€6.4k', delta: '53% of target', tone: 'ok' }
+    ],
+    queue: { title: 'Next actions', sub: 'What moves your desk forward today', href: 'AIRecruiter - Candidates.dc.html', rows: [
+      { badge: 'MO', title: 'Chase Marcus Odum', sub: 'No reply for 5 days · QA Automation Lead · offer window closing', tag: 'Critical', tone: 'err', cta: 'Chase', radius: '999px' },
+      { badge: 'SN', title: 'Brief Savannah Nguyen', sub: 'Interview at 14:00 · Nortech · Kubernetes depth', tag: 'Today', tone: 'warn', cta: 'Call', radius: '999px' },
+      { badge: 'NH', title: 'Submit Noor Haddad', sub: 'Lead review passed · Nortech waiting', tag: 'Today', tone: 'ok', cta: 'Submit', radius: '999px' },
+      { badge: 'AM', title: 'Review Arjun Mehta CV', sub: 'AI 81% · needs your read before lead review', tag: 'Tomorrow', tone: 'info', cta: 'Open', radius: '999px' }
+    ] },
+    chart: { title: 'Your week', legend: [['var(--primary-tint)', 'Submitted'], ['var(--primary)', 'Interviewed']] },
+    side: { title: 'Today', rows: [
+      { badge: '14', title: 'Savannah Nguyen', sub: 'Interview · Nortech', value: '14:00', tone: 'primary', radius: '8px' },
+      { badge: '16', title: 'Arjun Mehta', sub: 'Screening call', value: '16:30', tone: 'info', radius: '8px' },
+      { badge: '17', title: 'Noor Haddad', sub: 'Submit before the SLA', value: '17:00', tone: 'warn', radius: '8px' },
+      { badge: '18', title: 'Pipeline sync with Riya', sub: 'Weekly', value: '18:00', tone: 'violet', radius: '8px' }
+    ] },
+    actions: [
+      { icon: 'send', label: 'Submit candidate', href: 'AIRecruiter - Requisition Detail.dc.html', tone: 'primary' },
+      { icon: 'event', label: 'Schedule interview', href: 'AIRecruiter - Interviews.dc.html', tone: 'info' },
+      { icon: 'draft', label: 'Create offer', href: 'AIRecruiter - Offers.dc.html', tone: 'violet' },
+      { icon: 'person_add', label: 'Add candidate', href: 'AIRecruiter - Add Candidate.dc.html', tone: 'ok' },
+      { icon: 'add_box', label: 'Create job', href: 'AIRecruiter - Add Requisition.dc.html', tone: 'warn' }
+    ]
+  },
+  Sourcer: {
+    icon: 'person_search', user: 'Mira Joshi',
+    greeting: 'Good morning, Mira',
+    subtitle: '2 requisitions assigned · 34 of 40 invites sent today',
+    nav: ['main', 'sourcing'],
+    rail: { icon: 'flag', title: '6 invites to target', body: 'Hit 40 today and you keep a five-day streak.' },
+    alert: { tone: 'info', icon: 'flag', title: 'Six invites left to hit today\u2019s target', body: 'You are at 34 of 40. The Java Developer search has 18 unviewed profiles matching above 80%.', cta: 'Open sourcing', href: 'AIRecruiter - Candidates.dc.html' },
+    kpis: [
+      { icon: 'person_add', label: 'Candidates added', value: '26', delta: 'this week', tone: 'primary' },
+      { icon: 'send', label: 'Profiles contacted', value: '34 / 40', delta: 'today', tone: 'info' },
+      { icon: 'how_to_reg', label: 'Connection requests', value: '112', delta: '+18', tone: 'violet' },
+      { icon: 'percent', label: 'Response rate', value: '23%', delta: '↑ 4pts · 19% last week', tone: 'ok' }
+    ],
+    queue: { title: 'Your sourcing queue', sub: 'Searches, follow-ups and replies waiting on you', href: 'AIRecruiter - Candidates.dc.html', rows: [
+      { badge: '18', title: 'Need sourcing · REQ-2448', sub: 'Senior Java Developer · 18 profiles above 80%', tag: 'Source', tone: 'primary', cta: 'Open', radius: '8px' },
+      { badge: '7', title: 'Follow-up due', sub: 'No reply after 5 days · 7 candidates', tag: 'Chase', tone: 'warn', cta: 'Send', radius: '8px' },
+      { badge: '4', title: 'LinkedIn replies', sub: 'Interested — need a CV request', tag: 'Reply', tone: 'ok', cta: 'Reply', radius: '8px' },
+      { badge: '3', title: 'CV pending', sub: 'Promised a CV but not received', tag: '2 days', tone: 'info', cta: 'Remind', radius: '8px' }
+    ] },
+    chart: { title: 'Invites and replies', legend: [['var(--primary-tint)', 'Invites'], ['var(--primary)', 'Replies']] },
+    side: { title: 'Jobs assigned', rows: [
+      { badge: 'J', title: 'Senior Java Developer', sub: 'REQ-2448 · Nortech · Dev Shah', value: '18 new', tone: 'primary', radius: '8px', jobs: '7 sourced', risk: '4 submitted', riskTone: 'ok', out: '3 of 5 seats left' },
+      { badge: 'P', title: 'Platform Engineer', sub: 'REQ-2451 · Nortech · Dev Shah', value: '9 new', tone: 'info', radius: '8px' },
+      { badge: '+', title: 'Assign to recruiter', sub: 'Move a sourced candidate onward', value: '', tone: 'ok', radius: '8px' }
+    ] },
+    actions: [
+      { icon: 'extension', label: 'Open extension', href: 'AIRecruiter - Candidates.dc.html', tone: 'info' },
+      { icon: 'person_add', label: 'Add candidate', href: 'AIRecruiter - Add Candidate.dc.html', tone: 'primary' },
+      { icon: 'upload_file', label: 'Upload résumé', href: 'AIRecruiter - Candidates.dc.html', tone: 'violet' },
+      { icon: 'assignment_ind', label: 'Assign recruiter', href: 'AIRecruiter - Candidates.dc.html', tone: 'ok' }
+    ]
+  },
+  'Hiring Manager': {
+    icon: 'fact_check', user: 'Ana Novak',
+    greeting: 'Review queue, Ana',
+    subtitle: 'Internal quality gate · 14 profiles waiting on a decision',
+    nav: ['main', 'reviews'],
+    rail: { icon: 'timer', title: '3.2h average', body: 'Your median review time this week, down from 5.1h.' },
+    alert: { tone: 'warn', icon: 'rate_review', title: '14 profiles are waiting on your review', body: 'Four have been in the queue over 24 hours. Nothing reaches a client until you approve it.', cta: 'Start reviewing', href: 'AIRecruiter - Candidate Detail.dc.html' },
+    kpis: [
+      { icon: 'rate_review', label: 'Lead reviews pending', value: '14', delta: '4 over 24h', tone: 'warn' },
+      { icon: 'send', label: 'Profiles submitted today', value: '9', delta: '+3', tone: 'primary' },
+      { icon: 'event', label: 'Interviews today', value: '2', delta: '14:00 · 16:30', tone: 'ok' },
+      { icon: 'timer', label: 'Average review time', value: '3.2h', delta: 'target under 24h', tone: 'violet' }
+    ],
+    queue: { title: 'Waiting on your decision', sub: 'Approve, reject, or request changes from the recruiter', href: 'AIRecruiter - Candidate Detail.dc.html', rows: [
+      { badge: 'SN', title: 'Savannah Nguyen', sub: 'Senior Java Developer · interviewed yesterday · Dev Shah', tag: '31h left', tone: 'err', cta: 'Review', radius: '999px',
+        meta: [['Panel 4 of 5', 'groups', 'warn'], ['Recruiter says hire', 'thumb_up', 'ok'], ['AI 94%', 'auto_awesome', 'violet']] },
+      { badge: 'AM', title: 'Arjun Mehta', sub: 'Platform Engineer · interviewed Tue · Dev Shah', tag: '26h left', tone: 'warn', cta: 'Review', radius: '999px',
+        meta: [['Panel 5 of 5', 'groups', 'ok'], ['Panel split 3–2', 'balance', 'warn'], ['AI 81%', 'auto_awesome', 'violet']] },
+      { badge: 'EL', title: 'Elin Sørensen', sub: 'QA Automation Lead · Fablio · Mira Joshi', tag: '4h left', tone: 'info', cta: 'Review', radius: '999px',
+        meta: [['Awaiting first round', 'schedule', 'info'], ['Recruiter says hire', 'thumb_up', 'ok'], ['AI 84%', 'auto_awesome', 'violet']] },
+      { badge: 'JK', title: 'Jonas Keller', sub: 'Talent pool · no live requisition · Mira Joshi', tag: '2h left', tone: 'ok', cta: 'Review', radius: '999px',
+        meta: [['Speculative', 'inventory_2', 'muted'], ['AI 91%', 'auto_awesome', 'violet']] }
+    ] },
+    chart: { title: 'Reviewed vs approved', legend: [['var(--primary-tint)', 'Reviewed'], ['var(--primary)', 'Approved']] },
+    side: { title: 'Why profiles are rejected', rows: [
+      { badge: '9', title: 'Skills gap', sub: 'Missing a must-have from the brief', value: '38%', tone: 'err', radius: '8px',
+        jobs: 'Kubernetes ×6', risk: 'Terraform ×5', riskTone: 'warn', out: 'AWS ×4' },
+      { badge: '5', title: 'Thin evidence', sub: 'CV claims a skill with no project behind it', value: '21%', tone: 'warn', radius: '8px',
+        jobs: 'Kafka ×3', risk: 'Event-driven ×2', riskTone: 'info', out: 'Tighten the brief' },
+      { badge: '4', title: 'Salary out of band', sub: 'Expectation above the client range', value: '17%', tone: 'info', radius: '8px',
+        jobs: 'Avg €8k over', risk: 'Band unchanged 14mo', riskTone: 'err', out: 'Review with client' },
+      { badge: '6', title: 'Returned for changes', sub: 'Formatting or missing notice period', value: '24%', tone: 'violet', radius: '8px',
+        jobs: 'Notice missing ×4', risk: 'Formatting ×2', riskTone: 'muted', out: 'Recruiter coaching' }
+    ] },
+    actions: [
+      { icon: 'check_circle', label: 'Approve', href: 'AIRecruiter - Candidate Detail.dc.html', tone: 'ok' },
+      { icon: 'cancel', label: 'Reject', href: 'AIRecruiter - Candidate Detail.dc.html', tone: 'err' },
+      { icon: 'undo', label: 'Request changes', href: 'AIRecruiter - Candidate Detail.dc.html', tone: 'warn' },
+      { icon: 'edit_note', label: 'Add review notes', href: 'AIRecruiter - Candidate Detail.dc.html', tone: 'violet' }
+    ]
+  }
+};
+
+const ACTIVITY = [
+  { icon: 'check_circle', tone: 'ok', text: 'Ana Kelmendi approved Savannah Nguyen', when: 'Today, 09:12' },
+  { icon: 'send', tone: 'info', text: '4 candidates submitted to Nortech', when: 'Today, 08:40' },
+  { icon: 'schedule', tone: 'warn', text: 'SLA breached on REQ-2451', when: 'Yesterday, 17:05' },
+  { icon: 'post_add', tone: 'violet', text: 'REQ-2463 Data Engineer opened', when: 'Jul 29' }
+];
+const ACTIVITY_BY_ROLE = {
+  Recruiter: [
+    { icon: 'check_circle', tone: 'ok', text: 'Your candidate Savannah Nguyen was approved by Ana Kelmendi', when: 'Today, 09:12' },
+    { icon: 'forum', tone: 'info', text: 'Marcus Odum replied — asking about remote days', when: 'Today, 08:51' },
+    { icon: 'event_repeat', tone: 'warn', text: 'Arjun Mehta interview moved to Thursday 11:00', when: 'Yesterday, 17:40' },
+    { icon: 'thumb_up', tone: 'ok', text: 'Riya approved your Noor Haddad submission', when: 'Yesterday, 15:20' },
+    { icon: 'handshake', tone: 'violet', text: 'Daniel Okoro accepted his offer — TrueNorth', when: 'Jul 29' }
+  ],
+  Sourcer: [
+    { icon: 'person_add', tone: 'ok', text: 'You added 12 profiles to the Platform Engineer search', when: 'Today, 10:02' },
+    { icon: 'forum', tone: 'info', text: 'Elin Sørensen accepted your connection', when: 'Today, 09:15' },
+    { icon: 'fact_check', tone: 'warn', text: 'Your Fablio shortlist is still waiting on lead review', when: 'Yesterday, 16:30' },
+    { icon: 'thumb_up', tone: 'ok', text: 'Dev Shah picked up 3 of your sourced candidates', when: 'Jul 29' }
+  ],
+  'Hiring Manager': [
+    { icon: 'fact_check', tone: 'err', text: 'Your scorecard for Arjun Mehta is overdue — it is blocking the panel decision', when: 'Today, 09:05' },
+    { icon: 'how_to_reg', tone: 'warn', text: 'Dev Shah submitted Savannah Nguyen for Senior Java Developer', when: 'Today, 08:30' },
+    { icon: 'groups', tone: 'info', text: 'Panel feedback received — Arjun Mehta, 4 of 5 scorecards in', when: 'Today, 08:12' },
+    { icon: 'check_circle', tone: 'ok', text: 'Your offer for Daniel Okoro was approved by Riya Kapoor', when: 'Yesterday, 16:12' },
+    { icon: 'event_available', tone: 'violet', text: 'Interview completed — Elin Sørensen, first round', when: 'Yesterday, 11:40' }
+  ]
+};
+
+class Component extends DCLogic {
+  state = { light: true, role: 'Owner', roleMenuOpen: false, profileOpen: false, searchOpen: false, searchQuery: '', emptyMode: false, metric: 'Revenue', showAllTeam: false, showAllClients: false, showAllRecents: false };
+
+  _onKey = e => {
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); this.setState(s => ({ searchOpen: !s.searchOpen, searchQuery: '' })); }
+    else if (e.key === 'Escape' && this.state.searchOpen) this.setState({ searchOpen: false });
+  };
+
+  componentDidMount() {
+    let light = true;
+    try { light = (localStorage.getItem('hpx-theme') || 'light') !== 'dark'; } catch (e) {}
+    document.documentElement.classList.toggle('hpx-light', light);
+    window.addEventListener('keydown', this._onKey);
+    this.setState({ light, role: ROLES[this.props.role] ? this.props.role : 'Owner' });
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._onKey); }
+
+  componentDidUpdate(prev) {
+    if (prev.role !== this.props.role && ROLES[this.props.role]) this.setState({ role: this.props.role });
+  }
+
+  setTheme(light) {
+    document.documentElement.classList.toggle('hpx-light', light);
+    try { localStorage.setItem('hpx-theme', light ? 'light' : 'dark'); } catch (e) {}
+    this.setState({ light });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const R = ROLES[s.role] || ROLES.Owner;
+    const tone = k => T[k] || T.primary;
+
+
+    const empty = !!s.emptyMode;
+    const TW = TODAY_WORK[s.role] || TODAY_WORK.Owner;
+    const DK = DESK[s.role] || null;
+    const metricList = CHART_METRICS[s.role] || CHART_METRICS.Owner;
+    const metric = metricList.includes(s.metric) ? s.metric : metricList[0];
+    const CD = CHART_DATA[metric] || CHART_DATA.Revenue;
+    const bars = CD.bars;
+    const aiList = AI_FINDINGS[s.role] || AI_FINDINGS.Owner;
+    const recentList = RECENTS[s.role] || RECENTS.Owner;
+
+    const rawQ = s.searchQuery.trim();
+    const cmdOnly = rawQ.startsWith('>');
+    const q = (cmdOnly ? rawQ.slice(1) : rawQ).trim().toLowerCase();
+    const sGroups = [];
+    if (!cmdOnly) {
+      SEARCH_INDEX.forEach(g => {
+        const hits = g.items.filter(x => !q || (x.label + ' ' + x.sub).toLowerCase().includes(q));
+        if (hits.length) sGroups.push({
+          title: g.kind,
+          items: hits.slice(0, 4).map(x => ({ ...x, icon: g.icon, bg: tone(g.tone).bg, fg: tone(g.tone).fg, chev: 'north_east' }))
+        });
+      });
+    }
+    const cmdHits = COMMANDS.filter(c => !q || (c.label + ' ' + c.sub).toLowerCase().includes(q));
+    if (cmdHits.length) sGroups.push({
+      title: 'Commands',
+      items: cmdHits.slice(0, 6).map(c => ({ label: c.label, sub: c.sub, href: c.href, icon: c.icon, bg: 'var(--hover)', fg: 'var(--muted)', chev: 'keyboard_return' }))
+    });
+
+    return {
+      themeIcon: s.light ? 'dark_mode' : 'light_mode',
+      toggleTheme: () => this.setTheme(!s.light),
+      profileOpen: s.profileOpen,
+      toggleProfile: () => this.setState({ profileOpen: !s.profileOpen, roleMenuOpen: false }),
+      role: s.role,
+      userName: R.user,
+      userIn: R.user.split(' ').map(w => w[0]).join(''),
+      roleIcon: R.icon,
+      roleMenuOpen: s.roleMenuOpen,
+      toggleRoleMenu: () => this.setState({ roleMenuOpen: !s.roleMenuOpen, profileOpen: false }),
+      roleOptions: Object.keys(ROLES).map(r => ({
+        label: r, icon: ROLES[r].icon,
+        iconFg: s.role === r ? 'var(--primary)' : 'var(--muted)',
+        bg: s.role === r ? 'var(--hover)' : 'transparent',
+        pick: () => this.setState({ role: r, roleMenuOpen: false })
+      })),
+
+      isOwner: s.role === 'Owner',
+      showKpis: true,
+      teamPerf: s.showAllTeam ? TEAM_PERF : TEAM_PERF.slice(0, 5).map((r, i) => ({
+        ...r, in: r.name.split(' ').map(w => w[0]).join(''),
+        avBg: [T.primary, T.info, T.violet, T.ok][i % 4].bg,
+        avFg: [T.primary, T.info, T.violet, T.ok][i % 4].fg,
+        convFg: parseInt(r.conv) >= 40 ? 'var(--ok)' : 'var(--fg-2)',
+        slaFg: parseInt(r.sla) >= 90 ? 'var(--ok)' : parseInt(r.sla) >= 85 ? 'var(--warn)' : 'var(--err)'
+      })),
+      clientHealth: s.showAllClients ? CLIENT_HEALTH : CLIENT_HEALTH.slice(0, 3).map((c, i) => ({
+        ...c, in: c.name.slice(0, 2).toUpperCase(),
+        avBg: [T.primary, T.info, T.violet, T.ok, T.warn][i % 5].bg,
+        avFg: [T.primary, T.info, T.violet, T.ok, T.warn][i % 5].fg,
+        riskFg: tone(c.tone).fg, riskBg: tone(c.tone).bg
+      })),
+      hasWsAlerts: !!R.alerts,
+      wsAlertCount: R.alerts ? R.alerts.reduce((a, x) => a + Number(x.n), 0) : 0,
+      wsAlerts: (R.alerts || []).map(a => ({ ...a, bg: tone(a.tone).bg, fg: tone(a.tone).fg })),
+      greeting: R.greeting,
+      subtitle: empty ? 'Troy Consulting · nothing set up yet' : R.subtitle,
+      toggleEmpty: () => this.setState(st => ({ emptyMode: !st.emptyMode })),
+      emptyChipLabel: empty ? 'New workspace' : 'Preview empty',
+      emptyChipFg: empty ? 'var(--primary)' : 'var(--muted)',
+      emptyChipBg: empty ? 'var(--primary-tint)' : 'transparent',
+      emptyChipBorder: empty ? 'var(--primary)' : 'var(--line)',
+      teamMore: !s.showAllTeam,
+      teamMoreLabel: 'Show all ' + TEAM_PERF.length + ' recruiters',
+      expandTeam: () => this.setState({ showAllTeam: true }),
+      clientsMore: !s.showAllClients,
+      clientsMoreLabel: 'Show all ' + CLIENT_HEALTH.length + ' clients',
+      expandClients: () => this.setState({ showAllClients: true }),
+      recentsMore: !s.showAllRecents && recentList.length > 3,
+      expandRecents: () => this.setState({ showAllRecents: true }),
+      showSystem: s.role === 'Admin',
+      showTeamHealth: s.role === 'Team Lead',
+      showMyDesk: !!DK,
+      deskTitle: DK ? DK.title : '',
+      deskIcon: DK ? DK.icon : 'view_kanban',
+      deskHref: DK ? DK.href : '',
+      deskCta: DK ? DK.cta : '',
+      goalTitle: DK ? DK.goalTitle : '',
+      myPipeline: DK ? DK.rows.map(p => ({
+        stage: p.stage, n: String(p.n), href: p.href,
+        hasFlag: !!p.flag, flag: p.flag || '',
+        fg: p.tone === 'muted' ? 'var(--muted)' : tone(p.tone).fg,
+        pct: Math.round((p.n / DK.rows[0].n) * 100) + '%'
+      })) : [],
+      weekSub: DK ? DK.goalSub : '',
+      weekNote: DK ? DK.goalNote : '',
+      weekGoals: DK ? DK.goals.map(g => {
+        const pct = Math.min(100, Math.round((g.done / g.target) * 100));
+        return {
+          label: g.label, count: g.done + ' / ' + g.target,
+          pct: pct + '%',
+          fg: pct >= 100 ? 'var(--ok)' : pct >= 60 ? 'var(--primary)' : 'var(--warn)'
+        };
+      }) : [],
+      showSearches: s.role === 'Sourcer',
+      savedSearches: SAVED_SEARCHES.map(x => ({
+        name: x.name, n: String(x.n), age: x.age,
+        fg: x.tone === 'muted' ? 'var(--muted)' : tone(x.tone).fg,
+        bg: x.tone === 'muted' ? 'var(--hover)' : tone(x.tone).bg
+      })),
+      capacity: TEAM_HEALTH.capacity,
+      capacityFg: parseInt(TEAM_HEALTH.capacity) >= 90 ? 'var(--err)' : parseInt(TEAM_HEALTH.capacity) >= 80 ? 'var(--warn)' : 'var(--ok)',
+      capacityNote: TEAM_HEALTH.note,
+      healthBands: TEAM_HEALTH.bands.map(b => ({ n: String(b.n), label: b.label, who: b.who, pct: b.pct, fg: tone(b.tone).fg })),
+      coachSub: COACHING.length + ' of 5 recruiters need a conversation this week',
+      coaching: COACHING.map(c => ({
+        badge: c.badge, name: c.name, detail: c.detail, tag: c.tag, cta: c.cta, href: c.href,
+        avBg: tone(c.tone).bg, avFg: tone(c.tone).fg,
+        tagFg: tone(c.tone).fg, tagBg: tone(c.tone).bg
+      })),
+      railStats: (R.rail.stats || []).map(x => ({ n: String(x[0]), label: x[1] })),
+      hasRailStats: !!(R.rail.stats && R.rail.stats.length),
+      railBodyGap: R.rail.stats && R.rail.stats.length ? '11px' : '6px',
+      systemRows: SYSTEM.map(x => ({ label: x.label, value: x.value, note: x.note, fg: tone(x.tone).fg })),
+      statusChips: (STATUS_STRIP[s.role] || STATUS_STRIP.Owner).map(c => ({
+        label: c.label, fg: tone(c.tone).fg, bg: tone(c.tone).bg
+      })),
+      workTitle: TW.title || "Today's work",
+      workSub: TW.sub, workHref: TW.href,
+      workCount: String(TW.items.reduce((a, w) => a + w.n, 0)),
+      todayWork: TW.items.map(w => ({
+        n: String(w.n), label: w.label, detail: w.detail, icon: w.icon, href: w.href,
+        bg: tone(w.tone).bg, fg: tone(w.tone).fg
+      })),
+      adminActions: R.adminActions || [],
+      hasAdminActions: !!(R.adminActions && R.adminActions.length),
+      chartMetrics: metricList.map(m => ({
+        label: m, on: m === metric,
+        bg: m === metric ? 'var(--surface)' : 'transparent',
+        fg: m === metric ? 'var(--fg)' : 'var(--muted)',
+        pick: () => this.setState({ metric: m })
+      })),
+      chartNote: CD.note,
+
+      openSearch: () => this.setState({ searchOpen: true, searchQuery: '' }),
+      closeSearch: () => this.setState({ searchOpen: false }),
+      searchOpen: s.searchOpen,
+      searchQuery: s.searchQuery,
+      onSearchQuery: e => this.setState({ searchQuery: e.target.value }),
+      searchGroups: sGroups,
+      searchNone: sGroups.length === 0,
+
+      emptyWorkspace: empty,
+      notEmptyWorkspace: !empty,
+      emptySteps: EMPTY_STEPS.map((e, i) => ({
+        ...e,
+        numBg: [T.primary, T.info, T.ok][i % 3].bg,
+        numFg: [T.primary, T.info, T.ok][i % 3].fg
+      })),
+
+      aiSub: aiList.length + ' things worth a look, found while you were away · ' + s.role.toLowerCase() + ' view',
+      aiFindings: aiList.map(a => ({ ...a, n: String(a.n), bg: tone(a.tone).bg, fg: tone(a.tone).fg })),
+      recentItems: (s.showAllRecents ? recentList : recentList.slice(0, 3)).map(r => ({ ...r, bg: tone(r.tone).bg, fg: tone(r.tone).fg })),
+
+      navGroups: R.nav.map(key => ({
+        title: NAV[key].title,
+        items: NAV[key].items.map(it => ({
+          ...it,
+          bg: it.key === 'dash' ? 'var(--primary-tint)' : 'transparent',
+          fg: it.key === 'dash' ? 'var(--nav-fg)' : 'var(--muted)',
+          hoverFg: it.key === 'dash' ? 'var(--nav-fg)' : 'var(--fg)',
+          weight: it.key === 'dash' ? '700' : '600',
+        }))
+      })),
+      railIcon: R.rail.icon, railTitle: R.rail.title, railBody: R.rail.body,
+
+      alertIcon: R.alert.icon,
+      alertTitle: R.alert.title,
+      alertBody: R.alert.body,
+      alertCta: R.alert.cta,
+      alertHref: R.alert.href,
+      alertBg: tone(R.alert.tone).bg,
+      alertFg: tone(R.alert.tone).fg,
+
+      kpis: R.kpis.map(k => ({
+        ...k,
+        bg: tone(k.tone).bg,
+        cardBg: s.light ? tone(k.tone).bg : 'var(--surface)',
+        tileBg: s.light ? 'var(--surface)' : tone(k.tone).bg,
+        fg: tone(k.tone).fg,
+        deltaFg: k.tone === 'err' ? 'var(--err)' : k.tone === 'warn' ? 'var(--warn)' : k.tone === 'ok' ? 'var(--ok)' : 'var(--fg-2)'
+      })),
+
+      queueTitle: R.queue.title,
+      queueSub: R.queue.sub,
+      queueHref: R.queue.href,
+      queue: R.queue.rows.map(q => ({
+        ...q,
+        hasMeta: !!(q.meta && q.meta.length),
+        meta: (q.meta || []).map(m => ({ label: m[0], icon: m[1], fg: tone(m[2]).fg, bg: tone(m[2]).bg })),
+        avBg: tone(q.tone).bg, avFg: tone(q.tone).fg,
+        tagFg: q.tone === 'muted' ? 'var(--muted)' : tone(q.tone).fg,
+        tagBg: q.tone === 'muted' ? 'var(--hover)' : tone(q.tone).bg,
+        stripe: q.tone === 'muted' ? 'transparent' : tone(q.tone).fg,
+        act: () => {}
+      })),
+
+      chartTitle: R.chart.title,
+      chartLegend: R.chart.legend.map(l => ({ c: l[0], label: l[1] })),
+      chart: bars.map((v, i) => ({ label: ['Q1', 'Q2', 'Q3', 'Q4', 'Q1', 'Q2', 'Q3', 'Q4'][i], aH: v + '%', bH: Math.round(v * 0.62) + '%' })),
+
+      chartTitleLive: metric + ' by quarter',
+      sideTitle: R.side.title,
+      sideSub: R.side.sub || '',
+      sideRows: R.side.rows.map(r => ({
+        ...r,
+        bg: tone(r.tone).bg, fg: tone(r.tone).fg,
+        valFg: r.tone === 'err' ? 'var(--err)' : r.tone === 'warn' ? 'var(--warn)' : r.tone === 'ok' ? 'var(--ok)' : 'var(--fg-2)',
+        hasMeta: !!r.jobs,
+        jobs: r.jobs || '', risk: r.risk || '', out: r.out || '',
+        riskFg: tone(r.riskTone || 'primary').fg,
+        riskBg: tone(r.riskTone || 'primary').bg,
+        outFg: /^(Nothing|Tighten|Review|Recruiter)/.test(r.out || '') || /×/.test(r.out || '') ? 'var(--muted)' : 'var(--err)'
+      })),
+
+      actions: R.actions.map(a => ({ ...a, fg: tone(a.tone).fg })),
+      activity: (ACTIVITY_BY_ROLE[s.role] || ACTIVITY).map(a => ({ ...a, fg: tone(a.tone).fg }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

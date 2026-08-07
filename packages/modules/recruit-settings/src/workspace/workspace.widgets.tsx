@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useWatch } from "react-hook-form";
 
 /** The design's accent choices — the swatch row under Report branding. */
-const ACCENTS = ["#E4560F", "#D69B3C", "#3C7DD6", "#2F9E6B", "#8B5CF6", "#E0457B"];
+const ACCENTS = ["#0E2E5C", "#F59E0B", "#00B8D9", "#22C55E", "#8E33FF", "#FF5630"];
 
 /** `{ from, to }` — what the business-hours field stores. */
 interface HoursRange {

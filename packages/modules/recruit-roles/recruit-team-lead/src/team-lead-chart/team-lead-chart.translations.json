@@ -1,0 +1,15 @@
+{
+  "title": "Desk revenue by quarter",
+  "subtitle": "What the desk put up against what it booked",
+  "seriesA": "Submitted value",
+  "seriesB": "Booked",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "submissions": "Submissions",
+    "placements": "Placements",
+    "revenue": "Revenue"
+  }
+}

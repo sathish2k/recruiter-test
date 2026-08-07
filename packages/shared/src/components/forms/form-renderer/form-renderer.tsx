@@ -8,6 +8,7 @@ import { useTranslation } from "@recruit/sdk";
 import { isPossiblePhoneNumber } from "libphonenumber-js/max";
 import { useMemo } from "react";
 import { type FieldValues, FormProvider, type Resolver, useForm } from "react-hook-form";
+import { IconRenderer } from "../../renderers/icon-renderer";
 import { hiddenFields } from "../conditions";
 import { Field } from "../field/field";
 import { useFieldEffects } from "../field/use-field-effects";
@@ -66,8 +67,18 @@ export function defaultFor(prop: JsonSchemaProperty): unknown {
  * removing it makes `required` fail (and lets optional empties skip
  * format/pattern checks). Booleans/arrays aren't `""`, so they're untouched.
  */
-function stripEmptyOptional(_schema: JsonSchema, values: FieldValues): FieldValues {
+function stripEmptyOptional(schema: JsonSchema, values: FieldValues): FieldValues {
   const cleaned: FieldValues = { ...values };
+  // The `upload` widget holds `{ url, file }` so it can draw the local preview
+  // while the file is still uploading, but the schema types the field by what
+  // it stores — a URL string — and that string is what the API is sent. Unwrap
+  // it here, or ajv rejects the object with "must be string" and the form
+  // refuses to submit with no visible error.
+  for (const [key, prop] of Object.entries(schema.properties)) {
+    if (prop.widget !== "upload") continue;
+    const value = cleaned[key] as { url?: unknown } | undefined;
+    cleaned[key] = typeof value?.url === "string" ? value.url : "";
+  }
   for (const key of Object.keys(cleaned)) {
     if (cleaned[key] === "") delete cleaned[key];
   }
@@ -138,6 +149,7 @@ export function FormRenderer({
   defaultValues,
   onSubmit,
   submitLabel = "submit",
+  submitIcon,
   onCancel,
   cancelLabel = "cancel",
   loading = false,
@@ -207,7 +219,7 @@ export function FormRenderer({
             values: getValues(),
           })
         ) : (
-          <Stack spacing={1.5} sx={{ mt: fields.length ? "12px" : 0 }}>
+          <Stack spacing={1.5} sx={{ mt: fields.length ? "20px" : 0 }}>
             {beforeSubmit}
             {onCancel ? (
               <Box
@@ -215,7 +227,7 @@ export function FormRenderer({
                   display: "flex",
                   justifyContent: "flex-end",
                   gap: "8px",
-                  borderTop: "1px solid",
+                  borderTop: "1px dashed",
                   borderColor: "divider",
                   pt: "16px",
                 }}
@@ -236,14 +248,10 @@ export function FormRenderer({
               <Button
                 type="submit"
                 variant="contained"
+                size="large"
                 fullWidth
                 loading={loading || formState.isSubmitting}
-                sx={{
-                  borderRadius: "12px",
-                  py: "14px",
-                  fontSize: 14,
-                  fontWeight: 700,
-                }}
+                endIcon={submitIcon ? <IconRenderer name={submitIcon} size={18} /> : undefined}
               >
                 {t(submitLabel)}
               </Button>

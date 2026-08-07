@@ -5,6 +5,7 @@ import DarkModeRounded from "@mui/icons-material/DarkModeRounded";
 import LanguageRounded from "@mui/icons-material/LanguageRounded";
 import LightModeRounded from "@mui/icons-material/LightModeRounded";
 import Avatar from "@mui/material/Avatar";
+import Badge from "@mui/material/Badge";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
@@ -57,7 +58,9 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        px: "26px",
+        gap: "16px",
+        minHeight: 72,
+        px: "28px",
         py: "14px",
         borderBottom: "1px solid",
         borderColor: "divider",
@@ -82,11 +85,18 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
         </LinkRenderer>
       ) : (
         <Box sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontSize: 17, fontWeight: 600 }}>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+              fontSize: 24,
+              fontWeight: 700,
+              letterSpacing: "-.01em",
+            }}
+          >
             {titleKey ? t(titleKey) : ""}
           </Typography>
           {subtitleKey ? (
-            <Typography sx={{ fontSize: 12.5, color: "text.disabled", mt: "2px" }}>
+            <Typography sx={{ fontSize: 12.5, color: "text.secondary", mt: "3px" }}>
               {t(subtitleKey)}
             </Typography>
           ) : null}
@@ -101,7 +111,7 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
                 key="theme"
                 onClick={toggleTheme}
                 title={t("theme")}
-                sx={{ width: 32, height: 32 }}
+                sx={{ width: 36, height: 36 }}
               >
                 {themeMode === "dark" ? <LightModeRounded /> : <DarkModeRounded />}
               </IconButton>
@@ -115,17 +125,17 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
                   onClick={(e) => setLangMenu(e.currentTarget)}
                   title={t("language")}
                   sx={{
-                    height: 32,
-                    px: "11px",
+                    height: 36,
+                    px: "13px",
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
                     borderRadius: "999px",
                     border: "1px solid",
-                    borderColor: "divider",
+                    borderColor: "surface.border",
                     color: "text.secondary",
                     cursor: "pointer",
-                    fontSize: 11,
+                    fontSize: 12.5,
                     fontWeight: 700,
                     letterSpacing: ".04em",
                     "&:hover": {
@@ -134,7 +144,7 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
                     },
                   }}
                 >
-                  <LanguageRounded sx={{ fontSize: 15 }} />
+                  <LanguageRounded sx={{ fontSize: 18 }} />
                   {(language || "en").toUpperCase()}
                 </Box>
                 <Menu
@@ -202,8 +212,7 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
                       alignItems: "center",
                       gap: "11px",
                       p: "15px 16px",
-                      background:
-                        "linear-gradient(150deg,var(--mui-palette-surface-primarySoftBg),transparent)",
+                      bgcolor: "surface.primarySoftBg",
                     }}
                   >
                     <Avatar
@@ -307,23 +316,19 @@ export function AppbarComponent({ id, configuration, currentRoute, data }: Appba
             );
           }
           return (
-            <IconButton key={action.icon} onClick={go} sx={{ width: 32, height: 32 }}>
-              {action.icon ? <IconRenderer name={action.icon} size={16} /> : null}
-              {action.badge ? (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 5,
-                    right: 6,
-                    width: 7,
-                    height: 7,
-                    borderRadius: "999px",
-                    bgcolor: "primary.main",
-                    border: "2px solid",
-                    borderColor: "background.default",
-                  }}
-                />
-              ) : null}
+            <IconButton key={action.icon} onClick={go} sx={{ width: 36, height: 36 }}>
+              <Badge
+                variant={typeof action.badge === "number" ? "standard" : "dot"}
+                badgeContent={typeof action.badge === "number" ? action.badge : undefined}
+                invisible={!action.badge}
+                color="secondary"
+                overlap="circular"
+                sx={{
+                  "& .MuiBadge-badge": { border: "2px solid", borderColor: "background.paper" },
+                }}
+              >
+                {action.icon ? <IconRenderer name={action.icon} size={18} /> : null}
+              </Badge>
             </IconButton>
           );
         })}

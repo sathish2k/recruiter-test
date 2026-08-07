@@ -3,7 +3,11 @@ import type { Configuration } from "@recruit/sdk";
 export const JobPages: Record<string, Configuration> = {
   "Recruit.Jobs.Page": {
     id: "Recruit.Jobs.Page",
-    elements: [{ id: "jobs", type: "component", componentType: "Recruit.Jobs.Component" }],
+    stackContainer: { spacing: 2.5 },
+    elements: [
+      { id: "job-stats", type: "component", componentType: "Recruit.JobStats.Component" },
+      { id: "jobs", type: "component", componentType: "Recruit.Jobs.Component" },
+    ],
   },
   "Recruit.JobForm.Page": {
     id: "Recruit.JobForm.Page",
@@ -53,6 +57,11 @@ export const JobPages: Record<string, Configuration> = {
         id: "job-detail-stats",
         type: "component",
         componentType: "Recruit.JobDetailStats.Component",
+      },
+      {
+        id: "job-detail-pipeline",
+        type: "component",
+        componentType: "Recruit.JobDetailPipeline.Component",
       },
       {
         id: "job-detail-content",

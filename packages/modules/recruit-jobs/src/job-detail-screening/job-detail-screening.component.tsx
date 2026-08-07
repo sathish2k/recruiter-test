@@ -48,7 +48,7 @@ export function JobDetailScreeningComponent({ id }: { id: string }) {
           alignItems: "center",
           gap: "11px",
           p: "14px 18px",
-          background: "linear-gradient(120deg,rgba(242,106,27,.3),rgba(242,106,27,.06))",
+          background: "var(--mui-palette-surface-heroTint)",
         }}
       >
         <Box
@@ -59,7 +59,7 @@ export function JobDetailScreeningComponent({ id }: { id: string }) {
             borderRadius: "9px",
             display: "grid",
             placeItems: "center",
-            background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+            background: "var(--mui-palette-primary-main)",
             color: "#fff",
           }}
         >

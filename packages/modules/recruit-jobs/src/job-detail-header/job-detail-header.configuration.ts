@@ -16,7 +16,7 @@ export const JobDetailHeaderConfiguration: JobDetailHeaderConfiguration = {
       shape: "square",
       size: 64,
       icon: "work",
-      gradient: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+      gradient: "var(--mui-palette-primary-main)",
       fg: "#fff",
       title: "title",
       subtitle: "subtitleLine",

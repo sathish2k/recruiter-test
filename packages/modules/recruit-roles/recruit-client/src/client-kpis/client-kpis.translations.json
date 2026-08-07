@@ -1,0 +1,14 @@
+{
+  "greeting": "Your submissions",
+  "subtitle": "Candidates your agency has put in front of you.",
+  "kpis": {
+    "awaitingYou": "Awaiting your decision",
+    "awaitingYouDelta": "{value}",
+    "interviewsToday": "Interviews today",
+    "interviewsTodayDelta": "{value}",
+    "openRoles": "Open roles",
+    "openRolesDelta": "{value}",
+    "hires": "Hires this quarter",
+    "hiresDelta": "{value}"
+  }
+}

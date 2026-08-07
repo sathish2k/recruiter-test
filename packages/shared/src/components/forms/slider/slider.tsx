@@ -112,7 +112,7 @@ export function Slider({
               width: "100%",
               height: 8,
               borderRadius: "999px",
-              background: "linear-gradient(90deg,#3A3A38,#B9805A,#F26A1B)",
+              background: "var(--mui-palette-primary-main)",
             }}
           />
           <Box
@@ -124,8 +124,8 @@ export function Slider({
               height: 16,
               borderRadius: "999px",
               bgcolor: "#fff",
-              border: "3px solid #F26A1B",
-              boxShadow: "0 2px 8px rgba(0,0,0,.5)",
+              border: "3px solid var(--mui-palette-primary-main)",
+              boxShadow: "var(--mui-palette-surface-primaryShadow)",
             }}
           />
         </Box>

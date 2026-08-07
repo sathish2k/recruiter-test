@@ -12,6 +12,7 @@ import {
   type KnockoutQuestion,
   type StageSlas,
 } from "../models/job.model";
+import { jobMetrics, overdueJobIds } from "./job-metrics.service";
 import { workspaceSettings } from "./organization.service";
 import { formatReference, nextSequence } from "./sequence.service";
 
@@ -29,6 +30,12 @@ type JobJoins = {
 function toNumber(value?: string | null) {
   const n = Number(value ?? "");
   return Number.isFinite(n) ? n : 0;
+}
+
+/** The place segment of the list's meta line. A plain string, never a key —
+ * a city has no translation, and the work model is its own segment. */
+function locationOf(row: JobRow) {
+  return [row.address?.city, row.address?.country].filter(Boolean).join(", ");
 }
 
 function mapJob(row: JobRow & JobJoins) {
@@ -88,6 +95,9 @@ const SORT_FIELDS = {
   title: job.title,
   status: job.status,
   createdAt: job.createdAt,
+  updatedAt: job.updatedAt,
+  targetDate: job.targetDate,
+  openings: job.openings,
 } as const;
 
 function split(value?: string) {
@@ -102,6 +112,8 @@ export interface ListJobsParams {
   status?: string;
   clientId?: string;
   contactId?: string;
+  /** The list's "Past SLA only" toggle. */
+  overdue?: boolean;
   page?: number;
   pageSize?: number;
   sortKey?: string;
@@ -135,6 +147,11 @@ export async function listJobs(organizationId: string, params: ListJobsParams = 
   if (clientIds.length) filters.push(inArray(job.clientId, clientIds));
   // Roles a given contact is attached to (their detail screen).
   if (params.contactId) filters.push(eq(job.clientContactId, params.contactId));
+  if (params.overdue) {
+    const overdue = await overdueJobIds(organizationId);
+    // No overdue role must yield no rows, not every row.
+    filters.push(overdue.length ? inArray(job.id, overdue) : eq(job.id, ""));
+  }
 
   const where = and(...filters);
   const page = Math.max(1, params.page ?? 1);
@@ -150,7 +167,17 @@ export async function listJobs(organizationId: string, params: ListJobsParams = 
       .offset((page - 1) * pageSize),
     db.select({ total: count() }).from(job).where(where),
   ]);
-  return { data: rows.map(mapJob), totalCount: countRows[0]?.total ?? 0 };
+
+  // The list columns the design draws — pipeline split, fill and clock — are
+  // aggregates over applications, so they are resolved for the page only.
+  const metrics = await jobMetrics(organizationId, rows);
+  const data = rows.map((row) => ({
+    ...mapJob(row),
+    ...(metrics[row.id] ?? {}),
+    ownerName: row.sourcerName ?? row.profileLeadName ?? "",
+    locationLabel: locationOf(row),
+  }));
+  return { data, totalCount: countRows[0]?.total ?? 0 };
 }
 
 export async function getJob(organizationId: string, id: string) {

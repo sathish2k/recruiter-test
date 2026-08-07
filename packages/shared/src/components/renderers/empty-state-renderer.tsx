@@ -23,7 +23,16 @@ export interface EmptyStateAction {
 }
 
 export interface EmptyStateConfig {
-  /** Icon-tile glyph (see ICON_REGISTRY). */
+  /**
+   * Spot illustration from `/illustrations` (name without the extension), for
+   * the full-size state. Drawn at 160px on a 320×240 canvas.
+   *
+   * Ignored when `compact` is set: below ~96px the mark's kerfs close up and
+   * the scene turns to mud, so a dense rail widget keeps the icon tile. That
+   * is the design's own rule, not a shortcut.
+   */
+  illustration?: string;
+  /** Icon-tile glyph (see ICON_REGISTRY). The fallback, and the compact form. */
   icon: string;
   /** Heading translation key. */
   title: string;
@@ -88,21 +97,30 @@ export function EmptyStateRenderer({
         py: compact ? "18px" : "44px",
       }}
     >
-      <Box
-        sx={{
-          width: tileSize,
-          height: tileSize,
-          borderRadius: compact ? "13px" : "16px",
-          bgcolor: tone.bg,
-          border: "1px solid",
-          borderColor: tone.border,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <IconRenderer name={config.icon} size={iconSize} color={tone.icon} />
-      </Box>
+      {config.illustration && !compact ? (
+        <Box
+          component="img"
+          src={`/illustrations/${config.illustration}.svg`}
+          alt=""
+          sx={{ width: 160, height: 120, objectFit: "contain" }}
+        />
+      ) : (
+        <Box
+          sx={{
+            width: tileSize,
+            height: tileSize,
+            borderRadius: compact ? "13px" : "16px",
+            bgcolor: tone.bg,
+            border: "1px solid",
+            borderColor: tone.border,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconRenderer name={config.icon} size={iconSize} color={tone.icon} />
+        </Box>
+      )}
       <Typography
         sx={{
           fontSize: compact ? 14 : 16,

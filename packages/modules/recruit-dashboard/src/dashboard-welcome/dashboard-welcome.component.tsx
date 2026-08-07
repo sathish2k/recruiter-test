@@ -1,19 +1,11 @@
 "use client";
 
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { useAuthUser, useFetch, useTranslation } from "@recruit/sdk";
-import { IconRenderer, LinkRenderer, seedRecord } from "@recruit/shared";
-import delve from "dlv";
-import type { DashboardWelcomeConfig, WelcomeHighlight } from "./dashboard-welcome.configuration";
-
-const TONE_COLOR = {
-  accent: "primary",
-  neutral: "default",
-  warning: "warning",
-} as const;
+import { seedRecord } from "@recruit/shared";
+import type { DashboardWelcomeConfig } from "./dashboard-welcome.configuration";
 
 function greetingKey(config: DashboardWelcomeConfig) {
   const hour = new Date().getHours();
@@ -44,72 +36,28 @@ export function DashboardWelcomeComponent({
 
   const name = firstName(user?.name);
   const greeting = t(greetingKey(configuration));
-  const shown = configuration.highlights.filter(
-    (highlight) => Number(delve(summary, highlight.path) ?? 0) > 0,
-  );
+  const key = summary.isNewWorkspace ? configuration.emptySubtitle : configuration.subtitle;
 
   return (
     <Box>
       <Typography
         suppressHydrationWarning
         sx={{
-          fontFamily: "var(--font-manrope), 'Manrope', ui-sans-serif, sans-serif",
-          fontSize: 23,
+          fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+          fontSize: 24,
           fontWeight: 700,
-          letterSpacing: "-.02em",
+          letterSpacing: "-.01em",
         }}
       >
         {name ? `${greeting}, ${name}` : greeting}
       </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          flexWrap: "wrap",
-          mt: "9px",
-          minHeight: 26,
-        }}
-      >
-        {isLoading ? (
-          <Skeleton variant="rounded" width={220} height={22} sx={{ borderRadius: "999px" }} />
-        ) : shown.length === 0 ? (
-          <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
-            {t(configuration.emptyLead)}
-          </Typography>
-        ) : (
-          <>
-            <Typography sx={{ fontSize: 12, color: "text.disabled" }}>
-              {t(configuration.lead)}
-            </Typography>
-            {shown.map((highlight) => (
-              <HighlightChip key={highlight.path} config={highlight} data={summary} t={t} />
-            ))}
-          </>
-        )}
-      </Box>
+      {isLoading ? (
+        <Skeleton variant="text" width={280} height={16} sx={{ mt: "3px" }} />
+      ) : (
+        <Typography sx={{ fontSize: 12.5, color: "text.secondary", mt: "3px" }}>
+          {t(key, summary)}
+        </Typography>
+      )}
     </Box>
   );
-}
-
-function HighlightChip({
-  config,
-  data,
-  t,
-}: {
-  config: WelcomeHighlight;
-  data: Record<string, unknown>;
-  t: (key: string, vars?: Record<string, unknown>) => string;
-}) {
-  const chip = (
-    <Chip
-      variant="pill"
-      color={TONE_COLOR[config.tone ?? "neutral"]}
-      icon={<IconRenderer name={config.icon} size={13} color="inherit" />}
-      label={t(config.label, { value: delve(data, config.path) })}
-      sx={{ cursor: config.link ? "pointer" : "default" }}
-    />
-  );
-  if (!config.link) return chip;
-  return <LinkRenderer config={config.link}>{chip}</LinkRenderer>;
 }

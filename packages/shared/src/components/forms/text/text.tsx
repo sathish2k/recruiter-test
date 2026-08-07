@@ -37,8 +37,8 @@ export function TextWidget({ prop, field, fieldState, t, disabled }: WidgetProps
         slotProps={{
           input: {
             startAdornment: prop.icon ? (
-              <InputAdornment position="start" sx={{ color: "text.disabled" }}>
-                <IconRenderer name={prop.icon} size={18} />
+              <InputAdornment position="start" sx={{ color: "text.secondary" }}>
+                <IconRenderer name={prop.icon} size={20} />
               </InputAdornment>
             ) : undefined,
           },

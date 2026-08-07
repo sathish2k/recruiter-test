@@ -7,7 +7,7 @@ import type { WidgetProps } from "../types";
 
 /**
  * A fixed-length numeric code: a row of cells showing what has been entered,
- * and one real input under them that accepts typing *or* a paste.
+ * with one real input laid transparently over them.
  *
  * The cells are display only. Six separate inputs look the same until you try
  * to paste a code into them, or use a password manager, or reach them with a
@@ -26,19 +26,19 @@ export function VerificationCodeWidget({ name, prop, field, fieldState, t }: Wid
       help={prop.help ? t(prop.help) : undefined}
       error={fieldState.error?.message ? t(fieldState.error.message) : undefined}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <Box sx={{ position: "relative" }}>
         <Box
           aria-hidden
           data-testid="verification-code-cells"
-          sx={{ display: "flex", gap: "9px", mb: "18px" }}
+          sx={{ display: "flex", gap: "10px", width: "100%" }}
         >
           {Array.from({ length }, (_, index) => {
             const char = code[index] ?? "";
             // Three strengths: entered, where the next digit lands, and untouched.
             const borderColor = char
-              ? "surface.focusRing"
+              ? "primary.main"
               : index === code.length
-                ? "surface.controlOutline"
+                ? "surface.focusRing"
                 : "surface.controlBorder";
             return (
               <Box
@@ -47,19 +47,21 @@ export function VerificationCodeWidget({ name, prop, field, fieldState, t }: Wid
                 key={index}
                 data-testid={`verification-code-cell-${index}`}
                 sx={{
-                  width: 46,
-                  height: 56,
-                  borderRadius: "12px",
+                  flex: 1,
+                  height: 60,
+                  borderRadius: "8px",
                   bgcolor: "surface.inset",
                   border: "1.5px solid",
                   borderColor,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 21,
+                  fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+                  fontSize: 22,
                   fontWeight: 700,
                   color: "text.primary",
                   fontVariantNumeric: "tabular-nums",
+                  transition: "var(--recruit-motion-state)",
                 }}
               >
                 {char}
@@ -68,6 +70,8 @@ export function VerificationCodeWidget({ name, prop, field, fieldState, t }: Wid
           })}
         </Box>
 
+        {/* One real field, sat invisibly over the cells: paste, autofill and a
+            screen reader all reach it, and the row above is what's drawn. */}
         <InputBase
           value={code}
           name={name}
@@ -76,21 +80,17 @@ export function VerificationCodeWidget({ name, prop, field, fieldState, t }: Wid
           onChange={(event) =>
             field.onChange(event.target.value.replace(/\D/g, "").slice(0, length))
           }
-          placeholder={t(prop.placeholder ?? "")}
+          inputProps={{ "aria-label": t(prop.title ?? name) }}
           slotProps={{ input: { inputMode: "numeric", autoComplete: "one-time-code" } }}
           data-testid={`field-${name}`}
           sx={{
+            position: "absolute",
+            inset: 0,
             width: "100%",
-            bgcolor: "surface.inset",
-            border: "1px solid",
-            borderColor: "surface.controlBorder",
-            borderRadius: "12px",
-            p: "12px 15px",
-            fontSize: 13,
-            color: "text.primary",
-            letterSpacing: ".02em",
-            "&.Mui-focused": { borderColor: "surface.focusRing" },
-            "& .MuiInputBase-input": { p: 0, textAlign: "center" },
+            height: "100%",
+            opacity: 0,
+            cursor: "pointer",
+            "& .MuiInputBase-input": { height: "100%", p: 0, cursor: "pointer" },
           }}
         />
       </Box>

@@ -44,6 +44,16 @@ export interface GraphRendererConfig {
   legend?: boolean;
   /** Number formatting for axis + tooltip values. */
   valueType?: "number" | "currency" | "percentage";
+  /**
+   * Segmented metric picker above the chart. Each entry names the series it
+   * plots, so one card serves the design's Revenue / Placements / Submissions
+   * toggle without a component per metric. The first is selected on mount.
+   */
+  metrics?: {
+    label: string;
+    series: GraphSeries[];
+    valueType?: GraphRendererConfig["valueType"];
+  }[];
   /** First-run overlay shown over a faint axis frame when there are no rows.
    * `icon`/`title`/`description` are an ICON_REGISTRY name + translation keys. */
   emptyOverlay?: { icon: string; title: string; description: string };

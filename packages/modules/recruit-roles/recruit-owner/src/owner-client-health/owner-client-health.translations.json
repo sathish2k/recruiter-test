@@ -1,0 +1,19 @@
+{
+  "title": "Client health",
+  "subtitle": "Where the desk is exposed",
+  "viewAll": "All clients",
+  "columns": {
+    "client": "Client",
+    "openRoles": "Open",
+    "placed": "Placed",
+    "health": "Health"
+  },
+  "health": {
+    "healthy": "Healthy",
+    "atRisk": "At risk"
+  },
+  "empty": {
+    "title": "No clients yet",
+    "description": "Add a client and its health will be tracked here."
+  }
+}

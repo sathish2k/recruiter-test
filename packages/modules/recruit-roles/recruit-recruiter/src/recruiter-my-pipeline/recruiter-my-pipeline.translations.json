@@ -1,0 +1,11 @@
+{
+  "title": "My desk",
+  "cta": "Open board",
+  "pipeline": {
+    "screening": "Screening",
+    "submitted": "Submitted",
+    "interview": "Interview",
+    "offer": "Offer",
+    "empty": "Nothing here"
+  }
+}

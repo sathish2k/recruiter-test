@@ -1,17 +1,24 @@
 {
-  "title": "Welcome back",
-  "subtitle": "Source, screen, and schedule across every client — from one workspace.",
+  "title": "Sign in",
+  "subtitle": "Use the work account your HirePilotX workspace was created with.",
   "submit": "Sign in",
   "forgot": "Forgot password?",
-  "rememberMe": "Remember me",
+  "rememberMe": "Keep me signed in",
   "footerText": "New to HirePilotX?",
-  "footerLink": "Start a free trial",
+  "footerLink": "Start your 14-day free trial",
   "errors": {
     "invalid": "Incorrect email or password. Please try again."
   },
+  "locked": {
+    "title": "Account temporarily locked",
+    "subtitle": "Too many sign-in attempts failed, so we've paused this account for a few minutes. Nothing has changed — it unlocks on its own.",
+    "countdownLabel": "Unlocks in",
+    "note": "If this wasn't you, someone may be guessing your password. Reset it once the account unlocks, and it will be safe again.",
+    "resetInstead": "Reset my password instead"
+  },
   "email": {
-    "label": "Email",
-    "placeholder": "Email",
+    "label": "Work email",
+    "placeholder": "you@agency.com",
     "errors": {
       "required": "Email is required",
       "format": "Enter a valid work email"
@@ -19,10 +26,16 @@
   },
   "password": {
     "label": "Password",
-    "placeholder": "Password",
+    "placeholder": "Enter your password",
     "errors": {
       "required": "Password is required",
       "minLength": "Password must be at least 8 characters"
     }
+  },
+  "slab": {
+    "kicker": "Agency workspace",
+    "title": "Source. Submit. Place.",
+    "blurb": "Two funnels, one clock — sourcing on one side, client submissions on the other, both against the same SLA.",
+    "footer": "SOC 2 Type II · GDPR compliant · UK data residency"
   }
 }

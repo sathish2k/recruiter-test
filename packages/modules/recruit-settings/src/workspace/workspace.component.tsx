@@ -11,10 +11,10 @@ import {
   type UploadValue,
   useToast,
 } from "@recruit/shared";
-import type { WorkspaceConfiguration } from "./workspace.configuration";
+import type { WorkspaceFormConfiguration } from "./workspace.configuration";
 import { WORKSPACE_WIDGETS } from "./workspace.widgets";
 
-type WorkspaceConfig = typeof WorkspaceConfiguration;
+type WorkspaceConfig = WorkspaceFormConfiguration;
 
 type Organization = Record<string, unknown> & { id: string; name: string };
 
@@ -48,7 +48,7 @@ export function SettingsWorkspaceComponent({ id }: { id: string }) {
   }
 
   return (
-    <Box sx={{ maxWidth: 1240 }}>
+    <Box sx={{ minWidth: 0 }}>
       <FormWithSectionsRenderer
         // Remount once the record loads so defaultValues seed correctly.
         key={organization.id}

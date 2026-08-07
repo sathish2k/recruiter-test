@@ -1,34 +1,50 @@
 {
   "title": "Pending invitations",
-  "subtitle": "People who haven't accepted yet",
+  "subtitle": "{{totalCount}} outstanding · every invitation expires 7 days after it is sent",
   "empty": "No pending invitations",
-  "export": "Export",
-  "exportAs": "Export as",
-  "exportTypes": {
-    "csv": "CSV"
+  "emptyHint": "Try adjusting or clearing the filters.",
+  "emptyState": {
+    "title": "Nothing outstanding",
+    "description": "Every invitation you have sent has been accepted. New ones appear here until they are used or they expire."
   },
   "columns": {
-    "email": "Email",
+    "email": "Invitee",
+    "sentBy": "Sent by",
+    "date": "Date",
     "role": "Role",
-    "sent": "Sent",
     "expires": "Expires",
     "actions": "Actions"
   },
-  "filters": {
-    "search": "Search invitations"
-  },
   "roles": {
-    "admin": "Owner",
-    "lead": "Profile Lead",
-    "employee": "Recruiter",
-    "client": "Client"
+    "owner": "Owner",
+    "admin": "Admin",
+    "profileLead": "Profile Lead",
+    "recruiter": "Recruiter",
+    "sourcer": "Sourcer"
+  },
+  "expiry": {
+    "expired": "Expired",
+    "oneDayLeft": "1 day left",
+    "daysLeft": "{{count}} days left"
   },
   "actions": {
-    "resend": "Resend invite",
-    "cancel": "Cancel invite"
+    "resend": "Resend invitation",
+    "cancel": "Cancel invitation"
+  },
+  "cancelInvite": {
+    "title": "Cancel this invitation?",
+    "description": "{{email}} has not accepted yet.",
+    "submit": "Cancel invitation",
+    "keep": "Keep it",
+    "points": {
+      "link": "The link in their email stops working straight away.",
+      "again": "You can invite the same address again at any time."
+    }
   },
   "toast": {
     "resent": "Invitation resent",
-    "cancelled": "Invitation cancelled"
+    "resentSub": "{{email}} has a fresh link, valid for {{days}} days",
+    "cancelled": "Invitation cancelled",
+    "cancelledSub": "{{email}} can no longer use that link"
   }
 }

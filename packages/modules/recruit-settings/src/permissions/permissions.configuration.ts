@@ -1,155 +1,124 @@
-import type { AccessAction } from "@recruit/sdk";
-import type { TableRendererConfig } from "@recruit/shared";
+import type { AccessAction, AccessRule } from "@recruit/sdk";
+import type { RecordScope } from "@recruit/types";
 
-export interface PermissionRole {
-  value: string;
-  /** Translation key. */
-  label: string;
-}
-
-export interface CrudAction {
+/** One column of the matrix. `actions` is what a tick writes to the store. */
+export interface PermissionColumn {
   key: string;
-  letter: string;
   /** Translation key. */
   label: string;
-  /** Granular actions this CRUD group toggles as a unit. */
   actions: AccessAction[];
+  /** Columns that must be on for this one to mean anything. */
+  requires: string[];
 }
 
-/** A titled block of permission rows. */
+export interface PermissionRow {
+  resource: string;
+  /** IconRenderer registry key. */
+  icon: string;
+  /** Record-bearing, so the row carries a scope. */
+  scoped: boolean;
+}
+
 export interface PermissionGroup {
-  /** Translation key for the uppercased group heading. */
-  label: string;
-  resources: string[];
-}
-
-/** One role card above the matrix. */
-export interface RoleCard {
-  value: string;
-  /** Chip colours — the design gives each role its own triple. */
-  fg: string;
-  bg: string;
-  border: string;
-  /** True for the owner, which carries the "cannot be edited" note. */
-  locked?: boolean;
+  /** Translation key for the uppercased heading. */
+  key: string;
+  rows: PermissionRow[];
 }
 
 export interface PermissionsConfig {
-  /** Resource rows, in display order. */
-  resources: string[];
-  /** The same rows, split into the design's three sections. */
+  columns: PermissionColumn[];
   groups: PermissionGroup[];
-  /** Cards rendered above the matrix. */
-  cards: RoleCard[];
-  /** Resource → IconRenderer registry key. */
-  icons: Record<string, string>;
-  /** Role columns, in display order (values from `roles`). */
-  columns: string[];
-  /** Columns rendered locked (dimmed, not editable — the "*" wildcard). */
-  lockedColumns: string[];
-  /** Role column display labels (translation keys). */
-  roles: PermissionRole[];
-  /** CRUD toggle set for a role × resource cell. */
-  crudActions: CrudAction[];
-  /** Matrix structure — resource column + one custom cell per role column. */
-  table: TableRendererConfig;
+  /** Record-scope values, in the order the row cycles through them. */
+  scopes: RecordScope[];
+  /** Role key → IconRenderer key for the role card's tile. */
+  roleIcons: Record<string, string>;
+  /** Roles rendered frozen — the owner holds everything by definition. */
+  lockedRoles: string[];
+  /** Editing the matrix. Without it the screen is read-only. */
+  manageAccess: AccessRule;
+  /** Minting or deleting a role — a separate authority from editing one. */
+  createAccess: AccessRule;
+  /** Where a deleted custom role's holders land. */
+  reassignTo: string;
+  /** Icon a role the agency invents gets. */
+  customRoleIcon: string;
+  /** "Open in user management" target. */
+  membersLink: { routeId: string };
 }
 
-const groups = [
-  {
-    label: "groups.recruiting",
-    resources: [
-      "linkedinInvites",
-      "manageCvs",
-      "aiScreening",
-      "submitToClient",
-      "scheduleInterviews",
-      "exportCandidates",
-      "deleteCandidates",
-    ],
-  },
-  { label: "groups.jobsClients", resources: ["jobs", "clients", "dashboard"] },
-  { label: "groups.workspace", resources: ["settings", "automation"] },
-];
-
-const resources = groups.flatMap((group) => group.resources);
-
-const roles: PermissionRole[] = [
-  { value: "admin", label: "roles.admin" },
-  { value: "lead", label: "roles.lead" },
-  { value: "employee", label: "roles.employee" },
-];
-
-const table: TableRendererConfig = {
-  columns: [
-    {
-      label: { name: "permission" },
-      value: { type: "resource" },
-    },
-    ...roles.map((role) => ({
-      label: { name: role.label },
-      align: "center" as const,
-      value: { type: `perm:${role.value}` },
-    })),
-  ],
-};
-
+/**
+ * The matrix. Rows are the `Resource` union minus the two that gate routes
+ * (`settings`, `dashboard`) — those must stay out of the editable matrix, or
+ * clearing a tick locks the role out of the screen holding the matrix.
+ */
 export const PermissionsConfiguration: PermissionsConfig = {
-  resources,
-  groups,
-  cards: [
+  columns: [
+    { key: "view", label: "columns.view", actions: ["read", "view"], requires: [] },
+    { key: "create", label: "columns.create", actions: ["create"], requires: ["view"] },
+    { key: "edit", label: "columns.edit", actions: ["edit", "update"], requires: ["view"] },
+    { key: "delete", label: "columns.delete", actions: ["delete"], requires: ["view", "edit"] },
+    { key: "export", label: "columns.export", actions: ["export"], requires: ["view"] },
+  ],
+  groups: [
     {
-      value: "admin",
-      fg: "#F0B27C",
-      bg: "rgba(242,106,27,.14)",
-      border: "rgba(242,106,27,.35)",
-      locked: true,
+      key: "groups.recruiting",
+      rows: [
+        { resource: "jobs", icon: "work", scoped: true },
+        { resource: "candidates", icon: "group", scoped: true },
+        { resource: "submissions", icon: "kanban", scoped: true },
+        { resource: "interviews", icon: "event", scoped: true },
+      ],
     },
-    { value: "lead", fg: "#9BB8D9", bg: "rgba(90,130,180,.14)", border: "rgba(90,130,180,.35)" },
     {
-      value: "employee",
-      fg: "#8FD6AC",
-      bg: "rgba(78,168,116,.14)",
-      border: "rgba(78,168,116,.35)",
+      key: "groups.crm",
+      rows: [
+        { resource: "clients", icon: "domain", scoped: true },
+        { resource: "contacts", icon: "contacts", scoped: true },
+      ],
+    },
+    {
+      key: "groups.administration",
+      rows: [
+        { resource: "members", icon: "manage-accounts", scoped: false },
+        { resource: "roles", icon: "admin-panel-settings", scoped: false },
+        { resource: "workspace", icon: "settings", scoped: false },
+        { resource: "integrations", icon: "hub", scoped: false },
+        { resource: "security", icon: "shield", scoped: false },
+        { resource: "billing", icon: "credit-card", scoped: false },
+        { resource: "audit", icon: "article", scoped: false },
+      ],
+    },
+    {
+      key: "groups.analytics",
+      rows: [
+        { resource: "reports", icon: "monitoring", scoped: true },
+        { resource: "revenue", icon: "payments", scoped: true },
+        { resource: "commissions", icon: "request-quote", scoped: true },
+      ],
+    },
+    {
+      key: "groups.ai",
+      rows: [
+        { resource: "ai", icon: "sparkle", scoped: false },
+        { resource: "templates", icon: "mail", scoped: false },
+      ],
     },
   ],
-  icons: {
-    linkedinInvites: "person-add",
-    manageCvs: "upload-file",
-    aiScreening: "sparkle",
-    submitToClient: "fact-check",
-    scheduleInterviews: "call",
-    exportCandidates: "download",
-    deleteCandidates: "delete",
-    jobs: "work",
-    clients: "domain",
-    dashboard: "insights",
-    settings: "group-add",
-    automation: "automation",
+  scopes: ["own", "team", "all"],
+  roleIcons: {
+    owner: "shield-person",
+    admin: "admin-panel-settings",
+    accountManager: "handshake",
+    profileLead: "supervisor-account",
+    recruiter: "person-search",
+    sourcer: "travel-explore",
+    hiringManager: "fact-check",
+    client: "corporate-fare",
   },
-  columns: ["admin", "lead", "employee"],
-  lockedColumns: ["admin"],
-  roles,
-  crudActions: [
-    {
-      key: "create",
-      letter: "C",
-      label: "actions.create",
-      actions: ["create"],
-    },
-    { key: "read", letter: "R", label: "actions.read", actions: ["read"] },
-    {
-      key: "update",
-      letter: "U",
-      label: "actions.update",
-      actions: ["edit", "update"],
-    },
-    {
-      key: "delete",
-      letter: "D",
-      label: "actions.delete",
-      actions: ["delete"],
-    },
-  ],
-  table,
+  lockedRoles: ["owner"],
+  manageAccess: { resource: "roles", action: ["manage"] },
+  createAccess: { resource: "roles", action: ["create"] },
+  reassignTo: "recruiter",
+  customRoleIcon: "certificate",
+  membersLink: { routeId: "Recruit.SettingsMembers.Route" },
 };

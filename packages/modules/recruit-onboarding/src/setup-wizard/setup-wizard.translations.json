@@ -117,5 +117,25 @@
     "noInvitesValue": "You can invite recruiters any time from Settings → Team",
     "change": "Change",
     "note": "Nothing here is permanent — every one of these lives in Settings and can change as the agency does."
+  },
+  "created": {
+    "title": "Workspace created",
+    "blurb": "Your conventions, stages, rejection reasons and invites are saved. Pick where to start — or go straight to the dashboard.",
+    "cta": "Go to dashboard",
+    "foot": "Everything you set lives in Settings and can change as the agency does.",
+    "actions": {
+      "client": {
+        "title": "Add your first client",
+        "detail": "A client record carries its own location, currency and fee agreement."
+      },
+      "requisition": {
+        "title": "Open a requisition",
+        "detail": "The role your desk works against, with its own SLA clock."
+      },
+      "team": {
+        "title": "Invite the desk",
+        "detail": "Roles decide what each person can do; client access is set per person."
+      }
+    }
   }
 }

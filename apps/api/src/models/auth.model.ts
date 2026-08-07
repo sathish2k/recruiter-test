@@ -11,6 +11,9 @@ export const user = pgTable("user", {
   image: text("image"),
   role: text("role").notNull().default("admin"),
   agencyId: text("agency_id"),
+  /** The desk they sit on ("Perm Desk", "Executive Search") — a label the
+   * members list groups and filters by, not a scoping boundary. */
+  team: text("team"),
   status: text("status").notNull().default("active"),
   phone: text("phone"),
   timezone: text("timezone"),

@@ -6,7 +6,6 @@
     "profile": "My profile",
     "notifications": "Notifications",
     "settings": "Workspace settings",
-    "helpCenter": "Help center",
     "logout": "Sign out"
   },
   "roles": {
@@ -42,13 +41,18 @@
     "placements": "Placements",
     "aiScreening": "AI Screening",
     "automation": "Automation",
-    "settings": "Settings · Team & permissions",
+    "settings": "Workspace settings",
     "profile": "Settings · My profile",
-    "templates": "Settings · Email templates",
-    "notifications": "Notifications",
-    "helpCenter": "Help center"
+    "templates": "Workspace settings",
+    "members": "User management",
+    "roles": "Roles & permissions",
+    "notifications": "Notifications"
   },
   "subtitles": {
-    "contacts": "Everyone you talk to at your clients — hiring managers, HR and finance."
+    "candidates": "Everyone in the talent pool — sourced, screened, submitted or placed.",
+    "contacts": "Everyone you talk to at your clients — hiring managers, HR and finance.",
+    "settings": "Everything here applies to every seat in the workspace.",
+    "members": "Who is in this workspace, and what they can reach.",
+    "roles": "What each role can see and change."
   }
 }

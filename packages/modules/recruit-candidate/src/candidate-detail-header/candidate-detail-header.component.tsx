@@ -103,7 +103,7 @@ export function CandidateDetailHeaderComponent({ id }: { id: string }) {
                 inset: "-4px",
                 borderRadius: "999px",
                 background: (theme) =>
-                  `conic-gradient(#F26A1B 0deg,#E4560F ${(score / 100) * 360}deg,${theme.palette.surface.border} ${(score / 100) * 360}deg)`,
+                  `conic-gradient(${theme.palette.primary.main} 0deg,${theme.palette.primary.main} ${(score / 100) * 360}deg,${theme.palette.surface.track} ${(score / 100) * 360}deg)`,
               }}
             />
             <Box
@@ -136,7 +136,7 @@ export function CandidateDetailHeaderComponent({ id }: { id: string }) {
                   bottom: "-7px",
                   left: "50%",
                   transform: "translateX(-50%)",
-                  background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+                  background: "var(--mui-palette-primary-main)",
                   color: "#fff",
                   fontSize: 11,
                   fontWeight: 700,
@@ -238,9 +238,7 @@ export function CandidateDetailHeaderComponent({ id }: { id: string }) {
                           : "surface.border",
                     bgcolor: stage.state === "done" ? "surface.successSoftBg" : "transparent",
                     background:
-                      stage.state === "current"
-                        ? "linear-gradient(135deg,#FF8A3C,#E4560F)"
-                        : undefined,
+                      stage.state === "current" ? "var(--mui-palette-primary-main)" : undefined,
                     color: stage.state === "done" ? "surface.successFg" : "#fff",
                   }}
                 >

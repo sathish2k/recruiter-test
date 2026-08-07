@@ -15,14 +15,18 @@ import { LinkRenderer, type LinkRendererConfig } from "./link-renderer";
 import { MetricGroupRenderer, type MetricGroupRendererConfig } from "./metric-group-renderer";
 import { NumberRenderer, type NumberRendererConfig } from "./number-renderer";
 import { PillRenderer, type PillRendererConfig } from "./pill-renderer";
+import { RatingRenderer, type RatingRendererConfig } from "./rating-renderer";
 import { RoleRenderer, type RoleRendererConfig } from "./role-renderer";
 import { ScoreBarRenderer, type ScoreBarRendererConfig } from "./score-bar-renderer";
+import { SegmentBarRenderer, type SegmentBarRendererConfig } from "./segment-bar-renderer";
+import { StackRenderer, type StackRendererConfig } from "./stack-renderer";
 import {
   StaticTranslationRenderer,
   type StaticTranslationRendererConfig,
 } from "./static-translation-renderer";
 import { StatusRenderer, type StatusRendererConfig } from "./status-renderer";
 import { TextRenderer, type TextRendererConfig } from "./text-renderer";
+import { TimeRenderer, type TimeRendererConfig } from "./time-renderer";
 
 export type GenericRendererConfig =
   | TextRendererConfig
@@ -30,13 +34,17 @@ export type GenericRendererConfig =
   | NumberRendererConfig
   | CurrencyRendererConfig
   | DateRendererConfig
+  | TimeRendererConfig
   | BooleanRendererConfig
   | StatusRendererConfig
   | EntityRendererConfig
   | AiMatchRendererConfig
   | PillRendererConfig
+  | RatingRendererConfig
   | RoleRendererConfig
   | ScoreBarRendererConfig
+  | SegmentBarRendererConfig
+  | StackRendererConfig
   | MetricGroupRendererConfig
   | DotRendererConfig
   | ActionsRendererConfig
@@ -68,6 +76,8 @@ export function GenericRenderer({
       return <CurrencyRenderer config={config} data={data} />;
     case "date":
       return <DateRenderer config={config} data={data} />;
+    case "time":
+      return <TimeRenderer config={config} data={data} />;
     case "boolean":
       return <BooleanRenderer config={config} data={data} />;
     case "status":
@@ -78,12 +88,18 @@ export function GenericRenderer({
       return <AiMatchRenderer config={config} data={data} />;
     case "pill":
       return <PillRenderer config={config} data={data} />;
+    case "rating":
+      return <RatingRenderer config={config} data={data} />;
     case "dot":
       return <DotRenderer config={config} data={data} />;
     case "metric-group":
       return <MetricGroupRenderer config={config} data={data} />;
     case "score-bar":
       return <ScoreBarRenderer config={config} data={data} />;
+    case "segment-bar":
+      return <SegmentBarRenderer config={config} data={data} />;
+    case "stack":
+      return <StackRenderer config={config} data={data} />;
     case "role":
       return <RoleRenderer config={config} data={data} actionHandler={actionHandler} />;
     case "actions":

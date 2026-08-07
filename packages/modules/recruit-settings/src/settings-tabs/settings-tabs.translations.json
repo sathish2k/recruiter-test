@@ -1,17 +1,12 @@
 {
-  "title": "Settings",
-  "subtitle": "Workspace, team, billing & security for HirePilotX",
   "tabs": {
-    "workspace": "Workspace",
-    "members": "Members",
-    "roles": "Roles & permissions",
-    "templates": "Email templates",
-    "billing": "Billing",
-    "integrations": "Integrations",
+    "general": "General",
+    "branding": "Branding",
+    "localization": "Localization",
     "security": "Security",
+    "email": "Email",
+    "integrations": "Integrations",
+    "billing": "Billing",
     "auditLog": "Audit log"
-  },
-  "badges": {
-    "enterprise": "Enterprise"
   }
 }

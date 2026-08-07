@@ -9,26 +9,31 @@ export interface SidenavItem {
 
 export interface SidenavGroup {
   title: string;
-  items: SidenavItem[];
-}
-
-/** The gradient promo pinned to the bottom of the rail. Omit to hide it. */
-export interface SidenavPromo {
-  icon: string;
-  title: string;
-  body: string;
-  cta: { label: string; routeId: string };
-  secondary?: { label: string; routeId: string };
+  /** Groups are presentation, so they gate on `dashboardVariant` rather than a
+   * capability — the design gives three different RECRUITING groups to three
+   * roles that hold overlapping permissions. Items still carry the resource
+   * rule that decides whether a capability is really available. */
   access?: AccessRule;
+  items: SidenavItem[];
 }
 
 export interface SidenavConfig {
   groups: SidenavGroup[];
-  promo?: SidenavPromo;
 }
+
+/** Everyone holds `dashboard`, so this pairs with `attributes` to express a
+ * presentation-only rule without inventing a resource. */
+const forVariants = (...variants: string[]): AccessRule => ({
+  resource: "dashboard",
+  attributes: { dashboardVariant: variants },
+});
 
 // Nav structure. `title`/`label` are translation keys; `icon` maps to an MUI
 // icon in the component; `routeId` navigates via usePortalRouter.
+//
+// Interviews, Offers and Placements are in the design's rail but have no screen
+// yet, so they are held back rather than shipped as items that navigate
+// nowhere. Add each one back here when its route lands.
 const groups: SidenavGroup[] = [
   {
     title: "groups.main",
@@ -42,20 +47,10 @@ const groups: SidenavGroup[] = [
     ],
   },
   {
-    title: "groups.recruitment",
+    // The full desk: owner, account manager, team lead and recruiter.
+    title: "groups.recruiting",
+    access: forVariants("owner", "accountManager", "profileLead", "recruiter", "generic"),
     items: [
-      {
-        label: "items.clients",
-        access: { resource: "clients" },
-        icon: "domain",
-        routeId: "Recruit.Clients.Route",
-      },
-      {
-        label: "items.contacts",
-        access: { resource: "contacts" },
-        icon: "contacts",
-        routeId: "Recruit.Contacts.Route",
-      },
       {
         label: "items.jobs",
         access: { resource: "jobs" },
@@ -69,94 +64,99 @@ const groups: SidenavGroup[] = [
         routeId: "Recruit.Candidates.Route",
       },
       {
-        label: "items.interviews",
-        access: { resource: "interviews" },
-        icon: "event",
-        routeId: "Recruit.Interviews.Route",
-      },
-      {
-        label: "items.placements",
-        icon: "handshake",
-        routeId: "Recruit.Placements.Route",
-      },
-    ],
-  },
-  {
-    title: "groups.insights",
-    items: [
-      {
-        label: "items.analytics",
-        icon: "insights",
-        routeId: "Recruit.Analytics.Route",
-      },
-      {
-        label: "items.commissions",
-        access: { resource: "commissions" },
-        icon: "payments",
-        routeId: "Recruit.Commissions.Route",
-      },
-      {
-        label: "items.teamActivity",
-        icon: "monitoring",
-        routeId: "Recruit.TeamActivity.Route",
-      },
-    ],
-  },
-  {
-    title: "groups.aiFeatures",
-    items: [
-      {
-        label: "items.aiScreening",
+        label: "items.pipeline",
         access: { resource: "candidates" },
-        icon: "sparkle",
-        routeId: "Recruit.AiScreening.Route",
-      },
-      {
-        label: "items.automation",
-        access: { resource: "settings" },
-        icon: "automation",
-        routeId: "Recruit.Automation.Route",
+        icon: "kanban",
+        routeId: "Recruit.CandidateBoard.Route",
       },
     ],
   },
   {
-    title: "groups.tools",
+    // Top of the funnel only — a sourcer never reaches an offer.
+    title: "groups.recruiting",
+    access: forVariants("sourcer"),
     items: [
+      {
+        label: "items.jobs",
+        access: { resource: "jobs" },
+        icon: "work",
+        routeId: "Recruit.Jobs.Route",
+      },
+      {
+        label: "items.candidates",
+        access: { resource: "candidates" },
+        icon: "group",
+        routeId: "Recruit.Candidates.Route",
+      },
+      {
+        label: "items.pipeline",
+        access: { resource: "candidates" },
+        icon: "kanban",
+        routeId: "Recruit.CandidateBoard.Route",
+      },
+    ],
+  },
+  {
+    // The quality gate: what is waiting on a decision, not a pipeline to work.
+    title: "groups.recruiting",
+    access: forVariants("hiringManager", "client"),
+    items: [
+      {
+        label: "items.jobs",
+        access: { resource: "jobs" },
+        icon: "work",
+        routeId: "Recruit.Jobs.Route",
+      },
+      {
+        label: "items.candidates",
+        access: { resource: "candidates" },
+        icon: "group",
+        routeId: "Recruit.Candidates.Route",
+      },
+    ],
+  },
+  {
+    title: "groups.crm",
+    access: forVariants("owner", "admin", "accountManager", "profileLead", "generic"),
+    items: [
+      {
+        label: "items.clients",
+        access: { resource: "clients" },
+        icon: "domain",
+        routeId: "Recruit.Clients.Route",
+      },
+      {
+        label: "items.contacts",
+        access: { resource: "contacts" },
+        icon: "contacts",
+        routeId: "Recruit.Contacts.Route",
+      },
+    ],
+  },
+  {
+    title: "groups.administration",
+    access: forVariants("owner", "admin"),
+    items: [
+      {
+        label: "items.userManagement",
+        access: { resource: "members", action: ["manage"] },
+        icon: "supervisor-account",
+        routeId: "Recruit.SettingsMembers.Route",
+      },
+      {
+        label: "items.rolesPermissions",
+        access: { resource: "roles", action: ["manage"] },
+        icon: "shield-person",
+        routeId: "Recruit.SettingsRoles.Route",
+      },
       {
         label: "items.settings",
         access: { resource: "settings" },
         icon: "settings",
         routeId: "Recruit.Settings.Route",
       },
-      {
-        label: "items.integrations",
-        access: { resource: "settings" },
-        icon: "hub",
-        routeId: "Recruit.SettingsIntegrations.Route",
-      },
-      {
-        label: "items.auditLog",
-        access: { resource: "audit", action: ["read"] },
-        icon: "history",
-        routeId: "Recruit.AuditLog.Route",
-      },
-      {
-        label: "items.helpCenter",
-        icon: "help",
-        routeId: "Recruit.HelpCenter.Route",
-      },
     ],
   },
 ];
 
-export const SidenavConfiguration: SidenavConfig = {
-  groups,
-  promo: {
-    icon: "sparkle",
-    title: "promo.title",
-    body: "promo.body",
-    cta: { label: "promo.cta", routeId: "Recruit.SettingsBilling.Route" },
-    secondary: { label: "promo.secondary", routeId: "Recruit.SettingsBilling.Route" },
-    access: { resource: "settings" },
-  },
-};
+export const SidenavConfiguration: SidenavConfig = { groups };

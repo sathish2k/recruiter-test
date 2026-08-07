@@ -20,6 +20,7 @@ import {
   type SelectOption,
   SlidingPillTabs,
   useModal,
+  useSnackbar,
   useToast,
 } from "@recruit/shared";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -79,6 +80,7 @@ export function PipelineBoardComponent({ id }: { id: string }) {
   const config = useConfiguration<PipelineBoardConfiguration>(id);
   const router = usePortalRouter();
   const { show } = useToast();
+  const { show: showReceipt } = useSnackbar();
 
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -149,13 +151,14 @@ export function PipelineBoardComponent({ id }: { id: string }) {
         (data?.columns ?? []).find((column) => column.id === values.toStageId)?.name ?? "";
       moveModal.close();
       await mutate();
-      show(
+      // A stage move is the recruiter's own write, and it is reversible — so
+      // it gets the snackbar's receipt-with-undo, not a toast. Toasts are for
+      // things that happened elsewhere.
+      showReceipt(
         t(rejecting ? "toast.rejected" : "toast.moved", {
           name: move.card.candidateName,
           stage: toName,
         }),
-        t("toast.sub", { from: move.card.stageName }),
-        rejecting ? "warning" : "success",
         {
           label: t("toast.undo"),
           onClick: () => {

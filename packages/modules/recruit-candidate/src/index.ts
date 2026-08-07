@@ -8,11 +8,13 @@ import { CANDIDATE_DETAIL_INFO_COMPONENT } from "./candidate-detail-info/bootstr
 import { CANDIDATE_DETAIL_WORKSPACE_COMPONENT } from "./candidate-detail-workspace/bootstrap";
 import { CANDIDATE_FORM_COMPONENT } from "./candidate-form/bootstrap";
 import { CANDIDATE_IMPORT_COMPONENT } from "./candidate-import/bootstrap";
+import { CANDIDATE_STATS_COMPONENT } from "./candidate-stats/bootstrap";
 import { CANDIDATES_COMPONENT } from "./candidates/bootstrap";
 
 export const CandidateModule: Module = {
   id: "Candidate.Module",
   components: [
+    CANDIDATE_STATS_COMPONENT,
     CANDIDATES_COMPONENT,
     CANDIDATE_FORM_COMPONENT,
     CANDIDATE_IMPORT_COMPONENT,

@@ -81,8 +81,8 @@ function BrandCorner() {
   );
 }
 
-function Coin({ variant }: { variant: "notFound" | "denied" }) {
-  const denied = variant === "denied";
+function Coin({ lock }: { lock?: boolean }) {
+  const denied = !!lock;
   return (
     <Box
       sx={{
@@ -200,7 +200,7 @@ function ActionButton({ action, primary }: { action: ErrorScreenAction; primary?
             "linear-gradient(135deg,var(--mui-palette-primary-light),var(--mui-palette-primary-dark))",
           color: "#fff",
           border: "none",
-          boxShadow: "0 14px 34px rgba(228,86,15,.28)",
+          boxShadow: "var(--mui-palette-surface-primaryShadow)",
           "&:hover": { filter: "brightness(1.08)", color: "#fff" },
         }
       : {
@@ -237,7 +237,8 @@ function ActionButton({ action, primary }: { action: ErrorScreenAction; primary?
 }
 
 export function BrandErrorScreen({
-  variant,
+  code,
+  lock,
   headline,
   subtitle,
   primary,
@@ -245,7 +246,12 @@ export function BrandErrorScreen({
   note,
   errorLine,
 }: {
-  variant: "notFound" | "denied";
+  /** The two digits flanking the coin — the coin reads as the middle character,
+   * so 404 is `["4","4"]`, 403 `["4","3"]`, 500 `["5","0"]`. Omit for a state
+   * with no status code of its own, e.g. an expired session. */
+  code?: [string, string];
+  /** Draws the padlock shackle over the coin. */
+  lock?: boolean;
   headline: ReactNode;
   subtitle: ReactNode;
   primary?: ErrorScreenAction;
@@ -261,7 +267,8 @@ export function BrandErrorScreen({
         overflow: "hidden",
         color: "text.primary",
         backgroundColor: "background.default",
-        backgroundImage: "radial-gradient(55% 45% at 50% 58%,rgba(242,106,27,.13),transparent 70%)",
+        backgroundImage:
+          "radial-gradient(55% 45% at 50% 58%,var(--mui-palette-surface-heroTint),transparent 70%)",
       }}
     >
       <Box component="style">{KEYFRAMES}</Box>
@@ -286,11 +293,13 @@ export function BrandErrorScreen({
             gap: "clamp(10px,3vw,26px)",
           }}
         >
-          <Box sx={{ ...numberSx, animation: "bes-riseIn .7s ease-out both" }}>4</Box>
-          <Coin variant={variant} />
-          <Box sx={{ ...numberSx, animation: "bes-riseIn .7s ease-out .1s both" }}>
-            {variant === "denied" ? "3" : "4"}
-          </Box>
+          {code ? (
+            <Box sx={{ ...numberSx, animation: "bes-riseIn .7s ease-out both" }}>{code[0]}</Box>
+          ) : null}
+          <Coin lock={lock} />
+          {code ? (
+            <Box sx={{ ...numberSx, animation: "bes-riseIn .7s ease-out .1s both" }}>{code[1]}</Box>
+          ) : null}
         </Box>
 
         <Box

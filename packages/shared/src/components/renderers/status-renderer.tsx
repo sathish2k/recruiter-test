@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Chip, { type ChipProps } from "@mui/material/Chip";
 import { useTranslation } from "@recruit/sdk";
 import delve from "dlv";
+import { IconRenderer } from "./icon-renderer";
 
 export interface StatusRendererConfig {
   /** Render nothing when the value has no entry in `labels` — for a badge that
@@ -16,6 +17,9 @@ export interface StatusRendererConfig {
   id?: string;
   labels?: Record<string, string>;
   colors?: Record<string, ChipProps["color"]>;
+  /** Value → ICON_REGISTRY name drawn before the label, where the glyph carries
+   * the state as much as the wording does (a member's active/invited/off). */
+  icons?: Record<string, string>;
   variant?: ChipProps["variant"];
   /** Render a leading dot (in the current text color) before the label. */
   dot?: boolean;
@@ -40,10 +44,17 @@ export function StatusRenderer({
   // values alone — the design`s PRIMARY marker, absent on everyone else.
   if (config.labels && mapped === undefined && config.onlyMapped) return null;
 
+  const icon = config.icons?.[key];
+
   return (
     <Chip
       label={
-        config.dot ? (
+        icon ? (
+          <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <IconRenderer name={icon} size={14} color="inherit" />
+            {label}
+          </Box>
+        ) : config.dot ? (
           <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
             <Box
               component="span"

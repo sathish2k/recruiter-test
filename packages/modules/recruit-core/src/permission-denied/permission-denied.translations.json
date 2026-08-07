@@ -1,10 +1,6 @@
 {
   "title": "This page is locked for your role",
-  "requestedHeadline": "Request sent — hang tight",
-  "subtitle": "Your current role doesn't include this permission — request access or head back.",
-  "requestAccess": "Request access",
-  "accessRequested": "Access requested",
+  "subtitle": "Your current role doesn't include this permission. A workspace admin can grant it in Settings → Roles & permissions.",
   "backToDashboard": "Back to my dashboard",
-  "requestedNote": "Request sent — you'll be notified when access changes.",
   "errorLine": "Error code: 403 · Need help? Contact your admin"
 }

@@ -29,7 +29,7 @@ export function useColorMode(): ColorModeContextValue {
 function ColorModeBridge({ children }: { children: ReactNode }) {
   const { mode, systemMode, setMode } = useColorScheme();
   // `mode` is undefined until MUI has read storage; "system" resolves via systemMode.
-  const resolved: ThemeMode = (mode === "system" ? systemMode : mode) ?? "dark";
+  const resolved: ThemeMode = (mode === "system" ? systemMode : mode) ?? "light";
 
   const value = useMemo<ColorModeContextValue>(
     () => ({
@@ -53,7 +53,7 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
   return (
     // `modeStorageKey` keeps the key the previous implementation used, so an
     // existing stored preference survives the switch to MUI-managed persistence.
-    <ThemeProvider theme={theme} defaultMode="dark" modeStorageKey="recruit-theme">
+    <ThemeProvider theme={theme} defaultMode="light" modeStorageKey="recruit-theme">
       <CssBaseline />
       <ColorModeBridge>{children}</ColorModeBridge>
     </ThemeProvider>

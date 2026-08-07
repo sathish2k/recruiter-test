@@ -47,7 +47,7 @@ export function ClientsComponent({ id }: { id: string }) {
       placements: t("card.placements"),
       candidateFlow: t("card.candidateFlow"),
       inPipeline: t("card.inPipeline"),
-      accountManager: t("card.accountManager"),
+      lastActivity: t("card.lastActivity"),
       flow: {
         sourced: t("card.flow.sourced"),
         screening: t("card.flow.screening"),
@@ -72,19 +72,19 @@ export function ClientsComponent({ id }: { id: string }) {
       contacts: t("card.contacts"),
       more: t("card.more"),
       edit: t("card.edit"),
-      delete: t("card.delete"),
+      archive: t("card.archive"),
     }),
     [t],
   );
 
-  const confirmDelete = async () => {
+  const confirmArchive = async () => {
     const client = del.data;
     if (!client) return;
-    const mut = mutation as { remove?: (id?: string) => Promise<unknown> };
-    await mut.remove?.(client.id);
+    const mut = mutation as { archive?: (id?: string) => Promise<unknown> };
+    await mut.archive?.(client.id);
     await refresh();
     del.close();
-    show(t("toast.deleted", { name: client.name }));
+    show(t("toast.archived", { name: client.name }));
   };
 
   if (!config) return null;
@@ -107,7 +107,7 @@ export function ClientsComponent({ id }: { id: string }) {
               onEdit={(c) => router.push(config.editRouteId, { id: c.id })}
               onAddRole={() => router.push(config.addRoleRouteId)}
               onContacts={() => router.push(config.contactsRouteId)}
-              onDelete={(c) => del.open(c)}
+              onArchive={(c) => del.open(c)}
             />
           );
         }}
@@ -116,20 +116,20 @@ export function ClientsComponent({ id }: { id: string }) {
       <Modal
         open={del.isOpen}
         onClose={del.close}
-        title={t("delete.title")}
+        title={t("archive.title")}
         footer={
           <>
             <Button variant="outlined" onClick={del.close}>
-              {t("delete.cancel")}
+              {t("archive.cancel")}
             </Button>
-            <Button variant="contained" color="error" onClick={confirmDelete}>
-              {t("delete.confirm")}
+            <Button variant="contained" color="warning" onClick={confirmArchive}>
+              {t("archive.confirm")}
             </Button>
           </>
         }
       >
         <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
-          {t("delete.body", { name: del.data?.name ?? "" })}
+          {t("archive.body", { name: del.data?.name ?? "" })}
         </Typography>
       </Modal>
     </Box>

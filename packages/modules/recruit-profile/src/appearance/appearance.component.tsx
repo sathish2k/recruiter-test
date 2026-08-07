@@ -13,7 +13,7 @@ export function AppearanceComponent({ id }: { id: string }) {
   const config = useConfiguration<AppearanceConfiguration>(id);
   const { mode, setMode } = useColorMode();
   // ponytail: accent + UI density have no persistence yet — local preview only.
-  const [accent, setAccent] = useState(config.accents?.[0] ?? "#E4560F");
+  const [accent, setAccent] = useState(config.accents?.[0] ?? "#0E2E5C");
   const [prefs, setPrefs] = useState<Record<string, boolean>>({});
 
   if (!config.themeOptions) return null;

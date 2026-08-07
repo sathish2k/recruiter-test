@@ -30,6 +30,9 @@ export interface SearchFilter extends BaseFilter {
 export interface SegmentedFilter extends BaseFilter {
   type: "segmented";
   options: FilterOption[];
+  /** Path into the fetch envelope's `meta` holding `{ [option value]: count }`
+   * — live tab counts, as the design prints beside each label. */
+  countsPath?: string;
 }
 
 export interface DropdownFilter extends BaseFilter, RemoteOptions {

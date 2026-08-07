@@ -23,7 +23,7 @@ export function TableTotalsRenderer({
       sx={{
         "&:hover": { background: "transparent" },
         "& > td": {
-          borderTop: "1px solid",
+          borderTop: "1px dashed",
           borderColor: "divider",
           color: "text.secondary",
           fontWeight: 700,

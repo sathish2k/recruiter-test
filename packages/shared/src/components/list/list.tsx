@@ -81,7 +81,7 @@ export interface ListSectionProps {
 function SkeletonRow({ shape, divided }: { shape: ListSkeletonShape; divided: boolean }) {
   const action = shape.action ?? "toggle";
   return (
-    <Box sx={{ py: "13px", borderTop: divided ? "1px solid" : "none", borderColor: "divider" }}>
+    <Box sx={{ py: "13px", borderTop: divided ? "1px dashed" : "none", borderColor: "divider" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: "13px" }}>
         {shape.icon ? <Skeleton variant="rounded" width={34} height={34} /> : null}
         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -247,7 +247,7 @@ function ListRow({
     <Box
       sx={{
         py: dense ? 0 : "13px",
-        borderTop: divided ? "1px solid" : "none",
+        borderTop: divided ? "1px dashed" : "none",
         borderColor: "divider",
       }}
     >
@@ -378,7 +378,7 @@ export function ListSection({
       {footer != null ? (
         <Box
           sx={{
-            borderTop: divided ? "1px solid" : "none",
+            borderTop: divided ? "1px dashed" : "none",
             borderColor: "divider",
             pt: "12px",
             mt: "1px",

@@ -1,12 +1,12 @@
 {
   "metrics": {
     "submitted": "Submitted",
-    "submittedDelta": "{{value}} awaiting feedback",
+    "submittedDelta": "{value} awaiting feedback",
     "interviews": "Interviews",
-    "interviewsDelta": "{{value}} at interview stage",
+    "interviewsDelta": "{value} at interview stage",
     "offers": "Offers",
-    "offersDelta": "waiting {{value}} days",
+    "offersDelta": "waiting {value} days",
     "hires": "Hires",
-    "hiresDelta": "{{value}} openings remaining"
+    "hiresDelta": "{value} openings remaining"
   }
 }

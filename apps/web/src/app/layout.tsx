@@ -1,22 +1,23 @@
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import type { Metadata } from "next";
-import { Instrument_Sans, Manrope } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { getBootLocale } from "../locale";
 import { Providers } from "./providers";
 
-const instrument = Instrument_Sans({
+// Manrope carries all UI — it is the face the brand lockup is set in.
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-instrument",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
   display: "swap",
 });
 
-// Brand wordmark font (matches the Claude Design source).
-const manrope = Manrope({
+// Space Grotesk carries display: page titles, headline figures.
+const grotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-manrope",
+  weight: ["500", "600", "700"],
+  variable: "--font-grotesk",
   display: "swap",
 });
 
@@ -32,7 +33,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html
       lang={bootLocale.language ?? "en"}
-      className={`${instrument.variable} ${manrope.variable}`}
+      className={`${manrope.variable} ${grotesk.variable}`}
       suppressHydrationWarning
     >
       <body>
@@ -40,7 +41,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <html data-theme> so the first frame is already the right scheme. */}
         <InitColorSchemeScript
           attribute="data-theme"
-          defaultMode="dark"
+          defaultMode="light"
           modeStorageKey="recruit-theme"
         />
         <Providers initialLocale={bootLocale}>{children}</Providers>

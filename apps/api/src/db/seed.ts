@@ -13,14 +13,17 @@ import { randomUUID } from "node:crypto";
 import { and, eq, like } from "drizzle-orm";
 import { auditLog } from "../models/audit-log.model";
 import { user } from "../models/auth.model";
+import { subscription, usageMetric } from "../models/billing.model";
 import { type CandidateStatus, candidate } from "../models/candidate.model";
 import { client } from "../models/client.model";
 import { clientInvoice } from "../models/client-invoice.model";
 import { contact } from "../models/contact.model";
+import { integration } from "../models/integration.model";
 import { interview } from "../models/interview.model";
 import { invitation } from "../models/invitation.model";
 import { job } from "../models/job.model";
 import { organization } from "../models/organization.model";
+import { loginHistory, userSecurity } from "../models/security.model";
 import { db } from ".";
 
 /** Every seeded row's id carries this, so a re-run can clear its own data. */
@@ -28,6 +31,106 @@ const MARK = "seed-";
 const id = () => `${MARK}${randomUUID()}`;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const daysAgo = (days: number) => new Date(Date.now() - days * DAY_MS);
+
+/** What a working agency has plugged in — six live, one needing attention,
+ * which is the state the design's "6 · 1 warning" tile describes. */
+const INTEGRATIONS = [
+  {
+    provider: "gmail",
+    status: "connected" as const,
+    account: "ops@troyconsulting.com",
+    direction: "two-way",
+    syncedDaysAgo: 0,
+  },
+  {
+    provider: "google-calendar",
+    status: "connected" as const,
+    account: "ops@troyconsulting.com",
+    direction: "two-way",
+    syncedDaysAgo: 0,
+  },
+  {
+    provider: "linkedin",
+    status: "connected" as const,
+    account: "Troy Consulting",
+    direction: "pull",
+    syncedDaysAgo: 1,
+  },
+  {
+    provider: "slack",
+    status: "connected" as const,
+    account: "#hiring",
+    direction: "push",
+    syncedDaysAgo: 0,
+  },
+  {
+    provider: "zoom",
+    status: "connected" as const,
+    account: "ops@troyconsulting.com",
+    direction: "two-way",
+    syncedDaysAgo: 2,
+  },
+  {
+    provider: "greenhouse",
+    status: "connected" as const,
+    account: "troy-consulting",
+    direction: "pull",
+    syncedDaysAgo: 3,
+  },
+  {
+    provider: "outlook",
+    status: "warning" as const,
+    account: "ana@troyconsulting.com",
+    direction: "two-way",
+    syncedDaysAgo: 6,
+    warning: "Consent was revoked — interview sync has stopped for 6 members.",
+  },
+];
+
+/** Recent sign-ins, including one blocked attempt so the security card has
+ * something other than a wall of successes to show. */
+const SIGN_INS = [
+  {
+    browser: "Chrome 141",
+    os: "macOS 15",
+    location: "Bengaluru, IN",
+    ip: "49.205.12.8",
+    result: "success" as const,
+    daysAgo: 0,
+  },
+  {
+    browser: "Safari 18",
+    os: "iOS 18",
+    location: "Bengaluru, IN",
+    ip: "49.205.12.9",
+    result: "success" as const,
+    daysAgo: 0,
+  },
+  {
+    browser: "Chrome 141",
+    os: "Windows 11",
+    location: "Pune, IN",
+    ip: "103.21.58.44",
+    result: "success" as const,
+    daysAgo: 1,
+  },
+  {
+    browser: "Firefox 133",
+    os: "Ubuntu 24.04",
+    location: "Lisbon, PT",
+    ip: "185.93.2.17",
+    result: "blocked" as const,
+    daysAgo: 2,
+  },
+  {
+    browser: "Chrome 140",
+    os: "macOS 15",
+    location: "Bengaluru, IN",
+    ip: "49.205.12.8",
+    result: "success" as const,
+    daysAgo: 3,
+  },
+];
 
 const CLIENTS = [
   {
@@ -454,6 +557,85 @@ async function seed() {
   });
   if (interviewRows.length) await db.insert(interview).values(interviewRows);
 
+  // ── The workspace itself ────────────────────────────────────────────────
+  // The admin dashboard reads the plan, the security posture, what is
+  // connected and this period's AI usage. Without these its four KPI tiles
+  // render a label and nothing else.
+  const members = await db.select().from(user).where(eq(user.agencyId, organizationId));
+
+  await db
+    .insert(subscription)
+    .values({ organizationId, plan: "growth", seatTotal: 25, renewsAt: daysAgo(-45) })
+    .onConflictDoUpdate({
+      target: subscription.organizationId,
+      set: { seatTotal: 25, plan: "growth", updatedAt: new Date() },
+    });
+
+  const period = new Date().toISOString().slice(0, 7);
+  await db
+    .delete(usageMetric)
+    .where(and(eq(usageMetric.organizationId, organizationId), eq(usageMetric.period, period)));
+  await db.insert(usageMetric).values({
+    id: id(),
+    organizationId,
+    period,
+    aiCreditsUsed: 1284,
+    aiCreditsTotal: 3000,
+    resumeParsing: 412,
+    candidateMatches: 168,
+    emailsSent: 903,
+    storageUsed: 1_610_612_736,
+  });
+
+  const integrationRows = INTEGRATIONS.map((entry) => ({
+    id: id(),
+    organizationId,
+    provider: entry.provider,
+    status: entry.status,
+    account: entry.account,
+    connectedById: owner?.id ?? null,
+    connectedByName: owner?.name ?? null,
+    lastSyncAt: daysAgo(entry.syncedDaysAgo),
+    direction: entry.direction,
+    warning: entry.warning ?? null,
+  }));
+  await db
+    .insert(integration)
+    .values(
+      integrationRows.map(({ connectedById, ...row }) => ({ ...row, connectedBy: connectedById })),
+    );
+
+  // Two-factor on every seat but one, so the score lands in the design's band
+  // rather than at either extreme.
+  for (const [index, member] of members.entries()) {
+    await db
+      .insert(userSecurity)
+      .values({
+        userId: member.id,
+        twoFactorEnabled: index < members.length - 1 || members.length === 1,
+        twoFactorEnabledAt: daysAgo(30),
+        passwordChangedAt: daysAgo(45),
+      })
+      .onConflictDoUpdate({
+        target: userSecurity.userId,
+        set: { twoFactorEnabled: index < members.length - 1 || members.length === 1 },
+      });
+  }
+
+  const loginRows = SIGN_INS.map((entry, index) => ({
+    id: id(),
+    organizationId,
+    userId: members[index % Math.max(members.length, 1)]?.id ?? null,
+    email: members[index % Math.max(members.length, 1)]?.email ?? "unknown@example.com",
+    browser: entry.browser,
+    os: entry.os,
+    location: entry.location,
+    ip: entry.ip,
+    result: entry.result,
+    createdAt: daysAgo(entry.daysAgo),
+  }));
+  await db.insert(loginHistory).values(loginRows);
+
   console.log(`Seeded "${org.name}" (${organizationId})`);
   console.table({
     clients: clientRows.length,
@@ -463,6 +645,9 @@ async function seed() {
     invitations: inviteRows.length,
     stageMoves: moveRows.length,
     interviews: interviewRows.length,
+    integrations: integrationRows.length,
+    signIns: loginRows.length,
+    seats: `${members.length} / 25`,
   });
 }
 

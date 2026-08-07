@@ -23,6 +23,9 @@ import { findRouteBySlug } from "./router";
 type DataMap = Map<string, Record<string, unknown>>;
 type Registry = Map<string, ComponentDefinition>;
 
+/** The page configuration an app may register to own its own 404 screen. */
+const NOT_FOUND_PAGE_ID = "Recruit.NotFound.Page";
+
 function splitComponentData(entry: Record<string, unknown> | undefined) {
   const e = entry ?? {};
   return {
@@ -246,8 +249,25 @@ function RenderContainer({ config, children }: { config: Configuration; children
     return <Stack {...config.stackContainer}>{children}</Stack>;
   }
   if (config.gridContainer) {
+    const { templateColumns, spacing, ...grid } = config.gridContainer;
+    // An explicit template drives a plain CSS grid: children sit in fixed
+    // tracks in source order, so `gridItem` sizing has nothing to say.
+    if (templateColumns) {
+      return (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: templateColumns },
+            gap: spacing ?? "14px",
+            alignItems: "stretch",
+          }}
+        >
+          {children}
+        </Box>
+      );
+    }
     return (
-      <Grid container {...config.gridContainer}>
+      <Grid container spacing={spacing} {...grid}>
         {children}
       </Grid>
     );
@@ -291,7 +311,15 @@ export function createPortalApp(sdkConfig: {
       ? filterConfigurationsAccess(configurations, accessContext)
       : configurations;
 
-    const tree = generateRenderTree(matchedRoutes, accessibleConfigurations, routes, slugParts);
+    let tree = generateRenderTree(matchedRoutes, accessibleConfigurations, routes, slugParts);
+    // An unmatched slug renders the app's own 404 page through the normal
+    // pipeline, so its copy comes from a translation file like every other
+    // screen. Without one registered, PortalRenderer's built-in NotFound stands
+    // in. Rendered in place — the URL the user typed is preserved.
+    if (!tree?.page) {
+      const fallback = accessibleConfigurations.find((c) => c.id === NOT_FOUND_PAGE_ID);
+      if (fallback) tree = { layouts: [], page: fallback, slots: {} };
+    }
     const currentRoute = matchedRoutes ? (matchedRoutes[matchedRoutes.length - 1] ?? null) : null;
 
     const dataMap: DataMap = new Map();

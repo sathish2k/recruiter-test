@@ -185,7 +185,7 @@ export function AttachmentsWidget({
               border: "1px solid",
               borderColor: item.url ? "surface.successSoftBorder" : "surface.border",
               bgcolor: "surface.inset",
-              animation: `${fileIn} .4s cubic-bezier(.34,1.4,.5,1) both`,
+              animation: `${fileIn} 250ms cubic-bezier(0,0,.2,1) both`,
             }}
           >
             <Box sx={{ color: "surface.errorFg", flex: "none", display: "flex" }}>
@@ -224,7 +224,7 @@ export function AttachmentsWidget({
                   color: "surface.successFg",
                   flex: "none",
                   display: "flex",
-                  animation: `${tickPop} .4s cubic-bezier(.3,1.4,.4,1) both`,
+                  animation: `${tickPop} 250ms cubic-bezier(0,0,.2,1) both`,
                 }}
               >
                 <IconRenderer name="check-circle" size={18} />
@@ -255,7 +255,7 @@ export function AttachmentsWidget({
               border: "1px solid",
               borderColor: row.error ? "surface.errorFg" : "surface.primarySoftBorder",
               bgcolor: "surface.inset",
-              animation: `${fileIn} .4s cubic-bezier(.34,1.4,.5,1) both`,
+              animation: `${fileIn} 250ms cubic-bezier(0,0,.2,1) both`,
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: "11px", mb: "9px" }}>

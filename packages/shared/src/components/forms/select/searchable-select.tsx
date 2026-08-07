@@ -298,6 +298,9 @@ export function SearchableSelectField({
         ) : null}
         {canCreate && createOption ? (
           <Box
+            role="option"
+            tabIndex={0}
+            data-testid="select-create-option"
             onClick={() => {
               createOption.onCreate(search);
               close();

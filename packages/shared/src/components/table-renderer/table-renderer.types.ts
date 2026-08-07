@@ -74,6 +74,18 @@ export interface TableRendererConfig {
    * band spans the card edge to edge and the labels are uppercase.
    */
   variant?: "panel" | "list";
+  /**
+   * Pins the identifying column (the checkbox, if selectable, plus the first
+   * data column) against the left edge while the rest scrolls. On a wide record
+   * set this is what keeps the row's name in view — pair it with `maxHeight`,
+   * which does the same for the header.
+   */
+  pinFirstColumn?: boolean;
+  /**
+   * Caps the scroll area so the sticky header has something to stick to.
+   * Any CSS length; without it the page scrolls and the header travels with it.
+   */
+  maxHeight?: number | string;
   /** Adds a leading checkbox column and, once rows are picked, the bulk bar. */
   selectable?: boolean;
   /** Actions offered in that bar; each receives the selected rows. */

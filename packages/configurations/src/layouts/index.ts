@@ -17,6 +17,12 @@ export const layouts: Configuration[] = [
         componentType: "Recruit.Appbar.Component",
         position: "top",
       },
+      {
+        id: "Recruit.Breadcrumb.Layout",
+        type: "component",
+        componentType: "Recruit.Breadcrumb.Component",
+        position: "breadcrumb",
+      },
       { id: "Recruit.Core.Outlet.Layout", type: "outlet", position: "main" },
     ],
   },

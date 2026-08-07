@@ -1,0 +1,14 @@
+{
+  "greeting": "Review queue",
+  "subtitle": "The internal quality gate — approve, reject, or send it back.",
+  "kpis": {
+    "reviewsPending": "Lead reviews pending",
+    "reviewsPendingDelta": "{value}",
+    "submittedToday": "Profiles submitted today",
+    "submittedTodayDelta": "{value}",
+    "interviewsToday": "Interviews today",
+    "interviewsTodayDelta": "{value}",
+    "averageReviewTime": "Average review time",
+    "averageReviewTimeDelta": "{value}"
+  }
+}

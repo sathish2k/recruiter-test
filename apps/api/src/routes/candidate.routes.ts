@@ -100,12 +100,19 @@ export default new Elysia({ name: "candidate.routes" })
       search: t.Optional(t.String()),
       status: t.Optional(t.String()),
       jobId: t.Optional(t.String()),
+      client: t.Optional(t.String()),
+      stage: t.Optional(t.String()),
+      owner: t.Optional(t.String()),
+      source: t.Optional(t.String()),
+      quick: t.Optional(t.String()),
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
       sortKey: t.Optional(t.String()),
       sortDir: t.Optional(t.String()),
     }),
   })
+  /** Declared before `/candidates/:id` so "stats" is not read as an id. */
+  .get("/candidates/stats", (ctx) => candidateController.getCandidateStats(ctx), { isAuth: true })
   /** The same check every intake path runs — see findDuplicateCandidates. */
   .get("/candidates/duplicates", (ctx) => candidateController.getDuplicates(ctx), {
     isAuth: true,

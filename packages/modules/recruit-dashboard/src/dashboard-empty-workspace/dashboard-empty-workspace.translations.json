@@ -1,0 +1,10 @@
+{
+  "title": "Nothing to measure yet",
+  "description": "This dashboard fills itself as work moves through the pipeline. Add your first client and a requisition under it, and the revenue, SLA and risk figures start counting from there.",
+  "client.title": "Add your first client",
+  "client.detail": "Fee terms and contacts live here. Everything else hangs off a client.",
+  "job.title": "Open a requisition",
+  "job.detail": "The role you are hired to fill, with its salary band and SLA.",
+  "candidate.title": "Add candidates",
+  "candidate.detail": "Upload CVs or create records. The AI screens them as they land."
+}

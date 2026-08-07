@@ -159,7 +159,9 @@ export async function listClients(organizationId: string, params: ListClientsPar
 const QUARTER_MS = 90 * 24 * 60 * 60 * 1000;
 
 export async function clientStats(organizationId: string) {
-  const where = eq(client.organizationId, organizationId);
+  // Archived clients are out of the list, so they must be out of the tiles that
+  // count it too — otherwise "Active clients" keeps counting a hidden account.
+  const where = and(eq(client.organizationId, organizationId), eq(client.archived, false));
   const quarterAgo = new Date(Date.now() - QUARTER_MS);
   const [byStatusRows, [totals], [addedRow], [withRolesRow], placedRows] = await Promise.all([
     db

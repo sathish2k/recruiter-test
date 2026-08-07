@@ -9,12 +9,14 @@ import { OnboardingModule } from "@recruit/module-onboarding";
 import { PipelineModule } from "@recruit/module-pipeline";
 import { ProfileModule } from "@recruit/module-profile";
 import { SettingsModule } from "@recruit/module-settings";
+import { RoleDashboardModules } from "@recruit/roles";
 import type { Module } from "@recruit/sdk";
 
 export const AllModules: Module[] = [
   AuthModule,
   CoreModule,
   DashboardModule,
+  ...RoleDashboardModules,
   OnboardingModule,
   ProfileModule,
   SettingsModule,

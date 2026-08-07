@@ -219,9 +219,15 @@ export function Filters({
     return () => observer.disconnect();
   }, [responsive]);
 
+  // The design gives the segmented chip row its own line above the search and
+  // dropdowns, so it never competes with them for width or collapses into the
+  // overflow menu.
+  const segmented = useMemo(() => options.filter((f) => f.type === "segmented"), [options]);
+  const rest = useMemo(() => options.filter((f) => f.type !== "segmented"), [options]);
+
   const { visible, hidden } = useMemo(
-    () => (responsive ? splitFilters(options, width) : { visible: options, hidden: [] }),
-    [responsive, options, width],
+    () => (responsive ? splitFilters(rest, width) : { visible: rest, hidden: [] }),
+    [responsive, rest, width],
   );
 
   const activeChips = options
@@ -233,6 +239,13 @@ export function Filters({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {segmented.length ? (
+        <Box sx={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+          {segmented.map((filter) => (
+            <Box key={filter.key}>{control(filter, filters, setFilter)}</Box>
+          ))}
+        </Box>
+      ) : null}
       <Box
         ref={containerRef}
         sx={{

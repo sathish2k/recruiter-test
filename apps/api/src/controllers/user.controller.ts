@@ -1,12 +1,18 @@
 import { status } from "elysia";
 import { record as recordAudit } from "../services/audit-log.service";
+import { requestPasswordReset } from "../services/auth.service";
 import {
+  activateUser,
   deactivateUser,
+  findAgencyUser,
+  hasFreeSeat,
   inviteUser,
+  isLastOwner,
   listUsers,
   removeUser,
   setUserSuspended,
-  updateUserRole,
+  type UpdateUserInput,
+  updateUser,
 } from "../services/user.service";
 
 type Auth = { id: string; name?: string | null; agencyId?: string | null; role?: string | null };
@@ -20,21 +26,30 @@ export async function getUsers(ctx: { user: Auth; query?: Record<string, string 
   return { data, meta: { totalCount, ...meta } };
 }
 
-export async function patchUserRole(ctx: {
+export async function patchUser(ctx: {
   user: Auth;
   params: { id: string };
-  body: { role: string };
+  body: UpdateUserInput;
 }) {
-  const updated = await updateUserRole(ctx.params.id, ctx.body.role);
+  const agencyId = ctx.user.agencyId ?? "";
+  // Demoting the only active owner would leave the workspace unable to manage
+  // billing or ownership at all, so it is refused before the write.
+  if (ctx.body.role && ctx.body.role !== "owner" && (await isLastOwner(agencyId, ctx.params.id))) {
+    return status(422, "This is the last active owner");
+  }
+  const updated = await updateUser(ctx.params.id, ctx.body);
   if (!updated) return status(404, "User not found");
   await recordAudit({
-    organizationId: ctx.user.agencyId ?? "",
+    organizationId: agencyId,
     userId: ctx.user.id,
     actorName: ctx.user.name ?? "Unknown",
-    event: `${ctx.user.name ?? "Someone"} changed ${updated.displayName}'s role`,
+    event: `${ctx.user.name ?? "Someone"} updated ${updated.displayName}`,
     category: "permissions",
     objects: { Member: updated.displayName },
-    details: { "New role": ctx.body.role },
+    details: {
+      ...(ctx.body.role ? { "New role": ctx.body.role } : {}),
+      ...(ctx.body.team !== undefined ? { Team: ctx.body.team || "None" } : {}),
+    },
   });
   return { data: updated };
 }
@@ -53,9 +68,47 @@ export async function postInvite(ctx: { user: Auth; body: { email: string; role:
   }
 }
 
+/** Sends the member the ordinary reset link. An admin never sets a password
+ * for someone else — they only start the flow the member finishes. */
+export async function postResetPassword(ctx: { user: Auth; params: { id: string } }) {
+  const agencyId = ctx.user.agencyId ?? "";
+  const target = await findAgencyUser(agencyId, ctx.params.id);
+  if (!target) return status(404, "User not found");
+  await requestPasswordReset(target.email);
+  await recordAudit({
+    organizationId: agencyId,
+    userId: ctx.user.id,
+    actorName: ctx.user.name ?? "Unknown",
+    event: `${ctx.user.name ?? "Someone"} sent ${target.name} a password reset`,
+    category: "permissions",
+    objects: { Member: target.name },
+  });
+  return { data: { id: target.id, email: target.email } };
+}
+
+export async function postActivate(ctx: { user: Auth; params: { id: string } }) {
+  const agencyId = ctx.user.agencyId ?? "";
+  // A reactivated member takes a seat again, so the plan has to have one.
+  if (!(await hasFreeSeat(agencyId))) return status(422, "No seats available");
+  const updated = await activateUser(agencyId, ctx.params.id);
+  if (!updated) return status(404, "User not found");
+  await recordAudit({
+    organizationId: agencyId,
+    userId: ctx.user.id,
+    actorName: ctx.user.name ?? "Unknown",
+    event: `${ctx.user.name ?? "Someone"} reactivated ${updated.displayName}`,
+    category: "permissions",
+    objects: { Member: updated.displayName },
+  });
+  return { data: updated };
+}
+
 export async function postDeactivate(ctx: { user: Auth; params: { id: string } }) {
   if (ctx.params.id === ctx.user.id) {
     return status(422, "You can't deactivate yourself");
+  }
+  if (await isLastOwner(ctx.user.agencyId ?? "", ctx.params.id)) {
+    return status(422, "This is the last active owner");
   }
   const updated = await deactivateUser(ctx.params.id);
   if (!updated) return status(404, "User not found");

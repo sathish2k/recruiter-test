@@ -1,0 +1,16 @@
+{
+  "stats": {
+    "inPool": "In the pool",
+    "inPoolDelta": "+{value}",
+    "thisMonth": "This month",
+    "submitted": "Submitted",
+    "submittedDelta": "{value} waiting",
+    "submittedSub": "Across {{submittedClients}} clients",
+    "strongMatch": "Above 80% match",
+    "strongMatchDelta": "{value} unviewed",
+    "strongMatchSub": "On live requisitions",
+    "joined": "Joined",
+    "joinedDelta": "+{value}",
+    "yearToDate": "Year to date"
+  }
+}

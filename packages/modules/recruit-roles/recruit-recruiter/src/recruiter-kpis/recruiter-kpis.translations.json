@@ -1,0 +1,14 @@
+{
+  "greeting": "Good morning",
+  "subtitle": "What moves your desk forward today.",
+  "kpis": {
+    "openJobs": "Open jobs",
+    "openJobsDelta": "{value}",
+    "interviewsToday": "Today's interviews",
+    "interviewsTodayDelta": "{value}",
+    "offersPending": "Offers pending",
+    "offersPendingDelta": "{value}",
+    "revenueMonth": "Revenue this month",
+    "revenueMonthDelta": "{value}"
+  }
+}

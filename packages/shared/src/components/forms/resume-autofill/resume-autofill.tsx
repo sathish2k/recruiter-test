@@ -151,7 +151,7 @@ export function ResumeAutofillWidget({
           p: hero ? "26px 20px" : "14px 10px",
           borderRadius: "12px",
           border: "1px dashed",
-          borderColor: failed ? "error.main" : "rgba(242,106,27,.5)",
+          borderColor: failed ? "error.main" : "surface.primarySoftBorder",
           color: failed ? "error.main" : "surface.primarySoftFg",
           cursor: working ? "default" : "pointer",
           textAlign: "center",

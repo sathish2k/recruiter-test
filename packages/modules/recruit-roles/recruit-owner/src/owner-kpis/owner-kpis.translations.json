@@ -1,0 +1,14 @@
+{
+  "greeting": "Good morning",
+  "subtitle": "Your desk across every client — what is late, what is at risk, what is earning.",
+  "kpis": {
+    "revenueMonth": "Revenue this month",
+    "revenueMonthDelta": "{value}",
+    "placements": "Placements",
+    "placementsDelta": "{value}",
+    "outstanding": "Outstanding",
+    "outstandingDelta": "{value}",
+    "interviewsToday": "Interviews today",
+    "interviewsTodayDelta": "{value}"
+  }
+}

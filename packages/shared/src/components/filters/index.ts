@@ -11,3 +11,4 @@ export {
   type UseFiltersResult,
   useFilters,
 } from "./use-filters";
+export { type SavedFilter, type UseSavedFiltersResult, useSavedFilters } from "./use-saved-filters";

@@ -28,7 +28,9 @@ export interface AppbarLanguage {
 export interface AppbarAction {
   icon?: string;
   routeId?: string;
-  badge?: boolean;
+  /** Shows the notification marker. `true` is a bare dot; a number prints the
+   * count (capped at 99+). */
+  badge?: boolean | number;
   kind?: "avatar" | "theme" | "language";
   label?: string;
   menu?: AppbarAvatarMenu;

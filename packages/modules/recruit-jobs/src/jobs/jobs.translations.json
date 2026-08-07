@@ -1,22 +1,50 @@
 {
   "columns": {
-    "reference": "Ref",
-    "title": "Requirement",
+    "role": "Role",
     "client": "Client",
-    "status": "Status",
-    "openings": "Openings",
-    "updated": "Updated"
+    "pipeline": "Pipeline",
+    "filled": "Filled",
+    "sla": "SLA"
+  },
+  "statuses": {
+    "all": "All",
+    "open": "Active",
+    "on_hold": "On hold",
+    "filled": "Filled",
+    "closed": "Closed"
+  },
+  "employmentTypes": {
+    "full_time": "Full-time",
+    "part_time": "Part-time",
+    "contract": "Contract",
+    "temporary": "Temporary",
+    "internship": "Internship"
+  },
+  "pipeline": {
+    "inPlay": "{value} in play"
+  },
+  "filled": {
+    "count": "{value} of {{openings}} filled"
+  },
+  "sla": {
+    "overdue": "Overdue {value}d",
+    "due": "Due in {value}d",
+    "ok": "{value}d left",
+    "none": "No target",
+    "opened": "opened {value}d ago"
   },
   "filters": {
-    "search": "Search requirements or REQ-…"
+    "search": "Search title, REQ id, client or skill…",
+    "client": "Client",
+    "overdue": "Past SLA only"
   },
   "actions": {
     "new": "New requirement",
-    "edit": "Edit",
-    "archive": "Archive"
+    "edit": "Edit requirement",
+    "archive": "Close role"
   },
   "exportCsv": "Export CSV",
-  "empty": "No requirements yet",
+  "empty": "No requirements match these filters",
   "toast": {
     "archived": "{{name}} archived — restore it from Archived."
   }

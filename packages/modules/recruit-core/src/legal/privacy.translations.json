@@ -1,0 +1,42 @@
+{
+  "back": "Back to sign up",
+  "title": "Privacy Policy",
+  "updated": "Draft — not yet reviewed",
+  "draftNotice": "This is placeholder text, not a reviewed privacy notice. It describes what the product actually collects so the page is not empty, but it has not been written or reviewed by a lawyer or a data protection officer. Replace it with an approved notice before launch.",
+  "intro": "This policy explains what HirePilotX collects, why, and what you can do about it. It covers two different groups: the people who use the product, and the candidates and client contacts whose records live inside a workspace.",
+  "sections": [
+    {
+      "heading": "1. Information you give us",
+      "body": "When you create an account we collect your name, your work email address, your agency's name and a password, which is stored only in hashed form and is never readable by us. If you complete the setup wizard or your profile, we also hold the preferences you choose there — things like time format, language and notification settings."
+    },
+    {
+      "heading": "2. Information we collect automatically",
+      "body": "Every sign-in attempt is recorded, whether it succeeds or fails, along with the approximate time, the IP address, and the browser and operating system taken from your browser's user agent. This is what powers the login history in your security settings and what lets the platform lock an account after repeated failed attempts."
+    },
+    {
+      "heading": "3. Candidate and client records",
+      "body": "Workspaces hold records about candidates, client companies and client contacts — including names, contact details, CVs and the notes recruiters add. Your agency decides what goes in and is the controller of that data. We process it to run the service and do not use it to build profiles of our own or sell it to anyone."
+    },
+    {
+      "heading": "4. Email we send on your behalf",
+      "body": "The platform sends mail — verification codes, password resets, candidate and client messages — from addresses associated with your workspace. That is why we verify your email address before allowing you to send. Message content and delivery status pass through our email provider in order to be delivered."
+    },
+    {
+      "heading": "5. How long we keep things",
+      "body": "Account and workspace data is kept while the workspace is open. Verification codes and password reset links expire after thirty minutes and are deleted once used. Sign-in history and the workspace audit log are kept so that security questions can be answered after the fact. When a workspace closes, its data is deleted after the export window passes."
+    },
+    {
+      "heading": "6. Who else sees it",
+      "body": "Other members of your workspace see what their role permits. Beyond that, data reaches only the suppliers needed to run the service — hosting, email delivery, and the AI provider used for CV parsing and screening — and only for that purpose. We do not sell personal data."
+    },
+    {
+      "heading": "7. Keeping it safe",
+      "body": "Passwords are hashed. Sessions are held in cookies scoped to the application and can be ended from your security settings, individually or all at once. Changing a password ends every other session on the account. Each workspace's data is separated from every other workspace's."
+    },
+    {
+      "heading": "8. Your choices",
+      "body": "You can see and change your own profile from settings, review where you are signed in, and sign other devices out. Requests about a candidate's or contact's data should go to the agency whose workspace holds the record, since that agency decides what is held and why."
+    }
+  ],
+  "contact": "Questions about this policy, or a request about your own data, can go to HirePilotX support. Requests about a candidate record should go to the agency that holds it."
+}

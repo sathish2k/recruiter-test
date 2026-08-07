@@ -24,6 +24,9 @@ export type ActionItem = {
   access?: AccessRule;
   /** Boolean data path; the action is hidden on rows where it's truthy. */
   hideWhen?: string;
+  /** Boolean data path; the action is hidden on rows where it's *falsy* — the
+   * other half of a pair, e.g. reactivate showing only on a deactivated row. */
+  showWhen?: string;
   /** Draw this action as an accent pill rather than a bare icon or text link —
    * the design`s row-level call to action. */
   button?: boolean;
@@ -53,6 +56,7 @@ export function ActionsRenderer({
       {config.actions.map((a, i) => {
         // Declared but previously unenforced: an action can opt out per row.
         if (a.hideWhen && delve(data, a.hideWhen)) return null;
+        if (a.showWhen && !delve(data, a.showWhen)) return null;
         if (a.button) {
           const label = a.label ? t(a.label.name) : a.text;
           return (

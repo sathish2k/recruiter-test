@@ -53,8 +53,23 @@ export function MuiCoreLayout({
         }}
       >
         {positioned.top?.map(renderComponent)}
-        {positioned.breadcrumb?.map(renderComponent)}
-        <Box component="main" sx={{ flexGrow: 1, p: "22px 26px", overflow: "auto" }}>
+        {/* Sits above the scroll area, so it carries the content gutter itself
+            to stay aligned with the page head below it. */}
+        {positioned.breadcrumb?.length ? (
+          <Box sx={{ px: { xs: "16px", sm: "28px" }, pt: "14px" }}>
+            {positioned.breadcrumb.map(renderComponent)}
+          </Box>
+        ) : null}
+        {/* The design's content gutter: 28px desktop, 16px on small screens. */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: { xs: "16px", sm: "18px 28px 32px" },
+            overflow: "auto",
+            bgcolor: "background.default",
+          }}
+        >
           {children}
         </Box>
         {positioned.bottom?.map(renderComponent)}

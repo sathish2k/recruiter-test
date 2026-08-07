@@ -1,30 +1,24 @@
 import type { TabNavConfiguration } from "@recruit/shared";
 
 export const SettingsTabsConfiguration: TabNavConfiguration = {
-  title: "title",
-  subtitle: "subtitle",
+  orientation: "vertical",
   tabs: [
-    { label: "tabs.workspace", routeId: "Recruit.Settings.Route" },
-    { label: "tabs.members", routeId: "Recruit.SettingsMembers.Route" },
+    { label: "tabs.general", icon: "corporate-fare", routeId: "Recruit.Settings.Route" },
+    { label: "tabs.branding", icon: "palette", routeId: "Recruit.SettingsBranding.Route" },
     {
-      label: "tabs.roles",
-      routeId: "Recruit.SettingsRoles.Route",
-      access: { resource: "settings" },
+      label: "tabs.localization",
+      icon: "translate",
+      routeId: "Recruit.SettingsLocalization.Route",
     },
-    {
-      label: "tabs.templates",
-      routeId: "Recruit.EmailTemplates.Route",
-    },
-    {
-      label: "tabs.integrations",
-      routeId: "Recruit.SettingsIntegrations.Route",
-    },
-    { label: "tabs.billing", routeId: "Recruit.SettingsBilling.Route" },
-    { label: "tabs.security", routeId: "Recruit.SettingsSecurity.Route" },
+    { label: "tabs.security", icon: "shield", routeId: "Recruit.SettingsSecurity.Route" },
+    { label: "tabs.email", icon: "mail", routeId: "Recruit.EmailTemplates.Route" },
+    { label: "tabs.integrations", icon: "hub", routeId: "Recruit.SettingsIntegrations.Route" },
+    { label: "tabs.billing", icon: "credit-card", routeId: "Recruit.SettingsBilling.Route" },
     {
       label: "tabs.auditLog",
+      icon: "history",
       routeId: "Recruit.SettingsAuditLog.Route",
-      badge: "badges.enterprise",
+      access: { resource: "audit" },
     },
   ],
 };

@@ -3,7 +3,18 @@ import type { AppbarConfig } from "./appbar.types";
 // Icons and labels resolve in the component; see appbar.types.ts for the shape.
 export const AppbarConfiguration: AppbarConfig = {
   subtitles: {
+    "Recruit.Candidates.Route": "subtitles.candidates",
     "Recruit.Contacts.Route": "subtitles.contacts",
+    "Recruit.Settings.Route": "subtitles.settings",
+    "Recruit.SettingsBranding.Route": "subtitles.settings",
+    "Recruit.SettingsLocalization.Route": "subtitles.settings",
+    "Recruit.SettingsSecurity.Route": "subtitles.settings",
+    "Recruit.EmailTemplates.Route": "subtitles.settings",
+    "Recruit.SettingsIntegrations.Route": "subtitles.settings",
+    "Recruit.SettingsBilling.Route": "subtitles.settings",
+    "Recruit.SettingsAuditLog.Route": "subtitles.settings",
+    "Recruit.SettingsMembers.Route": "subtitles.members",
+    "Recruit.SettingsRoles.Route": "subtitles.roles",
   },
   titles: {
     "Recruit.Root": "titles.dashboard",
@@ -23,10 +34,17 @@ export const AppbarConfiguration: AppbarConfig = {
     "Recruit.AiScreening.Route": "titles.aiScreening",
     "Recruit.Automation.Route": "titles.automation",
     "Recruit.Settings.Route": "titles.settings",
+    "Recruit.SettingsBranding.Route": "titles.settings",
+    "Recruit.SettingsLocalization.Route": "titles.settings",
+    "Recruit.SettingsSecurity.Route": "titles.settings",
+    "Recruit.SettingsIntegrations.Route": "titles.settings",
+    "Recruit.SettingsBilling.Route": "titles.settings",
+    "Recruit.SettingsAuditLog.Route": "titles.settings",
+    "Recruit.SettingsMembers.Route": "titles.members",
+    "Recruit.SettingsRoles.Route": "titles.roles",
     "Recruit.Profile.Route": "titles.profile",
     "Recruit.EmailTemplates.Route": "titles.templates",
     "Recruit.Notifications.Route": "titles.notifications",
-    "Recruit.HelpCenter.Route": "titles.helpCenter",
   },
   back: {
     "Recruit.CandidateNew.Route": {
@@ -125,13 +143,6 @@ export const AppbarConfiguration: AppbarConfig = {
               icon: "settings",
               routeId: "Recruit.Settings.Route",
               access: { resource: "settings" },
-            },
-          ],
-          [
-            {
-              label: "menu.helpCenter",
-              icon: "help",
-              routeId: "Recruit.HelpCenter.Route",
             },
           ],
           [

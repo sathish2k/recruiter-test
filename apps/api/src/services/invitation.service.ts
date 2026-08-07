@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { user } from "../models/auth.model";
 import { invitation } from "../models/invitation.model";
 import { sendTemplateEmail } from "./transactional-email.service";
 
-const INVITE_TTL_DAYS = 14;
+/** How long an invitation link stays usable. Surfaced in the invite dialog and
+ * the pending list, so it is exported rather than restated in copy. */
+export const INVITE_TTL_DAYS = 7;
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
 
 /**
@@ -36,13 +38,10 @@ async function sendInvite(row: InvitationRow) {
 
 type InvitationRow = typeof invitation.$inferSelect;
 
-function relative(date?: Date | null): string {
-  if (!date) return "—";
-  const days = Math.round((date.getTime() - Date.now()) / 86_400_000);
-  if (days < 0) return "Expired";
-  if (days === 0) return "Today";
-  if (days === 1) return "Tomorrow";
-  return `in ${days} days`;
+/** Whole days left before the link stops working; negative once it has. */
+function daysLeft(date?: Date | null): number {
+  if (!date) return 0;
+  return Math.ceil((date.getTime() - Date.now()) / 86_400_000);
 }
 
 function sentLabel(date?: Date | null): string {
@@ -54,7 +53,16 @@ function sentLabel(date?: Date | null): string {
   return days === 1 ? "Yesterday" : `${days} days ago`;
 }
 
-function mapInvitation(row: InvitationRow) {
+/** "30 Jul 2026" — the pending list prints the send date, not a relative one,
+ * because it is the thing you compare against the expiry. */
+function sentOn(date?: Date | null): string {
+  if (!date) return "—";
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function mapInvitation(row: InvitationRow, invitedByName = "") {
+  const left = daysLeft(row.expiresAt);
+  const expired = left <= 0;
   return {
     id: row.id,
     email: row.email,
@@ -62,7 +70,14 @@ function mapInvitation(row: InvitationRow) {
     clientAccess: row.clientAccess ?? "",
     status: row.status,
     sent: sentLabel(row.createdAt),
-    expires: relative(row.expiresAt),
+    sentOn: sentOn(row.createdAt),
+    invitedByName,
+    daysLeft: Math.max(0, left),
+    expired,
+    /** `error` once expired, `warning` in the last two days, else neutral —
+     * the expiry chip's tone. */
+    expiryTone: expired ? "error" : left <= 2 ? "warning" : "default",
+    expires: expired ? "expired" : left === 1 ? "oneDayLeft" : "daysLeft",
   };
 }
 
@@ -72,7 +87,18 @@ export async function listInvitations(organizationId: string) {
     .from(invitation)
     .where(and(eq(invitation.organizationId, organizationId), eq(invitation.status, "pending")))
     .orderBy(asc(invitation.createdAt));
-  const data = rows.map(mapInvitation);
+
+  // One round-trip for every inviter on the page — the list names who sent it.
+  const inviterIds = [...new Set(rows.map((row) => row.invitedBy).filter(Boolean))] as string[];
+  const inviters = inviterIds.length
+    ? await db
+        .select({ id: user.id, name: user.name })
+        .from(user)
+        .where(inArray(user.id, inviterIds))
+    : [];
+  const nameById = new Map(inviters.map((row) => [row.id, row.name]));
+
+  const data = rows.map((row) => mapInvitation(row, nameById.get(row.invitedBy ?? "") ?? "—"));
   return { data, totalCount: data.length };
 }
 
@@ -117,7 +143,7 @@ export async function createInvitations(
         id: randomUUID(),
         organizationId,
         email,
-        role: input.role ?? "employee",
+        role: input.role ?? "recruiter",
         clientAccess: input.clientAccess ?? null,
         invitedBy,
         expiresAt,
@@ -125,7 +151,7 @@ export async function createInvitations(
     )
     .returning();
   await Promise.all(rows.map(sendInvite));
-  return { created: rows.map(mapInvitation), skipped };
+  return { created: rows.map((row) => mapInvitation(row)), skipped };
 }
 
 export async function cancelInvitation(organizationId: string, id: string) {

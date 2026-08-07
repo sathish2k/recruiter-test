@@ -46,7 +46,7 @@ const SUBTEXT_COLOR: Record<string, string> = {
 const ACTION_COLOR: Record<string, { fg: string; border: string }> = {
   connected: { fg: "surface.textMuted", border: "rgba(255,255,255,.14)" },
   warning: { fg: "warning.light", border: "rgba(214,155,60,.45)" },
-  available: { fg: "surface.primarySoftFg", border: "rgba(242,106,27,.4)" },
+  available: { fg: "surface.primarySoftFg", border: "surface.primarySoftBorder" },
 };
 
 export function SettingsIntegrationsComponent({ id }: { id: string }) {
@@ -199,7 +199,7 @@ export function SettingsIntegrationsComponent({ id }: { id: string }) {
                   // A stale connection carries an amber edge at rest; hovering
                   // any tile warms the border rather than filling the card.
                   ...(tile.status === "warning" ? { borderColor: "rgba(214,155,60,.35)" } : {}),
-                  "&:hover": { borderColor: "rgba(242,106,27,.35)" },
+                  "&:hover": { borderColor: "surface.primarySoftBorder" },
                 }}
               >
                 <Box

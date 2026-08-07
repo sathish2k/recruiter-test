@@ -71,6 +71,8 @@ export const routes: Route[] = [
     children: [
       "Recruit.SettingsMembers.Route",
       "Recruit.SettingsRoles.Route",
+      "Recruit.SettingsBranding.Route",
+      "Recruit.SettingsLocalization.Route",
       "Recruit.EmailTemplates.Route",
       "Recruit.SettingsIntegrations.Route",
       "Recruit.SettingsBilling.Route",
@@ -82,6 +84,18 @@ export const routes: Route[] = [
     id: "Recruit.SettingsMembers.Route",
     path: "members",
     page: "Recruit.SettingsMembers.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.SettingsBranding.Route",
+    path: "branding",
+    page: "Recruit.SettingsBranding.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.SettingsLocalization.Route",
+    path: "localization",
+    page: "Recruit.SettingsLocalization.Page",
     children: [],
   },
   {
@@ -299,6 +313,21 @@ export const routes: Route[] = [
     path: "permission-denied",
     layout: "Recruit.Bare.Layout",
     page: "Recruit.PermissionDenied.Page",
+    children: [],
+  },
+  // Public and unguarded: the sign-up screen links here before an account exists.
+  {
+    id: "Recruit.Terms.Route",
+    path: "terms",
+    layout: "Recruit.Bare.Layout",
+    page: "Recruit.Terms.Page",
+    children: [],
+  },
+  {
+    id: "Recruit.Privacy.Route",
+    path: "privacy",
+    layout: "Recruit.Bare.Layout",
+    page: "Recruit.Privacy.Page",
     children: [],
   },
 ];

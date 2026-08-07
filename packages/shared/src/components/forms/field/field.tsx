@@ -11,6 +11,7 @@ import { ChipsWidget } from "../chips/chips";
 import { ChoiceChipsWidget } from "../choice-chips/choice-chips";
 import { ColorWidget } from "../color/color";
 import { CompletenessWidget } from "../completeness/completeness";
+import { CurrencyWidget } from "../currency/currency";
 import { DateWidget } from "../date/date";
 import { DaysWidget } from "../days/days";
 import { EmailListWidget } from "../email-list/email-list";
@@ -21,9 +22,11 @@ import { MarkdownWidget } from "../markdown/markdown";
 import { MultiSelectWidget } from "../multiselect/multiselect";
 import { NumberWidget } from "../number/number";
 import { NumberMapWidget } from "../number-map/number-map";
+import { OptionCardsWidget } from "../option-cards/option-cards";
 import { PasswordWidget } from "../password/password";
 import { PhoneWidget } from "../phone/phone";
 import { RadioWidget } from "../radio/radio";
+import { RatingWidget } from "../rating/rating";
 import { RepeaterWidget } from "../repeater/repeater";
 import { ResumeAutofillWidget } from "../resume-autofill/resume-autofill";
 import { SegmentedWidget } from "../segmented/segmented";
@@ -57,6 +60,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   select: SelectWidget,
   segmented: SegmentedWidget,
   tiles: TilesWidget,
+  "option-cards": OptionCardsWidget,
   "email-list": EmailListWidget,
   switch: ToggleWidget,
   "switch-row": SwitchRowWidget,
@@ -71,6 +75,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   resumeAutofill: ResumeAutofillWidget,
   days: DaysWidget,
   radio: RadioWidget,
+  rating: RatingWidget,
   "checkbox-group": CheckboxGroupWidget,
   multiselect: MultiSelectWidget,
   number: NumberWidget,
@@ -80,6 +85,7 @@ export const WIDGETS: Record<BuiltInWidget, (props: WidgetProps) => React.ReactN
   time: DateWidget,
   datetime: DateWidget,
   color: ColorWidget,
+  currency: CurrencyWidget,
   heading: HeadingWidget,
   completeness: CompletenessWidget,
   facts: FactsWidget,

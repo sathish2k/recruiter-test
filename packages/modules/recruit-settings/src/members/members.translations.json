@@ -1,88 +1,164 @@
 {
   "title": "Members",
-  "seats": "{{used}} of {{total}} seats used",
-  "empty": "No members match your search or filters",
+  "seatLine": "{{used}} of {{total}} seats used · invitations do not take a seat until they are accepted",
+  "seatsShort": "{{used}} / {{total}}",
+  "you": "You",
+  "empty": "No one matches that",
+  "emptyHint": "Check the spelling, or clear the filters to see everyone.",
+  "readOnly": "You can see who is in the workspace, but only someone who manages members can invite, edit or deactivate people.",
+  "emptyState": {
+    "title": "It is just you so far",
+    "description": "Invite the recruiters and sourcers you work with. Nobody takes a seat until they accept the invitation."
+  },
+  "seatsFull": {
+    "title": "All {{total}} seats are in use",
+    "body": "Nobody new can be invited until a seat frees up. Deactivating someone releases theirs immediately.",
+    "withInactive": "{{count}} deactivated member still bills until your next invoice, but their seat is already free to reuse.",
+    "withInactive_other": "{{count}} deactivated members still bill until your next invoice, but their seats are already free to reuse."
+  },
   "columns": {
     "member": "Member",
     "role": "Role",
+    "team": "Team",
     "status": "Status",
     "lastActive": "Last active",
-    "actions": "Actions",
-    "clientAccess": "Client access",
-    "mfa": "MFA"
+    "actions": "Actions"
   },
   "roles": {
-    "admin": "Owner",
-    "lead": "Profile Lead",
-    "employee": "Recruiter",
-    "client": "Client"
+    "owner": "Owner",
+    "admin": "Admin",
+    "profileLead": "Profile Lead",
+    "recruiter": "Recruiter",
+    "sourcer": "Sourcer"
   },
+  "roleDetail": {
+    "owner": "Full control including billing, plan and ownership transfer.",
+    "admin": "Manages people, teams and workspace configuration. Cannot change billing.",
+    "profileLead": "Owns their clients end to end — submits, approves and invoices.",
+    "recruiter": "Works assigned requisitions. Sends submissions up for approval.",
+    "sourcer": "Sourcing only. Cannot submit, reject, or see fees."
+  },
+  "roleLockedHint": "Only someone who manages roles can grant this one",
   "status": {
     "active": "Active",
     "invited": "Invited",
+    "inactive": "Inactive",
     "suspended": "Suspended"
   },
+  "presence": {
+    "online": "Online",
+    "away": "Away",
+    "offline": "Offline"
+  },
   "filters": {
-    "search": "Search members…",
+    "search": "Search name or email",
+    "all": "All",
+    "status": "Status",
     "role": "Role",
-    "status": "Status"
+    "team": "Team"
+  },
+  "moreFilters": "Filters",
+  "clearAll": "Clear",
+  "bulk": {
+    "count": "{{count}} person selected",
+    "count_other": "{{count}} people selected",
+    "clear": "Clear selection"
   },
   "export": "Export",
   "exportAs": "Export as",
   "exportTypes": {
-    "csv": "CSV",
-    "xlsx": "Excel"
+    "csv": "CSV"
   },
   "actions": {
-    "invite": "Invite people",
-    "changeRole": "Change role",
-    "resendInvite": "Resend invite",
-    "deactivate": "Deactivate",
+    "invite": "Invite user",
+    "edit": "Edit user",
     "viewProfile": "View profile",
     "resetPassword": "Reset password",
-    "suspend": "Suspend",
-    "remove": "Remove…"
+    "activate": "Reactivate user",
+    "deactivate": "Deactivate user",
+    "export": "Export"
   },
   "inviteForm": {
-    "title": "Invite members",
-    "description": "One email per line — everyone joins with the role & access you pick.",
-    "submit": "Send invites",
-    "emails": "Emails",
-    "emailsPlaceholder": "john@agency.com\nalice@agency.com\nbob@agency.com",
+    "title": "Invite a user",
+    "description": "They get an email with a link that expires in {{days}} days. Nothing is charged until they accept.",
+    "submit": "Send invitation",
+    "email": "Email address",
+    "emailPlaceholder": "name@yourcompany.com",
     "role": "Role",
-    "clientAccess": "Client access",
-    "clientAccessOptions": {
-      "all": "All clients",
-      "unassigned": "Unassigned"
-    },
     "errors": {
-      "emails": "Enter at least one email address",
+      "email": "Enter an email address",
+      "emailFormat": "That is not a valid email address",
       "role": "Pick a role"
     }
   },
+  "editForm": {
+    "title": "Edit {{name}}",
+    "description": "Name, team and role only. Everything else is theirs to change from their own profile.",
+    "submit": "Save changes",
+    "name": "Full name",
+    "namePlaceholder": "Ana Ruiz",
+    "email": "Email address",
+    "emailHelp": "The address is the sign-in identity and cannot be changed here. Ask them to update it from their own profile.",
+    "team": "Team",
+    "teamPlaceholder": "Perm Desk",
+    "role": "Role",
+    "errors": {
+      "name": "Enter their name"
+    }
+  },
+  "deactivate": {
+    "title": "Deactivate {{name}}?",
+    "titlePlural": "Deactivate {{count}} people?",
+    "description": "They lose access immediately and the seat is freed.",
+    "submit": "Deactivate",
+    "submitPlural": "Deactivate {{count}}",
+    "points": {
+      "sessions": "Every session signs out at once and the sign-in link stops working.",
+      "sessions_other": "Every session ends immediately and {{count}} seats free up.",
+      "records": "Their notes, submissions and audit history stay on the records. Nothing is deleted.",
+      "reversible": "You can reactivate them later — the account is kept, just switched off."
+    }
+  },
+  "activate": {
+    "title": "Reactivate {{name}}?",
+    "description": "They get their access back, with the same role they had before.",
+    "submit": "Reactivate",
+    "points": {
+      "role": "Returns as a {{role}} — the role they held when they were switched off.",
+      "email": "They are emailed a sign-in link. No new invitation is needed.",
+      "seat": "One seat is taken again, effective on your next invoice."
+    }
+  },
+  "resetPassword": {
+    "title": "Send {{name}} a password reset?",
+    "description": "You are not setting a password for them — they choose their own.",
+    "submit": "Send reset link",
+    "points": {
+      "link": "A reset link goes to {{email}}, valid for one hour.",
+      "current": "Their current password keeps working until they use the link.",
+      "compromised": "If you think the account is compromised, deactivate it instead — that ends every session at once."
+    }
+  },
+  "blocked": {
+    "self": "You cannot deactivate your own account. Ask another owner to do it.",
+    "lastOwner": "That would leave the workspace with no active owner. Promote someone else first, or deselect an owner.",
+    "noSeats": "All {{total}} seats are in use. Deactivate someone else or add seats in Billing first."
+  },
   "cancel": "Cancel",
   "toast": {
-    "invited": "Invite sent",
-    "invitedPlural": "Invites sent",
-    "invitedSub": "{{count}} × {{role}} · {{access}}",
-    "invitedSkipped": "{{skipped}} already invited or a member",
-    "roleChanged": "Role updated",
-    "deactivated": "Member deactivated",
-    "suspended": "Member suspended",
-    "restored": "Member restored",
-    "removed": "Member removed",
-    "profileSoon": "Profile view coming soon",
-    "resetSent": "Password reset email sent",
-    "accessSoon": "Client access editing is coming soon"
-  },
-  "access": {
-    "all": "All clients",
-    "more": "+{{count}} more",
-    "manage": "Manage client access"
-  },
-  "mfa": {
-    "on": "Enabled",
-    "off": "Not enabled"
-  },
-  "roleLockedHint": "Ownership transfer is a separate flow — contact support"
+    "invited": "Invitation sent",
+    "invitedSub": "{{email}} has {{days}} days to accept",
+    "updated": "User updated",
+    "updatedSub": "{{name}}'s details were saved",
+    "deactivated": "User deactivated",
+    "deactivatedPlural": "{{count}} deactivated",
+    "deactivatedSub": "{{count}} seat freed — reactivate from this list at any time",
+    "deactivatedSub_other": "{{count}} seats freed — reactivate from this list at any time",
+    "activated": "User reactivated",
+    "activatedSub": "{{name}} can sign in again",
+    "resetSent": "Reset link sent",
+    "resetSentSub": "{{email}} has one hour to use it",
+    "exported": "Export started — {{count}} rows as CSV",
+    "profileSoon": "Profile view coming soon"
+  }
 }

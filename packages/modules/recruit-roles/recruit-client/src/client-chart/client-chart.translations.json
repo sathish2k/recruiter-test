@@ -1,0 +1,14 @@
+{
+  "title": "Spend by quarter",
+  "subtitle": "Committed against invoiced",
+  "seriesA": "Committed",
+  "seriesB": "Invoiced",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "submissions": "Submissions",
+    "placements": "Placements"
+  }
+}

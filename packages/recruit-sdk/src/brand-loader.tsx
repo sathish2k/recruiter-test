@@ -227,7 +227,7 @@ export function BrandLoaderScreen({ size, label }: BrandLoaderProps) {
         // Brand glow over the themed page colour — same in both schemes, since
         // the base beneath it is a token.
         background:
-          "radial-gradient(620px 420px at 50% 38%, rgba(242,106,27,.08), transparent 65%), radial-gradient(900px 600px at 50% 110%, rgba(245,158,11,.05), transparent 60%), var(--mui-palette-background-default)",
+          "radial-gradient(620px 420px at 50% 38%, var(--mui-palette-surface-heroTint), transparent 65%), radial-gradient(900px 600px at 50% 110%, rgba(245,158,11,.05), transparent 60%), var(--mui-palette-background-default)",
       }}
     >
       <Box sx={{ p: "40px" }}>

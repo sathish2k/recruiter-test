@@ -1,104 +1,133 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { IconRenderer } from "@recruit/shared";
-import type { RoleCard } from "./permissions.configuration";
+import type { Translate } from "./permissions.types";
 
-/** Who holds each role, derived from the members list. */
-export interface RoleHolders {
-  count: number;
-  names: string[];
+export interface RoleCardData {
+  role: string;
+  label: string;
+  description: string;
+  icon: string;
+  system: boolean;
+  members: number;
+  edited: string;
 }
 
 /**
- * The three-up summary above the matrix: role chip, member count, what the
- * role does, and who currently holds it. The owner card carries a lock note
- * because its permissions can't be edited.
+ * Pick a role here and the matrix below follows. Each card also carries who
+ * holds it — the count is the way into the members sheet, because "who does
+ * this affect" is the first question anyone editing permissions asks.
  */
 export function RoleCards({
   cards,
-  holders,
+  selected,
+  onSelect,
+  onViewMembers,
   t,
 }: {
-  cards: RoleCard[];
-  holders: Record<string, RoleHolders>;
-  t: (key: string, vars?: Record<string, unknown>) => string;
+  cards: RoleCardData[];
+  selected: string;
+  onSelect: (role: string) => void;
+  onViewMembers: (role: string) => void;
+  t: Translate;
 }) {
   return (
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-        gap: "16px",
+        gridTemplateColumns: "repeat(auto-fit,minmax(236px,1fr))",
+        gap: "12px",
       }}
     >
       {cards.map((card) => {
-        const held = holders[card.value] ?? { count: 0, names: [] };
+        const active = card.role === selected;
         return (
-          <Box
-            key={card.value}
-            sx={{
-              bgcolor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: "16px",
-              p: "18px 20px",
-            }}
+          <Card
+            key={card.role}
+            variant="selectable"
+            data-selected={active}
+            onClick={() => onSelect(card.role)}
+            sx={{ display: "flex", flexDirection: "column", gap: "9px" }}
           >
+            <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Box
+                sx={{
+                  width: 30,
+                  height: 30,
+                  flex: "none",
+                  borderRadius: "9px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: active ? "surface.primarySoftBg" : "surface.hover",
+                  color: active ? "surface.primarySoftFg" : "text.disabled",
+                }}
+              >
+                <IconRenderer name={card.icon} size={17} />
+              </Box>
+              <Typography
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {card.label}
+              </Typography>
+              <Chip
+                variant="badge"
+                color={card.system ? "default" : "secondary"}
+                label={card.system ? t("roles.system") : t("roles.custom")}
+                sx={{ flex: "none" }}
+              />
+            </Box>
+
+            <Typography sx={{ fontSize: 11.5, lineHeight: 1.6, color: "text.secondary" }}>
+              {card.description}
+            </Typography>
+
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                mb: "10px",
+                gap: "10px",
+                pt: "8px",
+                borderTop: "1px dashed",
+                borderColor: "divider",
               }}
             >
               <Box
-                component="span"
-                sx={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: card.fg,
-                  bgcolor: card.bg,
-                  border: "1px solid",
-                  borderColor: card.border,
-                  px: "12px",
-                  py: "4px",
-                  borderRadius: "999px",
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onViewMembers(card.role);
                 }}
-              >
-                {t(`roles.${card.value}`)}
-              </Box>
-              <Typography sx={{ fontSize: 11.5, color: "text.disabled" }}>
-                {t(held.count === 1 ? "cards.member" : "cards.members", { count: held.count })}
-              </Typography>
-            </Box>
-
-            <Typography sx={{ fontSize: 12, color: "text.secondary", lineHeight: 1.55 }}>
-              {t(`cards.desc.${card.value}`)}
-            </Typography>
-
-            <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "9px" }}>
-              {held.names.join(" · ") || t("cards.nobody")}
-            </Typography>
-
-            {card.locked ? (
-              <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
                   gap: "6px",
-                  fontSize: 11,
-                  color: "warning.light",
-                  mt: "8px",
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  color: "surface.linkFg",
+                  cursor: "pointer",
                 }}
               >
-                <IconRenderer name="lock" size={13} />
-                {t("cards.lockedNote")}
+                <IconRenderer name="group" size={15} />
+                {t(card.members === 1 ? "roles.user" : "roles.users", { count: card.members })}
               </Box>
-            ) : null}
-          </Box>
+              <Typography sx={{ fontSize: 10.5, color: "surface.textFaint", textAlign: "right" }}>
+                {card.edited}
+              </Typography>
+            </Box>
+          </Card>
         );
       })}
     </Box>

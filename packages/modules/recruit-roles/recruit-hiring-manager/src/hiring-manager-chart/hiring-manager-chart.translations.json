@@ -1,0 +1,14 @@
+{
+  "title": "Revenue behind your reviews",
+  "subtitle": "Value approved against value booked",
+  "seriesA": "Submitted value",
+  "seriesB": "Booked",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "submissions": "Submissions",
+    "placements": "Placements"
+  }
+}

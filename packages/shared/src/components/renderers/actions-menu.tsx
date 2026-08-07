@@ -63,8 +63,13 @@ export function ActionsMenu({
   const labelOf = (a: ActionItem) => (a.label ? t(a.label.name) : a.text) ?? a.type ?? "";
 
   // A row can opt out of individual actions — e.g. the owner, who can't be
-  // suspended, removed or re-invited.
-  const visible = actions.filter((a) => !a.hideWhen || !delve(data, a.hideWhen));
+  // suspended, removed or re-invited — or opt into one only it has, like the
+  // reactivate that replaces deactivate on a switched-off member.
+  const visible = actions.filter(
+    (a) =>
+      (!a.hideWhen || !delve(data, a.hideWhen)) &&
+      (!a.showWhen || Boolean(delve(data, a.showWhen))),
+  );
 
   if (!visible.length) return null;
 

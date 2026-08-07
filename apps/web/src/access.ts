@@ -1,5 +1,6 @@
 import { ROLE_PERMISSIONS } from "@recruit/configurations";
 import type { AccessContext } from "@recruit/sdk";
+import { dashboardVariantFor, normaliseRole } from "@recruit/types";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -31,9 +32,19 @@ export async function accessResolver(): Promise<AccessContext | null> {
   const session = await getServerSession();
   const user = session?.user;
   if (!user) return null;
-  const role = user.role ?? "employee";
+  // A live session may still carry a role string this build renamed, so the
+  // stored value is normalised before it is used to look up permissions —
+  // otherwise those users resolve to an empty map and every gated element
+  // silently disappears.
+  const role = normaliseRole(user.role);
   return {
-    attributes: { role, agencyId: user.agencyId, userId: user.id },
+    attributes: {
+      role,
+      // Which dashboard to render. Presentation only — see dashboardVariantFor.
+      dashboardVariant: dashboardVariantFor(user.role),
+      agencyId: user.agencyId,
+      userId: user.id,
+    },
     permissions: ROLE_PERMISSIONS[role] ?? {},
   };
 }

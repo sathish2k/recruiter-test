@@ -5,12 +5,15 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { type AccessRule, type Route, usePortalRouter, useTranslation } from "@recruit/sdk";
 import { SlidingPillTabs } from "../../tabs/sliding-pill-tabs";
+import { IconRenderer } from "../icon-renderer";
 
 export interface TabNavItem {
   /** Translation key for the pill label. */
   label: string;
   /** Route this pill navigates to; also matched against `currentRoute`. */
   routeId: string;
+  /** ICON_REGISTRY name — the leading glyph on a `vertical` rail row. */
+  icon?: string;
   /** Optional soft chip beside the label (translation key), e.g. `Enterprise`. */
   badge?: string;
   /** Stripped by the engine when the user can't access it. */
@@ -24,6 +27,12 @@ export interface TabNavConfiguration {
   subtitle?: string;
   /** Optional inline link rendered after the subtitle. */
   subtitleLink?: { text: string; routeId: string };
+  /**
+   * `horizontal` (default) is the sliding pill bar. `vertical` is the settings
+   * rail: a sticky column of icon rows sitting in its own grid track, with the
+   * page title carried by the appbar rather than the nav.
+   */
+  orientation?: "horizontal" | "vertical";
   tabs: TabNavItem[];
 }
 
@@ -49,6 +58,56 @@ export function TabNavRenderer({
   const activeRouteId =
     tabs.find((tab) => tab.routeId === currentRoute?.id)?.routeId ?? tabs[0]?.routeId;
   const subtitleLink = configuration?.subtitleLink;
+
+  if (configuration?.orientation === "vertical") {
+    return (
+      <Box
+        component="nav"
+        sx={{
+          position: "sticky",
+          top: "20px",
+          alignSelf: "start",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2px",
+        }}
+      >
+        {tabs.map((tab) => {
+          const active = tab.routeId === activeRouteId;
+          return (
+            <Box
+              key={tab.routeId}
+              onClick={() => router.push(tab.routeId)}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "11px",
+                p: "10px 12px",
+                borderRadius: "8px",
+                fontSize: 13.5,
+                cursor: "pointer",
+                transition: "var(--recruit-motion-state)",
+                ...(active
+                  ? {
+                      bgcolor: "surface.primarySoftBg",
+                      color: "surface.primarySoftFg",
+                      fontWeight: 700,
+                    }
+                  : {
+                      color: "text.secondary",
+                      fontWeight: 600,
+                      "&:hover": { bgcolor: "surface.hover", color: "text.primary" },
+                    }),
+              }}
+            >
+              {tab.icon ? <IconRenderer name={tab.icon} size={19} /> : null}
+              {t(tab.label)}
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>

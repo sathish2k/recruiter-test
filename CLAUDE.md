@@ -46,7 +46,7 @@ packages/
     src/components/auth/           AuthCard, SignIn, SignUp
     src/components/renderers/      LinkRenderer (config-driven links)
     src/utils/                     cn, format (locale-aware Intl)
-  ui/              The "Troy" design system: MUI theme overrides + variants ONLY.
+  ui/              The HirePilotX design system: MUI theme overrides + variants ONLY.
                    No wrapper components — use plain @mui/material with the theme.
   configurations/  The app's routes, layouts, and pages (see below).
   modules/         Feature modules (recruit-auth, recruit-dashboard, …).
@@ -130,25 +130,32 @@ Deeply-nested children can also read by id via the hooks below (no prop drilling
 
 ## Auth
 
-Credentials auth, JWT sessions, shared HS256 secret between next-auth and the API.
+**Better Auth** — server-side sessions, not JWTs. The API owns it
+(`apps/api/src/auth.ts`), mounted under `/api/auth/*`, with `plugins: [bearer()]`.
 
-1. **Register** — `POST /auth/register` creates the user (`Bun.password.hash`).
-2. **Login** — the sign-in form calls next-auth `signIn("credentials")`; its
-   `authorize` (`apps/web/src/auth.ts`) POSTs `/auth/login`. The API verifies the
-   password (`Bun.password.verify`) and signs a JWT (`JWT_SECRET`, claims
-   `{ sub, agencyId, role }`) via the shared `jwtPlugin`.
-3. **Session** — next-auth stores that token as `session.accessToken` (jwt +
-   session callbacks). The SDK's `AuthProvider` (wraps the tree, needs next-auth's
-   `SessionProvider` above it) shows a loader until the session resolves, then
-   calls `setAuthToken()` (logout should redirect, which reloads and clears the
-   in-memory SWR cache for free).
-4. **Requests** — the shared `httpClient` (one axios instance datasources use)
-   has a request **interceptor** that attaches `Authorization: Bearer <token>`.
-   The API `authGuard` (`isAuth` macro) verifies it with the same secret and
-   exposes `ctx.auth` (`{ sub, agencyId, role }`) to handlers.
+1. **The session is a database row.** `session` (`models/auth.model.ts`) holds
+   `{ id, token, expiresAt, userId }`. There is no self-contained signed claim
+   to decode — every check is a lookup, so revoking a session is a delete.
+2. **Same-origin by proxy.** The SDK's client (`providers/auth-provider.tsx`)
+   is `createAuthClient({ basePath: "/api/auth" })` against the *current* origin;
+   `apps/web/next.config.ts` rewrites `/api/auth/:path*` to the API. That is what
+   keeps the session cookie same-origin — don't point the client at the API host.
+3. **Session → token → requests.** `AuthProvider` wraps the tree, shows a loader
+   until `authClient.useSession()` resolves, then calls `setAuthToken(session.token)`.
+   The shared `httpClient` interceptor attaches `Authorization: Bearer <token>`;
+   the `bearer()` plugin is what makes the API accept it.
+4. **Guarding a route.** The `authGuard` plugin's `isAuth` macro calls
+   `auth.api.getSession({ headers })` and exposes **`ctx.user` / `ctx.session`**
+   (not `ctx.auth`). Also `isVerified` (403 `email-unverified` until the address
+   is confirmed — §5.1.2 / TC-AUTH-004) and `requireRole(role)`.
 
-Env: `JWT_SECRET` (shared, HS256), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`,
+Env: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (default `http://localhost:3001`),
 `API_URL` / `NEXT_PUBLIC_API_URL`.
+
+Getting a session for manual testing: don't hand-sign anything. Either drive the
+login form, or let Playwright do it — `e2e/auth.setup.ts` signs in once from
+`E2E_EMAIL` / `E2E_PASSWORD` in the gitignored `.env` and saves
+`e2e/.auth/user.json`, which every other project reuses via `storageState`.
 
 ### Route guards
 
@@ -194,15 +201,21 @@ unauthenticated visitors to login on the server, before any data is fetched.
 - The design system is theme-only (`packages/ui/src/theme.ts`): custom variants
   via the `variants` array + module augmentation; **no wrapper components**. Use
   plain `@mui/material/*` with the registered variants: `Button contained`
-  (orange-gradient pill) / `contained secondary` (light pill) / `outlined`,
-  `IconButton` (bordered circle; `color="primary"` soft-orange, `edge="end"`
-  borderless adornment), `Chip soft`, `Card
-  base|accent|feature|ghost|interactive|inset`, `Avatar`, `Paper dropdown`,
-  restyled Tabs/Menu/MenuItem/Dialog/Alert/Table/Pagination/Stepper, and the
-  shared `SearchField`. Colors via palette tokens (`text.*`, `divider`,
-  `background.paper`).
-- **Always use theme-based components.** Never hardcode chrome (`#1C1C1B`
-  cards, borders, radii, table styles) in component `sx` — use the themed atom;
+  (flat navy, 8px radius) / `contained secondary` (amber) / `outlined` / `soft`,
+  `IconButton` (36px bordered circle; `color="primary"` navy-tinted, `edge="end"`
+  borderless adornment), `Chip soft|pill|badge`, `Card
+  base|compact|accent|feature|ghost|interactive|inset|highlight|promo|spotlight`,
+  `Avatar`, `Paper dropdown`, restyled
+  Tabs/Menu/MenuItem/Dialog/Alert/Table/Pagination/Stepper, and the shared
+  `SearchField`. Colors via palette tokens (`text.*`, `divider`,
+  `background.paper`, `surface.*`).
+- **One action colour: the mark's navy** (`#0E2E5C` light, lifted to `#4372AF`
+  on dark). The amber `#F59E0B` is `secondary` — it marks the one thing in
+  motion on a screen and is never a semantic state. Cards separate with
+  `surface.cardShadow`, never a border; row rules and stepper connectors are
+  **dashed**. Light is the default scheme.
+- **Always use theme-based components.** Never hardcode chrome (colours,
+  borders, radii, table styles) in component `sx` — use the themed atom;
   if a look is missing, add a theme variant. Atoms (themed MUI) compose shared
   components (`packages/shared`); shared components compose feature modules.
 - MUI 9 removed system shorthand props — use `sx`. Grid uses `size`/`offset`.
@@ -244,10 +257,14 @@ loads `apps/api/.env` (JWT_SECRET etc.) — don't override env vars on the CLI.
 - `/Users/chithra/Development/ai-recruiter-app` — secondary (folder structure,
   MUI theme-as-design-system with no wrapper components).
 
-## Design source (Troy)
+## Design source (HirePilotX)
 
 Screens are designed in Claude Design — project
-<https://claude.ai/design/p/6f6b750f-ef0f-4411-a69c-9d63dde59ed0>. Fetch them
+<https://claude.ai/design/p/20dc175e-18bd-429c-b56b-8bdb670b5cc4>. The token
+contract lives twice: `_ds/hirepilotx-design-system-*/tokens/*.css` (the design
+system) and, resolved per screen, in each `*.dc.html`'s `:root` /
+`html.hpx-light` block — the screen files are the authority for what a screen
+looks like. Fetch them
 via the `claude_design` MCP (`https://api.anthropic.com/v1/design/mcp`, auth
 with `/design-login`; in Claude Code use the `DesignSync` tool): `list_files`
 on that project id, then `get_file` with a path like
@@ -258,12 +275,21 @@ pixel-by-pixel (via the theme's variants, never inline chrome).
 
 - **TypeScript 7 + Next 16.** Next's in-build type check requires
   `typescript/lib/typescript.js`, which the TS 7 native port doesn't ship (it
-  has only `lib/tsc.js`). Next therefore decides TypeScript is missing and tries
-  to `pnpm add -D typescript`, which fails the build *and* litters
-  `apps/*/pnpm-lock.yaml` + `apps/*/node_modules`. Two things keep this fixed,
-  both required: the `@typescript/native-preview` devDependency (Next detects it
-  and skips the install entirely) and `typescript.ignoreBuildErrors: true` in
-  every Next app's config. Never re-add per-app `pnpm-lock.yaml`.
+  has only `lib/tsc.js`), so Next can't type-check during `next build`.
+  Two config keys in every Next app keep the build green:
+  `typescript.ignoreBuildErrors: true` **and** `experimental.useTypeScriptCli:
+  true`; types are gated by `tsc --noEmit` instead (below). Without the second
+  key Next 16.2.12 does not degrade gracefully — it aborts with SIGABRT and
+  "TypeScript 7.0.2 does not provide the compiler API required by Next.js",
+  naming the flag in the message. Older Next builds instead decided TypeScript
+  was missing and ran
+  `pnpm add -D typescript`, which failed the build *and* littered
+  `apps/*/pnpm-lock.yaml` + `apps/*/node_modules`; the
+  `@typescript/native-preview` devDependency existed only to suppress that, and
+  was dropped once `typescript@7` shipped as a real release (it is the same
+  native compiler, and provides the `tsc` every typecheck script runs;
+  native-preview only ever provided `tsgo`, which nothing here calls). Never
+  re-add per-app `pnpm-lock.yaml`.
 - Types are gated by `tsc --noEmit`, not by the build. **Both** invocations are
   needed: `bunx turbo run typecheck` covers `apps/`, and `bunx tsc --noEmit` at
   the repo root covers `packages/` — the per-app tsconfigs `include` only their
@@ -288,7 +314,10 @@ pixel-by-pixel (via the theme's variants, never inline chrome).
   `bun run check:autocomplete` fails the build if it comes back.
 - Unknown `IconRenderer` names render **nothing** — `ICON_REGISTRY[name]`
   misses and the component returns `null`, so a typo is a silently blank cell,
-  not an error. Check the name exists in `icon-renderer.tsx` before using it.
+  not an error. The dashboard shipped four (`add-box`, `rate-review`,
+  `trending-up`, and `auto-awesome`, which `AiInsightRenderer` *defaults* to),
+  each an empty tile. `bun run check:icons` now fails the build on any unknown
+  name; add the glyph to `icon-renderer.tsx` rather than silencing it.
 - `react-apexcharts` renders a blank canvas under React 19 + Turbopack. The
   shared `Chart` (`packages/shared/src/components/graph-renderer/chart.tsx`)
   drives the core `apexcharts` lib imperatively instead (dynamic import,

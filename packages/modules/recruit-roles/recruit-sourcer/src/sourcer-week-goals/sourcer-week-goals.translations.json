@@ -1,0 +1,10 @@
+{
+  "title": "This week",
+  "subtitle": "Against your targets",
+  "note": "Targets come from your workspace settings and reset every Monday.",
+  "goals": {
+    "added": "Candidates added",
+    "submitted": "Submitted to clients",
+    "interviews": "Interviews booked"
+  }
+}

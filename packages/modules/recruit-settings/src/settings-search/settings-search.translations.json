@@ -1,0 +1,35 @@
+{
+  "placeholder": "Search settings",
+  "empty": "Nothing in settings matches \"{{query}}\".",
+  "tabs": {
+    "general": "General",
+    "branding": "Branding",
+    "localization": "Localization",
+    "security": "Security",
+    "email": "Email",
+    "integrations": "Integrations",
+    "billing": "Billing"
+  },
+  "entries": {
+    "agencyName": "Agency name",
+    "feeAgreement": "Fee agreement",
+    "identifiers": "Formats & identifiers",
+    "appLogo": "App logo",
+    "brandColour": "Brand colour",
+    "language": "Language",
+    "currency": "Currency",
+    "timezone": "Time zone",
+    "dateFormat": "Date format",
+    "workingHours": "Working hours",
+    "loginActivity": "Login activity",
+    "sessions": "Sessions",
+    "dangerZone": "Danger zone",
+    "organisationEmail": "Organisation email",
+    "replyTo": "Reply-to address",
+    "signature": "Signature",
+    "calendar": "Google Calendar",
+    "resumeParser": "Resume parser",
+    "planAndSeats": "Plan and seats",
+    "invoices": "Invoices"
+  }
+}

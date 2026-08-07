@@ -1,0 +1,6 @@
+{
+  "onPlan": "Revenue on plan",
+  "slaBreached": "{{count}} SLAs breached",
+  "invoiceOverdue": "{{count}} invoice overdue",
+  "pipelineHealthy": "Pipeline healthy"
+}

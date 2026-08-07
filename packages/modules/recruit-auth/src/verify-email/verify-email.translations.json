@@ -1,15 +1,15 @@
 {
   "title": "Verify your email",
-  "subtitle": "We sent a 6-digit code and a magic link to {{email}}.",
-  "expiresIn": "Code expires in",
+  "subtitle": "We sent a 6-digit code and a sign-in link to {{email}}. The code expires in {{clock}}.",
   "cta": "Verify email",
-  "resend": "Didn't get it? Resend code",
-  "resent": "New code sent ✓ ({{count}})",
-  "resendIn": "Resend in {{seconds}}s",
+  "sender": "notifications@hirepilotx.com",
+  "resend": "Send the code again",
+  "resent": "Code sent again ({{count}})",
+  "resendIn": "Send again in {{seconds}}s",
   "changeEmail": "Use a different email",
   "wrongAccount": "Wrong account?",
   "signInAsSomeoneElse": "Sign in as someone else",
-  "why": "Verification is required before you can use the workspace. Everything HirePilotX does sends mail as you — client submissions, candidate invites, weekly reports — so we confirm the address first. It takes one click.",
+  "why": "Nothing in the inbox? Check spam, then confirm your IT team allows mail from {{sender}}.",
   "code": {
     "label": "Verification code",
     "placeholder": "Type or paste the 6-digit code",
@@ -19,7 +19,7 @@
     }
   },
   "errors": {
-    "invalid": "That code is not right. Check the digits and try again.",
+    "invalid": "That code didn't match. Check the latest email — older codes stop working.",
     "expired": "That code has expired. Send yourself a new one.",
     "too-many-attempts": "Too many attempts. Request a new code to continue.",
     "cooldown": "Hang on a moment before requesting another code.",
@@ -27,13 +27,22 @@
   },
   "expired": {
     "title": "This link has expired",
-    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and it'll arrive in a few seconds.",
-    "cta": "Send a new link",
+    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and it arrives in a few seconds.",
+    "cta": "Send a fresh link",
     "note": "Your workspace and any invites you already sent are untouched — only this link stopped working."
   },
   "done": {
     "title": "Email verified",
-    "subtitle": "You're in. Your workspace is ready — start by adding your first client.",
-    "cta": "Continue to setup"
+    "subtitle": "Your workspace is live. Sign in and a short setup wizard will walk you through it.",
+    "cta": "Go to setup",
+    "wizardTitle": "Setup wizard · about 3 minutes",
+    "wizardBody": "Five steps — workspace conventions, your pipeline stages, rejection reasons, your team, then a review. You can leave at any point and pick up where you stopped.",
+    "note": "Everything it sets lives in Settings afterwards, so nothing you choose now is permanent."
+  },
+  "slab": {
+    "kicker": "One more step",
+    "title": "We send mail as you.",
+    "blurb": "Client submissions, candidate invites and weekly reports all leave from your address — so it gets confirmed first.",
+    "footer": "Codes and links expire 30 minutes after sending"
   }
 }

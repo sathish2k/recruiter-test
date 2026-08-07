@@ -1,0 +1,9 @@
+{
+  "title": "Team health",
+  "capacityLabel": "capacity",
+  "health": {
+    "stretched": "Stretched",
+    "steady": "Steady",
+    "capacity": "Room to take more"
+  }
+}

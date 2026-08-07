@@ -1,0 +1,14 @@
+{
+  "greeting": "Your portfolio",
+  "subtitle": "Renewals, fees and account health across the clients you own.",
+  "kpis": {
+    "portfolioValue": "Portfolio value",
+    "portfolioValueDelta": "{value}",
+    "activeAccounts": "Active accounts",
+    "activeAccountsDelta": "{value}",
+    "renewalsDue": "Renewals due",
+    "renewalsDueDelta": "{value}",
+    "accountHealth": "Account health",
+    "accountHealthDelta": "{value}"
+  }
+}

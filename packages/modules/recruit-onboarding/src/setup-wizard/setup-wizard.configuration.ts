@@ -168,4 +168,15 @@ const links: Record<string, LinkRendererConfig> = {
 /** The roles an invite can carry, in the order the picker offers them. */
 const roles = ["Admin", "Profile lead", "Sourcer", "Finance"];
 
-export const SetupWizardConfiguration = { steps, links, roles };
+/**
+ * What the confirmation screen offers once the workspace exists. Each card is
+ * the first move on one of the three things a new desk needs — a client to
+ * bill, a requisition to work, and people to work it.
+ */
+const doneActions = [
+  { key: "client", icon: "domain", tone: "primary", routeId: "Recruit.Clients.Route" },
+  { key: "requisition", icon: "work", tone: "success", routeId: "Recruit.Jobs.Route" },
+  { key: "team", icon: "group", tone: "info", routeId: "Recruit.SettingsMembers.Route" },
+] as const;
+
+export const SetupWizardConfiguration = { steps, links, roles, doneActions };

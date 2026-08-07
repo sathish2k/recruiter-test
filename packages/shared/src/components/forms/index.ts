@@ -3,6 +3,7 @@ export { CalloutWidget } from "./callout/callout";
 export { CheckboxGroupWidget } from "./checkbox-group/checkbox-group";
 export { ChipsWidget } from "./chips/chips";
 export { ColorWidget } from "./color/color";
+export { CurrencyWidget } from "./currency/currency";
 export { DateWidget } from "./date/date";
 export type {
   DayOption,

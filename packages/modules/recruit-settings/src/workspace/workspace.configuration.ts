@@ -9,12 +9,21 @@ const HOURS = Array.from({ length: 48 }, (_, i) => {
   return `${hour12}:${minute} ${suffix}`;
 });
 
-const profileForm: JsonSchema = {
+/** Every workspace field the four settings tabs draw from. Each tab exports its
+ * own schema below holding only the properties it edits, so a partial save
+ * carries nothing the tab does not show — the API merges the patch. */
+export interface WorkspaceFormConfiguration {
+  profileForm: JsonSchema;
+  sections: FormSection[];
+}
+
+// ── General ──────────────────────────────────────────────────────────────────
+
+const generalForm: JsonSchema = {
   type: "object",
   // Timezone, currency, language and the phone picker all source their options
   // from GET /reference — the widget fetches and caches, so the screen doesn't.
   properties: {
-    // ── General ────────────────────────────────────────────────────────────
     logo: {
       // The value is `{ url, file }` — see UploadValue.
       type: "object",
@@ -52,54 +61,6 @@ const profileForm: JsonSchema = {
       widget: "addressGroup",
       title: "fields.officeAddress",
     },
-    // The full IANA list, straight off the runtime's ICU data.
-    timezone: {
-      type: "string",
-      widget: "select",
-      title: "fields.timezone",
-      optionSource: { url: "/reference", path: "data.timezones" },
-    },
-    language: {
-      type: "string",
-      widget: "select",
-      title: "fields.language",
-      optionSource: { url: "/reference", path: "data.languages" },
-    },
-
-    // ── Email branding ─────────────────────────────────────────────────────
-    fromName: {
-      type: "string",
-      title: "fields.fromName",
-      placeholder: "fields.fromNamePlaceholder",
-    },
-    fromEmail: {
-      type: "string",
-      format: "email",
-      title: "fields.fromEmail",
-      placeholder: "fields.fromEmailPlaceholder",
-    },
-    replyTo: {
-      type: "string",
-      format: "email",
-      title: "fields.replyTo",
-      placeholder: "fields.replyToPlaceholder",
-    },
-    bcc: {
-      type: "string",
-      format: "email",
-      title: "fields.bcc",
-      placeholder: "fields.bccPlaceholder",
-    },
-    emailSignature: {
-      type: "string",
-      widget: "textarea",
-      rows: 4,
-      title: "fields.emailSignature",
-      placeholder: "fields.emailSignaturePlaceholder",
-      help: "fields.emailSignatureHelp",
-    },
-
-    // ── Recruitment defaults ───────────────────────────────────────────────
     placementFee: {
       type: "number",
       widget: "number",
@@ -111,6 +72,18 @@ const profileForm: JsonSchema = {
       minimum: 0,
       maximum: 100,
       step: 0.01,
+    },
+    feedbackSla: {
+      type: "string",
+      title: "fields.feedbackSla",
+      enum: ["24 hours", "48 hours", "72 hours", "5 working days"],
+      help: "fields.feedbackSlaHelp",
+    },
+    replacementPeriod: {
+      type: "string",
+      title: "fields.replacementPeriod",
+      enum: ["30 days", "60 days", "90 days", "None"],
+      help: "fields.replacementPeriodHelp",
     },
     // ISO 4217, via ICU.
     currency: {
@@ -152,39 +125,29 @@ const profileForm: JsonSchema = {
       title: "fields.jobVisibility",
       enum: ["Everyone", "Team only", "Private"],
     },
-    workingDays: {
-      type: "array",
-      widget: "days",
-      title: "fields.workingDays",
-      dayOptions: [
-        { value: "Mon", label: "Mon" },
-        { value: "Tue", label: "Tue" },
-        { value: "Wed", label: "Wed" },
-        { value: "Thu", label: "Thu" },
-        { value: "Fri", label: "Fri" },
-        { value: "Sat", label: "Sat" },
-        { value: "Sun", label: "Sun" },
-      ],
-      dayPresets: [
-        { label: "presets.weekdays", values: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
-        { label: "presets.weekends", values: ["Sat", "Sun"] },
-        { label: "presets.everyday", values: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
-      ],
+    autoScreen: {
+      type: "boolean",
+      widget: "switch-row",
+      title: "fields.autoScreen",
+      help: "fields.autoScreenHelp",
     },
-    // One field holding `{ from, to }` — labelled once, with the two pickers
-    // nested under FROM / TO captions.
-    businessHours: {
-      type: "object",
-      widget: "hoursRange",
-      title: "fields.businessHours",
-      enum: HOURS,
-      help: "fields.businessHoursHelp",
+    blockUnsigned: {
+      type: "boolean",
+      widget: "switch-row",
+      title: "fields.blockUnsigned",
+      help: "fields.blockUnsignedHelp",
     },
-    firstDayOfWeek: {
-      type: "string",
-      widget: "segmented",
-      title: "fields.firstDayOfWeek",
-      enum: ["Monday", "Sunday", "Saturday"],
+    weeklyReport: {
+      type: "boolean",
+      widget: "switch-row",
+      title: "fields.weeklyReport",
+      help: "fields.weeklyReportHelp",
+    },
+    portalCv: {
+      type: "boolean",
+      widget: "switch-row",
+      title: "fields.portalCv",
+      help: "fields.portalCvHelp",
     },
     duplicateDetection: {
       type: "boolean",
@@ -200,18 +163,6 @@ const profileForm: JsonSchema = {
       enum: ["Email", "Phone", "LinkedIn URL", "Resume hash"],
       row: true,
       help: "fields.duplicateIdentifiersHelp",
-    },
-
-    // ── Formats & identifiers ──────────────────────────────────────────────
-    dateFormat: {
-      type: "string",
-      title: "fields.dateFormat",
-      enum: ["DD MMM YYYY", "DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"],
-    },
-    timeFormat: {
-      type: "string",
-      title: "fields.timeFormat",
-      enum: ["12-hour (2:30 PM)", "24-hour (14:30)"],
     },
     candidatePrefix: {
       type: "string",
@@ -237,8 +188,91 @@ const profileForm: JsonSchema = {
       title: "fields.invoicePrefix",
       placeholder: "fields.invoicePrefixPlaceholder",
     },
+    prefixLock: {
+      type: "string",
+      widget: "callout",
+      variant: "banner",
+      tone: "info",
+      icon: "lock",
+      help: "fields.prefixLockHelp",
+    },
+  },
+  required: ["name"],
+  errorMessage: { required: { name: "fields.nameRequired" } },
+};
 
-    // ── Report branding ────────────────────────────────────────────────────
+const generalSections: FormSection[] = [
+  {
+    title: "sections.agency",
+    description: "sections.agencyDescription",
+    columns: 2,
+    fields: [
+      { name: "logo", span: 2 },
+      "name",
+      "website",
+      "phone",
+      { name: "officeAddress", span: 2 },
+    ],
+  },
+  {
+    title: "sections.recruitmentDefaults",
+    description: "sections.recruitmentDefaultsDescription",
+    columns: 3,
+    fields: [
+      "placementFee",
+      "feedbackSla",
+      "replacementPeriod",
+      "currency",
+      "noticePeriod",
+      "resumePrivacy",
+      { name: "defaultOwner", span: 2 },
+      "jobVisibility",
+      { name: "autoScreen", span: 3 },
+      { name: "blockUnsigned", span: 3 },
+      { name: "weeklyReport", span: 3 },
+      { name: "portalCv", span: 3 },
+      { name: "duplicateDetection", span: 3 },
+      { name: "duplicateIdentifiers", span: 3 },
+    ],
+  },
+  {
+    title: "sections.formats",
+    description: "sections.formatsDescription",
+    columns: 2,
+    fields: [
+      "candidatePrefix",
+      "jobPrefix",
+      "clientPrefix",
+      "invoicePrefix",
+      { name: "prefixLock", span: 2 },
+    ],
+  },
+];
+
+export const GeneralConfiguration: WorkspaceFormConfiguration = {
+  profileForm: generalForm,
+  sections: generalSections,
+};
+
+// ── Branding ─────────────────────────────────────────────────────────────────
+
+const brandingForm: JsonSchema = {
+  type: "object",
+  properties: {
+    accentColor: {
+      type: "string",
+      widget: "accentSwatches",
+      title: "fields.accentColor",
+      help: "fields.accentColorHelp",
+    },
+    contrastNote: {
+      type: "string",
+      widget: "callout",
+      variant: "banner",
+      tone: "info",
+      icon: "check-circle",
+      help: "fields.contrastNoteHelp",
+    },
     whiteLabel: {
       type: "boolean",
       widget: "switch-row",
@@ -247,80 +281,209 @@ const profileForm: JsonSchema = {
       badge: "fields.whiteLabelBadge",
       badgeIcon: "star",
     },
-    accentColor: {
-      type: "string",
-      widget: "accentSwatches",
-      title: "fields.accentColor",
-      help: "fields.accentColorHelp",
-    },
   },
-  required: ["name"],
-  errorMessage: { required: { name: "fields.nameRequired" } },
 };
 
-const sections: FormSection[] = [
+const brandingSections: FormSection[] = [
   {
-    title: "sections.general",
-    columns: 2,
-    fields: [
-      { name: "logo", span: 2 },
-      "name",
-      "website",
-      "phone",
-      { name: "officeAddress", span: 2 },
-      "timezone",
-      "language",
-    ],
-  },
-  {
-    title: "sections.emailBranding",
-    description: "sections.emailBrandingDescription",
-    columns: 2,
-    fields: ["fromName", "fromEmail", "replyTo", "bcc", { name: "emailSignature", span: 2 }],
-  },
-  {
-    title: "sections.recruitmentDefaults",
-    description: "sections.recruitmentDefaultsDescription",
-    columns: 2,
-    fields: [
-      "placementFee",
-      "currency",
-      "noticePeriod",
-      "resumePrivacy",
-      "defaultOwner",
-      "jobVisibility",
-      "workingDays",
-      "businessHours",
-      "firstDayOfWeek",
-      { name: "duplicateDetection", span: 2 },
-      { name: "duplicateIdentifiers", span: 2 },
-    ],
-  },
-  {
-    title: "sections.formats",
-    description: "sections.formatsDescription",
-    columns: 2,
-    fields: [
-      "dateFormat",
-      "timeFormat",
-      "candidatePrefix",
-      "jobPrefix",
-      "clientPrefix",
-      "invoicePrefix",
-    ],
+    title: "sections.brandColour",
+    description: "sections.brandColourDescription",
+    fields: ["accentColor", "contrastNote"],
   },
   {
     title: "sections.reportBranding",
     description: "sections.reportBrandingDescription",
-    columns: 2,
-    fields: [
-      { name: "whiteLabel", span: 2 },
-      { name: "accentColor", span: 2 },
-    ],
+    fields: ["whiteLabel"],
   },
 ];
 
-export const WorkspaceConfiguration: {
-  profileForm: JsonSchema;
-  sections: FormSection[];
-} = { profileForm, sections };
+export const BrandingConfiguration: WorkspaceFormConfiguration = {
+  profileForm: brandingForm,
+  sections: brandingSections,
+};
+
+// ── Localization ─────────────────────────────────────────────────────────────
+
+const localizationForm: JsonSchema = {
+  type: "object",
+  properties: {
+    language: {
+      type: "string",
+      widget: "select",
+      title: "fields.language",
+      optionSource: { url: "/reference", path: "data.languages" },
+      help: "fields.languageHelp",
+    },
+    // The full IANA list, straight off the runtime's ICU data.
+    timezone: {
+      type: "string",
+      widget: "select",
+      title: "fields.timezone",
+      optionSource: { url: "/reference", path: "data.timezones" },
+    },
+    currency: {
+      type: "string",
+      widget: "select",
+      title: "fields.currency",
+      optionSource: { url: "/reference", path: "data.currencies" },
+    },
+    dateFormat: {
+      type: "string",
+      title: "fields.dateFormat",
+      enum: ["DD MMM YYYY", "DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD.MM.YYYY"],
+    },
+    timeFormat: {
+      type: "string",
+      title: "fields.timeFormat",
+      enum: ["12-hour (2:30 PM)", "24-hour (14:30)"],
+    },
+    numberFormat: {
+      type: "string",
+      title: "fields.numberFormat",
+      enum: ["1,000.00", "1.000,00", "1 000,00"],
+    },
+    firstDayOfWeek: {
+      type: "string",
+      widget: "segmented",
+      title: "fields.firstDayOfWeek",
+      enum: ["Monday", "Sunday", "Saturday"],
+    },
+    // One field holding `{ from, to }` — labelled once, with the two pickers
+    // nested under FROM / TO captions.
+    businessHours: {
+      type: "object",
+      widget: "hoursRange",
+      title: "fields.businessHours",
+      enum: HOURS,
+      help: "fields.businessHoursHelp",
+    },
+    workingDays: {
+      type: "array",
+      widget: "days",
+      title: "fields.workingDays",
+      dayOptions: [
+        { value: "Mon", label: "Mon" },
+        { value: "Tue", label: "Tue" },
+        { value: "Wed", label: "Wed" },
+        { value: "Thu", label: "Thu" },
+        { value: "Fri", label: "Fri" },
+        { value: "Sat", label: "Sat" },
+        { value: "Sun", label: "Sun" },
+      ],
+      dayPresets: [
+        { label: "presets.weekdays", values: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+        { label: "presets.weekends", values: ["Sat", "Sun"] },
+        { label: "presets.everyday", values: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] },
+      ],
+    },
+    slaNote: {
+      type: "string",
+      widget: "callout",
+      variant: "banner",
+      tone: "accent",
+      icon: "timer",
+      help: "fields.slaNoteHelp",
+    },
+  },
+};
+
+const localizationSections: FormSection[] = [
+  {
+    title: "sections.language",
+    description: "sections.languageDescription",
+    fields: ["language"],
+  },
+  {
+    title: "sections.regionalFormats",
+    description: "sections.regionalFormatsDescription",
+    columns: 3,
+    fields: ["timezone", "currency", "dateFormat", "timeFormat", "numberFormat", "firstDayOfWeek"],
+  },
+  {
+    title: "sections.workingTime",
+    description: "sections.workingTimeDescription",
+    columns: 2,
+    fields: ["businessHours", "workingDays", { name: "slaNote", span: 2 }],
+  },
+];
+
+export const LocalizationConfiguration: WorkspaceFormConfiguration = {
+  profileForm: localizationForm,
+  sections: localizationSections,
+};
+
+// ── Email ────────────────────────────────────────────────────────────────────
+
+const emailForm: JsonSchema = {
+  type: "object",
+  properties: {
+    fromName: {
+      type: "string",
+      title: "fields.fromName",
+      placeholder: "fields.fromNamePlaceholder",
+    },
+    fromEmail: {
+      type: "string",
+      format: "email",
+      title: "fields.fromEmail",
+      placeholder: "fields.fromEmailPlaceholder",
+      help: "fields.fromEmailHelp",
+    },
+    replyTo: {
+      type: "string",
+      format: "email",
+      title: "fields.replyTo",
+      placeholder: "fields.replyToPlaceholder",
+      help: "fields.replyToHelp",
+    },
+    bcc: {
+      type: "string",
+      format: "email",
+      title: "fields.bcc",
+      placeholder: "fields.bccPlaceholder",
+    },
+    dnsNote: {
+      type: "string",
+      widget: "callout",
+      variant: "banner",
+      tone: "info",
+      icon: "verified-user",
+      help: "fields.dnsNoteHelp",
+    },
+    emailSignature: {
+      type: "string",
+      widget: "textarea",
+      rows: 4,
+      title: "fields.emailSignature",
+      placeholder: "fields.emailSignaturePlaceholder",
+      help: "fields.emailSignatureHelp",
+    },
+    emailFooter: {
+      type: "string",
+      widget: "callout",
+      variant: "banner",
+      tone: "info",
+      icon: "info",
+      help: "fields.emailFooterHelp",
+    },
+  },
+};
+
+const emailSections: FormSection[] = [
+  {
+    title: "sections.addresses",
+    description: "sections.addressesDescription",
+    columns: 2,
+    fields: ["fromName", "fromEmail", "replyTo", "bcc", { name: "dnsNote", span: 2 }],
+  },
+  {
+    title: "sections.signature",
+    description: "sections.signatureDescription",
+    fields: ["emailSignature", "emailFooter"],
+  },
+];
+
+export const EmailSettingsConfiguration: WorkspaceFormConfiguration = {
+  profileForm: emailForm,
+  sections: emailSections,
+};

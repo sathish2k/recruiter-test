@@ -7,7 +7,7 @@ export interface ClientsConfiguration {
   detailRouteId: string;
   addRoleRouteId: string;
   contactsRouteId: string;
-  /** Minimum card width before the grid wraps (design: 300px). */
+  /** Minimum card width before the grid wraps (design: 340px). */
   cardMinWidth: number;
   /**
    * Drives TableFilterExportRenderer: the search + status tabs + health filter
@@ -23,7 +23,7 @@ export const ClientsConfiguration: ClientsConfiguration = {
   detailRouteId: "Recruit.ClientDetail.Route",
   addRoleRouteId: "Recruit.Jobs.Route",
   contactsRouteId: "Recruit.Contacts.Route",
-  cardMinWidth: 300,
+  cardMinWidth: 340,
   table: {
     columns: [],
     pagination: { pageSize: 6 },
@@ -59,7 +59,12 @@ export const ClientsConfiguration: ClientsConfiguration = {
     },
     exportFilename: "clients",
     ctas: [
-      { label: { name: "addClient" }, routeId: "Recruit.ClientNew.Route", variant: "primary" },
+      {
+        label: { name: "addClient" },
+        icon: "add",
+        routeId: "Recruit.ClientNew.Route",
+        variant: "primary",
+      },
     ],
     emptyLabel: "empty",
   },

@@ -175,6 +175,36 @@ export async function jobKpis(organizationId: string, id: string) {
   };
 }
 
+/**
+ * The board strip across the top of the detail screen — one tile per stage in
+ * board order, with the totals the card's kicker prints. Counts come from the
+ * applications themselves, so the strip and the board can never disagree.
+ */
+export async function jobStageStrip(organizationId: string, id: string) {
+  const row = await detailBase(organizationId, id);
+  if (!row) return null;
+
+  const [rows, stages] = await Promise.all([pipelineRows(id), listStages(organizationId)]);
+  const live = rows.filter((entry) => entry.status === "active");
+  const hires = rows.filter((entry) => entry.status === "hired").length;
+
+  return {
+    data: stages.map((stage) => ({
+      key: stage.id,
+      // Board columns are workspace-named, so the label is the row's own name
+      // rather than a translation key.
+      label: stage.name,
+      count:
+        stage.kind === "hire" ? hires : live.filter((entry) => entry.stageId === stage.id).length,
+    })),
+    meta: {
+      pipeline: live.length,
+      hires,
+      openings: row.openings,
+    },
+  };
+}
+
 /** The rail's assigned-team card: who owns this requirement, and the number
  * each of them is measured on. */
 export async function jobTeam(organizationId: string, id: string) {

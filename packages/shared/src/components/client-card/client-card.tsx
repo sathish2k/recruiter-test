@@ -13,6 +13,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { type MouseEvent, useState } from "react";
 import { IconRenderer } from "../renderers";
+import { TONE_BG, TONE_FG, type Tone } from "../renderers/tones";
 
 export interface ClientCardData {
   id: string;
@@ -41,7 +42,7 @@ export interface ClientCardLabels {
   placements: string;
   candidateFlow: string;
   inPipeline: string;
-  accountManager: string;
+  lastActivity: string;
   flow: Record<"sourced" | "screening" | "interviewing", string>;
   status: Record<string, string>;
   health: Record<string, string>;
@@ -50,7 +51,7 @@ export interface ClientCardLabels {
   contacts: string;
   more: string;
   edit: string;
-  delete: string;
+  archive: string;
 }
 
 export interface ClientCardHandlers {
@@ -58,7 +59,7 @@ export interface ClientCardHandlers {
   onAddRole?: (client: ClientCardData) => void;
   onContacts?: (client: ClientCardData) => void;
   onEdit?: (client: ClientCardData) => void;
-  onDelete?: (client: ClientCardData) => void;
+  onArchive?: (client: ClientCardData) => void;
 }
 
 const LOGO_PALETTE = [
@@ -72,17 +73,18 @@ const LOGO_PALETTE = [
 
 /** Pipeline bar segments, in board order — the design's stage hues. */
 const FLOW_SEGMENTS = [
-  { key: "sourced" as const, color: "var(--mui-palette-surface-neutral)" },
+  { key: "sourced" as const, color: "var(--mui-palette-surface-textFaint)" },
   { key: "screening" as const, color: "var(--mui-palette-surface-infoFg)" },
   { key: "interviewing" as const, color: "var(--mui-palette-surface-accentBright)" },
 ];
 
-// Health tone → themed foreground token (dot + label share it).
-const HEALTH_FG: Record<string, string> = {
-  healthy: "surface.successFg",
-  attention: "surface.warningFg",
-  at_risk: "surface.accentBright",
-  dormant: "surface.textSecondary",
+// Health → tone. The amber `accentBright` is `secondary` and never a semantic
+// state, so "at risk" reads on the error ramp, not the pilot amber.
+const HEALTH_TONE: Record<string, Tone> = {
+  healthy: "success",
+  attention: "warning",
+  at_risk: "error",
+  dormant: "muted",
 };
 
 function hue(name: string) {
@@ -101,15 +103,16 @@ function initials(name: string) {
 }
 
 const ACTION_BTN = {
-  width: 28,
-  height: 28,
+  width: 30,
+  height: 30,
+  borderRadius: "8px",
   border: "1px solid",
   borderColor: "surface.border",
-  color: "text.secondary",
+  color: "surface.textSecondary",
   "&:hover": { bgcolor: "surface.hover", color: "text.primary" },
 } as const;
 
-function CardChip({ icon, label, iconColor }: { icon: string; label: string; iconColor?: string }) {
+function CardChip({ icon, label }: { icon: string; label: string }) {
   return (
     <Box
       sx={{
@@ -119,20 +122,14 @@ function CardChip({ icon, label, iconColor }: { icon: string; label: string; ico
         flex: "none",
         px: "10px",
         py: "4px",
-        borderRadius: "999px",
-        bgcolor: "surface.hoverSubtle",
-        border: "1px solid",
-        borderColor: "surface.divider",
+        borderRadius: "6px",
+        bgcolor: "surface.inset",
         fontSize: 11,
-        fontWeight: 600,
+        fontWeight: 700,
         color: "surface.textMuted",
       }}
     >
-      <IconRenderer
-        name={icon}
-        size={13}
-        color={iconColor ?? "var(--mui-palette-surface-textSecondary)"}
-      />
+      <IconRenderer name={icon} size={14} color="var(--mui-palette-surface-textSecondary)" />
       {label}
     </Box>
   );
@@ -143,35 +140,35 @@ export function ClientCardSkeleton() {
     <Card
       variant="interactive"
       sx={{
-        p: "20px 18px 16px",
-        borderRadius: "18px",
-        minHeight: 270,
+        p: "20px",
+        borderRadius: "16px",
+        minHeight: 300,
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: "11px" }}>
-        <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: "13px" }} />
+      <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <Skeleton variant="rounded" width={44} height={44} sx={{ borderRadius: "12px" }} />
         <Box sx={{ flex: 1 }}>
           <Skeleton variant="text" width="60%" height={20} />
-          <Skeleton variant="text" width="40%" height={14} sx={{ mt: "3px" }} />
+          <Skeleton variant="text" width="40%" height={14} sx={{ mt: "2px" }} />
         </Box>
-        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "6px" }} />
       </Box>
-      <Skeleton variant="text" width="45%" height={16} sx={{ mt: "12px" }} />
-      <Box sx={{ mt: "15px" }}>
+      <Skeleton variant="text" width="45%" height={16} sx={{ mt: "14px" }} />
+      <Box sx={{ mt: "16px" }}>
         <Skeleton variant="text" width="100%" height={12} />
-        <Skeleton variant="rounded" height={8} sx={{ mt: "7px", borderRadius: "99px" }} />
-        <Skeleton variant="text" width="80%" height={12} sx={{ mt: "7px" }} />
+        <Skeleton variant="rounded" height={8} sx={{ mt: "8px", borderRadius: "99px" }} />
+        <Skeleton variant="text" width="80%" height={12} sx={{ mt: "8px" }} />
       </Box>
-      <Box sx={{ display: "flex", gap: "7px", mt: "13px" }}>
-        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
-        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "999px" }} />
+      <Box sx={{ display: "flex", gap: "8px", mt: "16px" }}>
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "6px" }} />
+        <Skeleton variant="rounded" width={78} height={24} sx={{ borderRadius: "6px" }} />
       </Box>
-      <Box sx={{ flex: 1 }} />
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "6px", mt: "15px", pt: "12px" }}>
-        {[0, 1, 2, 3].map((i) => (
-          <Skeleton key={i} variant="circular" width={28} height={28} />
+      <Box sx={{ flex: 1, minHeight: "14px" }} />
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "6px", pt: "14px" }}>
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} variant="rounded" width={30} height={30} sx={{ borderRadius: "8px" }} />
         ))}
       </Box>
     </Card>
@@ -185,7 +182,7 @@ export function ClientCard({
   onAddRole,
   onContacts,
   onEdit,
-  onDelete,
+  onArchive,
 }: {
   client: ClientCardData;
   labels: ClientCardLabels;
@@ -194,11 +191,11 @@ export function ClientCard({
   const logo = hue(client.name);
   const status = client.status ?? "paused";
   const health = client.health ?? "healthy";
-  const healthFg = HEALTH_FG[health] ?? "surface.textSecondary";
+  const healthTone = HEALTH_TONE[health] ?? "muted";
+  const healthFg = TONE_FG[healthTone];
   const isHiring = status === "hiring";
   const flow = client.flow ?? { sourced: 0, screening: 0, interviewing: 0 };
   const pipeline = flow.sourced + flow.screening + flow.interviewing;
-  const lead = hue(client.accountLeadName ?? client.name);
 
   const openMenu = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -217,16 +214,17 @@ export function ClientCard({
   return (
     <Card
       variant="interactive"
+      data-testid="client-card"
       onClick={() => onOpen?.(client)}
       sx={{
-        p: "20px 18px 16px",
+        p: "20px",
         display: "flex",
         flexDirection: "column",
-        borderRadius: "18px",
-        minHeight: 270,
+        borderRadius: "16px",
+        minHeight: 300,
         cursor: "pointer",
-        transition: "transform .15s, border-color .15s",
-        "&:hover": { transform: "translateY(-2px)", borderColor: "surface.borderStrong" },
+        transition: "transform 200ms cubic-bezier(.4,0,.2,1)",
+        "&:hover": { transform: "translateY(-2px)" },
       }}
     >
       {/* Logo + health */}
@@ -238,16 +236,17 @@ export function ClientCard({
           gap: "10px",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: "11px", minWidth: 0 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
           <Avatar
             variant="rounded"
             sx={{
               width: 44,
               height: 44,
-              borderRadius: "13px",
+              borderRadius: "12px",
               bgcolor: logo.bg,
               color: logo.fg,
-              fontSize: 16,
+              fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+              fontSize: 17,
               fontWeight: 700,
               flex: "none",
             }}
@@ -255,28 +254,26 @@ export function ClientCard({
             {initials(client.name)}
           </Avatar>
           <Box sx={{ minWidth: 0 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "7px" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Typography noWrap sx={{ fontSize: 15, fontWeight: 700, letterSpacing: "-.01em" }}>
                 {client.name}
               </Typography>
               <Box
                 sx={{
                   flex: "none",
-                  fontSize: 10,
+                  fontSize: 10.5,
                   fontWeight: 700,
                   px: "8px",
                   py: "2px",
-                  borderRadius: "999px",
-                  border: "1px solid",
-                  color: isHiring ? "surface.successFg" : "surface.textMuted",
-                  bgcolor: isHiring ? "surface.successSoftBg" : "surface.tint",
-                  borderColor: isHiring ? "surface.successSoftBorder" : "surface.borderStrong",
+                  borderRadius: "6px",
+                  color: isHiring ? TONE_FG.success : "surface.textMuted",
+                  bgcolor: isHiring ? TONE_BG.success : "surface.inset",
                 }}
               >
                 {labels.status[status] ?? status}
               </Box>
             </Box>
-            <Typography noWrap sx={{ fontSize: 11, color: "text.disabled", mt: "3px" }}>
+            <Typography noWrap sx={{ fontSize: 11.5, color: "surface.textSecondary", mt: "2px" }}>
               {client.industry}
             </Typography>
           </Box>
@@ -288,50 +285,56 @@ export function ClientCard({
             gap: "6px",
             flex: "none",
             fontSize: 11,
-            fontWeight: 600,
+            fontWeight: 700,
             color: healthFg,
-            bgcolor: "surface.scrim",
-            border: "1px solid",
-            borderColor: "surface.border",
-            px: "11px",
-            py: "4px",
-            borderRadius: "999px",
+            bgcolor: TONE_BG[healthTone],
+            px: "9px",
+            py: "3px",
+            borderRadius: "6px",
           }}
         >
-          <Box sx={{ width: 5, height: 5, borderRadius: "999px", bgcolor: healthFg }} />
+          <Box sx={{ width: 7, height: 7, borderRadius: "999px", bgcolor: healthFg }} />
           {labels.health[health] ?? health}
         </Box>
       </Box>
 
-      {/* Activity line (optional) */}
+      {/* Next-action line (optional) */}
       {client.activity ? (
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "7px",
-            mt: "7px",
-            fontSize: 12,
-            fontWeight: 600,
+            mt: "14px",
+            fontSize: 12.5,
+            fontWeight: 700,
             color: healthFg,
           }}
         >
+          <IconRenderer name="event" size={16} color="inherit" />
           <Box
-            sx={{ width: 6, height: 6, borderRadius: "99px", bgcolor: healthFg, flex: "none" }}
-          />
-          {client.activity}
+            component="span"
+            sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+          >
+            {client.activity}
+          </Box>
         </Box>
       ) : null}
 
       {/* Candidate flow */}
-      <Box sx={{ mt: "15px" }}>
+      <Box sx={{ mt: "16px" }}>
         <Box sx={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
           <Box
-            sx={{ fontSize: 10, letterSpacing: ".08em", color: "text.disabled", fontWeight: 700 }}
+            sx={{
+              fontSize: 10.5,
+              letterSpacing: ".08em",
+              color: "surface.textSecondary",
+              fontWeight: 700,
+            }}
           >
             {labels.candidateFlow}
           </Box>
-          <Box sx={{ fontSize: 11, color: "text.secondary" }}>
+          <Box sx={{ fontSize: 11.5, color: "surface.textSecondary" }}>
             <Box component="b" sx={{ color: "text.primary", fontSize: 12.5 }}>
               {pipeline}
             </Box>{" "}
@@ -345,7 +348,8 @@ export function ClientCard({
             height: 8,
             borderRadius: "99px",
             overflow: "hidden",
-            mt: "7px",
+            bgcolor: "surface.inset",
+            mt: "8px",
           }}
         >
           {FLOW_SEGMENTS.map((segment) => (
@@ -364,8 +368,8 @@ export function ClientCard({
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            mt: "7px",
+            gap: "12px",
+            mt: "8px",
             fontSize: 10.5,
             color: "surface.textSecondary",
             whiteSpace: "nowrap",
@@ -390,51 +394,26 @@ export function ClientCard({
       </Box>
 
       {/* Roles / placed chips + account manager */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: "7px", mt: "13px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "16px" }}>
         <CardChip icon="work" label={`${client.openRoles ?? 0} ${labels.requirements}`} />
-        <CardChip
-          icon="handshake"
-          iconColor="var(--mui-palette-surface-accentBright)"
-          label={`${client.placements ?? 0} ${labels.placements}`}
-        />
+        <CardChip icon="handshake" label={`${client.placements ?? 0} ${labels.placements}`} />
         {client.accountLeadName ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: "3px",
-              ml: "auto",
-              minWidth: 0,
-            }}
-          >
-            <Box
+          <Box sx={{ display: "flex", alignItems: "center", gap: "6px", ml: "auto", minWidth: 0 }}>
+            <Avatar
               sx={{
+                width: 20,
+                height: 20,
                 fontSize: 9,
-                letterSpacing: ".09em",
-                color: "surface.textFaint",
                 fontWeight: 700,
+                bgcolor: "surface.inset",
+                color: "surface.textMuted",
               }}
             >
-              {labels.accountManager}
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-              <Avatar
-                sx={{
-                  width: 18,
-                  height: 18,
-                  fontSize: 8.5,
-                  fontWeight: 700,
-                  bgcolor: lead.bg,
-                  color: lead.fg,
-                }}
-              >
-                {initials(client.accountLeadName)}
-              </Avatar>
-              <Typography noWrap sx={{ fontSize: 11, color: "text.secondary" }}>
-                {client.accountLeadName}
-              </Typography>
-            </Box>
+              {initials(client.accountLeadName)}
+            </Avatar>
+            <Typography noWrap sx={{ fontSize: 11.5, color: "surface.textSecondary" }}>
+              {client.accountLeadName}
+            </Typography>
           </Box>
         ) : null}
       </Box>
@@ -445,20 +424,20 @@ export function ClientCard({
           sx={{
             display: "flex",
             alignItems: "flex-start",
-            gap: "9px",
-            mt: "14px",
-            pt: "13px",
-            borderTop: "1px solid",
+            gap: "10px",
+            mt: "16px",
+            pt: "14px",
+            borderTop: "1px dashed",
             borderColor: "surface.divider",
           }}
         >
-          <Box sx={{ color: "surface.successFg", flex: "none", mt: "1px" }}>
-            <IconRenderer name="sparkle" size={14} />
+          <Box sx={{ color: "surface.successFg", flex: "none", lineHeight: 1.4 }}>
+            <IconRenderer name="auto-awesome" size={16} color="inherit" />
           </Box>
           <Box sx={{ minWidth: 0 }}>
-            <Typography sx={{ fontSize: 12, fontWeight: 600 }}>{client.insightTitle}</Typography>
+            <Typography sx={{ fontSize: 12.5, fontWeight: 700 }}>{client.insightTitle}</Typography>
             {client.insightBody ? (
-              <Typography sx={{ fontSize: 11, color: "text.secondary", mt: "1px" }}>
+              <Typography sx={{ fontSize: 11.5, color: "surface.textSecondary", mt: "1px" }}>
                 {client.insightBody}
               </Typography>
             ) : null}
@@ -466,28 +445,7 @@ export function ClientCard({
         </Box>
       ) : null}
 
-      {/* Account lead */}
-      {client.accountLeadName ? (
-        <Box sx={{ display: "flex", alignItems: "center", gap: "8px", mt: "14px" }}>
-          <Avatar
-            sx={{
-              width: 22,
-              height: 22,
-              fontSize: 8.5,
-              fontWeight: 700,
-              bgcolor: hue(client.accountLeadName).bg,
-              color: hue(client.accountLeadName).fg,
-            }}
-          >
-            {initials(client.accountLeadName)}
-          </Avatar>
-          <Typography sx={{ fontSize: 12, color: "text.muted" }}>
-            {client.accountLeadName}
-          </Typography>
-        </Box>
-      ) : null}
-
-      <Box sx={{ flex: 1 }} />
+      <Box sx={{ flex: 1, minHeight: "14px" }} />
 
       {/* Footer: event + actions */}
       <Box
@@ -495,57 +453,47 @@ export function ClientCard({
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "space-between",
-          gap: "8px",
-          mt: "15px",
-          pt: "12px",
-          borderTop: "1px solid",
+          gap: "10px",
+          pt: "14px",
+          borderTop: "1px dashed",
           borderColor: "surface.divider",
         }}
       >
+        {/* A bare caption over nothing reads as a broken row, so the whole
+            block waits until there is an activity to label. */}
         <Box sx={{ minWidth: 0 }}>
           {client.eventText ? (
-            <Typography
-              sx={{
-                fontSize: 12,
-                color: "text.muted",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {client.eventText}
-            </Typography>
-          ) : null}
-          {client.eventWhen ? (
-            <Typography sx={{ fontSize: 11, color: "text.disabled", mt: "2px" }}>
-              {client.eventWhen}
-            </Typography>
+            <>
+              <Box
+                sx={{
+                  fontSize: 10,
+                  letterSpacing: ".08em",
+                  fontWeight: 700,
+                  color: "surface.textSecondary",
+                }}
+              >
+                {labels.lastActivity}
+              </Box>
+              <Typography noWrap sx={{ fontSize: 12.5, color: "surface.textMuted", mt: "3px" }}>
+                {client.eventText}
+              </Typography>
+              {client.eventWhen ? (
+                <Typography sx={{ fontSize: 11, color: "surface.textSecondary", mt: "1px" }}>
+                  {client.eventWhen}
+                </Typography>
+              ) : null}
+            </>
           ) : null}
         </Box>
         <Box sx={{ display: "flex", gap: "6px", flex: "none" }}>
           <IconButton title={labels.open} onClick={run(onOpen)} sx={ACTION_BTN}>
-            <IconRenderer name="open-in-new" size={14} />
+            <IconRenderer name="open-in-new" size={16} />
           </IconButton>
-          <IconButton
-            title={labels.addRole}
-            onClick={run(onAddRole)}
-            sx={{
-              width: 28,
-              height: 28,
-              border: "1px solid",
-              borderColor: "surface.primarySoftBorder",
-              bgcolor: "surface.primarySoftBg",
-              color: "surface.accentBright",
-              "&:hover": { bgcolor: "surface.primarySoftBorder", color: "surface.accentBright" },
-            }}
-          >
-            <IconRenderer name="add" size={14} />
-          </IconButton>
-          <IconButton title={labels.contacts} onClick={run(onContacts)} sx={ACTION_BTN}>
-            <IconRenderer name="contacts" size={14} />
+          <IconButton title={labels.edit} onClick={run(onEdit)} sx={ACTION_BTN}>
+            <IconRenderer name="edit" size={16} />
           </IconButton>
           <IconButton title={labels.more} onClick={openMenu} sx={ACTION_BTN}>
-            <IconRenderer name="more" size={14} />
+            <IconRenderer name="more" size={16} />
           </IconButton>
           <Menu
             anchorEl={menuEl}
@@ -554,16 +502,20 @@ export function ClientCard({
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             transformOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
-            <MenuItem onClick={run(onEdit)} sx={{ fontSize: 12.5, gap: "9px" }}>
-              <IconRenderer name="edit" size={14} />
-              {labels.edit}
+            <MenuItem onClick={run(onAddRole)} sx={{ fontSize: 12.5, gap: "10px" }}>
+              <IconRenderer name="add-box" size={16} />
+              {labels.addRole}
+            </MenuItem>
+            <MenuItem onClick={run(onContacts)} sx={{ fontSize: 12.5, gap: "10px" }}>
+              <IconRenderer name="contacts" size={16} />
+              {labels.contacts}
             </MenuItem>
             <MenuItem
-              onClick={run(onDelete)}
-              sx={{ fontSize: 12.5, gap: "9px", color: "surface.errorFg" }}
+              onClick={run(onArchive)}
+              sx={{ fontSize: 12.5, gap: "10px", color: "surface.warningFg" }}
             >
-              <IconRenderer name="delete" size={14} />
-              {labels.delete}
+              <IconRenderer name="archive" size={16} />
+              {labels.archive}
             </MenuItem>
           </Menu>
         </Box>

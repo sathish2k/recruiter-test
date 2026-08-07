@@ -2,16 +2,16 @@
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { FormRenderer } from "../forms";
 import type { FormValues, JsonSchema } from "../forms/types";
 import { IconRenderer } from "../renderers";
 import { LinkRenderer, type LinkRendererConfig } from "../renderers/link-renderer";
 import { AuthCard } from "./auth-card";
+import { AuthActionRow, AuthNote, AuthTextAction } from "./auth-parts";
 
 export interface VerifyEmailHandlers {
   /** Confirms the typed code. Resolves true when the account is now verified. */
@@ -111,57 +111,99 @@ export function VerifyEmail({ id, handlers }: { id: string; handlers: VerifyEmai
     }
   };
 
-  /** The design bolds the address inside the sentence. */
-  const withEmail = (key: string) => {
-    const text = t(key, { email });
-    const [before, after] = text.split(email);
-    return (
-      <>
-        {before}
-        <Box component="span" sx={{ fontWeight: 600, color: "text.primary" }}>
-          {email}
+  /** The design bolds the variable parts inside the sentence. */
+  const emphasise = (key: string, values: Record<string, string>) => {
+    const text = t(key, values);
+    const marks = Object.values(values).filter(Boolean);
+    if (!marks.length) return text;
+    const parts = text.split(new RegExp(`(${marks.map(escapeRegExp).join("|")})`, "g"));
+    return parts.map((part, index) =>
+      marks.includes(part) ? (
+        // Positional split of one sentence — the index is the identity.
+        // biome-ignore lint/suspicious/noArrayIndexKey: split fragments
+        <Box component="b" key={index} sx={{ fontWeight: 700, color: "text.primary" }}>
+          {part}
         </Box>
-        {after}
-      </>
+      ) : (
+        part
+      ),
     );
   };
 
-  const footer = links?.signIn ? (
-    <Typography
-      sx={{ mt: "22px", fontSize: 12.5, color: "text.secondary", textAlign: "center" }}
-      data-testid="verify-wrong-account"
-    >
+  const slab = {
+    kicker: t("slab.kicker"),
+    title: t("slab.title"),
+    blurb: t("slab.blurb"),
+    footer: t("slab.footer"),
+  };
+
+  const footer: ReactNode = links?.signIn ? (
+    <Box component="span" data-testid="verify-wrong-account">
       {t("wrongAccount")}{" "}
       <LinkRenderer
         config={{ ...links.signIn, text: t("signInAsSomeoneElse"), sx: { fontWeight: 600 } }}
       />
-    </Typography>
+    </Box>
   ) : null;
 
   if (view === "done") {
     return (
       <AuthCard
-        width={500}
-        icon={<IconRenderer name="mark-email-read" size={26} />}
-        iconColor="surface.successFg"
+        icon="mark-email-read"
+        tone="success"
+        slab={slab}
+        footer={footer}
         title={t("done.title")}
         subtitle={t("done.subtitle")}
+        subtitleGap="22px"
         data-testid="verify-done"
       >
+        {/* The design previews the wizard before handing the user to it, so a
+            five-step form isn't a surprise on the other side of sign-in. */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: "11px",
+            p: "16px",
+            borderRadius: "12px",
+            bgcolor: "surface.primarySoftBg",
+          }}
+        >
+          <Box sx={{ flex: "none", lineHeight: 1.2, color: "surface.primarySoftFg" }}>
+            <IconRenderer name="auto-fix-high" size={20} color="inherit" />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontSize: 13, fontWeight: 700 }}>{t("done.wizardTitle")}</Typography>
+            <Typography
+              sx={{
+                fontSize: 12.5,
+                lineHeight: 1.6,
+                color: "surface.textMuted",
+                mt: "3px",
+                textWrap: "pretty",
+              }}
+            >
+              {t("done.wizardBody")}
+            </Typography>
+          </Box>
+        </Box>
+        <Typography sx={{ fontSize: 12, lineHeight: 1.6, color: "text.secondary", mt: "12px" }}>
+          {t("done.note")}
+        </Typography>
         {links?.getStarted ? (
           <LinkRenderer config={links.getStarted}>
             <Button
               variant="contained"
+              size="large"
               fullWidth
               data-testid="verify-continue"
-              startIcon={<IconRenderer name="rocket" size={17} />}
-              sx={{ borderRadius: "12px", py: "14px", fontSize: 14, fontWeight: 700 }}
+              endIcon={<IconRenderer name="arrow-forward" size={18} />}
+              sx={{ mt: "24px" }}
             >
               {t("done.cta")}
             </Button>
           </LinkRenderer>
         ) : null}
-        {footer}
       </AuthCard>
     );
   }
@@ -169,132 +211,92 @@ export function VerifyEmail({ id, handlers }: { id: string; handlers: VerifyEmai
   if (view === "expired") {
     return (
       <AuthCard
-        width={500}
-        icon={<IconRenderer name="link-off" size={26} />}
-        iconColor="surface.errorFg"
+        icon="link-off"
+        tone="error"
+        slab={slab}
+        footer={footer}
         title={t("expired.title")}
-        subtitle={withEmail("expired.subtitle")}
+        subtitle={emphasise("expired.subtitle", { email })}
+        subtitleGap="24px"
         data-testid="verify-expired"
       >
         <Button
           variant="contained"
+          size="large"
           fullWidth
           loading={sending}
           disabled={cooldown > 0}
           data-testid="verify-resend-fresh"
-          startIcon={<IconRenderer name="send" size={16} />}
           onClick={resend}
-          sx={{ borderRadius: "12px", py: "14px", fontSize: 14, fontWeight: 700 }}
+          sx={{ mb: "20px" }}
         >
           {cooldown > 0 ? t("resendIn", { seconds: cooldown }) : t("expired.cta")}
         </Button>
-        <Notice text={t("expired.note")} icon="shield" />
-        {footer}
+        <AuthNote icon="shield">{t("expired.note")}</AuthNote>
       </AuthCard>
     );
   }
 
   return (
     <AuthCard
-      width={500}
-      icon={<IconRenderer name="forward-to-inbox" size={26} />}
-      iconColor="surface.accentBright"
+      slab={slab}
+      footer={footer}
       title={t("title")}
-      subtitle={withEmail("subtitle")}
-      subtitleGap="6px"
+      subtitle={emphasise("subtitle", { email, clock })}
       data-testid="verify-pending"
     >
-      <Typography
-        sx={{ fontSize: 12, color: "text.disabled", textAlign: "center", mb: "22px" }}
-        data-testid="verify-expiry"
-      >
-        {t("expiresIn")}{" "}
-        <Box component="b" sx={{ color: "surface.warningSoftFg" }}>
-          {clock}
-        </Box>
-      </Typography>
-
       {schema ? <FormRenderer id={id} schema={schema} onSubmit={submit} submitLabel="cta" /> : null}
 
       {error ? (
         <Typography
-          sx={{ mt: "10px", fontSize: 12, color: "error.main", textAlign: "center" }}
+          role="alert"
           data-testid="verify-error"
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "9px",
+            mt: "14px",
+            p: "11px 13px",
+            borderRadius: "8px",
+            bgcolor: "surface.errorSoftBg",
+            fontSize: 12.5,
+            fontWeight: 600,
+            lineHeight: 1.5,
+            color: "surface.errorFg",
+          }}
         >
+          <IconRenderer name="error" size={17} color="inherit" />
           {error}
         </Typography>
       ) : null}
 
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "14px",
-          mt: "18px",
-          fontSize: 12.5,
-        }}
-      >
-        <Link
-          component="button"
-          type="button"
-          underline="none"
-          onClick={resend}
-          data-testid="verify-resend"
-          sx={{
-            fontSize: 12.5,
-            fontWeight: 600,
-            color: resends > 0 ? "surface.successFg" : "surface.primarySoftFg",
-            "&:hover": { color: resends > 0 ? "surface.successFg" : "primary.light" },
-          }}
-        >
-          {cooldown > 0
-            ? t("resendIn", { seconds: cooldown })
-            : resends > 0
-              ? t("resent", { count: resends })
-              : t("resend")}
-        </Link>
-        <Box component="span" sx={{ color: "surface.controlOutline" }}>
-          |
-        </Box>
-        {links?.changeEmail ? (
-          <LinkRenderer
-            config={{
-              ...links.changeEmail,
-              text: t("changeEmail"),
-              sx: { fontSize: 12.5, fontWeight: 600, color: "surface.primarySoftFg" },
-            }}
-          />
-        ) : null}
-      </Box>
+      <AuthActionRow>
+        {[
+          <AuthTextAction
+            key="resend"
+            onClick={resend}
+            disabled={cooldown > 0 || sending}
+            label={
+              cooldown > 0
+                ? t("resendIn", { seconds: cooldown })
+                : resends > 0
+                  ? t("resent", { count: resends })
+                  : t("resend")
+            }
+          />,
+          links?.changeEmail ? (
+            <LinkRenderer key="change" config={{ ...links.changeEmail, text: t("changeEmail") }} />
+          ) : null,
+        ]}
+      </AuthActionRow>
 
-      <Notice text={t("why")} icon="mark-email-unread" />
-      {footer}
+      <Box sx={{ mt: "24px" }}>
+        <AuthNote icon="mark-email-unread">{emphasise("why", { sender: t("sender") })}</AuthNote>
+      </Box>
     </AuthCard>
   );
 }
 
-/** The design's explanatory strip under the card's controls. */
-function Notice({ text, icon }: { text: string; icon: string }) {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        gap: "10px",
-        mt: "20px",
-        p: "12px 14px",
-        borderRadius: "12px",
-        bgcolor: "surface.hoverSubtle",
-        border: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      <Box sx={{ display: "flex", flex: "none", color: "text.disabled", mt: "1px" }}>
-        <IconRenderer name={icon} size={16} />
-      </Box>
-      <Typography sx={{ fontSize: 11.5, lineHeight: 1.6, color: "text.secondary" }}>
-        {text}
-      </Typography>
-    </Box>
-  );
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

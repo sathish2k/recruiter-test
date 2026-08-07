@@ -1,60 +1,211 @@
 {
-  "title": "What each role can do",
-  "note": "Member-level overrides & per-client access are managed in Team & Permissions",
-  "permission": "Permission",
-  "editHint": "Click a cell to edit",
   "roles": {
-    "admin": "Owner",
-    "lead": "Profile Lead",
-    "employee": "Recruiter",
-    "client": "Client"
+    "title": "Roles",
+    "note": "Eight roles ship with HirePilotX and cannot be deleted. Duplicate one to build your own.",
+    "duplicate": "Duplicate {{role}}",
+    "create": "New role",
+    "system": "SYSTEM",
+    "custom": "CUSTOM",
+    "user": "{{count}} user",
+    "users": "{{count}} users",
+    "neverEdited": "Never edited",
+    "editedBy": "Edited {{date}} by {{name}}",
+    "edited": "Edited {{date}}",
+    "labels": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "accountManager": "Account Manager",
+      "profileLead": "Profile Lead",
+      "recruiter": "Recruiter",
+      "sourcer": "Sourcer",
+      "hiringManager": "Hiring Manager",
+      "client": "Client"
+    },
+    "descriptions": {
+      "owner": "Runs the agency. Everything, including billing and ownership.",
+      "admin": "Manages people and workspace configuration. Not payment details.",
+      "accountManager": "Owns a book of clients — renewals, fees and account health.",
+      "profileLead": "Leads a desk end to end — reviews what recruiters submit.",
+      "recruiter": "Works assigned jobs and submits candidates for approval.",
+      "sourcer": "Sourcing only. Cannot submit, reject, or see money.",
+      "hiringManager": "The internal quality gate. Reviews before a client sees it.",
+      "client": "Client portal only. Sees and approves their own submissions.",
+      "custom": "Custom role."
+    }
   },
-  "resources": {
-    "dashboard": "View dashboard & reports",
-    "clients": "Manage clients & contracts",
-    "jobs": "Manage roles / jobs",
-    "candidates": "Upload & manage candidates",
-    "interviews": "Call candidates & schedule interviews",
-    "settings": "Invite & manage team members",
-    "linkedinInvites": "Send LinkedIn invites & share JD",
-    "manageCvs": "Upload & manage received CVs",
-    "aiScreening": "Run AI screening on CVs",
-    "submitToClient": "Review CVs & submit to client",
-    "scheduleInterviews": "Call candidates & schedule interviews",
-    "exportCandidates": "Export candidates",
-    "deleteCandidates": "Delete candidates",
-    "automation": "Configure automation & integrations"
+  "matrix": {
+    "title": "Permission matrix",
+    "systemTag": "SYSTEM ROLE",
+    "customTag": "CUSTOM ROLE",
+    "subtitle": "Tick a box to grant. Delete implies edit and view — HirePilotX keeps those in step for you.",
+    "customSubtitle": "Custom role. Tick a box to grant; delete implies edit and view.",
+    "ownerNote": "Owner is fixed. It always holds every permission — that is what makes it the account of last resort, and why it cannot be edited or deleted.",
+    "systemNote": "{{role}} ships with HirePilotX. You can adjust its permissions, but it cannot be deleted. To diverge substantially, duplicate it instead — upgrades may add new resources to system roles.",
+    "resource": "RESOURCE",
+    "recordScope": "RECORD SCOPE",
+    "search": "Search resource",
+    "coverage": "{{reached}} / {{total}} resources",
+    "coverageTitle": "RESOURCE ACCESS · {{role}}",
+    "coverageNone": "None",
+    "granted": "{{on}} of {{total}} granted",
+    "emptyTitle": "No resource matches \"{{query}}\"",
+    "emptyBody": "Try the module name as it appears in the sidebar — Jobs, Candidates, Clients.",
+    "clearSearch": "Clear search",
+    "tips": {
+      "frozen": "Owner always holds every permission",
+      "forced": "{{column}} is required by another permission on {{resource}}",
+      "grant": "Grant {{column}} on {{resource}}",
+      "remove": "Remove {{column}} on {{resource}}",
+      "grantAll": "Grant {{column}} on all {{count}} visible resources",
+      "clearAll": "Clear {{column}} on all {{count}} visible resources",
+      "scope": "Own = their records · Team = their desk · All = the whole workspace",
+      "scopeNone": "{{resource}} is workspace-wide — there is nothing to scope",
+      "scopeFrozen": "Owner sees everything"
+    }
   },
-  "actions": {
-    "create": "Create",
-    "read": "Read",
-    "update": "Update",
-    "delete": "Delete"
-  },
-  "buttons": {
-    "reset": "Reset to defaults",
-    "save": "Save changes"
-  },
-  "toast": {
-    "savedTitle": "Permissions updated",
-    "savedRole": "{{role}} permissions saved"
+  "columns": {
+    "view": "VIEW",
+    "create": "CREATE",
+    "edit": "EDIT",
+    "delete": "DELETE",
+    "export": "EXPORT"
   },
   "groups": {
     "recruiting": "RECRUITING",
-    "jobsClients": "JOBS & CLIENTS",
-    "workspace": "WORKSPACE"
+    "crm": "CRM",
+    "administration": "ADMINISTRATION",
+    "analytics": "ANALYTICS",
+    "ai": "AI"
   },
-  "cards": {
+  "scopes": {
+    "own": "Own",
+    "team": "Team",
+    "all": "All",
+    "none": "—"
+  },
+  "resources": {
+    "jobs": "Jobs",
+    "candidates": "Candidates",
+    "submissions": "Pipeline",
+    "interviews": "Interviews",
+    "clients": "Clients",
+    "contacts": "Contacts",
+    "members": "Users",
+    "roles": "Roles",
+    "workspace": "Workspace",
+    "integrations": "Integrations",
+    "security": "Security",
+    "billing": "Billing",
+    "audit": "Audit log",
+    "reports": "Reports",
+    "revenue": "Revenue",
+    "commissions": "Commissions",
+    "ai": "AI Workspace",
+    "templates": "Email templates"
+  },
+  "hints": {
+    "jobs": "Requisitions and their fee terms",
+    "candidates": "Profiles, CVs and notes",
+    "submissions": "Stage moves and submissions",
+    "interviews": "Scheduling and scorecards",
+    "clients": "Accounts, fee agreements, SLA",
+    "contacts": "Client-side people",
+    "members": "Invite, edit and deactivate",
+    "roles": "This screen",
+    "workspace": "Branding and recruitment defaults",
+    "integrations": "Mail, calendar and the API",
+    "security": "Sessions, SSO and policy",
+    "billing": "Plan, seats and invoices",
+    "audit": "Who did what, and when",
+    "reports": "Revenue, funnel and SLA",
+    "revenue": "Placement fees and invoices",
+    "commissions": "Payouts against placements",
+    "ai": "Screening and copilot",
+    "templates": "Outbound email and sequences"
+  },
+  "summary": {
+    "title": "Permission summary",
+    "subtitle": "What {{role}} will be able to do once saved.",
+    "reachable": "Resources reachable",
+    "reachableNote": "Modules that appear in their sidebar.",
+    "enabled": "Permissions enabled",
+    "enabledNote": "Individual grants across the matrix.",
+    "restricted": "No access",
+    "restrictedNote": "Hidden entirely from this role.",
+    "destructive": "Can delete records",
+    "destructiveNote": "Deletion is the permission to audit first.",
+    "of": "of {{total}}",
+    "resource": "resource",
+    "resources": "resources",
+    "noAccess": "No access at all:",
+    "noAccessBody": "Those modules will not appear in the sidebar for anyone holding this role.",
+    "deleteBand": "Deleting {{role}} moves its {{members}} to the role you nominate. The role itself cannot be recovered.",
+    "deleteRole": "Delete role"
+  },
+  "savebar": {
+    "change": "{{count}} change",
+    "changes": "{{count}} changes",
+    "note": "{{changes}} to {{role}} · applies immediately to {{members}} when saved",
+    "discard": "Discard",
+    "review": "Review and save"
+  },
+  "members": {
+    "person": "{{count}} person",
+    "people": "{{count}} people",
     "member": "{{count}} member",
     "members": "{{count}} members",
-    "nobody": "No one yet",
-    "lockedNote": "Cannot be edited or deleted",
-    "desc": {
-      "admin": "Full workspace control — clients, contracts, billing, members & settings.",
-      "lead": "Runs requirements end-to-end: reviews CVs, submits to clients, schedules interviews.",
-      "employee": "Sources candidates — LinkedIn invites, JD sharing, CV uploads & AI screening."
+    "subtitle": "{{shown}} of {{total}} shown · the rest are on the users screen",
+    "openInUsers": "Open in user management",
+    "empty": "Nobody holds this role yet."
+  },
+  "dialogs": {
+    "cancel": "Cancel",
+    "save": {
+      "title": "Apply {{changes}} to {{role}}?",
+      "blurb": "Changes apply immediately to all {{members}} with this role. Anyone signed in now will see their access change without reloading.",
+      "whatChanges": "WHAT CHANGES",
+      "more": "{{count}} further changes not listed above.",
+      "confirm": "Apply changes"
+    },
+    "create": {
+      "title": "New role",
+      "blurb": "Custom roles can be edited and deleted. Start from an existing role if you only need a small variation.",
+      "confirm": "Create role",
+      "nameLabel": "Role name",
+      "namePlaceholder": "e.g. Senior Recruiter",
+      "nameTaken": "A role called \"{{name}}\" already exists.",
+      "nameFirst": "Name the role first",
+      "startFrom": "Start from",
+      "blank": "Blank",
+      "blankDetail": "No permissions. You grant every one deliberately.",
+      "copyDetail": "Copies all {{count}} permissions and their record scopes from {{role}}."
+    },
+    "duplicate": {
+      "title": "Duplicate {{role}}",
+      "blurb": "Copies every permission and scope from {{role}}. The copy is a custom role, so you can change or delete it freely.",
+      "confirm": "Create copy",
+      "copySuffix": "{{role}} (copy)"
+    },
+    "delete": {
+      "title": "Delete {{role}}?",
+      "blurb": "This role is used by {{members}}.",
+      "confirmType": "Type {{role}} to confirm",
+      "typeFirst": "Type the role name to confirm",
+      "confirm": "Delete role",
+      "cancel": "Keep it",
+      "moves": "Everyone holding it moves to {{role}}, the closest system role. Nobody is locked out.",
+      "audited": "The change is recorded in the audit log against your name.",
+      "irreversible": "The role and its permission set cannot be recovered."
     }
   },
-  "manageMembers": "Manage members",
-  "footerNote": "Owner permissions are locked · click a Profile Lead or Recruiter cell to toggle. View / Edit / Approve levels & custom roles (Sourcer, Finance, QA…) arrive with Enterprise."
+  "toast": {
+    "savedTitle": "Permissions saved",
+    "savedSub": "{{role}} updated for {{members}} · effective now",
+    "createdTitle": "Role created",
+    "createdSub": "{{role}} is ready — assign it from user management",
+    "deletedTitle": "Role deleted",
+    "deletedSub": "{{role}} removed · {{members}} moved to {{target}}",
+    "failedTitle": "That didn't save",
+    "failedSub": "Nothing changed. Try again, or reload the page."
+  }
 }

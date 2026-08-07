@@ -30,7 +30,7 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
         cursor: "pointer",
         position: "relative",
         transition: "background .15s",
-        bgcolor: on ? "#F26A1B" : "rgba(255,255,255,.14)",
+        bgcolor: on ? "primary.main" : "surface.neutral",
       }}
     >
       <Box
@@ -106,7 +106,7 @@ export function AiScreeningWidget({ field, t }: WidgetProps) {
           alignItems: "center",
           gap: "11px",
           p: "16px 20px",
-          background: "linear-gradient(120deg,rgba(242,106,27,.3),rgba(242,106,27,.06))",
+          background: "var(--mui-palette-surface-heroTint)",
         }}
       >
         <Box
@@ -115,7 +115,7 @@ export function AiScreeningWidget({ field, t }: WidgetProps) {
             height: 34,
             flex: "none",
             borderRadius: "10px",
-            background: "linear-gradient(135deg,#FF8A3C,#E4560F)",
+            background: "var(--mui-palette-primary-main)",
             color: "#fff",
             display: "flex",
             alignItems: "center",

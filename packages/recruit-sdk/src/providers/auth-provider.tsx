@@ -3,7 +3,8 @@
 import { createAuthClient } from "better-auth/react";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { BrandLoaderScreen } from "../brand-loader";
-import { setAuthToken } from "../client";
+import { setAuthToken, setSessionLostHandler } from "../client";
+import { SessionExpired } from "../session-expired";
 
 /** Better Auth client. Uses the current (web) origin so the session cookie is
  * same-origin; the web app proxies /api/auth/* to the API (see next.config). */
@@ -45,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const token = data?.session?.token;
   const user = (data?.user as AuthUser | undefined) ?? null;
   const [ready, setReady] = useState(false);
+  const [expired, setExpired] = useState(false);
+  const logout = useLogout();
 
   useEffect(() => {
     if (isPending) return;
@@ -52,7 +55,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setReady(true);
   }, [isPending, token]);
 
+  // A session that dies mid-visit used to surface as whichever failure the
+  // calling screen happened to render. Now it replaces the screen, once.
+  useEffect(() => {
+    setSessionLostHandler(() => setExpired(true));
+    return () => setSessionLostHandler(undefined);
+  }, []);
+
   if (!ready) return <BrandLoaderScreen />;
+  if (expired) return <SessionExpired onSignIn={logout} />;
 
   return <AuthUserContext.Provider value={user}>{children}</AuthUserContext.Provider>;
 }

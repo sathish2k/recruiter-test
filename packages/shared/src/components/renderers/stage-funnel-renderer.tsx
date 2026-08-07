@@ -246,7 +246,7 @@ function FunnelColumn({
         minWidth: 0,
         height: "100%",
         p: "5px 12px 0",
-        borderLeft: index === 0 ? "none" : "1px solid",
+        borderLeft: index === 0 ? "none" : "1px dashed",
         borderColor: "surface.divider",
         borderRadius: "10px 10px 0 0",
         color: "text.primary",

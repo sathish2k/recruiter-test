@@ -21,7 +21,7 @@ export function SwitchRowWidget({ prop, field, t }: WidgetProps) {
         justifyContent: "space-between",
         gap: "16px",
         py: "13px",
-        borderTop: "1px solid",
+        borderTop: "1px dashed",
         borderColor: "divider",
       }}
     >

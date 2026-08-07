@@ -12,6 +12,8 @@ export {
   buildOptions,
   buildSeries,
   DEFAULT_PALETTE,
+  DIVERGING_PALETTE,
+  SEQUENTIAL_PALETTE,
 } from "./graph-renderer.helpers";
 export type {
   GraphFilter,

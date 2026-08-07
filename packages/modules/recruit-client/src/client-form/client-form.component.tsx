@@ -57,6 +57,15 @@ interface Client {
   offLimitsMonths: number;
   taxId: string;
   notes: string;
+  status: string;
+  logo: string;
+  linkedin: string;
+  careerPage: string;
+  timezone: string;
+  companySize: string;
+  annualHiringVolume: string;
+  replacementPeriod: string;
+  contractRenewsAt: string;
 }
 
 const FEE_BASIS = ["percent", "flat"];
@@ -289,6 +298,19 @@ export function ClientFormComponent({ id }: { id: string }) {
           billingEmail: splitEmails(data.billingEmail),
           taxId: data.taxId,
           notes: data.notes,
+          // Every field the API lets an edit write must be seeded from the
+          // record. A field left out here falls back to its schema default and
+          // is submitted, so omitting `status` silently reset a hiring client
+          // to "prospect" on every save.
+          status: data.status,
+          logo: { url: data.logo ?? "" },
+          linkedin: data.linkedin,
+          careerPage: data.careerPage,
+          timezone: data.timezone,
+          companySize: data.companySize,
+          annualHiringVolume: data.annualHiringVolume,
+          replacementPeriod: data.replacementPeriod,
+          contractRenewsAt: data.contractRenewsAt,
           contract: data.contract ?? [],
           attachments: data.attachments ?? [],
           sameAsBilling: data.shippingSameAsBilling ?? true,

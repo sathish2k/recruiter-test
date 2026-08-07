@@ -20,6 +20,7 @@ export type BuiltInWidget =
   | "select"
   | "segmented"
   | "tiles"
+  | "option-cards"
   | "email-list"
   | "switch"
   | "switch-row"
@@ -33,9 +34,11 @@ export type BuiltInWidget =
   | "resumeAutofill"
   | "days"
   | "radio"
+  | "rating"
   | "checkbox-group"
   | "multiselect"
   | "number"
+  | "currency"
   | "number-map"
   | "slider"
   | "date"
@@ -257,8 +260,12 @@ export interface JsonSchemaProperty {
   /** `repeater`: the fields of one row (a sub-record); stored as an array of
    * objects. Nested field names are `<name>.<index>.<key>`. */
   itemSchema?: Record<string, JsonSchemaProperty>;
-  /** `choice-chips`: the options offered, each able to carry a second line. */
+  /** `choice-chips` / `option-cards`: the options offered, each able to carry a
+   * second line (`meta`). */
   choices?: ChoiceOption[];
+  /** `option-cards`: option value → why it cannot be picked (a t-key). A locked
+   * option stays visible but dimmed, carrying the reason as its title. */
+  optionLocked?: Record<string, string>;
   /** `choice-chips`: `"stacked"` puts the detail under the label in a rounded
    * card (the date-format picker) rather than beside it in a pill. */
   choiceLayout?: "inline" | "stacked";
@@ -385,6 +392,9 @@ export interface FormRendererProps extends FormLayoutProps {
   onSubmit: (data: FormValues, meta?: { addAnother?: boolean }) => void | Promise<void>;
   /** Translation key for the submit button (default "submit"). */
   submitLabel?: string;
+  /** Glyph after the submit label — the design's forward arrow on a flow's
+   * final action. Name from the icon registry. */
+  submitIcon?: string;
   /** When set, renders a Cancel button beside Submit (footer row) that calls it. */
   onCancel?: () => void;
   /** Translation key for the cancel button (default "cancel"). */

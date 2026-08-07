@@ -5,7 +5,7 @@ import { BrandErrorScreen } from "./error-screen";
 export function NotFound() {
   return (
     <BrandErrorScreen
-      variant="notFound"
+      code={["4", "4"]}
       headline="The pilot left this page"
       subtitle="It was moved, renamed, or never took off. Check the link — or fly back to somewhere that exists."
       primary={{

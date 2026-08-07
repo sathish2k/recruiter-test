@@ -1,23 +1,43 @@
-// Deliberate non-theme colours: the chart series palette needs hues that stay
-// distinguishable from each other, which a two-scheme token set can't provide.
 import type { ApexOptions } from "apexcharts";
 import delve from "dlv";
 import type { ApexChartType } from "./chart";
 import type { GraphRendererConfig, GraphRow, TFuncLike } from "./graph-renderer.types";
 
+/**
+ * Categorical series. Three steps of the brand navy plus one warm neutral:
+ * cool-versus-warm is the axis every red-green deficiency preserves, and
+ * lightness carries the rest, so the set is colour-vision safe by construction
+ * rather than by luck.
+ *
+ * Four is the ceiling, deliberately. A semantic hue is never a series — green
+ * next to red is indistinguishable for ~8% of men, and an amber series reads
+ * as a warning. Past four categories the answer is small multiples.
+ */
 export const DEFAULT_PALETTE = [
-  "var(--mui-palette-primary-light)",
-  "var(--mui-palette-success-main)",
-  "var(--mui-palette-info-light)",
-  "var(--mui-palette-warning-light)",
-  "#C99BE0",
-  "var(--mui-palette-error-light)",
-  "#7FC8C0",
-  "var(--mui-palette-primary-dark)",
+  "var(--mui-palette-surface-chart1)",
+  "var(--mui-palette-surface-chart2)",
+  "var(--mui-palette-surface-chart3)",
+  "var(--mui-palette-surface-chart4)",
 ];
 
-const AXIS_COLOR = "var(--mui-palette-text-disabled)";
-const GRID_COLOR = "var(--mui-palette-surface-hover)";
+/** Magnitude, light → dark. Use when the series are ordered, not categorical. */
+export const SEQUENTIAL_PALETTE = [
+  "var(--mui-palette-surface-chartSeq1)",
+  "var(--mui-palette-surface-chartSeq2)",
+  "var(--mui-palette-surface-chartSeq3)",
+  "var(--mui-palette-surface-chartSeq4)",
+  "var(--mui-palette-surface-chartSeq5)",
+];
+
+/** Signed change, negative → neutral → positive. */
+export const DIVERGING_PALETTE = [
+  "var(--mui-palette-surface-chartDivNeg)",
+  "var(--mui-palette-surface-chartDivMid)",
+  "var(--mui-palette-surface-chartDivPos)",
+];
+
+const AXIS_COLOR = "var(--mui-palette-surface-chartAxis)";
+const GRID_COLOR = "var(--mui-palette-surface-chartGrid)";
 
 function formatValue(value: number, type?: GraphRendererConfig["valueType"]): string {
   if (type === "currency") return `$${value.toLocaleString()}`;
@@ -59,6 +79,9 @@ export function buildOptions(
   config: GraphRendererConfig,
   rows: GraphRow[],
   t: TFuncLike,
+  // Apex paints its tooltip itself rather than from CSS variables, so it needs
+  // the resolved scheme rather than a token.
+  mode: "light" | "dark" = "light",
 ): ApexOptions {
   const colors = buildColors(config);
   const legend = config.legend ?? isCircular(config.type);
@@ -84,7 +107,7 @@ export function buildOptions(
     dataLabels: { enabled: isCircular(config.type) },
     stroke: { curve: "smooth", width: config.type === "line" ? 2.5 : 1 },
     tooltip: {
-      theme: "dark",
+      theme: mode,
       y: {
         formatter: (v: number) => formatValue(v, config.valueType),
       },

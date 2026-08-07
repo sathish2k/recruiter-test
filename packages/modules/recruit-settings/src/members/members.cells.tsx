@@ -1,9 +1,10 @@
 "use client";
 
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { IconRenderer } from "@recruit/shared";
 
 /** A member row as the table sees it. */
 type Row = Record<string, unknown>;
@@ -13,122 +14,119 @@ type T = (key: string, vars?: Record<string, unknown> | string) => string;
 
 const str = (row: Row, key: string) => (row[key] as string) ?? "";
 
+/** Presence is a freshness band, not a session — see the API's `presenceOf`. */
+const PRESENCE_COLOR: Record<string, string> = {
+  online: "var(--mui-palette-success-main)",
+  away: "var(--mui-palette-warning-main)",
+  offline: "var(--mui-palette-text-disabled)",
+};
+
+function presenceColor(row: Row) {
+  return PRESENCE_COLOR[str(row, "presence")] ?? PRESENCE_COLOR.offline;
+}
+
 /**
- * Client access: one chip per client the member can see, with the overflow
- * rolled into a `+N` chip. Empty means the whole book, which the design shows
- * as a muted dash rather than an empty cell.
+ * Avatar, name and address — with presence riding on the avatar as a dot, so
+ * "who is around" reads from the same glance as "who is here". The YOU badge
+ * marks your own row, which several actions refuse to touch.
  */
-export function ClientAccessCell(row: Row, t: T, onManage?: (row: Row) => void, max = 2) {
-  const stored = Array.isArray(row.clientAccess) ? (row.clientAccess as string[]) : [];
-  // Unrestricted access still reads as a chip, matching every other value.
-  const clients = stored.length ? stored : [t("access.all")];
-  const shown = clients.slice(0, max);
-  const rest = clients.length - shown.length;
-
+export function MemberCell(row: Row, t: T) {
   return (
-    // The whole cell is the affordance in the design: a hover-highlighted,
-    // rounded target that opens access management. The negative margin lets
-    // that highlight bleed past the text without shifting the row.
-    <Box
-      title={t("access.manage")}
-      onClick={onManage ? () => onManage(row) : undefined}
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "5px",
-        alignItems: "center",
-        m: "-4px",
-        p: "4px",
-        borderRadius: "9px",
-        cursor: onManage ? "pointer" : "default",
-        "&:hover": onManage ? { bgcolor: "rgba(255,255,255,.04)" } : undefined,
-      }}
-    >
-      {shown.map((name) => (
-        <Box
-          key={name}
+    <Box sx={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+      <Box sx={{ position: "relative", flex: "none" }}>
+        <Avatar
           sx={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "surface.textMuted",
-            bgcolor: "surface.hover",
-            border: "1px solid",
-            borderColor: "surface.controlBorder",
-            px: "10px",
-            py: "3px",
-            borderRadius: "999px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {name}
-        </Box>
-      ))}
-      {rest > 0 ? (
-        <Box
-          sx={{
-            fontSize: 11,
+            width: 36,
+            height: 36,
+            fontSize: 12,
             fontWeight: 700,
-            color: "surface.primarySoftFg",
-            bgcolor: "rgba(242,106,27,.1)",
-            border: "1px solid rgba(242,106,27,.3)",
-            px: "10px",
-            py: "3px",
-            borderRadius: "999px",
-            whiteSpace: "nowrap",
+            bgcolor: str(row, "avatarBg"),
+            color: str(row, "avatarFg"),
           }}
         >
-          {t("access.more", { count: rest })}
+          {str(row, "initials")}
+        </Avatar>
+        <Tooltip title={t(`presence.${str(row, "presence") || "offline"}`)} placement="top">
+          <Box
+            sx={{
+              position: "absolute",
+              right: -1,
+              bottom: -1,
+              width: 11,
+              height: 11,
+              borderRadius: "999px",
+              bgcolor: presenceColor(row),
+              border: "2px solid",
+              borderColor: "background.paper",
+            }}
+          />
+        </Tooltip>
+      </Box>
+      <Box sx={{ minWidth: 0 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+          <Typography
+            sx={{
+              fontSize: 13.5,
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {str(row, "displayName")}
+          </Typography>
+          {row.isCurrentUser ? (
+            <Chip variant="badge" color="primary" size="small" label={t("you")} />
+          ) : null}
         </Box>
-      ) : null}
-      {/* Owner access is fixed; everyone else's is editable from here. */}
-      <IconRenderer
-        name={row.isOwner ? "lock" : "edit"}
-        size={14}
-        sx={{ color: "text.disabled", p: "2px" }}
-      />
+        <Typography
+          sx={{
+            fontSize: 11.5,
+            color: "text.disabled",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {str(row, "email")}
+        </Typography>
+      </Box>
     </Box>
   );
 }
 
-/** MFA state as plain icon + label — no chip, unlike the status column. */
-export function MfaCell(row: Row, t: T) {
-  const on = !!row.mfaEnabled;
+/** Relative label with the absolute timestamp behind a tooltip, over the
+ * presence word the dot on the avatar shows without saying. */
+export function LastActiveCell(row: Row, t: T) {
   return (
-    <Box sx={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-      <IconRenderer
-        name={on ? "check-circle" : "warning"}
-        size={14}
-        sx={{ color: on ? "surface.successFg" : "warning.light" }}
-      />
-      <Typography
-        sx={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: on ? "surface.successFg" : "warning.light",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {on ? t("mfa.on") : t("mfa.off")}
-      </Typography>
+    <Box sx={{ minWidth: 0 }}>
+      <Tooltip title={str(row, "lastActiveFull")} placement="top">
+        <Typography
+          sx={{
+            fontSize: 12,
+            color: "text.secondary",
+            whiteSpace: "nowrap",
+            cursor: "help",
+            display: "inline-block",
+          }}
+        >
+          {str(row, "lastActive")}
+        </Typography>
+      </Tooltip>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "5px", mt: "1px" }}>
+        <Box
+          sx={{
+            width: 6,
+            height: 6,
+            flex: "none",
+            borderRadius: "999px",
+            bgcolor: presenceColor(row),
+          }}
+        />
+        <Typography sx={{ fontSize: 10.5, color: "text.disabled" }}>
+          {t(`presence.${str(row, "presence") || "offline"}`)}
+        </Typography>
+      </Box>
     </Box>
-  );
-}
-
-/** Relative label with the absolute timestamp behind a tooltip. */
-export function LastActiveCell(row: Row) {
-  return (
-    <Tooltip title={str(row, "lastActiveFull")} placement="top">
-      <Typography
-        sx={{
-          fontSize: 12.5,
-          color: "text.secondary",
-          whiteSpace: "nowrap",
-          cursor: "help",
-          display: "inline-block",
-        }}
-      >
-        {str(row, "lastActive")}
-      </Typography>
-    </Tooltip>
   );
 }

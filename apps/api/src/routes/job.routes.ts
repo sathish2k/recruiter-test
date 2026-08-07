@@ -78,16 +78,20 @@ export default new Elysia({ name: "job.routes" })
       status: t.Optional(t.String()),
       clientId: t.Optional(t.String()),
       contactId: t.Optional(t.String()),
+      overdue: t.Optional(t.String()),
       page: t.Optional(t.String()),
       pageSize: t.Optional(t.String()),
       sortKey: t.Optional(t.String()),
       sortDir: t.Optional(t.String()),
     }),
   })
+  // Before /jobs/:id, or "stats" matches as an id.
+  .get("/jobs/stats", (ctx) => jobController.getJobStats(ctx), { isAuth: true })
   .get("/jobs/:id", (ctx) => jobController.getJobById(ctx), { isAuth: true })
   // The detail screen — one endpoint per card.
   .get("/jobs/:id/summary", (ctx) => jobController.getJobSummary(ctx), { isAuth: true })
   .get("/jobs/:id/kpis", (ctx) => jobController.getJobKpis(ctx), { isAuth: true })
+  .get("/jobs/:id/stages", (ctx) => jobController.getJobStages(ctx), { isAuth: true })
   .get("/jobs/:id/team", (ctx) => jobController.getJobTeam(ctx), { isAuth: true })
   .get("/jobs/:id/timeline", (ctx) => jobController.getJobTimeline(ctx), { isAuth: true })
   .get("/jobs/:id/info", (ctx) => jobController.getJobInfo(ctx), { isAuth: true })

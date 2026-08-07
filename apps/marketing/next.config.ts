@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    // Next 16.2.12 aborts the build outright when it can't load the TS
+    // compiler API; TypeScript 7 (the native port) ships only `lib/tsc.js`.
+    // This tells Next to shell out to the TypeScript CLI instead of requiring
+    // the API. Types stay gated by `tsc --noEmit`, not by the build.
+    useTypeScriptCli: true,
+  },
 };
 
 export default nextConfig;

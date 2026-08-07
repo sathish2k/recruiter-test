@@ -4,9 +4,46 @@
     {
       "name": "web",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "cwd": "apps/web",
       "port": 3000
+    },
+    {
+      "name": "web-preview",
+      "runtimeExecutable": "bunx",
+      "runtimeArgs": [
+        "next",
+        "start",
+        "-p",
+        "3010"
+      ],
+      "cwd": "apps/web",
+      "port": 3010
+    },
+    {
+      "name": "api-test",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "PORT=3002 bun run src/index.ts"
+      ],
+      "cwd": "apps/api",
+      "port": 3002
+    },
+    {
+      "name": "web-audit",
+      "runtimeExecutable": "bunx",
+      "runtimeArgs": [
+        "next",
+        "dev",
+        "-p",
+        "3021"
+      ],
+      "cwd": "apps/web",
+      "port": 3021
     }
   ]
 }

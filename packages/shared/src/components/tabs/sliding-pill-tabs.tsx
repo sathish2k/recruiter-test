@@ -108,7 +108,7 @@ export function SlidingPillTabs({
           opacity: ind.ready ? 1 : 0,
           pointerEvents: "none",
           transition:
-            "left .45s cubic-bezier(.3,1.4,.35,1), top .45s cubic-bezier(.3,1.4,.35,1), width .45s cubic-bezier(.3,1.4,.35,1), opacity .2s ease",
+            "left 200ms cubic-bezier(.4,0,.2,1), top 200ms cubic-bezier(.4,0,.2,1), width 200ms cubic-bezier(.4,0,.2,1), opacity 200ms cubic-bezier(.4,0,.2,1)",
         }}
       />
       {items.map((item) => {

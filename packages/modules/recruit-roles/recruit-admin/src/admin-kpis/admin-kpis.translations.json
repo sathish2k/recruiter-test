@@ -1,0 +1,14 @@
+{
+  "greeting": "Workspace health",
+  "subtitle": "Seats, security and integrations — the housekeeping that keeps the desk running.",
+  "kpis": {
+    "seatsUsed": "Seats used",
+    "seatsUsedDelta": "{value}",
+    "securityScore": "Security score",
+    "securityScoreDelta": "{value}",
+    "integrations": "Integrations",
+    "integrationsDelta": "{value}",
+    "aiCredits": "AI credits",
+    "aiCreditsDelta": "{value}"
+  }
+}

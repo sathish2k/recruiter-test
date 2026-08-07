@@ -4,6 +4,7 @@ import { record as recordAudit } from "../services/audit-log.service";
 import {
   archiveCandidate,
   type CandidateInput,
+  candidateStats,
   createCandidate,
   deleteCandidate,
   findDuplicateCandidates,
@@ -50,16 +51,26 @@ export async function getCandidates(ctx: {
   user: Auth;
   query: Record<string, string | undefined>;
 }) {
-  const { data, totalCount } = await listCandidates(ctx.user.agencyId ?? "", {
+  const { data, totalCount, quickCounts } = await listCandidates(ctx.user.agencyId ?? "", {
     search: ctx.query.search,
     status: ctx.query.status,
     jobId: ctx.query.jobId,
+    client: ctx.query.client,
+    stage: ctx.query.stage,
+    owner: ctx.query.owner,
+    source: ctx.query.source,
+    quick: ctx.query.quick,
+    userId: ctx.user.id,
     page: ctx.query.page ? Number(ctx.query.page) : undefined,
     pageSize: ctx.query.pageSize ? Number(ctx.query.pageSize) : undefined,
     sortKey: ctx.query.sortKey,
     sortDir: ctx.query.sortDir,
   });
-  return { data, meta: { totalCount } };
+  return { data, meta: { totalCount, quickCounts } };
+}
+
+export async function getCandidateStats(ctx: { user: Auth }) {
+  return candidateStats(ctx.user.agencyId ?? "");
 }
 
 export async function getCandidateById(ctx: { user: Auth; params: { id: string } }) {

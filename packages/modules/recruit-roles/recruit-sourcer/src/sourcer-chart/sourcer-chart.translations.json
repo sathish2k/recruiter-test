@@ -1,0 +1,14 @@
+{
+  "title": "Pipeline value by quarter",
+  "subtitle": "What your sourcing put into play",
+  "seriesA": "Submitted value",
+  "seriesB": "Booked",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "submissions": "Submissions",
+    "placements": "Placements"
+  }
+}

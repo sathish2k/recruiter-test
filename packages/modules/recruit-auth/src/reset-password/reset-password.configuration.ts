@@ -1,10 +1,12 @@
 import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
+// The design links in the action colour at 13/600, underline on hover only.
 const accentSx = {
+  fontSize: 13,
   fontWeight: 600,
-  color: "surface.primarySoftFg",
+  color: "surface.linkFg",
   textDecoration: "none",
-  "&:hover": { color: "primary.light" },
+  "&:hover": { textDecoration: "underline" },
 };
 
 const schema: JsonSchema = {
@@ -22,7 +24,6 @@ const schema: JsonSchema = {
       format: "password",
       minLength: 8,
       icon: "lock",
-      hideLabel: true,
       strengthMeter: true,
       title: "password.label",
       placeholder: "password.placeholder",
@@ -32,7 +33,6 @@ const schema: JsonSchema = {
       type: "string",
       format: "password",
       icon: "lock-reset",
-      hideLabel: true,
       matchesField: "password",
       title: "confirmPassword.label",
       placeholder: "confirmPassword.placeholder",
@@ -48,6 +48,8 @@ const links: Record<string, LinkRendererConfig> = {
     underline: "none",
     sx: accentSx,
   },
+  // The invalid-link state sends the user back to request a new one.
+  forgot: { routeId: "Auth.ForgotPassword.Route", underline: "none" },
 };
 
 export const ResetPasswordConfiguration = { schema, links };

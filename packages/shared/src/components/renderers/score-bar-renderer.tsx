@@ -23,7 +23,13 @@ export function ScoreBarRenderer({
   config: ScoreBarRendererConfig;
   data?: Record<string, unknown>;
 }) {
-  const score = Number(delve(data, config.path) ?? 0);
+  const raw = delve(data, config.path);
+  // An unscored record is not a zero-percent match — the design leaves the cell
+  // empty rather than printing a score nothing produced.
+  if (raw === null || raw === undefined || raw === "") {
+    return <Typography sx={{ fontSize: 13, color: "text.disabled" }}>—</Typography>;
+  }
+  const score = Number(raw);
   const clamped = Math.min(100, Math.max(0, score));
   const threshold = config.threshold ?? 80;
   return (

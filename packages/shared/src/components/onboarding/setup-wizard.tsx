@@ -10,7 +10,7 @@ import Card from "@mui/material/Card";
 import Skeleton from "@mui/material/Skeleton";
 import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-import { useConfiguration, usePortalRouter, useTranslation } from "@recruit/sdk";
+import { useConfiguration, useTranslation } from "@recruit/sdk";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { FormRenderer } from "../forms";
 import type { FormValues, JsonSchema } from "../forms/types";
@@ -63,6 +63,13 @@ interface WizardConfig {
   steps?: Record<string, JsonSchema>;
   roles?: string[];
   links?: Record<string, LinkRendererConfig>;
+  /** Cards offered on the confirmation screen once the workspace exists. */
+  doneActions?: readonly {
+    key: string;
+    icon: string;
+    tone: "primary" | "success" | "info" | "warning";
+    routeId: string;
+  }[];
 }
 
 const STEP_KEYS = ["basics", "stages", "reasons", "team", "review"] as const;
@@ -95,13 +102,13 @@ export function SetupWizard({
 }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<WizardConfig>(id);
-  const router = usePortalRouter();
   const steps = config.steps ?? {};
 
   const [step, setStep] = useState(state.setupStep);
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [resumed, setResumed] = useState(state.setupStep > 0);
+  const [created, setCreated] = useState(false);
   /** The wizard is inert until the first payload lands. */
   const [ready, setReady] = useState(state.stages.length > 0);
   const entryStep = useRef(state.setupStep);
@@ -236,8 +243,7 @@ export function SetupWizard({
   const finish = async () => {
     if (!ready) return;
     await save({ setupStep: STEP_KEYS.length - 1, completed: true });
-    const target = config.links?.dashboard?.routeId;
-    if (target) router.push(target);
+    setCreated(true);
   };
 
   /** The footer the design puts below the panel, shared by every step. */
@@ -250,6 +256,7 @@ export function SetupWizard({
           data-testid="wizard-back"
           startIcon={<ArrowBackRounded />}
           onClick={() => void move(step - 1)}
+          sx={{ minHeight: 44, px: "18px" }}
         >
           {t("back")}
         </Button>
@@ -276,6 +283,8 @@ export function SetupWizard({
             variant="contained"
             disabled={!ready}
             data-testid="wizard-next"
+            size="large"
+            sx={{ px: "24px" }}
             endIcon={<ArrowForwardRounded />}
             onClick={submits ? undefined : () => void move(step + 1)}
           >
@@ -287,6 +296,8 @@ export function SetupWizard({
           variant="contained"
           disabled={!ready}
           data-testid="wizard-finish"
+          size="large"
+          sx={{ px: "26px" }}
           startIcon={<RocketLaunchRounded />}
           onClick={() => void finish()}
         >
@@ -297,7 +308,7 @@ export function SetupWizard({
   );
 
   const roleNotes = (
-    <Box sx={{ mt: "18px", pt: "16px", borderTop: "1px solid", borderColor: "divider" }}>
+    <Box sx={{ mt: "18px", pt: "16px", borderTop: "1px dashed", borderColor: "divider" }}>
       <Typography
         sx={{
           fontSize: 11,
@@ -323,184 +334,327 @@ export function SetupWizard({
   );
 
   const panel = (children: ReactNode) => (
-    <Card
-      variant="base"
-      data-testid="wizard-panel"
-      sx={{
-        borderRadius: "18px",
-        p: "22px 24px",
-        boxShadow: "var(--mui-palette-surface-menuShadow)",
-      }}
-    >
+    <Card variant="base" data-testid="wizard-panel" sx={{ borderRadius: "16px", p: "26px 28px" }}>
       {children}
     </Card>
   );
 
+  const doneActions = config.doneActions ?? [];
+
   return (
-    <Box
-      data-testid="setup-wizard"
-      sx={{ position: "relative", zIndex: 1, maxWidth: 720, mx: "auto", p: "92px 24px 72px" }}
-    >
+    <Box data-testid="setup-wizard" sx={{ position: "relative", zIndex: 1 }}>
+      {/* The design gives the wizard its own bar: the mark on the left, the
+          autosave state and the leave-for-now escape on the right. */}
       <Box
         sx={{
-          position: "absolute",
-          top: 28,
-          right: 24,
           display: "flex",
           alignItems: "center",
-          gap: "14px",
+          justifyContent: "flex-end",
+          gap: "16px",
+          p: "26px 32px",
         }}
       >
-        <Typography
-          data-testid="wizard-save-state"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "5px",
-            fontSize: 11,
-            color: "text.disabled",
-          }}
-        >
-          <IconRenderer name="check-circle" size={13} />
-          {saving ? t("saving") : t("saved")}
-        </Typography>
-        {config.links?.dashboard ? (
-          <LinkRenderer
-            config={{
-              ...config.links.dashboard,
-              text: t("later"),
-              sx: { fontSize: 12.5, fontWeight: 600, color: "surface.primarySoftFg" },
+        {/* The lockup is drawn once, by the auth backdrop this route sits on —
+            the bar only carries the right-hand group. */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <Typography
+            data-testid="wizard-save-state"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: 12,
+              color: "text.secondary",
             }}
-          />
-        ) : null}
-      </Box>
-
-      {resumed ? (
-        <Card
-          data-testid="wizard-resumed"
-          sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "11px",
-            bgcolor: "surface.warningSoftBg",
-            border: "1px solid",
-            borderColor: "surface.warningSoftBorder",
-            borderRadius: "14px",
-            p: "13px 16px",
-            mb: "22px",
-          }}
-        >
-          <Box sx={{ color: "surface.warningSoftFg", display: "flex", flex: "none" }}>
-            <IconRenderer name="history" size={18} />
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: 13, fontWeight: 700, color: "surface.warningSoftFg" }}>
-              {t("resume.title")}
-            </Typography>
-            <Typography sx={{ fontSize: 12, lineHeight: 1.55, color: "text.primary", mt: "3px" }}>
-              {t("resume.body", {
-                step: entryStep.current + 1,
-                total: STEP_KEYS.length,
-                label: t(`steps.${STEP_KEYS[entryStep.current] ?? "basics"}.label`).toLowerCase(),
-              })}
-            </Typography>
-          </Box>
-          <Button
-            variant="text"
-            size="small"
-            disabled={!ready}
-            data-testid="wizard-start-over"
-            onClick={() => void move(0)}
           >
-            {t("resume.startOver")}
-          </Button>
-        </Card>
-      ) : null}
-
-      <Typography
-        data-testid="wizard-step-kicker"
-        sx={{ fontSize: 11, fontWeight: 700, letterSpacing: ".09em", color: "text.disabled" }}
-      >
-        {t("stepOf", { step: step + 1, total: STEP_KEYS.length })}
-      </Typography>
-      <Typography sx={{ fontSize: 27, fontWeight: 700, letterSpacing: "-.015em", mt: "7px" }}>
-        {t(`steps.${stepKey}.title`)}
-      </Typography>
-      <Typography
-        sx={{ fontSize: 14, lineHeight: 1.6, color: "text.secondary", mt: "8px", maxWidth: 560 }}
-      >
-        {t(`steps.${stepKey}.blurb`)}
-      </Typography>
-
-      <Box
-        data-testid="wizard-rail"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "7px",
-          m: "24px 0 22px",
-          flexWrap: "wrap",
-        }}
-      >
-        {STEP_KEYS.map((key, index) => (
-          <RailChip
-            key={key}
-            stepKey={key}
-            label={t(`steps.${key}.label`)}
-            index={index}
-            current={step}
-            onClick={() => index <= step && void move(index)}
-          />
-        ))}
+            <IconRenderer name="cloud-done" size={17} />
+            {saving ? t("saving") : t("saved")}
+          </Typography>
+          {config.links?.dashboard ? (
+            <LinkRenderer
+              config={{
+                ...config.links.dashboard,
+                text: t("later"),
+                sx: { fontSize: 12.5, fontWeight: 700, color: "surface.linkFg" },
+              }}
+            />
+          ) : null}
+        </Box>
       </Box>
 
-      {schema && !ready ? (
-        <>
-          {panel(
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-              {[0, 1, 2].map((row) => (
-                <Skeleton key={row} variant="rounded" height={56} />
-              ))}
-            </Box>,
-          )}
-          {footer("next", false)}
-        </>
-      ) : schema ? (
-        <FormRenderer
-          // Remounting per step is deliberate: each step is its own form with
-          // its own defaults, and carrying state across them would be wrong.
-          // react-hook-form reads defaultValues once, so the form must not
-          // mount before the workspace's own values have arrived — hence the
-          // `ready` gate above rather than a key that changes under it.
-          key={stepKey}
-          id={id}
-          schema={schema}
-          defaultValues={defaultsFor(stepKey)}
-          // A grid, not a stack, so a schema can put two short fields on one
-          // row (date and time format) — everything else defaults to full width.
-          gridContainer={{ columns: 12, spacing: 2.75 }}
-          widgets={WIZARD_WIDGETS}
-          onSubmit={(values) => move(step + 1, values)}
-          wrapFields={(fields) =>
-            panel(
-              <>
-                {fields}
-                {stepKey === "team" ? roleNotes : null}
-              </>,
-            )
-          }
-          actions={() => footer(step === 3 ? "nextInvites" : "next", true)}
-        />
-      ) : (
-        <>
-          {panel(<ReviewStep id={id} state={state} onChange={(target) => void move(target)} />)}
-          {footer("finish", false)}
-        </>
-      )}
+      {created ? (
+        <Box sx={{ maxWidth: 820, mx: "auto", p: "40px 24px 80px" }}>
+          <Card
+            variant="base"
+            data-testid="wizard-created"
+            sx={{ borderRadius: "16px", p: "44px 44px 36px", textAlign: "center" }}
+          >
+            <Box
+              sx={{
+                width: 76,
+                height: 76,
+                mx: "auto",
+                borderRadius: "999px",
+                bgcolor: "surface.successSoftBg",
+                color: "surface.successFg",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconRenderer name="check" size={40} color="inherit" />
+            </Box>
+            <Typography
+              sx={{
+                fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: "-.02em",
+                mt: "20px",
+              }}
+            >
+              {t("created.title")}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: 14,
+                lineHeight: 1.65,
+                color: "text.secondary",
+                mt: "8px",
+                maxWidth: 520,
+                mx: "auto",
+                textWrap: "pretty",
+              }}
+            >
+              {t("created.blurb")}
+            </Typography>
 
-      <Typography sx={{ fontSize: 11.5, color: "text.disabled", mt: "14px", textAlign: "center" }}>
-        {step === STEP_KEYS.length - 1 ? t("footNote.last") : t("footNote.default")}
-      </Typography>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(216px,1fr))",
+                gap: "12px",
+                mt: "30px",
+                textAlign: "left",
+              }}
+            >
+              {doneActions.map((action) => (
+                <LinkRenderer
+                  key={action.key}
+                  config={{ routeId: action.routeId, underline: "none" }}
+                >
+                  <Card
+                    variant="inset"
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "9px",
+                      p: "18px",
+                      height: "100%",
+                      border: "1px solid transparent",
+                      cursor: "pointer",
+                      transition: "var(--recruit-motion-state)",
+                      "&:hover": { borderColor: "primary.main", bgcolor: "surface.hover" },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "9px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flex: "none",
+                        bgcolor: `surface.${action.tone}SoftBg`,
+                        color:
+                          action.tone === "primary"
+                            ? "surface.primarySoftFg"
+                            : `surface.${action.tone}Fg`,
+                      }}
+                    >
+                      <IconRenderer name={action.icon} size={19} color="inherit" />
+                    </Box>
+                    <Typography sx={{ fontSize: 13.5, fontWeight: 700, color: "text.primary" }}>
+                      {t(`created.actions.${action.key}.title`)}
+                    </Typography>
+                    <Typography sx={{ fontSize: 12, lineHeight: 1.6, color: "text.secondary" }}>
+                      {t(`created.actions.${action.key}.detail`)}
+                    </Typography>
+                  </Card>
+                </LinkRenderer>
+              ))}
+            </Box>
+
+            {config.links?.dashboard ? (
+              <LinkRenderer config={config.links.dashboard}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  data-testid="wizard-created-cta"
+                  endIcon={<ArrowForwardRounded />}
+                  sx={{ mt: "26px", px: "26px" }}
+                >
+                  {t("created.cta")}
+                </Button>
+              </LinkRenderer>
+            ) : null}
+            <Typography sx={{ fontSize: 11.5, color: "text.secondary", mt: "14px" }}>
+              {t("created.foot")}
+            </Typography>
+          </Card>
+        </Box>
+      ) : (
+        <Box sx={{ maxWidth: 880, mx: "auto", p: "14px 24px 72px" }}>
+          {resumed ? (
+            <Card
+              data-testid="wizard-resumed"
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "11px",
+                bgcolor: "surface.warningSoftBg",
+                border: "1px solid",
+                borderColor: "surface.warningSoftBorder",
+                borderRadius: "14px",
+                p: "13px 16px",
+                mb: "22px",
+              }}
+            >
+              <Box sx={{ color: "surface.warningSoftFg", display: "flex", flex: "none" }}>
+                <IconRenderer name="history" size={18} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography sx={{ fontSize: 13, fontWeight: 700, color: "surface.warningSoftFg" }}>
+                  {t("resume.title")}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 12, lineHeight: 1.55, color: "text.primary", mt: "3px" }}
+                >
+                  {t("resume.body", {
+                    step: entryStep.current + 1,
+                    total: STEP_KEYS.length,
+                    label: t(
+                      `steps.${STEP_KEYS[entryStep.current] ?? "basics"}.label`,
+                    ).toLowerCase(),
+                  })}
+                </Typography>
+              </Box>
+              <Button
+                variant="text"
+                size="small"
+                disabled={!ready}
+                data-testid="wizard-start-over"
+                onClick={() => void move(0)}
+              >
+                {t("resume.startOver")}
+              </Button>
+            </Card>
+          ) : null}
+
+          <Typography
+            data-testid="wizard-step-kicker"
+            sx={{ fontSize: 11, fontWeight: 700, letterSpacing: ".09em", color: "text.secondary" }}
+          >
+            {t("stepOf", { step: step + 1, total: STEP_KEYS.length })}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "var(--font-grotesk), 'Space Grotesk', system-ui, sans-serif",
+              fontSize: 30,
+              fontWeight: 700,
+              letterSpacing: "-.02em",
+              mt: "8px",
+              textWrap: "pretty",
+            }}
+          >
+            {t(`steps.${stepKey}.title`)}
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: 14,
+              lineHeight: 1.6,
+              color: "text.secondary",
+              mt: "8px",
+              maxWidth: 640,
+            }}
+          >
+            {t(`steps.${stepKey}.blurb`)}
+          </Typography>
+
+          <Box
+            data-testid="wizard-rail"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              m: "22px 0 20px",
+              flexWrap: "wrap",
+            }}
+          >
+            {STEP_KEYS.map((key, index) => (
+              <RailChip
+                key={key}
+                stepKey={key}
+                label={t(`steps.${key}.label`)}
+                index={index}
+                current={step}
+                onClick={() => index <= step && void move(index)}
+              />
+            ))}
+          </Box>
+
+          {schema && !ready ? (
+            <>
+              {panel(
+                <Box sx={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+                  {[0, 1, 2].map((row) => (
+                    <Skeleton key={row} variant="rounded" height={56} />
+                  ))}
+                </Box>,
+              )}
+              {footer("next", false)}
+            </>
+          ) : schema ? (
+            <FormRenderer
+              // Remounting per step is deliberate: each step is its own form with
+              // its own defaults, and carrying state across them would be wrong.
+              // react-hook-form reads defaultValues once, so the form must not
+              // mount before the workspace's own values have arrived — hence the
+              // `ready` gate above rather than a key that changes under it.
+              key={stepKey}
+              id={id}
+              schema={schema}
+              defaultValues={defaultsFor(stepKey)}
+              // A grid, not a stack, so a schema can put two short fields on one
+              // row (date and time format) — everything else defaults to full width.
+              gridContainer={{ columns: 12, spacing: 2.75 }}
+              widgets={WIZARD_WIDGETS}
+              onSubmit={(values) => move(step + 1, values)}
+              wrapFields={(fields) =>
+                panel(
+                  <>
+                    {fields}
+                    {stepKey === "team" ? roleNotes : null}
+                  </>,
+                )
+              }
+              actions={() => footer(step === 3 ? "nextInvites" : "next", true)}
+            />
+          ) : (
+            <>
+              {panel(<ReviewStep id={id} state={state} onChange={(target) => void move(target)} />)}
+              {footer("finish", false)}
+            </>
+          )}
+
+          <Typography
+            sx={{ fontSize: 11.5, color: "text.disabled", mt: "14px", textAlign: "center" }}
+          >
+            {step === STEP_KEYS.length - 1 ? t("footNote.last") : t("footNote.default")}
+          </Typography>
+        </Box>
+      )}
 
       <Snackbar
         open={Boolean(toast)}
@@ -628,42 +782,40 @@ function RailChip({
       sx={{
         display: "flex",
         alignItems: "center",
-        gap: "7px",
-        borderRadius: "999px",
-        p: "6px 13px 6px 8px",
+        gap: "8px",
+        height: 38,
+        px: "14px",
+        borderRadius: "8px",
         cursor: index <= current ? "pointer" : "default",
-        bgcolor: active
-          ? "surface.primarySoftBg"
-          : done
-            ? "surface.successSoftBg"
-            : "background.paper",
+        bgcolor: active ? "surface.primarySoftBg" : done ? "surface.successSoftBg" : "transparent",
         border: "1px solid",
         borderColor: active
           ? "surface.primarySoftBorder"
           : done
             ? "surface.successSoftBorder"
-            : "divider",
-        color: active ? "surface.primarySoftFg" : done ? "surface.successFg" : "text.disabled",
+            : "surface.border",
+        color: active ? "surface.primarySoftFg" : done ? "surface.successFg" : "text.secondary",
+        transition: "var(--recruit-motion-state)",
       }}
     >
       <Box
         sx={{
-          width: 19,
-          height: 19,
+          width: 20,
+          height: 20,
           borderRadius: "999px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 10,
+          fontSize: 10.5,
           fontWeight: 700,
           flex: "none",
-          bgcolor: active ? "primary.main" : done ? "surface.successSoftBg" : "surface.neutral",
-          color: active ? "primary.contrastText" : "inherit",
+          bgcolor: active ? "primary.main" : done ? "surface.successFg" : "surface.neutral",
+          color: active || done ? "primary.contrastText" : "text.secondary",
         }}
       >
-        {done ? "✓" : index + 1}
+        {done ? <IconRenderer name="check" size={14} color="inherit" /> : index + 1}
       </Box>
-      <Typography sx={{ fontSize: 11.5, fontWeight: 600, whiteSpace: "nowrap", color: "inherit" }}>
+      <Typography sx={{ fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", color: "inherit" }}>
         {label}
       </Typography>
     </Box>

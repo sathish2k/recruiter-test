@@ -7,7 +7,7 @@
     "requirementsDelta": "Across {value} clients",
     "avgTimeToHire": "Avg Time to Hire",
     "days": "{value} days",
-    "avgTimeToHireDelta": "across placed candidates",
+    "avgTimeToHireDelta": "Across placed candidates",
     "placements": "Placements",
     "placementsDelta": "all time"
   }

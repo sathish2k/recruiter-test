@@ -1,365 +1,542 @@
 "use client";
 
-import CancelRounded from "@mui/icons-material/CancelRounded";
-import CheckCircleRounded from "@mui/icons-material/CheckCircleRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
 import Skeleton from "@mui/material/Skeleton";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { type AccessAction, useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
-import { IconRenderer, useToast } from "@recruit/shared";
+import { useAccess, useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
+import { IconRenderer, useModal, useToast } from "@recruit/shared";
+import type { RecordScope } from "@recruit/types";
 import { useEffect, useMemo, useState } from "react";
+import { MembersSheet } from "./members-sheet";
+import { type MatrixGroup, PermissionMatrix } from "./permission-matrix";
+import { PermissionSummary, type SummaryStat } from "./permission-summary";
 import type { PermissionsConfig } from "./permissions.configuration";
-import { RoleCards, type RoleHolders } from "./role-cards";
+import {
+  applyToggle,
+  buildDrafts,
+  cloneDraft,
+  cloneDrafts,
+  type DraftState,
+  diffDraft,
+  matrixResources,
+  type RoleDraft,
+  type RoleHolders,
+  type RoleRecord,
+  serialize,
+  summarise,
+} from "./permissions.model";
+import { type RoleCardData, RoleCards } from "./role-cards";
+import { DeleteRoleDialog, RoleFormDialog, SaveDialog } from "./role-dialogs";
 
-interface RolePermissions {
-  role: string;
-  permissions: { resource: string; actions: AccessAction[] }[];
-}
-
-type PermState = Record<string, Record<string, Set<AccessAction>>>;
-
-function buildState(data: RolePermissions[], columns: string[], resources: string[]): PermState {
-  const state: PermState = {};
-  for (const role of columns) {
-    const entry = data.find((d) => d.role === role);
-    const wildcard = entry?.permissions.find((p) => p.resource === "*");
-    const map: Record<string, Set<AccessAction>> = {};
-    for (const resource of resources) {
-      if (wildcard) {
-        map[resource] = new Set(wildcard.actions);
-      } else {
-        const perm = entry?.permissions.find((p) => p.resource === resource);
-        map[resource] = new Set(perm?.actions ?? []);
-      }
-    }
-    state[role] = map;
-  }
-  return state;
-}
-
-function serializeRole(state: PermState, role: string, resources: string[]): string {
-  return resources
-    .map((resource) => [...(state[role]?.[resource] ?? [])].sort().join(","))
-    .join("|");
-}
-
-function cloneState(state: PermState): PermState {
-  const next: PermState = {};
-  for (const role of Object.keys(state)) {
-    next[role] = {};
-    for (const resource of Object.keys(state[role])) {
-      next[role][resource] = new Set(state[role][resource]);
-    }
-  }
-  return next;
-}
+const EMPTY_DRAFT: RoleDraft = { grants: {}, scope: {}, extras: {} };
 
 export function PermissionsComponent({ id }: { id: string }) {
   const { t } = useTranslation(id);
   const config = useConfiguration<PermissionsConfig>(id);
-  const { data, meta, isLoading, mutation, mutate } = useFetch<RolePermissions[]>(id);
+  const { data, meta, isLoading, mutation, mutate } = useFetch<RoleRecord[]>(id);
   const { show } = useToast();
+  const { can } = useAccess();
 
-  const columns = config.columns ?? [];
-  const resources = config.resources ?? [];
-  const crudActions = config.crudActions ?? [];
-  const lockedColumns = useMemo(() => config.lockedColumns ?? [], [config.lockedColumns]);
+  // Editing a role and minting one are separate authorities: an admin tunes the
+  // matrix, only an owner adds or removes a role.
+  const canManage = can(config.manageAccess);
+  const canCreate = can(config.createAccess);
 
-  const baseline = useMemo(
-    () => buildState(data ?? [], columns, resources),
-    [data, columns, resources],
-  );
-  const [editable, setEditable] = useState<PermState>(baseline);
-  const [saving, setSaving] = useState(false);
+  const saveModal = useModal();
+  const createModal = useModal<"create" | "duplicate">();
+  const deleteModal = useModal();
+
+  const records = useMemo(() => data ?? [], [data]);
+  const holders = (meta?.holders as Record<string, RoleHolders>) ?? {};
+  const resources = useMemo(() => matrixResources(config), [config]);
+
+  const baseline = useMemo(() => buildDrafts(records, config), [records, config]);
+  const [drafts, setDrafts] = useState<DraftState>(baseline);
+  const [roleId, setRoleId] = useState("");
+  const [query, setQuery] = useState("");
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [membersRole, setMembersRole] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", preset: "blank" });
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    setEditable(cloneState(baseline));
+    setDrafts(cloneDrafts(baseline));
   }, [baseline]);
 
-  // Counts and names come from the same endpoint as the matrix, so the cards
-  // can't drift from the roles they describe.
-  const holders = (meta?.holders as Record<string, RoleHolders>) ?? {};
+  // Land on the first role that can actually be edited — opening on a frozen
+  // one reads as "this screen does nothing".
+  const fallback =
+    records.find((entry) => !config.lockedRoles.includes(entry.role))?.role ??
+    records[0]?.role ??
+    "";
+  const selected = roleId && drafts[roleId] ? roleId : fallback;
+  const record = records.find((entry) => entry.role === selected);
+  const draft = drafts[selected] ?? EMPTY_DRAFT;
+  const base = baseline[selected] ?? EMPTY_DRAFT;
+  const locked = config.lockedRoles.includes(selected) || !canManage;
 
-  const roleLabelOf = (role: string) => config.roles?.find((r) => r.value === role)?.label ?? role;
-  const isLocked = (role: string) => lockedColumns.includes(role);
+  const roleLabel = (role: string) => {
+    const entry = records.find((item) => item.role === role);
+    return entry?.label ?? t(`roles.labels.${role}`, role);
+  };
+  const roleDescription = (entry: RoleRecord) =>
+    entry.description ?? t(`roles.descriptions.${entry.role}`, t("roles.descriptions.custom"));
+  const resourceLabel = (resource: string) => t(`resources.${resource}`, resource);
+  const columnLabel = (key: string) =>
+    t(config.columns.find((column) => column.key === key)?.label ?? key);
+  const scopeLabel = (scope: RecordScope) => t(`scopes.${scope}`);
+  const memberCount = (role: string) => {
+    const count = holders[role]?.count ?? 0;
+    return t(count === 1 ? "members.member" : "members.members", { count });
+  };
 
-  const changedRoles = columns.filter(
-    (role) =>
-      !isLocked(role) &&
-      serializeRole(editable, role, resources) !== serializeRole(baseline, role, resources),
-  );
-  const dirty = changedRoles.length > 0;
-
-  /** Every granular action, so a binary "on" grants the whole row. */
-  const allActions = useMemo(
-    () => [...new Set(crudActions.flatMap((group) => group.actions))],
-    [crudActions],
-  );
-
-  /** The design's cell is a single yes/no — granting means the full set. */
-  const toggleCell = (role: string, resource: string) => {
-    setEditable((prev) => {
-      const next = cloneState(prev);
-      const set = next[role][resource];
-      if (set.size > 0) set.clear();
-      else for (const a of allActions) set.add(a);
-      return next;
+  const editRole = (apply: (next: RoleDraft) => void) => {
+    if (locked) return;
+    setDrafts((prev) => {
+      const copy = cloneDraft(prev[selected] ?? EMPTY_DRAFT);
+      apply(copy);
+      return { ...prev, [selected]: copy };
     });
   };
 
-  const reset = () => {
-    setEditable(cloneState(baseline));
-  };
+  const needle = query.trim().toLowerCase();
+  const visibleGroups: MatrixGroup[] = config.groups
+    .map((group) => ({
+      key: group.key,
+      title: t(group.key),
+      rows: group.rows
+        .map((row) => ({
+          ...row,
+          name: resourceLabel(row.resource),
+          hint: t(`hints.${row.resource}`, ""),
+        }))
+        .filter(
+          (row) =>
+            !needle ||
+            row.name.toLowerCase().includes(needle) ||
+            row.hint.toLowerCase().includes(needle),
+        ),
+    }))
+    .filter((group) => group.rows.length > 0);
+
+  const visible = visibleGroups.flatMap((group) => group.rows.map((row) => row.resource));
+
+  const coverage = resources.map((resource) => {
+    const granted = draft.grants[resource] ?? [];
+    return {
+      resource,
+      name: resourceLabel(resource),
+      on: granted.length > 0,
+      letters: granted.map((key) => columnLabel(key).charAt(0)).join(""),
+    };
+  });
+
+  const changes = diffDraft(base, draft, config, {
+    resource: resourceLabel,
+    column: columnLabel,
+    scope: scopeLabel,
+  });
+
+  const totals = summarise(draft, config);
+  const stats: SummaryStat[] = [
+    {
+      key: "reachable",
+      value: totals.reachable.length,
+      unit: t("summary.of", { total: totals.resources.length }),
+      label: t("summary.reachable"),
+      note: t("summary.reachableNote"),
+    },
+    {
+      key: "enabled",
+      value: totals.enabled,
+      unit: t("summary.of", { total: totals.total }),
+      label: t("summary.enabled"),
+      note: t("summary.enabledNote"),
+    },
+    {
+      key: "restricted",
+      value: totals.restricted.length,
+      unit: t(totals.restricted.length === 1 ? "summary.resource" : "summary.resources"),
+      label: t("summary.restricted"),
+      note: t("summary.restrictedNote"),
+      tone: totals.restricted.length ? "default" : "success",
+    },
+    {
+      key: "destructive",
+      value: totals.destructive.length,
+      unit: t(totals.destructive.length === 1 ? "summary.resource" : "summary.resources"),
+      label: t("summary.destructive"),
+      note: t("summary.destructiveNote"),
+      tone: totals.destructive.length ? "warning" : "success",
+    },
+  ];
+
+  const restricted = totals.restricted.map(resourceLabel);
+
+  const cards: RoleCardData[] = records.map((entry) => ({
+    role: entry.role,
+    label: roleLabel(entry.role),
+    description: roleDescription(entry),
+    icon: entry.icon ?? config.roleIcons[entry.role] ?? config.customRoleIcon,
+    system: entry.system,
+    members: holders[entry.role]?.count ?? 0,
+    edited: entry.updatedAt
+      ? entry.updatedBy
+        ? t("roles.editedBy", {
+            date: new Date(entry.updatedAt).toLocaleDateString(),
+            name: entry.updatedBy,
+          })
+        : t("roles.edited", { date: new Date(entry.updatedAt).toLocaleDateString() })
+      : t("roles.neverEdited"),
+  }));
+
+  const presets = [
+    { id: "blank", label: t("dialogs.create.blank"), detail: t("dialogs.create.blankDetail") },
+    ...records.map((entry) => ({
+      id: entry.role,
+      label: roleLabel(entry.role),
+      detail: t("dialogs.create.copyDetail", {
+        count: summarise(drafts[entry.role] ?? EMPTY_DRAFT, config).enabled,
+        role: roleLabel(entry.role),
+      }),
+    })),
+  ];
+
+  const nameTaken =
+    !!form.name.trim() &&
+    cards.some((card) => card.label.toLowerCase() === form.name.trim().toLowerCase());
+
+  const failed = () => show(t("toast.failedTitle"), t("toast.failedSub"), "error");
 
   const save = async () => {
-    if (!dirty || saving) return;
-    setSaving(true);
+    setBusy(true);
     try {
-      for (const role of changedRoles) {
-        const permissions = resources
-          .map((resource) => ({
-            resource,
-            actions: [...editable[role][resource]],
-          }))
-          .filter((p) => p.actions.length > 0);
-        await mutation.update?.({ role, permissions });
-      }
-      const labels = changedRoles.map((role) => t(roleLabelOf(role)));
+      await mutation.update?.({ role: selected, ...serialize(draft, config) });
       await mutate();
+      saveModal.close();
       show(
         t("toast.savedTitle"),
-        changedRoles.length === 1 ? t("toast.savedRole", { role: labels[0] }) : labels.join(" · "),
+        t("toast.savedSub", { role: roleLabel(selected), members: memberCount(selected) }),
       );
+    } catch {
+      failed();
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   };
 
-  const GRID = "2.4fr 1fr 1fr 1fr";
-
-  /** Mirrors the real layout so the swap to content doesn't shift anything. */
-  const skeleton = (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-          gap: "16px",
-        }}
-      >
-        {[0, 1, 2].map((card) => (
-          <Box
-            key={card}
-            sx={{
-              bgcolor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: "16px",
-              p: "18px 20px",
-            }}
-          >
-            <Skeleton variant="rounded" width={92} height={24} sx={{ borderRadius: "999px" }} />
-            <Skeleton variant="text" width="100%" sx={{ mt: "12px" }} />
-            <Skeleton variant="text" width="80%" />
-            <Skeleton variant="text" width={110} sx={{ mt: "9px" }} />
-          </Box>
-        ))}
-      </Box>
-      <Box
-        sx={{
-          bgcolor: "background.paper",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: "16px",
-          p: "20px 22px",
-        }}
-      >
-        <Skeleton variant="text" width={180} height={22} />
-        <Skeleton variant="text" width={340} />
-        <Skeleton variant="rounded" height={38} sx={{ mt: "14px", borderRadius: "10px" }} />
-        {[0, 1, 2, 3, 4, 5].map((row) => (
-          <Box
-            key={row}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: GRID,
-              gap: "10px",
-              alignItems: "center",
-              p: "11px 14px",
-            }}
-          >
-            <Skeleton variant="text" width="70%" />
-            {[0, 1, 2].map((cell) => (
-              <Skeleton key={cell} variant="circular" width={19} height={19} sx={{ mx: "auto" }} />
-            ))}
-          </Box>
-        ))}
-      </Box>
-    </Box>
-  );
-
-  if (isLoading) return skeleton;
-
-  /** One yes/no glyph. The owner column is fixed on and reads dimmed. */
-  const cell = (resource: string, role: string) => {
-    const on = (editable[role]?.[resource]?.size ?? 0) > 0;
-    const locked = isLocked(role);
-    return (
-      <Box
-        key={role}
-        onClick={locked ? undefined : () => toggleCell(role, resource)}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          cursor: locked ? "default" : "pointer",
-          opacity: locked ? 0.55 : 1,
-        }}
-      >
-        {on || locked ? (
-          <CheckCircleRounded sx={{ fontSize: 19, color: "surface.successFg" }} />
-        ) : (
-          <CancelRounded sx={{ fontSize: 19, color: "rgba(255,255,255,.22)" }} />
-        )}
-      </Box>
-    );
+  const createRole = async () => {
+    const duplicate = createModal.data === "duplicate";
+    setBusy(true);
+    try {
+      const created = (await mutation.create?.({
+        label: form.name.trim(),
+        from: duplicate ? selected : form.preset,
+      })) as RoleRecord | undefined;
+      await mutate();
+      createModal.close();
+      if (created) setRoleId(created.role);
+      show(t("toast.createdTitle"), t("toast.createdSub", { role: form.name.trim() }));
+    } catch {
+      failed();
+    } finally {
+      setBusy(false);
+    }
   };
 
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <RoleCards cards={config.cards ?? []} holders={holders} t={t} />
+  const removeRole = async () => {
+    const label = roleLabel(selected);
+    const members = memberCount(selected);
+    setBusy(true);
+    try {
+      await mutation.remove?.({ role: selected, reassignTo: config.reassignTo });
+      await mutate();
+      deleteModal.close();
+      setTyped("");
+      setRoleId(config.reassignTo);
+      show(
+        t("toast.deletedTitle"),
+        t("toast.deletedSub", { role: label, members, target: roleLabel(config.reassignTo) }),
+      );
+    } catch {
+      failed();
+    } finally {
+      setBusy(false);
+    }
+  };
 
-      <Box
-        sx={{
-          bgcolor: "background.paper",
-          border: "1px solid",
-          borderColor: "divider",
-          borderRadius: "16px",
-          p: "20px 22px",
-        }}
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <Card variant="base" sx={{ p: "22px 24px" }}>
+          <Skeleton variant="text" width={160} height={24} />
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit,minmax(236px,1fr))",
+              gap: "12px",
+              mt: "16px",
+            }}
+          >
+            {[0, 1, 2, 3].map((card) => (
+              <Skeleton key={card} variant="rounded" height={132} sx={{ borderRadius: "12px" }} />
+            ))}
+          </Box>
+        </Card>
+        <Card variant="base" sx={{ p: "22px 24px" }}>
+          <Skeleton variant="text" width={200} height={24} />
+          {[0, 1, 2, 3, 4, 5].map((row) => (
+            <Skeleton key={row} variant="text" height={38} />
+          ))}
+        </Card>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}
+    >
+      <Card
+        variant="base"
+        sx={{ p: "22px 24px", display: "flex", flexDirection: "column", gap: "16px" }}
       >
         <Box
           sx={{
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "space-between",
-            mb: "14px",
-            gap: "12px",
+            gap: "16px",
+            flexWrap: "wrap",
           }}
         >
           <Box>
-            <Typography sx={{ fontSize: 14.5, fontWeight: 700 }}>{t("title")}</Typography>
-            <Typography sx={{ fontSize: 12, color: "text.disabled", mt: "2px" }}>
-              {t("note")}
+            <Typography sx={{ fontSize: 15, fontWeight: 700 }}>{t("roles.title")}</Typography>
+            <Typography sx={{ fontSize: 12.5, color: "text.secondary", mt: "3px" }}>
+              {t("roles.note")}
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<IconRenderer name="tune" size={15} />}
-            sx={{ flex: "none" }}
-          >
-            {t("manageMembers")}
-          </Button>
-        </Box>
-
-        {/* Column header strip */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: GRID,
-            gap: "10px",
-            p: "10px 14px",
-            bgcolor: "var(--mui-palette-surface-headBg)",
-            borderRadius: "10px",
-            fontSize: 12,
-            color: "text.secondary",
-          }}
-        >
-          <Box>{t("permission")}</Box>
-          {columns.map((role) => (
-            <Box key={role} sx={{ textAlign: "center" }}>
-              {t(roleLabelOf(role))}
-            </Box>
-          ))}
-        </Box>
-
-        {(config.groups ?? []).map((group) => (
-          <Box key={group.label}>
-            <Typography
-              sx={{
-                fontSize: 10.5,
-                letterSpacing: ".1em",
-                fontWeight: 700,
-                color: "text.disabled",
-                p: "16px 14px 7px",
-              }}
-            >
-              {t(group.label)}
-            </Typography>
-            {group.resources.map((resource) => (
-              <Box
-                key={resource}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: GRID,
-                  gap: "10px",
-                  alignItems: "center",
-                  p: "11px 14px",
-                  borderBottom: "1px solid rgba(255,255,255,.05)",
-                  fontSize: 13,
+          {canCreate ? (
+            <Box sx={{ display: "flex", gap: "8px" }}>
+              <Button
+                variant="outlined"
+                startIcon={<IconRenderer name="content-copy" size={17} />}
+                onClick={() => {
+                  setForm({
+                    name: t("dialogs.duplicate.copySuffix", { role: roleLabel(selected) }),
+                    preset: selected,
+                  });
+                  createModal.open("duplicate");
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "9px",
-                    color: "surface.textMuted",
-                  }}
-                >
-                  <IconRenderer
-                    name={config.icons?.[resource] ?? "settings"}
-                    size={16}
-                    sx={{ color: "text.disabled" }}
-                  />
-                  {t(`resources.${resource}`)}
-                  <Tooltip title={t(`tips.${resource}`, "")} placement="top">
-                    <Box component="span" sx={{ display: "inline-flex", cursor: "help" }}>
-                      <IconRenderer name="help" size={14} sx={{ color: "#5A5852" }} />
-                    </Box>
-                  </Tooltip>
-                </Box>
-                {columns.map((role) => cell(resource, role))}
-              </Box>
-            ))}
-          </Box>
-        ))}
+                {t("roles.duplicate", { role: roleLabel(selected) })}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<IconRenderer name="add" size={17} />}
+                onClick={() => {
+                  setForm({ name: "", preset: "blank" });
+                  createModal.open("create");
+                }}
+              >
+                {t("roles.create")}
+              </Button>
+            </Box>
+          ) : null}
+        </Box>
 
+        <RoleCards
+          cards={cards}
+          selected={selected}
+          onSelect={(role) => {
+            setRoleId(role);
+            setQuery("");
+          }}
+          onViewMembers={setMembersRole}
+          t={t}
+        />
+      </Card>
+
+      <PermissionMatrix
+        config={config}
+        groups={visibleGroups}
+        visible={visible}
+        draft={draft}
+        roleLabel={roleLabel(selected)}
+        system={record?.system ?? true}
+        locked={locked}
+        note={
+          locked
+            ? t("matrix.ownerNote")
+            : record?.system
+              ? t("matrix.systemNote", { role: roleLabel(selected) })
+              : ""
+        }
+        query={query}
+        onQuery={setQuery}
+        collapsed={collapsed}
+        onToggleGroup={(key) => setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }))}
+        onToggleCell={(resource, column, on) =>
+          editRole((next) => {
+            next.grants[resource] = applyToggle(
+              next.grants[resource] ?? [],
+              config.columns,
+              column,
+              on,
+            );
+          })
+        }
+        onToggleColumn={(column, on) =>
+          editRole((next) => {
+            for (const resource of visible) {
+              next.grants[resource] = applyToggle(
+                next.grants[resource] ?? [],
+                config.columns,
+                column,
+                on,
+              );
+            }
+          })
+        }
+        onCycleScope={(resource) =>
+          editRole((next) => {
+            const order = config.scopes;
+            const at = order.indexOf(next.scope[resource] ?? "all");
+            next.scope[resource] = order[(at + 1) % order.length] ?? "all";
+          })
+        }
+        coverage={coverage}
+        t={t}
+      />
+
+      <PermissionSummary
+        roleLabel={roleLabel(selected)}
+        stats={stats}
+        restricted={restricted}
+        custom={!!record && !record.system && canCreate}
+        memberCount={memberCount(selected)}
+        onDelete={() => {
+          setTyped("");
+          deleteModal.open();
+        }}
+        t={t}
+      />
+
+      {changes.length > 0 ? (
         <Box
           sx={{
+            // Sticky, not fixed: the bar belongs to the content column, so it
+            // never has to know how wide the side rail is.
+            position: "sticky",
+            bottom: 0,
+            zIndex: (theme) => theme.zIndex.appBar,
+            borderRadius: "12px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "12px",
-            pt: "14px",
+            gap: "16px",
+            flexWrap: "wrap",
+            p: "14px 28px",
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow: "var(--mui-palette-surface-menuShadow)",
           }}
         >
-          <Typography
-            sx={{ fontSize: 11.5, color: "text.disabled", maxWidth: 520, lineHeight: 1.5 }}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "11px",
+              flex: 1,
+              minWidth: 280,
+              fontSize: 12.5,
+              lineHeight: 1.5,
+              color: "text.primary",
+            }}
           >
-            {t("footerNote")}
-          </Typography>
-          <Box sx={{ display: "flex", gap: "8px", flex: "none" }}>
-            <Button variant="outlined" onClick={reset} disabled={!dirty}>
-              {t("buttons.reset")}
+            <IconRenderer
+              name="warning"
+              size={19}
+              sx={{ flex: "none", color: "surface.warningFg" }}
+            />
+            <Box>
+              {t("savebar.note", {
+                changes: t(changes.length === 1 ? "savebar.change" : "savebar.changes", {
+                  count: changes.length,
+                }),
+                role: roleLabel(selected),
+                members: memberCount(selected),
+              })}
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: "10px", flex: "none" }}>
+            <Button
+              variant="outlined"
+              onClick={() => setDrafts((prev) => ({ ...prev, [selected]: cloneDraft(base) }))}
+            >
+              {t("savebar.discard")}
             </Button>
-            <Button variant="contained" onClick={save} loading={saving} disabled={!dirty}>
-              {t("buttons.save")}
+            <Button variant="contained" onClick={() => saveModal.open()}>
+              {t("savebar.review")}
             </Button>
           </Box>
         </Box>
-      </Box>
+      ) : null}
+
+      <MembersSheet
+        open={!!membersRole}
+        onClose={() => setMembersRole(null)}
+        roleLabel={membersRole ? roleLabel(membersRole) : ""}
+        holders={membersRole ? holders[membersRole] : undefined}
+        membersLink={config.membersLink}
+        t={t}
+      />
+
+      <SaveDialog
+        open={saveModal.isOpen}
+        onClose={saveModal.close}
+        onConfirm={save}
+        changes={changes}
+        roleLabel={roleLabel(selected)}
+        memberCount={memberCount(selected)}
+        busy={busy}
+        t={t}
+      />
+
+      <RoleFormDialog
+        open={createModal.isOpen}
+        mode={createModal.data === "duplicate" ? "duplicate" : "create"}
+        sourceLabel={roleLabel(selected)}
+        value={form}
+        onChange={setForm}
+        presets={presets}
+        nameTaken={nameTaken}
+        onClose={createModal.close}
+        onConfirm={createRole}
+        busy={busy}
+        t={t}
+      />
+
+      <DeleteRoleDialog
+        open={deleteModal.isOpen}
+        roleLabel={roleLabel(selected)}
+        reassignLabel={roleLabel(config.reassignTo)}
+        memberCount={memberCount(selected)}
+        typed={typed}
+        onTyped={setTyped}
+        onClose={deleteModal.close}
+        onConfirm={removeRole}
+        busy={busy}
+        t={t}
+      />
     </Box>
   );
 }

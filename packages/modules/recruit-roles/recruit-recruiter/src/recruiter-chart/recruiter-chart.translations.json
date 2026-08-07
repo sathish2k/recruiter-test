@@ -1,0 +1,15 @@
+{
+  "title": "Your revenue by quarter",
+  "subtitle": "Potential value against what you booked",
+  "seriesA": "Submitted value",
+  "seriesB": "Booked",
+  "empty": {
+    "title": "No revenue booked yet",
+    "description": "Requisitions you fill will chart their fee here by quarter."
+  },
+  "metrics": {
+    "submissions": "Submissions",
+    "placements": "Placements",
+    "revenue": "Revenue"
+  }
+}

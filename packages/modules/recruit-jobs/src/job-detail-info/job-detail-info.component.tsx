@@ -93,7 +93,7 @@ export function JobDetailInfoComponent({ id }: { id: string }) {
                     height: "100%",
                     width: `${data.percent}%`,
                     borderRadius: "999px",
-                    background: "linear-gradient(90deg,#FF8A3C,#E4560F)",
+                    background: "var(--mui-palette-primary-main)",
                   }}
                 />
               </Box>

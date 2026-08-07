@@ -88,6 +88,19 @@ export function usePortalRouter(): PortalRouter {
   return ctx;
 }
 
+/**
+ * The matched route branch, root-first. This is the tree position of the
+ * current URL — what a breadcrumb is, before it is styled.
+ */
+export function useRouteBranch(): Route[] {
+  const routes = useContext(RoutesContext);
+  const pathname = usePathname();
+  return useMemo(
+    () => findRouteBySlug((pathname ?? "/").split("/").filter(Boolean), routes) ?? [],
+    [routes, pathname],
+  );
+}
+
 export function useRouteParams(): Record<string, string> {
   const routes = useContext(RoutesContext);
   const pathname = usePathname();

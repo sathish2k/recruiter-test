@@ -84,7 +84,7 @@ export function JobDetailTimelineComponent({ id }: { id: string }) {
                       bgcolor: milestone.state === "done" ? "surface.successSoftBg" : "transparent",
                       background:
                         milestone.state === "current"
-                          ? "linear-gradient(135deg,#FF8A3C,#E4560F)"
+                          ? "var(--mui-palette-primary-main)"
                           : undefined,
                       color: milestone.state === "done" ? "surface.successFg" : "#fff",
                     }}

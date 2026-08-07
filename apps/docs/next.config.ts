@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
   // app (see externalDir), and Next otherwise guesses the root from lockfiles.
   turbopack: { root: join(import.meta.dirname, "..", "..") },
   experimental: {
+    // Next 16.2.12 aborts the build outright when it can't load the TS
+    // compiler API; TypeScript 7 (the native port) ships only `lib/tsc.js`.
+    // This tells Next to shell out to the TypeScript CLI instead of requiring
+    // the API. Types stay gated by `tsc --noEmit`, not by the build.
+    useTypeScriptCli: true,
     externalDir: true,
   },
   // Next's in-build type check requires `typescript/lib/typescript.js`, which

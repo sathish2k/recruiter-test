@@ -109,7 +109,7 @@ export function GetStarted({
           sx={{
             height: "100%",
             width: `${(doneCount / Math.max(total, 1)) * 100}%`,
-            background: "linear-gradient(90deg,#FF8A3C,#E4560F)",
+            background: "var(--mui-palette-primary-main)",
             borderRadius: "999px",
             transition: "width .25s",
           }}

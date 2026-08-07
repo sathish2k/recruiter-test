@@ -1,0 +1,42 @@
+{
+  "back": "Back to sign up",
+  "title": "Terms of Service",
+  "updated": "Draft — not yet reviewed",
+  "draftNotice": "This is placeholder text, not a binding agreement. It describes how the product actually behaves so the page is not empty, but it has not been written or reviewed by a lawyer. Replace it with counsel-approved terms before launch.",
+  "intro": "These terms describe the agreement between HirePilotX and the agency workspace you create. By creating a workspace you confirm you are authorised to accept them on that agency's behalf.",
+  "sections": [
+    {
+      "heading": "1. Your workspace",
+      "body": "Creating an account creates a workspace for your agency. The first person to create a workspace for an agency becomes its Owner. Anyone who signs up afterwards with the same agency name joins that existing workspace as a Recruiter rather than creating a second one. Owners control who else has access and what each role can do."
+    },
+    {
+      "heading": "2. Your account",
+      "body": "You are responsible for keeping your password private and for activity that happens under your account. We verify your email address before you can create records or send mail, so that messages leaving the platform can be attributed to a real address. Tell us promptly if you believe someone else has used your account."
+    },
+    {
+      "heading": "3. Acceptable use",
+      "body": "Use the platform for legitimate recruitment work. Do not upload material you have no right to share, attempt to reach data belonging to other workspaces, or use the platform to send unsolicited bulk mail. We may suspend a workspace that puts the service or other customers at risk."
+    },
+    {
+      "heading": "4. Candidate and client data",
+      "body": "The candidate and client records in your workspace belong to your agency. We process them on your behalf in order to run the service. You are responsible for having a lawful basis to hold that data and for responding to requests from the people it describes. How we handle it is set out in the Privacy Policy."
+    },
+    {
+      "heading": "5. Trial and billing",
+      "body": "New workspaces start with a free trial that requires no payment card. If you continue past the trial, charges apply according to the plan you choose. You may cancel at any time; cancelling stops future charges and does not refund a period already started."
+    },
+    {
+      "heading": "6. Availability and changes",
+      "body": "We aim to keep the service available but do not promise uninterrupted access, and we may change or withdraw features. Where a change materially reduces what your plan provides, we will give notice before it takes effect."
+    },
+    {
+      "heading": "7. Ending the agreement",
+      "body": "You may close your workspace at any time. We may end the agreement if these terms are broken or if fees go unpaid. When a workspace closes, you have a limited window to export your data before it is deleted."
+    },
+    {
+      "heading": "8. Liability",
+      "body": "Nothing here limits liability that cannot lawfully be limited. Subject to that, our liability in connection with the service is limited to the fees paid in the twelve months before the claim, and we are not liable for lost profits, lost opportunities or indirect loss."
+    }
+  ],
+  "contact": "Questions about these terms can go to your workspace Owner or to HirePilotX support."
+}

@@ -1,10 +1,12 @@
 import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
+// The design links in the action colour at 13/600, underline on hover only.
 const accentSx = {
+  fontSize: 13,
   fontWeight: 600,
-  color: "surface.primarySoftFg",
+  color: "surface.linkFg",
   textDecoration: "none",
-  "&:hover": { color: "primary.light" },
+  "&:hover": { textDecoration: "underline" },
 };
 
 // No validation on the login screen — fields submit as-is and the API decides.
@@ -14,7 +16,6 @@ const schema: JsonSchema = {
     email: {
       type: "string",
       icon: "mail",
-      hideLabel: true,
       title: "email.label",
       placeholder: "email.placeholder",
     },
@@ -22,7 +23,6 @@ const schema: JsonSchema = {
       type: "string",
       format: "password",
       icon: "lock",
-      hideLabel: true,
       title: "password.label",
       placeholder: "password.placeholder",
     },
@@ -34,13 +34,13 @@ const links: Record<string, LinkRendererConfig> = {
     routeId: "Auth.ForgotPassword.Route",
     text: "forgot",
     underline: "none",
-    sx: { fontSize: 12.5, ...accentSx },
+    sx: accentSx,
   },
   signUp: {
     routeId: "Auth.CreateAccount.Route",
     text: "footerLink",
     underline: "none",
-    sx: accentSx,
+    sx: { ...accentSx, fontWeight: 700 },
   },
 };
 
