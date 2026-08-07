@@ -1,0 +1,118 @@
+"use client";
+
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Typography from "@mui/material/Typography";
+import { useConfiguration, useFetch, useTranslation } from "@recruit/sdk";
+import { seedRecord } from "../../utils/seed-data";
+import { IconRenderer } from "./icon-renderer";
+
+export interface FunnelStage {
+  key: string;
+  count: number;
+  pct: number;
+  /** Optional bar tone; "success" renders the green gradient (later stages). */
+  tone?: "default" | "success";
+}
+
+export interface FunnelData {
+  stages: FunnelStage[];
+  insightStage?: string;
+  insightDrop?: number;
+}
+
+export interface FunnelRendererConfig {
+  /** Card title — `name` is a translation key. */
+  title: { name: string };
+  /** Prefix for each stage's label translation key (default "stage."). */
+  stageLabelPrefix?: string;
+  /** Row value template — a translation key interpolated with the stage row
+   * (i18next `{{count}}` / `{{pct}}` style). */
+  valueFormat: { name: string };
+  /** Trailing amber insight note. `name` is a translation key interpolated
+   * with `{ stage, drop }`; `icon` overrides the leading icon. */
+  insight?: { name: string; icon?: string };
+}
+
+// The orange bar is the theme's shared gradient; green is funnel-specific and
+// built from palette variables so it tracks the scheme too.
+const GREEN =
+  "linear-gradient(90deg,var(--mui-palette-success-main),var(--mui-palette-surface-successFg))";
+
+export function FunnelRenderer({
+  id,
+  config: configProp,
+  data: dataProp,
+}: {
+  id: string;
+  config?: FunnelRendererConfig;
+  data?: FunnelData;
+}) {
+  const configFromId = useConfiguration<FunnelRendererConfig>(id);
+  const config = configProp ?? configFromId;
+  const { t } = useTranslation(id);
+  const seedData = seedRecord(dataProp);
+  const { data } = useFetch<FunnelData>(id, { data: seedData });
+  if (!data || !config) return null;
+
+  const prefix = config.stageLabelPrefix ?? "stage.";
+
+  return (
+    <Card variant="base">
+      <Typography sx={{ fontSize: 14.5, fontWeight: 700, mb: "16px" }}>
+        {t(config.title.name)}
+      </Typography>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "13px" }}>
+        {data.stages.map((stage) => (
+          <Box key={stage.key}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: "6px",
+              }}
+            >
+              <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
+                {t(`${prefix}${stage.key}`)}
+              </Typography>
+              <Typography sx={{ fontSize: 12.5 }}>
+                {t(config.valueFormat.name, { ...stage })}
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                height: 9,
+                borderRadius: "999px",
+                background: "var(--mui-palette-surface-hover)",
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${stage.pct}%`,
+                  height: "100%",
+                  borderRadius: "999px",
+                  background: (theme) => (stage.tone === "success" ? GREEN : theme.gradients.bar),
+                }}
+              />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+      {config.insight ? (
+        <Alert
+          severity="warning"
+          icon={<IconRenderer name={config.insight.icon ?? "psychology"} size={18} />}
+          sx={{ mt: "18px" }}
+        >
+          {t(config.insight.name, {
+            stage: t(`${prefix}${data.insightStage}`),
+            drop: data.insightDrop,
+          })}
+        </Alert>
+      ) : null}
+    </Card>
+  );
+}
