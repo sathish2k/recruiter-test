@@ -1,6 +1,7 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
+import { usePathname } from "next/navigation";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { BrandLoaderScreen } from "../brand-loader";
 import { setAuthToken, setSessionLostHandler } from "../client";
@@ -41,8 +42,18 @@ export function useLogout(): () => void {
   }, []);
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+  children,
+  publicPaths = [],
+}: {
+  children: ReactNode;
+  /** Paths (exact match) that render without waiting for the session — a guest
+   * screen gated behind the loader would otherwise blank the server-rendered
+   * HTML and push LCP past the whole hydrate-then-fetch round trip. */
+  publicPaths?: string[];
+}) {
   const { data, isPending } = authClient.useSession();
+  const pathname = usePathname();
   const token = data?.session?.token;
   const user = (data?.user as AuthUser | undefined) ?? null;
   const [ready, setReady] = useState(false);
@@ -62,7 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setSessionLostHandler(undefined);
   }, []);
 
-  if (!ready) return <BrandLoaderScreen />;
+  const isPublic = pathname != null && publicPaths.includes(pathname);
+  if (!ready && !isPublic) return <BrandLoaderScreen />;
   if (expired) return <SessionExpired onSignIn={logout} />;
 
   return <AuthUserContext.Provider value={user}>{children}</AuthUserContext.Provider>;

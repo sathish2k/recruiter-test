@@ -17,11 +17,13 @@ don't rely on eyeballing.
 ## Responsive Design
 
 - **Mobile-first CSS.** Write all styles from mobile-up. Never write desktop
-  styles and try to downscale.
-- **Container queries over media queries.** For reusable components (buttons,
-  cards), prioritize container queries (`@container`) over screen media queries
-  (`md:`, `lg:`) so components stay responsive whether they sit in a
-  full-screen grid or a narrow sidebar.
+  styles and try to downscale. In MUI `sx` that means base styles are the
+  mobile ones and enhancements use `theme.breakpoints.up(...)` /
+  `@media (min-width: …)` — never `max-width` overrides.
+- **Container queries for reusable components.** Where a shared component
+  (card, button cluster) must adapt to its *container* rather than the screen
+  (full-width grid vs narrow sidebar), use CSS container queries via `sx`
+  (`@container`) instead of viewport media queries.
 - **Multi-viewport checks.** Verify layouts with Playwright at mobile (375px),
   tablet (768px), and desktop (1440px) widths — screenshot each and check for
   overlapping text or horizontal scrolling.
@@ -63,14 +65,15 @@ don't rely on eyeballing.
   must use `suppressHydrationWarning` or be wrapped in a Client Component that
   renders strictly after mounting (`isMounted` state check).
 
-## Single-Source-of-Truth Types (Eden Treaty)
+## Single-Source-of-Truth Types
 
 - Never write manually duplicated TypeScript definitions for API responses on
   the frontend.
-- All component data types infer their shapes from the backend by exporting the
-  Elysia app instance type: `export type App = typeof app;`.
-- The frontend consumes this type exclusively via
-  `import type { App } from "@/server"`.
+- Cross-cutting domain types live once in `@recruit/types`; both the API and
+  the web app import from there (see `normaliseRole`, `DEFAULT_ROLE_PERMISSIONS`).
+- Components never call the API directly — data flows through each feature's
+  `*.datasource.ts` factory over the SDK's shared `httpClient`, consumed with
+  `useFetch(id)`. The datasource is the single place a response shape is named.
 
 ## Context Hygiene
 
@@ -93,9 +96,13 @@ Before pushing any feature code, run the full check:
 
 > Run a comprehensive production build (`bun run build`). Execute Playwright
 > tests across mobile and desktop layout dimensions, scan the page layout for
-> Axe accessibility issues, and verify that all Next.js Server Components
-> render statically without accidentally falling back into slow dynamic
-> client-side rendering. Refactor any code that fails these rules.
+> Axe accessibility issues, and confirm no route has *accidentally* gone
+> dynamic. (The engine's `[[...slug]]` route is dynamic **by design** — the
+> auth guard reads session headers per request; that one is expected.)
+> Refactor any code that fails these rules.
+
+Also run the repo's own consistency gates — they must all pass:
+`bun run check:icons`, `check:autocomplete`, `check:routes`, `check:sx-background`.
 
 ---
 
@@ -108,7 +115,7 @@ dependencies, and renders it. You almost never hand-write a page.
 ## Stack
 
 Bun + Turborepo monorepo. Next.js 16 (App Router) + MUI 9 + React 19 web app;
-Elysia + Mongoose API. next-auth, SWR, React Hook Form, ajv (JSON-schema forms),
+Elysia + Drizzle (Postgres) API. Better Auth, SWR, React Hook Form, ajv (JSON-schema forms),
 Gemini (`@google/genai`), Mailjet. Biome for lint/format. TypeScript 7.
 
 Single root `package.json` — packages have **no** per-package `package.json`.
@@ -125,10 +132,10 @@ apps/
     src/routes/       *.routes.ts — wiring only, auto-registered via Bun.Glob
     src/controllers/  request handlers (HTTP shaping / status codes)
     src/services/     business logic (HTTP-free)
-    src/models/       mongoose schemas ONLY (no logic)
+    src/models/       drizzle schemas ONLY (no logic)
     src/plugins/      cross-cutting Elysia plugins (auth-guard)
     src/lib/          external clients (mailjet, gemini)
-    src/db.ts         mongoose connection singleton
+    src/db.ts         drizzle/postgres connection singleton
   docs/    MUI-style docs site — engine guide + live demos.
 packages/
   recruit-sdk/     THE HEART. Config-driven engine + providers + hooks.
@@ -238,10 +245,14 @@ Deeply-nested children can also read by id via the hooks below (no prop drilling
    to decode — every check is a lookup, so revoking a session is a delete.
 2. **Same-origin by proxy.** The SDK's client (`providers/auth-provider.tsx`)
    is `createAuthClient({ basePath: "/api/auth" })` against the *current* origin;
-   `apps/web/next.config.ts` rewrites `/api/auth/:path*` to the API. That is what
-   keeps the session cookie same-origin — don't point the client at the API host.
+   the route handler `apps/web/src/app/api/auth/[...auth]/route.ts` forwards to
+   the API (and answers `get-session` as "no session" while the API is down).
+   That is what keeps the session cookie same-origin — don't point the client at
+   the API host.
 3. **Session → token → requests.** `AuthProvider` wraps the tree, shows a loader
    until `authClient.useSession()` resolves, then calls `setAuthToken(session.token)`.
+   Routes without a guard are passed as `publicPaths` — those screens render
+   from server HTML immediately instead of waiting behind the loader (LCP).
    The shared `httpClient` interceptor attaches `Authorization: Bearer <token>`;
    the `bearer()` plugin is what makes the API accept it.
 4. **Guarding a route.** The `authGuard` plugin's `isAuth` macro calls

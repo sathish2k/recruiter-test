@@ -1,0 +1,48 @@
+{
+  "title": "Verify your email",
+  "subtitle": "We sent a 6-digit code and a sign-in link to {{email}}. The code expires in {{clock}}.",
+  "cta": "Verify email",
+  "sender": "notifications@hirepilotx.com",
+  "resend": "Send the code again",
+  "resent": "Code sent again ({{count}})",
+  "resendIn": "Send again in {{seconds}}s",
+  "changeEmail": "Use a different email",
+  "wrongAccount": "Wrong account?",
+  "signInAsSomeoneElse": "Sign in as someone else",
+  "why": "Nothing in the inbox? Check spam, then confirm your IT team allows mail from {{sender}}.",
+  "code": {
+    "label": "Verification code",
+    "placeholder": "Type or paste the 6-digit code",
+    "errors": {
+      "required": "Enter the 6-digit code we sent you",
+      "format": "That code should be 6 digits"
+    }
+  },
+  "errors": {
+    "invalid": "That code didn't match. Check the latest email — older codes stop working.",
+    "expired": "That code has expired. Send yourself a new one.",
+    "too-many-attempts": "Too many attempts. Request a new code to continue.",
+    "cooldown": "Hang on a moment before requesting another code.",
+    "hourly-cap": "Too many codes requested this hour. Try again later."
+  },
+  "expired": {
+    "title": "This link has expired",
+    "subtitle": "Verification links last 30 minutes. Send a fresh one to {{email}} and it arrives in a few seconds.",
+    "cta": "Send a fresh link",
+    "note": "Your workspace and any invites you already sent are untouched — only this link stopped working."
+  },
+  "done": {
+    "title": "Email verified",
+    "subtitle": "Your workspace is live. Sign in and a short setup wizard will walk you through it.",
+    "cta": "Go to setup",
+    "wizardTitle": "Setup wizard · about 3 minutes",
+    "wizardBody": "Five steps — workspace conventions, your pipeline stages, rejection reasons, your team, then a review. You can leave at any point and pick up where you stopped.",
+    "note": "Everything it sets lives in Settings afterwards, so nothing you choose now is permanent."
+  },
+  "slab": {
+    "kicker": "One more step",
+    "title": "We send mail as you.",
+    "blurb": "Client submissions, candidate invites and weekly reports all leave from your address — so it gets confirmed first.",
+    "footer": "Codes and links expire 30 minutes after sending"
+  }
+}

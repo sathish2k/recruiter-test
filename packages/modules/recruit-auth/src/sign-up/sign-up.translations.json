@@ -1,0 +1,70 @@
+{
+  "title": "Create your account",
+  "subtitle": "You own the workspace you create. Invite the rest of the desk once you're in.",
+  "submit": "Create account",
+  "footerText": "Already have an account?",
+  "footerLink": "Sign in",
+  "errors": {
+    "emailTaken": "That email already has an account. Sign in instead, or use a different work email.",
+    "generic": "We couldn't create your account just now. Please try again."
+  },
+  "terms": {
+    "consent": "I agree to the",
+    "and": "and",
+    "tos": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "authorised": ", and I confirm I am authorised to create a workspace for this agency.",
+    "text": "By creating an account you agree to the",
+    "required": "You must accept the terms to continue",
+    "consentAria": "I agree to the Terms of Service and Privacy Policy, and I confirm I am authorised to create a workspace for this agency."
+  },
+  "firstName": {
+    "label": "First name",
+    "placeholder": "Ana",
+    "errors": {
+      "required": "First name is required",
+      "minLength": "At least 2 characters",
+      "maxLength": "No more than 50 characters"
+    }
+  },
+  "lastName": {
+    "label": "Last name",
+    "placeholder": "Novak",
+    "errors": {
+      "required": "Last name is required",
+      "minLength": "At least 2 characters",
+      "maxLength": "No more than 50 characters"
+    }
+  },
+  "agency": {
+    "label": "Agency name",
+    "placeholder": "Troy Consulting",
+    "errors": {
+      "required": "Agency name is required",
+      "minLength": "At least 2 characters",
+      "maxLength": "No more than 50 characters"
+    }
+  },
+  "email": {
+    "label": "Work email",
+    "placeholder": "you@agency.com",
+    "errors": {
+      "required": "Work email is required",
+      "format": "Enter a valid email address"
+    }
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "8 characters or more",
+    "errors": {
+      "required": "Password is required",
+      "minLength": "At least 8 characters"
+    }
+  },
+  "slab": {
+    "kicker": "Free trial",
+    "title": "Start with one client.",
+    "blurb": "Add a requisition, invite a sourcer, and put your first submission in front of a client this week.",
+    "footer": "14 days free · No card required · Cancel any time"
+  }
+}

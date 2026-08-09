@@ -1,9 +1,10 @@
 import { join } from "node:path";
 import type { NextConfig } from "next";
 
-const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-
 const nextConfig: NextConfig = {
+  // Debuggable production stack traces; this is a private app, so shipping
+  // source maps is an acceptable trade for readable errors.
+  productionBrowserSourceMaps: true,
   // Dev and build must not share an output directory: `next build` overwrites
   // the chunks a running `next dev` is serving, which surfaces as
   // ChunkLoadError in the browser until the dev server is restarted.
@@ -29,16 +30,9 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true,
     externalDir: true,
   },
-  // Proxy Better Auth through the web origin so its session cookie is
-  // same-origin — required for the server-side auth guard on guarded pages.
-  async rewrites() {
-    return [
-      {
-        source: "/api/auth/:path*",
-        destination: `${API_URL}/api/auth/:path*`,
-      },
-    ];
-  },
+  // Better Auth is proxied same-origin by the route handler at
+  // src/app/api/auth/[...auth]/route.ts (a rewrite cannot degrade gracefully
+  // when the API is down).
 };
 
 export default nextConfig;

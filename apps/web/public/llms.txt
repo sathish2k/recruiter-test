@@ -1,0 +1,16 @@
+# HirePilotX
+
+> HirePilotX is an applicant tracking system (ATS) for recruiting agencies: manage clients, jobs, candidates, submissions and interviews from one workspace.
+
+The app is an authenticated workspace; the pages below are the public entry points. All other screens require a signed-in session.
+
+## Pages
+
+- [Sign in](/login): Sign in to your agency workspace
+- [Create account](/create-account): Start a workspace with a 14-day free trial
+- [Verify email](/verify): Confirm the work email address a workspace was created with
+
+## Policies
+
+- [Terms of Service](/terms): Terms governing use of HirePilotX
+- [Privacy Policy](/privacy): How HirePilotX handles personal data

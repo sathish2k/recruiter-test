@@ -20,6 +20,11 @@ export function Providers({
   children: ReactNode;
   initialLocale?: LocalePreferences;
 }) {
+  // Unguarded routes are guest screens — they render straight from the server
+  // HTML instead of waiting behind the session loader.
+  const publicPaths = routes
+    .filter((route) => !route.guard?.length)
+    .map((route) => `/${route.path}`.replace(/\/+/g, "/"));
   return (
     <AppRouterCacheProvider options={{ key: "mui" }}>
       <ThemeModeProvider>
@@ -28,7 +33,7 @@ export function Providers({
             <LocaleProvider defaultLanguage="en" initialPreferences={initialLocale}>
               <PortalRouterProvider routes={routes}>
                 <DatasourceProvider modules={AllModules}>
-                  <AuthProvider>{children}</AuthProvider>
+                  <AuthProvider publicPaths={publicPaths}>{children}</AuthProvider>
                 </DatasourceProvider>
               </PortalRouterProvider>
             </LocaleProvider>

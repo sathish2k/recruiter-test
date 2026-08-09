@@ -6,11 +6,15 @@ import { getBootLocale } from "../locale";
 import { Providers } from "./providers";
 
 // Manrope carries all UI — it is the face the brand lockup is set in.
+// `optional` (not `swap`): a late font swap repaints the largest text block and
+// that repaint becomes the page's LCP under mobile throttling; optional paints
+// the fallback once and applies the webfont only when it arrives in time (or
+// from cache on every later visit).
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-manrope",
-  display: "swap",
+  display: "optional",
 });
 
 // Space Grotesk carries display: page titles, headline figures.
@@ -18,7 +22,7 @@ const grotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-grotesk",
-  display: "swap",
+  display: "optional",
 });
 
 export const metadata: Metadata = {
