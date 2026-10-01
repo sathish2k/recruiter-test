@@ -66,7 +66,6 @@ export function FieldShell({
 }: {
   label: string;
   hideLabel?: boolean;
-  /** Input element id this label points at (`<label htmlFor>`). */
   htmlFor?: string;
   /** Already translated. */
   help?: string;

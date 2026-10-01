@@ -35,7 +35,7 @@ tree in providers. Components read their slice by id — never prop-drill.
    the bootstrap's `value` straight at the shared renderer (see below). Write a
    component only when it adds real logic (an `actionHandler`, a `data`-slice, a
    modal, composed sections).
-2. `<feature>.configuration.ts` — structure (schema, columns, links, route ids). No text.
+2. `<feature>.configuration.ts` — structure (schema, columns, links, route ids). No text. **No styles** — no `sx`/colour/font values in any configuration; components style via themed atoms and the `linkSx` tokens from `@recruit/ui`.
 3. `<feature>.translations.json` — all text. Per-language files: `<feature>.translations.de.json` → `value: { fallback, de }` in bootstrap.
 4. `<feature>.datasource.ts` — optional factory `() => ({ get, create, ... })` using `httpClient`.
 5. `bootstrap.ts` — `ComponentDefinition` binding them under a dot-id (`Recruit.<Name>.Component` + `.Configuration/.Translation/.Datasource`).

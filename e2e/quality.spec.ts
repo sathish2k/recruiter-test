@@ -1,9 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-// The CLAUDE.md pre-push gate: every shipped screen holds its layout at the
-// three reference widths and passes an axe WCAG 2.0/2.1 AA scan.
-
 const SCREENS = ["/login", "/create-account", "/verify", "/get-started", "/terms", "/privacy"];
 
 const VIEWPORTS = [

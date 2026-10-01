@@ -47,9 +47,6 @@ export function AuthProvider({
   publicPaths = [],
 }: {
   children: ReactNode;
-  /** Paths (exact match) that render without waiting for the session — a guest
-   * screen gated behind the loader would otherwise blank the server-rendered
-   * HTML and push LCP past the whole hydrate-then-fetch round trip. */
   publicPaths?: string[];
 }) {
   const { data, isPending } = authClient.useSession();

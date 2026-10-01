@@ -1,7 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Runs against a production build (`bun run build` first) — dev-server
-// numbers and markup are not what ships.
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,

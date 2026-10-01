@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
+import { linkSx } from "@recruit/ui";
 import { useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { FormRenderer } from "../forms";
@@ -141,7 +142,8 @@ export function VerifyEmail({ id, handlers }: { id: string; handlers: VerifyEmai
     <Box component="span" data-testid="verify-wrong-account">
       {t("wrongAccount")}{" "}
       <LinkRenderer
-        config={{ ...links.signIn, text: t("signInAsSomeoneElse"), sx: { fontWeight: 600 } }}
+        config={{ ...links.signIn, text: t("signInAsSomeoneElse") }}
+        sx={linkSx.accentSoft}
       />
     </Box>
   ) : null;
@@ -285,7 +287,11 @@ export function VerifyEmail({ id, handlers }: { id: string; handlers: VerifyEmai
             }
           />,
           links?.changeEmail ? (
-            <LinkRenderer key="change" config={{ ...links.changeEmail, text: t("changeEmail") }} />
+            <LinkRenderer
+              key="change"
+              config={{ ...links.changeEmail, text: t("changeEmail") }}
+              sx={linkSx.accentSoft}
+            />
           ) : null,
         ]}
       </AuthActionRow>

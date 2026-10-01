@@ -1,22 +1,5 @@
 import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
-// The design links in the action colour at 13/600, underline on hover only.
-const accentSx = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: "surface.linkFg",
-  textDecoration: "none",
-  "&:hover": { textDecoration: "underline" },
-};
-// Links inside a sentence take the sentence's own size.
-const inlineSx = {
-  fontSize: "inherit",
-  fontWeight: 700,
-  color: "surface.linkFg",
-  textDecoration: "none",
-  "&:hover": { textDecoration: "underline" },
-};
-
 const schema: JsonSchema = {
   type: "object",
   required: ["firstName", "lastName", "agency", "email", "password"],
@@ -93,18 +76,11 @@ const schema: JsonSchema = {
 };
 
 const links: Record<string, LinkRendererConfig> = {
-  tos: { routeId: "Recruit.Terms.Route", text: "terms.tos", sx: inlineSx },
-  privacy: { routeId: "Recruit.Privacy.Route", text: "terms.privacy", sx: inlineSx },
-  signIn: {
-    routeId: "Auth.Login.Route",
-    text: "footerLink",
-    underline: "none",
-    sx: accentSx,
-  },
+  tos: { routeId: "Recruit.Terms.Route", text: "terms.tos" },
+  privacy: { routeId: "Recruit.Privacy.Route", text: "terms.privacy" },
+  signIn: { routeId: "Auth.Login.Route", text: "footerLink", underline: "none" },
 };
 
-// The design pairs the two name fields on one row; everything below runs full
-// width. A field's `grid.size` counts in these 12 columns.
 const gridContainer = { columns: 12, spacing: "16px" } as const;
 
 export const SignUpConfiguration = { schema, links, gridContainer };

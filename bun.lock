@@ -62,6 +62,10 @@
         "vite": "^8.2.1",
       },
     },
+    "apps/api": {
+      "name": "@recruit/api",
+      "version": "0.0.0",
+    },
     "apps/web": {
       "name": "@recruit/web",
       "version": "0.0.0",
@@ -422,6 +426,8 @@
     "@protobufjs/pool": ["@protobufjs/pool@1.1.0", "", {}, "sha512-0kELaGSIDBKvcgS4zkjz1PeddatrjYcmMWOlAuAPwAeccUrPHdUqo/J6LiymHHEiJT5NrF1UVwxY14f+fy4WQw=="],
 
     "@protobufjs/utf8": ["@protobufjs/utf8@1.1.2", "", {}, "sha512-b1UQwcEZ4yCnMCD8DAL1VlbvBJE9/IX4FTIp7BG1xYpf29SLazLSrqUkj4w7Y5y7cCVP6E5tcqqcI0xemPkHug=="],
+
+    "@recruit/api": ["@recruit/api@workspace:apps/api"],
 
     "@recruit/web": ["@recruit/web@workspace:apps/web"],
 

@@ -181,8 +181,6 @@ export function AuthCard({
           p: 0,
           overflow: "hidden",
           display: "grid",
-          // Mobile-first: a single form column with the brand panel dropped
-          // rather than squeezed; the slab joins only once its own width fits.
           gridTemplateColumns: "minmax(0,1fr)",
           maxWidth: 460,
           "& [data-slab]": { display: "none" },

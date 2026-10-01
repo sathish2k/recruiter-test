@@ -20,8 +20,6 @@ export function Providers({
   children: ReactNode;
   initialLocale?: LocalePreferences;
 }) {
-  // Unguarded routes are guest screens — they render straight from the server
-  // HTML instead of waiting behind the session loader.
   const publicPaths = routes
     .filter((route) => !route.guard?.length)
     .map((route) => `/${route.path}`.replace(/\/+/g, "/"));

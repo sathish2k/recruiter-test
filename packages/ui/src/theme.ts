@@ -1467,3 +1467,26 @@ export const denseFormVars = {
   "--recruit-control-pad-y": "14px",
   "--recruit-control-font": "14px",
 } as const;
+
+export const linkSx = {
+  accent: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: "surface.linkFg",
+    textDecoration: "none",
+    "&:hover": { textDecoration: "underline" },
+  },
+  accentSoft: {
+    fontWeight: 600,
+    color: "surface.primarySoftFg",
+    textDecoration: "none",
+    "&:hover": { color: "primary.light" },
+  },
+  inline: {
+    fontSize: "inherit",
+    fontWeight: 700,
+    color: "surface.linkFg",
+    textDecoration: "none",
+    "&:hover": { textDecoration: "underline" },
+  },
+} as const;

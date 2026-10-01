@@ -19,7 +19,10 @@
     "check:icons": "bun scripts/check-icon-names.mjs",
     "check:routes": "bun scripts/check-route-ids.mjs",
     "check:sx-background": "bun scripts/check-sx-background.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:generate": "bun run --filter=@recruit/api db:generate",
+    "db:migrate": "bun run --filter=@recruit/api db:migrate",
+    "db:studio": "bun run --filter=@recruit/api db:studio"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1105.0",

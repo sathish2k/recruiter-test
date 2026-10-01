@@ -232,8 +232,11 @@ Deeply-nested children can also read by id via the hooks below (no prop drilling
   or `next/link` directly.
 - **Links** — `LinkRenderer` (config-driven) resolves a `routeId` to a path via
   `usePortalRouter` and renders an MUI `Link` over `next/link` (SPA nav). Its
-  config (`routeId`/`href`/`text`/`params`/`sx`/…) lives in the component's
+  config (`routeId`/`href`/`text`/`params`/…) lives in the component's
   `*.configuration.ts`; `text` is a translation key resolved by the component.
+  **Configurations never carry styles** — the rendering component passes the
+  look via LinkRenderer's `sx` prop, using the design system's `linkSx` tokens
+  (`accent` / `accentSoft` / `inline`) from `@recruit/ui`.
 
 ## Auth
 

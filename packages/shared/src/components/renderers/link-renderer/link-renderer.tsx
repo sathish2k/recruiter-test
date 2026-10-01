@@ -33,7 +33,6 @@ export interface LinkRendererConfig {
   underline?: LinkProps["underline"];
   params?: Record<string, LinkParamConfig>;
   queryParams?: Record<string, LinkParamConfig>;
-  sx?: LinkProps["sx"];
 }
 
 function isExternal(value: string): boolean {
@@ -49,10 +48,12 @@ export function LinkRenderer({
   config,
   data = {},
   children,
+  sx,
 }: {
   config: LinkRendererConfig;
   data?: Record<string, unknown>;
   children?: ReactNode;
+  sx?: LinkProps["sx"];
 }) {
   const { getPathFromRouteId } = usePortalRouter();
   const { t } = useTranslation(config.id ?? "");
@@ -67,7 +68,6 @@ export function LinkRenderer({
     variant = "inherit",
     params = {},
     queryParams = {},
-    sx,
   } = config;
 
   const value = path ? (delve(data, path) as string | undefined) : undefined;

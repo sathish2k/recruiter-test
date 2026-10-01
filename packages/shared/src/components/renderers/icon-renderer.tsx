@@ -19,12 +19,6 @@ import Box from "@mui/material/Box";
 import type { SxProps, Theme } from "@mui/material/styles";
 import delve from "dlv";
 
-/**
- * Registry of every icon name a configuration may reference. Only icons used
- * by shipped features are registered — an unknown name renders nothing, so
- * `bun run check:icons` gates the build on this map staying complete. Add the
- * glyph here when a new feature references it.
- */
 export const ICON_REGISTRY: Record<string, SvgIconComponent> = {
   "arrow-forward": ArrowForwardRounded,
   "auto-fix-high": AutoFixHighRounded,

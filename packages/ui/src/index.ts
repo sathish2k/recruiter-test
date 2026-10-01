@@ -1,2 +1,2 @@
 export { ThemeModeProvider, useColorMode } from "./color-mode";
-export { createAppTheme, denseFormVars, type ThemeMode, theme } from "./theme";
+export { createAppTheme, denseFormVars, linkSx, type ThemeMode, theme } from "./theme";

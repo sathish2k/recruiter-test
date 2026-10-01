@@ -60,7 +60,11 @@ in features or build local icon maps — add the name to the registry instead.
 
 ## LinkRenderer — the ONLY navigation primitive
 
-Config: `{ routeId | href | path, label: { name } | text, params, queryParams, target, sx, ... }`.
+Config: `{ routeId | href | path, label: { name } | text, params, queryParams, target, ... }`.
+**No styles in config.** The rendering component styles the link via the `sx`
+*prop* (`<LinkRenderer config={cfg} sx={linkSx.accent} />`) using the `linkSx`
+tokens from `@recruit/ui` — `accent` (standalone 13/600), `accentSoft`
+(soft-primary, hover lightens), `inline` (inherits sentence size, 700).
 Route ids resolve via `usePortalRouter` → SPA `next/link`. Two modes:
 - Text link: `<LinkRenderer config={cfg} data={row} />`.
 - **Wrap any component**: pass children — `<LinkRenderer config={cfg}><Card .../></LinkRenderer>`

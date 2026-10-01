@@ -2,8 +2,6 @@ import { join } from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Debuggable production stack traces; this is a private app, so shipping
-  // source maps is an acceptable trade for readable errors.
   productionBrowserSourceMaps: true,
   // Dev and build must not share an output directory: `next build` overwrites
   // the chunks a running `next dev` is serving, which surfaces as
@@ -30,9 +28,6 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true,
     externalDir: true,
   },
-  // Better Auth is proxied same-origin by the route handler at
-  // src/app/api/auth/[...auth]/route.ts (a rewrite cannot degrade gracefully
-  // when the API is down).
 };
 
 export default nextConfig;

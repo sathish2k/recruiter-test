@@ -4,6 +4,7 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { useConfiguration, useTranslation } from "@recruit/sdk";
+import { linkSx } from "@recruit/ui";
 import { useState } from "react";
 import { FormRenderer } from "../forms";
 import type { FormRendererProps, FormValues, JsonSchema } from "../forms/types";
@@ -22,7 +23,6 @@ export interface SignUpValues {
 interface SignUpConfig {
   schema?: JsonSchema;
   links?: Record<string, LinkRendererConfig>;
-  /** Column model for the field grid — the design's paired name row. */
   gridContainer?: FormRendererProps["gridContainer"];
 }
 
@@ -34,15 +34,11 @@ export function SignUp({
 }: {
   id: string;
   onSubmit: (values: SignUpValues) => void | Promise<void>;
-  /** Shown as an error alert above the form, e.g. the address is taken. */
   error?: string;
-  /** Called when the user edits a field while an error is shown — dismiss it. */
   onClearError?: () => void;
 }) {
   const { schema, links, gridContainer } = useConfiguration<SignUpConfig>(id);
   const { t } = useTranslation(id);
-  // Consent is a decision, not a value the account carries, so it stays out of
-  // the schema and gates the submit here — the same shape as "remember me".
   const [accepted, setAccepted] = useState(false);
   const [showConsentError, setShowConsentError] = useState(false);
   const link = (config?: LinkRendererConfig) =>
@@ -63,7 +59,7 @@ export function SignUp({
       }}
       footer={
         <>
-          {t("footerText")} {signIn ? <LinkRenderer config={signIn} /> : null}
+          {t("footerText")} {signIn ? <LinkRenderer config={signIn} sx={linkSx.accent} /> : null}
         </>
       }
     >
@@ -88,9 +84,6 @@ export function SignUp({
             }}
             beforeSubmit={
               <Box sx={{ display: "flex", flexDirection: "column", gap: "8px", mt: "8px" }}>
-                {/* Links can't legally nest inside a <button>, so the control is
-                    the glyph alone (a real checkbox to AT) and the sentence —
-                    with its links — sits beside it as its visible description. */}
                 <Box sx={{ display: "flex", alignItems: "flex-start", gap: "11px" }}>
                   <Box
                     component="button"
@@ -133,8 +126,9 @@ export function SignUp({
                     component="span"
                     sx={{ fontSize: 12.5, lineHeight: 1.6, color: "surface.textMuted" }}
                   >
-                    {t("terms.consent")} {tos ? <LinkRenderer config={tos} /> : null}{" "}
-                    {t("terms.and")} {privacy ? <LinkRenderer config={privacy} /> : null}
+                    {t("terms.consent")}{" "}
+                    {tos ? <LinkRenderer config={tos} sx={linkSx.inline} /> : null} {t("terms.and")}{" "}
+                    {privacy ? <LinkRenderer config={privacy} sx={linkSx.inline} /> : null}
                     {t("terms.authorised")}
                   </Typography>
                 </Box>
@@ -160,8 +154,8 @@ export function SignUp({
       ) : null}
 
       <Typography sx={{ mt: "14px", fontSize: 11.5, lineHeight: 1.6, color: "text.secondary" }}>
-        {t("terms.text")} {tos ? <LinkRenderer config={tos} /> : null} {t("terms.and")}{" "}
-        {privacy ? <LinkRenderer config={privacy} /> : null}.
+        {t("terms.text")} {tos ? <LinkRenderer config={tos} sx={linkSx.inline} /> : null}{" "}
+        {t("terms.and")} {privacy ? <LinkRenderer config={privacy} sx={linkSx.inline} /> : null}.
       </Typography>
     </AuthCard>
   );

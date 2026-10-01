@@ -22,8 +22,6 @@ import { FieldLabel, FieldOptionalContext, FieldRequiredContext } from "./field-
  * takes WidgetProps and adding one line here; nothing else in the form layer
  * needs to know about it.
  */
-// Only the widgets shipped so far are registered; unknown names fall back to
-// TextWidget below. Re-add entries (and their folders) as features land.
 export const WIDGETS: Partial<Record<BuiltInWidget, (props: WidgetProps) => React.ReactNode>> = {
   text: TextWidget,
   textarea: TextWidget,

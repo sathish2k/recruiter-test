@@ -1,12 +1,5 @@
 import type { JsonSchema, LinkRendererConfig } from "@recruit/shared";
 
-const accentSx = {
-  fontWeight: 600,
-  color: "surface.primarySoftFg",
-  textDecoration: "none",
-  "&:hover": { color: "primary.light" },
-};
-
 const schema: JsonSchema = {
   type: "object",
   required: ["code"],
@@ -31,10 +24,8 @@ const schema: JsonSchema = {
 };
 
 const links: Record<string, LinkRendererConfig> = {
-  // "Use a different email" goes back to sign-up, not to login — the address
-  // they need to change is the one they just registered with.
-  changeEmail: { routeId: "Auth.CreateAccount.Route", underline: "none", sx: accentSx },
-  signIn: { routeId: "Auth.Login.Route", underline: "none", sx: accentSx },
+  changeEmail: { routeId: "Auth.CreateAccount.Route", underline: "none" },
+  signIn: { routeId: "Auth.Login.Route", underline: "none" },
   getStarted: { routeId: "Recruit.GetStarted.Route", underline: "none" },
 };
 
